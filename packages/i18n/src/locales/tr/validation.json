@@ -1,0 +1,18 @@
+{
+  "errors": {
+    "auth": {
+      "email_invalid": "Geçersiz e-posta adresi.",
+      "phone_required": "Telefon numarası gereklidir.",
+      "phone_invalid": "Geçersiz telefon numarası.",
+      "password_required": "Şifre gereklidir.",
+      "password_min": "Şifre en az 6 karakter olmalıdır.",
+      "password_max": "Şifre en fazla 128 karakter olabilir.",
+      "name_min": "İsim en az 2 karakter olmalıdır.",
+      "name_max": "İsim en fazla 128 karakter olabilir.",
+      "surname_min": "Soyisim en az 2 karakter olmalıdır.",
+      "surname_max": "Soyisim en fazla 128 karakter olabilir.",
+      "passwords_not_match": "Şifreler eşleşmiyor.",
+      "email_or_phone_required": "E-posta veya telefon numarası gereklidir."
+    }
+  }
+}

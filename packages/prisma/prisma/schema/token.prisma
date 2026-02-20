@@ -1,0 +1,52 @@
+// ─── Refresh Tokens & OAuth ───────────────────────────────────────────────────
+
+model RefreshToken {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sessionId String
+  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  tokenHash String
+
+  family String
+
+  isRevoked Boolean @default(false)
+
+  replacedByTokenId String?       @unique
+  replacedByToken   RefreshToken? @relation("TokenChain", fields: [replacedByTokenId], references: [id], onDelete: SetNull)
+  replacesToken     RefreshToken? @relation("TokenChain")
+
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([family])
+  @@index([userId, family, isRevoked, createdAt])
+  @@index([expiresAt])
+}
+
+model OAuthAccount {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  provider          OAuthProvider
+  providerAccountId String
+
+  accessToken  String?
+  refreshToken String?
+  tokenExpiry  DateTime?
+  scope        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+  @@index([provider])
+}

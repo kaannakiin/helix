@@ -2,5 +2,30 @@
   "extends": "./tsconfig.base.json",
   "compileOnSave": false,
   "files": [],
-  "references": []
+  "references": [
+    {
+      "path": "./apps/backend-e2e"
+    },
+    {
+      "path": "./apps/backend"
+    },
+    {
+      "path": "./packages/prisma"
+    },
+    {
+      "path": "./packages/schemas"
+    },
+    {
+      "path": "./packages/constants"
+    },
+    {
+      "path": "./packages/types"
+    },
+    {
+      "path": "./packages/i18n"
+    },
+    {
+      "path": "./packages/ui"
+    }
+  ]
 }

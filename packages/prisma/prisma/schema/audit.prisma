@@ -1,0 +1,57 @@
+// ─── Audit & History ──────────────────────────────────────────────────────────
+
+model LoginHistory {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sessionId String?
+  session   Session? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+
+  deviceId String?
+  device   Device? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+
+  ipAddress String?
+  userAgent String?
+
+  city    String?
+  country String?
+  lat     Float?
+  lng     Float?
+
+  loginMethod LoginMethod
+  status      LoginStatus
+
+  failureReason String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([userId, createdAt])
+  @@index([userId, status])
+  @@index([ipAddress])
+  @@index([createdAt])
+}
+
+model AccountEvent {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  eventType AccountEventType
+
+  ipAddress String?
+  userAgent String?
+
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([userId, eventType])
+  @@index([userId, createdAt])
+  @@index([eventType])
+  @@index([createdAt])
+}

@@ -1,0 +1,76 @@
+// ─── Session & Device ─────────────────────────────────────────────────────────
+
+model Session {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sessionToken String @unique
+
+  ipAddress String?
+  userAgent String?
+
+  browserName    String?
+  browserVersion String?
+  osName         String?
+  osVersion      String?
+  deviceType     DeviceType @default(UNKNOWN)
+
+  city    String?
+  country String?
+  lat     Float?
+  lng     Float?
+
+  isActive Boolean @default(true)
+
+  revokedAt    DateTime?
+  revokeReason SessionRevokeReason?
+
+  deviceId String?
+  device   Device? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+
+  createdAt      DateTime @default(now())
+  lastActivityAt DateTime @default(now())
+  expiresAt      DateTime
+
+  loginHistory  LoginHistory[]
+  refreshTokens RefreshToken[]
+
+  @@index([userId])
+  @@index([sessionToken])
+  @@index([userId, isActive])
+  @@index([expiresAt])
+  @@index([deviceId])
+  @@index([createdAt])
+}
+
+model Device {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  deviceName String?
+
+  deviceType     DeviceType @default(UNKNOWN)
+  browserName    String?
+  browserVersion String?
+  osName         String?
+  osVersion      String?
+
+  fingerprint String?
+
+  isTrusted Boolean @default(false)
+
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+
+  sessions     Session[]
+  loginHistory LoginHistory[]
+
+  @@unique([userId, fingerprint])
+  @@index([userId])
+  @@index([userId, isTrusted])
+  @@index([lastSeenAt])
+}

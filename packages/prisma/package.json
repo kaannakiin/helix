@@ -1,0 +1,47 @@
+{
+  "name": "@org/prisma",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/src/index.js",
+  "module": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "@org/source": "./src/index.ts",
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js",
+      "default": "./dist/src/index.js"
+    },
+    "./client": {
+      "@org/source": "./src/client.ts",
+      "types": "./dist/src/client.d.ts",
+      "import": "./dist/src/client.js",
+      "default": "./dist/src/client.js"
+    },
+    "./browser": {
+      "@org/source": "./src/browser.ts",
+      "types": "./dist/src/browser.d.ts",
+      "import": "./dist/src/browser.js",
+      "default": "./dist/src/browser.js"
+    }
+  },
+  "scripts": {
+    "seed:customers": "npx tsx src/seeds/customers/example-data-customers.ts"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.4.1",
+    "@prisma/client": "^7.4.1",
+    "dotenv": "^17.3.1",
+    "pg": "^8.18.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^10.3.0",
+    "@types/node": "^20.19.9",
+    "@types/pg": "^8.16.0",
+    "prisma": "^7.4.1",
+    "typescript": "~5.9.3"
+  }
+}

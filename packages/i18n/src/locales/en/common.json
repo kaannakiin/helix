@@ -1,0 +1,172 @@
+{
+  "app_name": "Helix",
+  "loading": "Loading...",
+  "nav": {
+    "toggle_navigation": "Toggle navigation",
+    "dashboard": "Dashboard",
+    "orders": "Orders",
+    "products": "Products",
+    "customers": "Customers",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "marketing": "Marketing",
+    "inventory": "Inventory",
+    "discounts": "Discounts",
+    "reports": "Reports",
+    "groups": {
+      "main": "Main",
+      "commerce": "Commerce",
+      "marketing": "Marketing",
+      "system": "System"
+    },
+    "search_placeholder": "Search...",
+    "search_nothing_found": "No results found",
+    "logout": "Logout",
+    "profile": "Profile"
+  },
+  "auth": {
+    "sign_in_title": "Sign in to your account",
+    "register_title": "Create your account",
+    "no_account": "Don't have an account?",
+    "register_link": "Create one",
+    "have_account": "Already have an account?",
+    "sign_in_link": "Sign in",
+    "or_continue_with": "Or continue with",
+    "email_label": "Email address",
+    "phone_label": "Phone number",
+    "password_label": "Password",
+    "confirm_password_label": "Confirm password",
+    "first_name_label": "First name",
+    "last_name_label": "Last name",
+    "remember_me": "Remember me",
+    "forgot_password": "Forgot password?",
+    "sign_in_button": "Sign in",
+    "create_account_button": "Create account",
+    "email_tab": "Email",
+    "phone_tab": "Phone"
+  },
+  "admin": {
+    "customers": {
+      "title": "Customers",
+      "subtitle": "Manage all user accounts",
+      "notFound": "Customer not found.",
+      "table": {
+        "name": "Name",
+        "surname": "Surname",
+        "email": "Email",
+        "phone": "Phone",
+        "role": "Role",
+        "status": "Status",
+        "emailVerified": "Email Verified",
+        "phoneVerified": "Phone Verified",
+        "twoFactorEnabled": "2FA",
+        "lastLoginAt": "Last Login",
+        "loginCount": "Login Count",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters"
+      },
+      "detail": {
+        "title": "Customer Details",
+        "backToList": "Back to Customers",
+        "sections": {
+          "overview": "Overview",
+          "contactInfo": "Contact Information",
+          "security": "Security",
+          "activity": "Activity"
+        },
+        "sessions": "Sessions",
+        "devices": "Devices",
+        "loginHistory": "Login History",
+        "memberSince": "Member since",
+        "lastSeen": "Last seen",
+        "neverLoggedIn": "Never logged in",
+        "yes": "Yes",
+        "no": "No",
+        "notProvided": "Not provided"
+      }
+    }
+  },
+  "dataTable": {
+    "filters": {
+      "reset": "Reset",
+      "text": {
+        "placeholder": "Filter..."
+      },
+      "date": {
+        "placeholder": "Select date...",
+        "placeholderTo": "Select end date...",
+        "equals": "Equals",
+        "greaterThan": "After",
+        "lessThan": "Before",
+        "inRange": "Between"
+      },
+      "boolean": {
+        "placeholder": "Select...",
+        "yes": "Yes",
+        "no": "No"
+      },
+      "number": {
+        "placeholder": "Value...",
+        "placeholderTo": "To...",
+        "equals": "Equals",
+        "greaterThan": "Greater than",
+        "lessThan": "Less than",
+        "inRange": "Between"
+      },
+      "locale": {
+        "placeholder": "Select locale...",
+        "labels": {
+          "en": "English",
+          "tr": "Turkish",
+          "de": "German",
+          "fr": "French",
+          "es": "Spanish",
+          "it": "Italian",
+          "nl": "Dutch"
+        }
+      }
+    }
+  },
+  "export": {
+    "boolean_yes": "Yes",
+    "boolean_no": "No"
+  },
+  "errors": {
+    "generic": "Something went wrong. Please try again.",
+    "auth": {
+      "email_conflict": "Email is already registered.",
+      "phone_conflict": "Phone number is already registered.",
+      "account_suspended": "Account is suspended.",
+      "account_banned": "Account is banned.",
+      "account_deactivated": "Account is deactivated.",
+      "user_not_found": "User not found.",
+      "current_password_incorrect": "Current password is incorrect.",
+      "invalid_credentials": "Invalid credentials.",
+      "refresh_token_missing": "Refresh token missing.",
+      "invalid_refresh_token": "Invalid refresh token.",
+      "no_password_set": "This account uses social login. Please sign in with your social provider."
+    }
+  }
+}

@@ -1,0 +1,172 @@
+{
+  "app_name": "Helix",
+  "loading": "Yükleniyor...",
+  "nav": {
+    "toggle_navigation": "Navigasyonu aç/kapa",
+    "dashboard": "Dashboard",
+    "orders": "Siparişler",
+    "products": "Ürünler",
+    "customers": "Müşteriler",
+    "analytics": "Analitik",
+    "settings": "Ayarlar",
+    "marketing": "Pazarlama",
+    "inventory": "Envanter",
+    "discounts": "İndirimler",
+    "reports": "Raporlar",
+    "groups": {
+      "main": "Ana Menü",
+      "commerce": "Ticaret",
+      "marketing": "Pazarlama",
+      "system": "Sistem"
+    },
+    "search_placeholder": "Ara...",
+    "search_nothing_found": "Sonuç bulunamadı",
+    "logout": "Çıkış Yap",
+    "profile": "Profil"
+  },
+  "auth": {
+    "sign_in_title": "Hesabınıza giriş yapın",
+    "register_title": "Hesabınızı oluşturun",
+    "no_account": "Hesabınız yok mu?",
+    "register_link": "Kayıt olun",
+    "have_account": "Zaten hesabınız var mı?",
+    "sign_in_link": "Giriş yapın",
+    "or_continue_with": "Veya şununla devam edin",
+    "email_label": "E-posta adresi",
+    "phone_label": "Telefon numarası",
+    "password_label": "Şifre",
+    "confirm_password_label": "Şifre tekrar",
+    "first_name_label": "Ad",
+    "last_name_label": "Soyad",
+    "remember_me": "Beni hatırla",
+    "forgot_password": "Şifremi unuttum?",
+    "sign_in_button": "Giriş yap",
+    "create_account_button": "Hesap oluştur",
+    "email_tab": "E-posta",
+    "phone_tab": "Telefon"
+  },
+  "admin": {
+    "customers": {
+      "title": "Müşteriler",
+      "subtitle": "Tüm kullanıcı hesaplarını yönetin",
+      "notFound": "Müşteri bulunamadı.",
+      "table": {
+        "name": "Ad",
+        "surname": "Soyad",
+        "email": "E-posta",
+        "phone": "Telefon",
+        "role": "Rol",
+        "status": "Durum",
+        "emailVerified": "E-posta Doğrulandı",
+        "phoneVerified": "Telefon Doğrulandı",
+        "twoFactorEnabled": "2FA",
+        "lastLoginAt": "Son Giriş",
+        "loginCount": "Giriş Sayısı",
+        "createdAt": "Oluşturulma"
+      },
+      "contextMenu": {
+        "view": "Detayları Görüntüle",
+        "copy": "Kopyala",
+        "copySelected": "Seçilenleri Kopyala",
+        "copyAsTable": "Tablo (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Düz Metin",
+        "exportGroup": "Dışa Aktar",
+        "exportCSV": "CSV Olarak Dışa Aktar",
+        "exportExcel": "Excel Olarak Dışa Aktar"
+      },
+      "footer": {
+        "totalRows": "Toplam: {count}",
+        "selectedRows": "Seçili: {count}",
+        "refresh": "Yenile"
+      },
+      "filterDrawer": {
+        "title": "Filtreler",
+        "clearAll": "Tümünü Temizle",
+        "activeFilters": "{count} aktif",
+        "noFilters": "Filtre bulunmuyor",
+        "apply": "Filtrele"
+      },
+      "detail": {
+        "title": "Müşteri Detayları",
+        "backToList": "Müşterilere Dön",
+        "sections": {
+          "overview": "Genel Bakış",
+          "contactInfo": "İletişim Bilgileri",
+          "security": "Güvenlik",
+          "activity": "Aktivite"
+        },
+        "sessions": "Oturumlar",
+        "devices": "Cihazlar",
+        "loginHistory": "Giriş Geçmişi",
+        "memberSince": "Üyelik tarihi",
+        "lastSeen": "Son görülme",
+        "neverLoggedIn": "Hiç giriş yapmadı",
+        "yes": "Evet",
+        "no": "Hayır",
+        "notProvided": "Belirtilmemiş"
+      }
+    }
+  },
+  "dataTable": {
+    "filters": {
+      "reset": "Sıfırla",
+      "text": {
+        "placeholder": "Filtrele..."
+      },
+      "date": {
+        "placeholder": "Tarih seçin...",
+        "placeholderTo": "Bitiş tarihi seçin...",
+        "equals": "Eşit",
+        "greaterThan": "Sonra",
+        "lessThan": "Önce",
+        "inRange": "Arasında"
+      },
+      "boolean": {
+        "placeholder": "Seçin...",
+        "yes": "Evet",
+        "no": "Hayır"
+      },
+      "number": {
+        "placeholder": "Değer...",
+        "placeholderTo": "Bitiş...",
+        "equals": "Eşit",
+        "greaterThan": "Büyük",
+        "lessThan": "Küçük",
+        "inRange": "Arasında"
+      },
+      "locale": {
+        "placeholder": "Dil seçin...",
+        "labels": {
+          "en": "İngilizce",
+          "tr": "Türkçe",
+          "de": "Almanca",
+          "fr": "Fransızca",
+          "es": "İspanyolca",
+          "it": "İtalyanca",
+          "nl": "Hollandaca"
+        }
+      }
+    }
+  },
+  "export": {
+    "boolean_yes": "Evet",
+    "boolean_no": "Hayır"
+  },
+  "errors": {
+    "generic": "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
+    "auth": {
+      "email_conflict": "Bu e-posta adresi zaten kayıtlı.",
+      "phone_conflict": "Bu telefon numarası zaten kayıtlı.",
+      "account_suspended": "Hesap askıya alınmış.",
+      "account_banned": "Hesap yasaklanmış.",
+      "account_deactivated": "Hesap devre dışı bırakılmış.",
+      "user_not_found": "Kullanıcı bulunamadı.",
+      "current_password_incorrect": "Mevcut şifre yanlış.",
+      "invalid_credentials": "Geçersiz kimlik bilgileri.",
+      "refresh_token_missing": "Yenileme tokeni eksik.",
+      "invalid_refresh_token": "Geçersiz yenileme tokeni.",
+      "no_password_set": "Bu hesap sosyal giriş kullanıyor. Lütfen sosyal hesabınızla giriş yapın."
+    }
+  }
+}

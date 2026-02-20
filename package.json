@@ -2,20 +2,66 @@
   "name": "@org/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "start": "nx run-many -t serve dev --parallel",
+    "build": "nx run-many -t build --parallel"
+  },
   "private": true,
-  "dependencies": {},
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "devDependencies": {
+    "@eslint/js": "^9.8.0",
+    "@nestjs/schematics": "^11.0.0",
+    "@nestjs/testing": "^11.0.0",
+    "@nx/eslint": "22.5.0",
+    "@nx/eslint-plugin": "22.5.0",
+    "@nx/jest": "22.5.0",
     "@nx/js": "22.5.0",
+    "@nx/nest": "22.5.0",
+    "@nx/next": "22.5.0",
+    "@nx/node": "22.5.0",
+    "@nx/web": "22.5.0",
+    "@nx/webpack": "22.5.0",
     "@swc-node/register": "1.11.1",
+    "@swc/cli": "~0.8.0",
     "@swc/core": "1.15.8",
     "@swc/helpers": "0.5.18",
+    "@swc/jest": "~0.2.38",
+    "@tailwindcss/postcss": "^4.2.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "20.19.9",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "eslint": "^9.8.0",
+    "eslint-config-prettier": "^10.0.0",
+    "jest": "^30.0.2",
+    "jest-environment-node": "^30.0.2",
+    "jest-util": "^30.0.2",
     "nx": "22.5.0",
+    "postcss": "^8.5.6",
+    "postcss-preset-mantine": "^1.18.0",
+    "postcss-simple-vars": "^7.0.1",
     "prettier": "^2.6.2",
+    "tailwindcss": "^4.2.0",
+    "ts-jest": "^29.4.0",
+    "ts-node": "10.9.1",
     "tslib": "^2.3.0",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "typescript-eslint": "^8.40.0",
+    "webpack-cli": "^5.1.4"
   },
-  "workspaces": [
-    "packages/*"
-  ]
+  "dependencies": {
+    "@fast-csv/format": "^5.0.5",
+    "@hookform/resolvers": "^5.2.2",
+    "@mantine/core": "^8.3.15",
+    "@mantine/dates": "^8.3.15",
+    "@mantine/hooks": "^8.3.15",
+    "@mantine/notifications": "^8.3.15",
+    "@mantine/spotlight": "^8.3.15",
+    "dayjs": "^1.11.19",
+    "exceljs": "^4.4.0",
+    "react-hook-form": "^7.71.1"
+  }
 }

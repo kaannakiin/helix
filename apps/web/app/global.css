@@ -1,0 +1,18 @@
+@layer theme, base, mantine, components, utilities;
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+@custom-variant dark (&:where([data-mantine-color-scheme="dark"], [data-mantine-color-scheme="dark"] *));
+
+@theme {
+  --color-primary-0: var(--mantine-color-primary-0);
+  --color-primary-1: var(--mantine-color-primary-1);
+  --color-primary-2: var(--mantine-color-primary-2);
+  --color-primary-3: var(--mantine-color-primary-3);
+  --color-primary-4: var(--mantine-color-primary-4);
+  --color-primary-5: var(--mantine-color-primary-5);
+  --color-primary-6: var(--mantine-color-primary-6);
+  --color-primary-7: var(--mantine-color-primary-7);
+  --color-primary-8: var(--mantine-color-primary-8);
+  --color-primary-9: var(--mantine-color-primary-9);
+}

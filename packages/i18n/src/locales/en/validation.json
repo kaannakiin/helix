@@ -1,0 +1,18 @@
+{
+  "errors": {
+    "auth": {
+      "email_invalid": "Invalid email address.",
+      "phone_required": "Phone number is required.",
+      "phone_invalid": "Invalid phone number.",
+      "password_required": "Password is required.",
+      "password_min": "Password must be at least 6 characters.",
+      "password_max": "Password must be at most 128 characters.",
+      "name_min": "Name must be at least 2 characters.",
+      "name_max": "Name must be at most 128 characters.",
+      "surname_min": "Surname must be at least 2 characters.",
+      "surname_max": "Surname must be at most 128 characters.",
+      "passwords_not_match": "Passwords do not match.",
+      "email_or_phone_required": "Email or phone number is required."
+    }
+  }
+}
