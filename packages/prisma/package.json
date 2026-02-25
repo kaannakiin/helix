@@ -28,9 +28,12 @@
     }
   },
   "scripts": {
-    "seed:customers": "npx tsx src/seeds/customers/example-data-customers.ts"
+    "seed:base": "npx tsx src/seeds/base-seed.ts",
+    "seed:customers": "npx tsx src/seeds/customers/example-data-customers.ts",
+    "seed:products": "npx tsx src/seeds/products/example-data-products.ts"
   },
   "dependencies": {
+    "@node-rs/argon2": "^2.0.2",
     "@prisma/adapter-pg": "^7.4.1",
     "@prisma/client": "^7.4.1",
     "dotenv": "^17.3.1",

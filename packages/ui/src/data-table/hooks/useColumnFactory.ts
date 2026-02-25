@@ -1,39 +1,43 @@
-import { useMemo } from "react";
-import type { ColDef, ValueGetterParams } from "ag-grid-community";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
-import localizedFormat from "dayjs/plugin/localizedFormat";
+import type { ColDef, ValueGetterParams } from 'ag-grid-community';
+import dayjs from 'dayjs';
+import localizedFormat from 'dayjs/plugin/localizedFormat';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import timezone from 'dayjs/plugin/timezone';
+import utc from 'dayjs/plugin/utc';
+import { useMemo } from 'react';
+import { BadgeCellRenderer } from '../components/BadgeCellRenderer';
+import { BooleanCellRenderer } from '../components/BooleanCellRenderer';
+import { BooleanFilter } from '../components/BooleanFilter';
+import { DateFilter } from '../components/DateFilter';
+import { EnumFilter } from '../components/EnumFilter';
+import { LocaleFilter } from '../components/LocaleFilter';
+import { NumberFilter } from '../components/NumberFilter';
+import { TextFilter } from '../components/TextFilter';
 import {
   useDataTableTranslations,
   type DataTableTranslations,
-} from "../context/DataTableTranslationContext";
-import { TextFilter } from "../components/TextFilter";
-import { DateFilter } from "../components/DateFilter";
-import { BooleanFilter } from "../components/BooleanFilter";
-import { NumberFilter } from "../components/NumberFilter";
-import { EnumFilter } from "../components/EnumFilter";
-import { BooleanCellRenderer } from "../components/BooleanCellRenderer";
-import { BadgeCellRenderer } from "../components/BadgeCellRenderer";
-import { LocaleFilter } from "../components/LocaleFilter";
+} from '../context/DataTableTranslationContext';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(localizedFormat);
+dayjs.extend(relativeTime);
 
 export type ColumnType =
-  | "text"
-  | "number"
-  | "boolean"
-  | "date"
-  | "datetime"
-  | "currency"
-  | "percentage"
-  | "badge"
-  | "locale"
-  | "action";
+  | 'text'
+  | 'number'
+  | 'boolean'
+  | 'date'
+  | 'datetime'
+  | 'currency'
+  | 'percentage'
+  | 'badge'
+  | 'locale'
+  | 'action';
 
 export type FieldPath<T> = (keyof T & string) | (string & {});
+
+export type DateStyle = 'standard' | 'compact' | 'full' | 'relative';
 
 export interface ColumnOptions<T> extends Partial<ColDef<T>> {
   type?: ColumnType;
@@ -41,6 +45,7 @@ export interface ColumnOptions<T> extends Partial<ColDef<T>> {
   currency?: string;
   colorMap?: Record<string, string>;
   enumOptions?: Array<{ value: string; label: string }>;
+  dateStyle?: DateStyle;
 }
 
 export interface ColumnFactoryOptions {
@@ -52,32 +57,32 @@ const serverSideDoesFilterPass = () => true;
 
 function getNestedValue(data: unknown, path: string): unknown {
   return path
-    .split(".")
+    .split('.')
     .reduce(
       (obj, key) => (obj as Record<string, unknown> | undefined)?.[key],
-      data,
+      data
     );
 }
 
 function isNestedField(field: string): boolean {
-  return field.includes(".");
+  return field.includes('.');
 }
 
 export function useColumnFactory(
   translations?: DataTableTranslations,
-  options?: ColumnFactoryOptions,
+  options?: ColumnFactoryOptions
 ) {
   const contextTranslations = useDataTableTranslations();
   const resolvedTranslations = translations ?? contextTranslations;
   const tz =
     options?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const locale = options?.locale?.toLowerCase() ?? "en";
+  const locale = options?.locale?.toLowerCase() ?? 'en';
 
   return useMemo(() => {
     const resolveHeader = (
       field: string,
       headerKey?: string,
-      headerName?: string,
+      headerName?: string
     ): string => {
       if (headerKey && resolvedTranslations.columns?.[headerKey]) {
         return resolvedTranslations.columns[headerKey];
@@ -85,7 +90,7 @@ export function useColumnFactory(
       if (headerName) {
         return headerName;
       }
-      const lastSegment = field.includes(".") ? field.split(".").pop()! : field;
+      const lastSegment = field.includes('.') ? field.split('.').pop()! : field;
       return lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1);
     };
 
@@ -101,15 +106,15 @@ export function useColumnFactory(
     });
 
     const buildNumberConfig = <T>(): Partial<ColDef<T>> => ({
-      type: "numericColumn",
+      type: 'numericColumn',
       sortable: true,
       filter: {
         component: NumberFilter,
         doesFilterPass: serverSideDoesFilterPass,
       },
-      cellStyle: { textAlign: "right" },
+      cellStyle: { textAlign: 'right' },
       valueFormatter: (params) => {
-        if (params.value === null || params.value === undefined) return "";
+        if (params.value === null || params.value === undefined) return '';
         return Number(params.value).toLocaleString(locale);
       },
       flex: 1,
@@ -127,47 +132,59 @@ export function useColumnFactory(
       width: 100,
     });
 
-    const buildDateConfig = <T>(): Partial<ColDef<T>> => ({
+    const formatDate = (value: unknown, style: DateStyle, includeTime: boolean): string => {
+      if (!value) return '';
+      const d = dayjs(value as string | Date).tz(tz).locale(locale);
+      if (style === 'relative') return d.fromNow();
+      if (includeTime) {
+        switch (style) {
+          case 'compact': return d.format('l LT');
+          case 'full': return d.format('LLLL');
+          default: return d.format('L LT');
+        }
+      }
+      switch (style) {
+        case 'compact': return d.format('l');
+        case 'full': return d.format('LL');
+        default: return d.format('L');
+      }
+    };
+
+    const buildDateConfig = <T>(style: DateStyle = 'standard'): Partial<ColDef<T>> => ({
       sortable: true,
       filter: {
         component: DateFilter,
         doesFilterPass: serverSideDoesFilterPass,
       },
-      valueFormatter: (params) => {
-        if (!params.value) return "";
-        return dayjs(params.value).tz(tz).locale(locale).format("L");
-      },
+      valueFormatter: (params) => formatDate(params.value, style, false),
       resizable: true,
       flex: 1,
       minWidth: 100,
     });
 
-    const buildDateTimeConfig = <T>(): Partial<ColDef<T>> => ({
+    const buildDateTimeConfig = <T>(style: DateStyle = 'standard'): Partial<ColDef<T>> => ({
       sortable: true,
       filter: {
         component: DateFilter,
         doesFilterPass: serverSideDoesFilterPass,
       },
-      valueFormatter: (params) => {
-        if (!params.value) return "";
-        return dayjs(params.value).tz(tz).locale(locale).format("L LT");
-      },
+      valueFormatter: (params) => formatDate(params.value, style, true),
       resizable: true,
       flex: 1,
       minWidth: 100,
     });
 
     const buildCurrencyConfig = <T>(
-      currencyCode: string,
+      currencyCode: string
     ): Partial<ColDef<T>> => ({
-      type: "numericColumn",
+      type: 'numericColumn',
       sortable: true,
       filter: false,
-      cellStyle: { textAlign: "right" },
+      cellStyle: { textAlign: 'right' },
       valueFormatter: (params) => {
-        if (params.value === null || params.value === undefined) return "";
+        if (params.value === null || params.value === undefined) return '';
         return new Intl.NumberFormat(locale, {
-          style: "currency",
+          style: 'currency',
           currency: currencyCode,
         }).format(params.value);
       },
@@ -176,12 +193,12 @@ export function useColumnFactory(
     });
 
     const buildPercentageConfig = <T>(): Partial<ColDef<T>> => ({
-      type: "numericColumn",
+      type: 'numericColumn',
       sortable: true,
       filter: false,
-      cellStyle: { textAlign: "right" },
+      cellStyle: { textAlign: 'right' },
       valueFormatter: (params) => {
-        if (params.value === null || params.value === undefined) return "";
+        if (params.value === null || params.value === undefined) return '';
         return `${Number(params.value).toFixed(2)}%`;
       },
       flex: 1,
@@ -190,7 +207,7 @@ export function useColumnFactory(
 
     const buildBadgeConfig = <T>(
       colorMap: Record<string, string>,
-      enumOptions?: Array<{ value: string; label: string }>,
+      enumOptions?: Array<{ value: string; label: string }>
     ): Partial<ColDef<T>> => ({
       cellRenderer: BadgeCellRenderer,
       cellRendererParams: { colorMap },
@@ -223,50 +240,51 @@ export function useColumnFactory(
       resizable: false,
       flex: 0,
       width: 120,
-      pinned: "right" as const,
+      pinned: 'right' as const,
     });
 
     const createColumn = <T>(
       field: FieldPath<T>,
-      columnOptions: ColumnOptions<T> = {},
+      columnOptions: ColumnOptions<T> = {}
     ): ColDef<T> => {
       const {
-        type: columnType = "text",
+        type: columnType = 'text',
         headerKey,
         headerName,
         currency: currencyCode,
         colorMap,
         enumOptions,
+        dateStyle,
         ...rest
       } = columnOptions;
 
       let typeConfig: Partial<ColDef<T>>;
       switch (columnType) {
-        case "number":
+        case 'number':
           typeConfig = buildNumberConfig<T>();
           break;
-        case "boolean":
+        case 'boolean':
           typeConfig = buildBooleanConfig<T>();
           break;
-        case "date":
-          typeConfig = buildDateConfig<T>();
+        case 'date':
+          typeConfig = buildDateConfig<T>(dateStyle);
           break;
-        case "datetime":
-          typeConfig = buildDateTimeConfig<T>();
+        case 'datetime':
+          typeConfig = buildDateTimeConfig<T>(dateStyle);
           break;
-        case "currency":
-          typeConfig = buildCurrencyConfig<T>(currencyCode ?? "USD");
+        case 'currency':
+          typeConfig = buildCurrencyConfig<T>(currencyCode ?? 'USD');
           break;
-        case "percentage":
+        case 'percentage':
           typeConfig = buildPercentageConfig<T>();
           break;
-        case "badge":
+        case 'badge':
           typeConfig = buildBadgeConfig<T>(colorMap ?? {}, enumOptions);
           break;
-        case "locale":
+        case 'locale':
           typeConfig = buildLocaleConfig<T>();
           break;
-        case "action":
+        case 'action':
           typeConfig = buildActionConfig<T>();
           break;
         default:
@@ -283,7 +301,7 @@ export function useColumnFactory(
             sortable: false,
           }
         : {
-            field: field as ColDef<T>["field"],
+            field: field as ColDef<T>['field'],
           };
 
       return {

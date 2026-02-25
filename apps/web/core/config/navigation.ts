@@ -1,4 +1,4 @@
-import { ADMIN_NAV_ROUTES } from '@org/constants';
+import { ADMIN_NAV_ROUTES } from '@org/constants/routes-constants';
 import type { LucideIcon } from 'lucide-react';
 import {
   BarChart3,

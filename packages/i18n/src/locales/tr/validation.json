@@ -13,6 +13,36 @@
       "surname_max": "Soyisim en fazla 128 karakter olabilir.",
       "passwords_not_match": "Şifreler eşleşmiyor.",
       "email_or_phone_required": "E-posta veya telefon numarası gereklidir."
+    },
+    "common": {
+      "required": "Bu alan zorunludur.",
+      "locale_required": "Dil seçimi zorunludur.",
+      "name_required": "İsim zorunludur.",
+      "translations_min": "En az bir çeviri gereklidir.",
+      "slug_pattern": "Slug yalnızca küçük harf, rakam ve tire içerebilir.",
+      "duplicate_locale": "Aynı dil birden fazla eklenmiş.",
+      "duplicate_slug": "Aynı slug birden fazla kullanılmış.",
+      "duplicate_name_in_locale": "Aynı dilde aynı isim birden fazla kullanılmış.",
+      "duplicate_category": "Aynı kategori birden fazla eklenmiş.",
+      "duplicate_variant_group": "Aynı varyant grubu birden fazla eklenmiş.",
+      "duplicate_variant_combination": "Aynı varyant kombinasyonu birden fazla eklenmiş.",
+      "duplicate_sku": "Aynı SKU birden fazla kullanılmış.",
+      "files_too_many": "Çok fazla dosya yüklendi.",
+      "variant_options_min": "En az bir seçenek gereklidir.",
+      "variant_unique_key_required": "Varyant benzersiz anahtarı zorunludur.",
+      "variant_option_values_min": "En az bir seçenek değeri gereklidir.",
+      "variant_option_count_mismatch": "Seçenek sayısı varyant grubu sayısıyla eşleşmiyor.",
+      "variant_option_invalid": "Geçersiz seçenek seçildi.",
+      "variant_missing_group_option": "Her varyant grubundan tam olarak bir seçenek seçilmelidir.",
+      "variant_unique_key_mismatch": "Varyant anahtarı seçilen seçeneklerle eşleşmiyor.",
+      "variant_groups_required": "Varyantlar etkinken en az bir varyant grubu gereklidir.",
+      "variant_groups_not_allowed": "Varyantlar devre dışıyken varyant grubu eklenemez.",
+      "variants_required": "Varyantlar etkinken en az bir varyant gereklidir.",
+      "variants_not_allowed": "Varyantlar devre dışıyken varyant eklenemez.",
+      "multiple_color_groups": "Yalnızca bir renk varyant grubuna izin verilir.",
+      "product_type_required": "Ürün tipi zorunludur.",
+      "product_status_required": "Ürün durumu zorunludur.",
+      "tracking_strategy_required": "Takip stratejisi zorunludur."
     }
   }
 }

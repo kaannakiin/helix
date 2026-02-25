@@ -1,0 +1,194 @@
+// ─── Country (ikas: Country, SAP: T005, Netsis: Ulke) ──────────────────────
+
+model Country {
+  id   String @id @default(cuid())
+  code String @unique // ISO 3166-1 alpha-2: "TR", "US", "DE"
+  iso3 String @unique // ISO 3166-1 alpha-3: "TUR", "USA", "DEU"
+
+  phoneCode      String? // "+90", "+1", "+49"
+  currency       String? // "Turkish Lira", "US Dollar"
+  currencyCode   String? // "TRY", "USD"
+  currencySymbol String? // "₺", "$"
+  native         String? // Native name: "Türkiye"
+  region         String? // Continent/region: "Asia", "Europe"
+  subregion      String? // "Western Asia", "Western Europe"
+  emoji          String? // "🇹🇷"
+
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations CountryTranslation[]
+  states       State[]
+  warehouses   Warehouse[]
+
+  @@index([code])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+// ─── Country Translation (ikas: LocationTranslations) ───────────────────────
+
+model CountryTranslation {
+  id String @id @default(cuid())
+
+  countryId String
+  country   Country @relation(fields: [countryId], references: [id], onDelete: Cascade)
+
+  locale Locale
+
+  name String // "Turkey" / "Türkiye"
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([countryId, locale])
+  @@index([countryId])
+  @@index([locale])
+}
+
+// ─── State / Il (ikas: State, SAP: T005S, Netsis: Il) ──────────────────────
+// Türkiye: 81 il. Diger ulkeler: eyalet/bolge.
+
+model State {
+  id String @id @default(cuid())
+
+  countryId String
+  country   Country @relation(fields: [countryId], references: [id], onDelete: Cascade)
+
+  name      String  // "İstanbul", "Ankara"
+  native    String? // Native name (if different)
+  stateCode String? // Plaka kodu: "34", "06"
+
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations StateTranslation[]
+  cities       City[]
+  warehouses   Warehouse[]
+
+  @@unique([countryId, name])
+  @@index([countryId])
+  @@index([name])
+  @@index([stateCode])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+// ─── State Translation (ikas: LocationTranslations) ─────────────────────────
+
+model StateTranslation {
+  id String @id @default(cuid())
+
+  stateId String
+  state   State @relation(fields: [stateId], references: [id], onDelete: Cascade)
+
+  locale Locale
+
+  name String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([stateId, locale])
+  @@index([stateId])
+  @@index([locale])
+}
+
+// ─── City / Ilce (ikas: City) ───────────────────────────────────────────────
+// Türkiye: Ilce seviyesi. Ornegin Istanbul > Kadikoy, Besiktas
+
+model City {
+  id String @id @default(cuid())
+
+  countryId String
+  stateId   String
+  state     State @relation(fields: [stateId], references: [id], onDelete: Cascade)
+
+  name     String  // "Kadıköy", "Beşiktaş", "Çankaya"
+  cityCode String? // City/district code
+
+  latitude  String? // ikas stores as String
+  longitude String?
+
+  sortOrder Int @default(0)
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  districts  District[]
+  warehouses Warehouse[]
+
+  @@unique([stateId, name])
+  @@index([stateId])
+  @@index([countryId])
+  @@index([name])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+// ─── District / Semt (ikas: District) ───────────────────────────────────────
+// Türkiye: Semt seviyesi. Ornegin Kadikoy > Moda, Caferaga
+
+model District {
+  id String @id @default(cuid())
+
+  cityId    String
+  city      City @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  countryId String
+  stateId   String
+
+  name String // "Moda", "Caferağa"
+
+  latitude  String?
+  longitude String?
+
+  sortOrder Int @default(0)
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  towns Town[]
+
+  @@unique([cityId, name])
+  @@index([cityId])
+  @@index([countryId])
+  @@index([stateId])
+  @@index([name])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+// ─── Town / Mahalle (ikas: Town) ────────────────────────────────────────────
+// Türkiye: Mahalle seviyesi. En detayli seviye.
+
+model Town {
+  id String @id @default(cuid())
+
+  districtId String
+  district   District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+
+  name String // "Caferağa Mahallesi"
+
+  sortOrder Int @default(0)
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([districtId, name])
+  @@index([districtId])
+  @@index([name])
+  @@index([isActive])
+  @@index([sortOrder])
+}

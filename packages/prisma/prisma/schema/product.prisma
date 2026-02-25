@@ -1,0 +1,103 @@
+// ─── Product ─────────────────────────────────────────────────────────────────
+
+model Product {
+  id     String        @id @default(cuid())
+  type   ProductType   @default(PHYSICAL)
+  status ProductStatus @default(DRAFT)
+
+  brandId String?
+  brand   Brand?  @relation(fields: [brandId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations  ProductTranslation[]
+  images        Image[]
+  variantGroups ProductVariantGroup[]
+  variants      ProductVariant[]
+  categories    ProductCategory[]
+  tags          ProductTag[]
+
+  googleTaxonomyId Int?
+  googleTaxonomy   GoogleTaxonomy? @relation(fields: [googleTaxonomyId], references: [id], onDelete: SetNull)
+
+  @@index([status])
+  @@index([type])
+  @@index([createdAt])
+  @@index([brandId])
+  @@index([googleTaxonomyId])
+}
+
+// ─── Product Translation ─────────────────────────────────────────────────────
+
+model ProductTranslation {
+  id String @id @default(cuid())
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  locale Locale
+
+  name             String
+  slug             String
+  shortDescription String?
+  description      String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productId, locale])
+  @@unique([locale, slug, productId])
+  @@index([productId])
+  @@index([locale, slug])
+}
+
+// ─── Product Variant (purchasable SKU) ───────────────────────────────────────
+
+model ProductVariant {
+  id String @id @default(cuid())
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  sku      String? @unique
+  barcode  String?
+  isActive Boolean @default(true)
+
+  trackingStrategy TrackingStrategy @default(NONE)
+
+  sortOrder Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  optionValues   ProductVariantValue[]
+  images         Image[]
+  stockLevels    StockLevel[]
+  stockMovements StockMovement[]
+  batches        Batch[]
+  serialNumbers  SerialNumber[]
+  productUnits   ProductUnitOfMeasure[]
+
+  @@index([productId])
+  @@index([productId, isActive])
+  @@index([sku])
+  @@index([barcode])
+  @@index([sortOrder])
+}
+
+// ─── Product Variant Value (variant ↔ option selection link) ─────────────────
+
+model ProductVariantValue {
+  id String @id @default(cuid())
+
+  productVariantId String
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+
+  variantOptionId String
+  variantOption   VariantOption @relation(fields: [variantOptionId], references: [id], onDelete: Cascade)
+
+  @@unique([productVariantId, variantOptionId])
+  @@index([productVariantId])
+  @@index([variantOptionId])
+}

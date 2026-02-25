@@ -13,6 +13,36 @@
       "surname_max": "Surname must be at most 128 characters.",
       "passwords_not_match": "Passwords do not match.",
       "email_or_phone_required": "Email or phone number is required."
+    },
+    "common": {
+      "required": "This field is required.",
+      "locale_required": "Language selection is required.",
+      "name_required": "Name is required.",
+      "translations_min": "At least one translation is required.",
+      "slug_pattern": "Slug must contain only lowercase letters, numbers, and hyphens.",
+      "duplicate_locale": "Duplicate language detected.",
+      "duplicate_slug": "Duplicate slug detected.",
+      "duplicate_name_in_locale": "Duplicate name in the same language.",
+      "duplicate_category": "Duplicate category assignment.",
+      "duplicate_variant_group": "Duplicate variant group.",
+      "duplicate_variant_combination": "Duplicate variant combination.",
+      "duplicate_sku": "Duplicate SKU.",
+      "files_too_many": "Too many files uploaded.",
+      "variant_options_min": "At least one option is required.",
+      "variant_unique_key_required": "Variant unique key is required.",
+      "variant_option_values_min": "At least one option value is required.",
+      "variant_option_count_mismatch": "Option count does not match the number of variant groups.",
+      "variant_option_invalid": "Invalid option selected.",
+      "variant_missing_group_option": "Each variant group must have exactly one option selected.",
+      "variant_unique_key_mismatch": "Variant key does not match the selected options.",
+      "variant_groups_required": "At least one variant group is required when variants are enabled.",
+      "variant_groups_not_allowed": "Variant groups are not allowed when variants are disabled.",
+      "variants_required": "At least one variant is required when variants are enabled.",
+      "variants_not_allowed": "Variants are not allowed when variants are disabled.",
+      "multiple_color_groups": "Only one color variant group is allowed.",
+      "product_type_required": "Product type is required.",
+      "product_status_required": "Product status is required.",
+      "tracking_strategy_required": "Tracking strategy is required."
     }
   }
 }

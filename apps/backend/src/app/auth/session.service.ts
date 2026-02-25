@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { MAX_ACTIVE_SESSIONS, SESSION_EXPIRY_DAYS } from '@org/constants';
+import {
+  MAX_ACTIVE_SESSIONS,
+  SESSION_EXPIRY_DAYS,
+} from '@org/constants/auth-constants';
 import { Prisma, type SessionRevokeReason } from '@org/prisma/client';
 import { randomBytes } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';

@@ -1,0 +1,19 @@
+// ─── Currency ────────────────────────────────────────────────────────────────
+
+model Currency {
+  id String @id @default(cuid())
+
+  code          CurrencyCode @unique
+  symbol        String
+  name          String
+  decimalPlaces Int          @default(2)
+
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([code])
+  @@index([isActive])
+}

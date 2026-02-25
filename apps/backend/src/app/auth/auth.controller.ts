@@ -22,7 +22,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { ACCESS_TOKEN_COOKIE_NAME } from '@org/constants';
+import { ACCESS_TOKEN_COOKIE_NAME } from '@org/constants/auth-constants';
 import type { Request, Response } from 'express';
 import { RealIp } from 'nestjs-real-ip';
 import { CurrentUser } from '../../core/decorators/current-user.decorator';

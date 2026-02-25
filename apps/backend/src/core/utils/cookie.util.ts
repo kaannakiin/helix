@@ -1,12 +1,12 @@
-import type { Response } from 'express';
 import {
-  ACCESS_TOKEN_COOKIE_NAME,
-  REFRESH_TOKEN_COOKIE_NAME,
   ACCESS_COOKIE_PATH,
-  REFRESH_COOKIE_PATH,
+  ACCESS_TOKEN_COOKIE_NAME,
   ACCESS_TOKEN_EXPIRY_MS,
+  REFRESH_COOKIE_PATH,
+  REFRESH_TOKEN_COOKIE_NAME,
   REFRESH_TOKEN_EXPIRY_DAYS,
-} from '@org/constants';
+} from '@org/constants/auth-constants';
+import type { Response } from 'express';
 
 export function setAccessTokenCookie(res: Response, token: string): void {
   res.cookie(ACCESS_TOKEN_COOKIE_NAME, token, {

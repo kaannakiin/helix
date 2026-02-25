@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
-import { INSTAGRAM_STRATEGY } from '@org/constants';
+import { INSTAGRAM_STRATEGY } from '@org/constants/auth-constants';
 import { Strategy, type Profile } from 'passport-facebook';
 import type { OAuthProfile } from '../interfaces';
 
 @Injectable()
-export class InstagramStrategy extends PassportStrategy(Strategy, INSTAGRAM_STRATEGY) {
+export class InstagramStrategy extends PassportStrategy(
+  Strategy,
+  INSTAGRAM_STRATEGY
+) {
   constructor(config: ConfigService) {
     super({
       clientID: config.getOrThrow<string>('INSTAGRAM_CLIENT_ID'),
@@ -22,7 +25,7 @@ export class InstagramStrategy extends PassportStrategy(Strategy, INSTAGRAM_STRA
     accessToken: string,
     refreshToken: string,
     profile: Profile,
-    done: (err: Error | null, user?: OAuthProfile | false) => void,
+    done: (err: Error | null, user?: OAuthProfile | false) => void
   ): Promise<void> {
     const oauthProfile: OAuthProfile = {
       provider: 'INSTAGRAM',

@@ -1,0 +1,71 @@
+// ─── Category ─────────────────────────────────────────────────────────────────
+
+model Category {
+  id   String @id @default(cuid())
+  slug String @unique
+
+  parentId String?
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryHierarchy")
+
+  depth Int @default(0)
+
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations CategoryTranslation[]
+  images       Image[]
+  products     ProductCategory[]
+
+  @@index([parentId])
+  @@index([parentId, isActive, sortOrder])
+  @@index([depth])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+// ─── Category Translation ─────────────────────────────────────────────────────
+
+model CategoryTranslation {
+  id String @id @default(cuid())
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  locale Locale
+
+  name            String
+  description     String?
+  metaTitle       String?
+  metaDescription String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([categoryId, locale])
+  @@index([categoryId])
+  @@index([locale])
+}
+
+// ─── Product ↔ Category (join table) ──────────────────────────────────────────
+
+model ProductCategory {
+  id String @id @default(cuid())
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  sortOrder Int @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@unique([productId, categoryId])
+  @@index([productId])
+  @@index([categoryId])
+}

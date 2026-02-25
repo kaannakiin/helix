@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { hash as argon2Hash, verify as argon2Verify } from '@node-rs/argon2';
 import {
   ACCESS_TOKEN_EXPIRY,
   REFRESH_TOKEN_EXPIRY,
   REFRESH_TOKEN_EXPIRY_DAYS,
-} from '@org/constants';
+} from '@org/constants/auth-constants';
 import type { TokenPayload } from '@org/types/token';
-import { hash as argon2Hash, verify as argon2Verify } from '@node-rs/argon2';
 import { randomUUID } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import type { ValidatedUser } from './interfaces';

@@ -4,7 +4,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import {
   JWT_REFRESH_STRATEGY,
   REFRESH_TOKEN_COOKIE_NAME,
-} from '@org/constants';
+} from '@org/constants/auth-constants';
 import type { Request } from 'express';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import type { RefreshTokenPayload } from '../token.service';
@@ -33,13 +33,17 @@ export class JwtRefreshStrategy extends PassportStrategy(
     const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE_NAME];
 
     if (!refreshToken) {
-      throw new UnauthorizedException('common.errors.auth.refresh_token_missing');
+      throw new UnauthorizedException(
+        'common.errors.auth.refresh_token_missing'
+      );
     }
 
     const result = await this.tokenService.validateRefreshToken(refreshToken);
 
     if (!result) {
-      throw new UnauthorizedException('common.errors.auth.invalid_refresh_token');
+      throw new UnauthorizedException(
+        'common.errors.auth.invalid_refresh_token'
+      );
     }
 
     return {

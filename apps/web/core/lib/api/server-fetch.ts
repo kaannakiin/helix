@@ -1,12 +1,11 @@
+import { ACCESS_TOKEN_COOKIE_NAME } from '@org/constants/auth-constants';
 import { cookies } from 'next/headers';
-import { ACCESS_TOKEN_COOKIE_NAME } from '@org/constants';
 
-const BACKEND_URL =
-  process.env.BACKEND_INTERNAL_URL || 'http://localhost:3001';
+const BACKEND_URL = process.env.BACKEND_INTERNAL_URL || 'http://localhost:3001';
 
 export async function serverFetch<T = unknown>(
   path: string,
-  options: RequestInit = {},
+  options: RequestInit = {}
 ): Promise<T> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get(ACCESS_TOKEN_COOKIE_NAME)?.value;

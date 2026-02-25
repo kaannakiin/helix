@@ -1,0 +1,225 @@
+// ─── Stock Level (SAP: MARD/MCHB, Netsis: Stok Bakiye) ─────────────────────
+// Current stock quantity for a ProductVariant at a specific location.
+
+model StockLevel {
+  id String @id @default(cuid())
+
+  // WHAT: which variant
+  productVariantId String
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+
+  // WHERE: location hierarchy (warehouse required, zone/bin optional)
+  warehouseId String
+  warehouse   Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+
+  zoneId String?
+  zone   WarehouseZone? @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+
+  binId String?
+  bin   WarehouseBin? @relation(fields: [binId], references: [id], onDelete: SetNull)
+
+  // Stock category (SAP: Stock Type)
+  category StockCategory @default(UNRESTRICTED)
+
+  // Optional batch reference
+  batchId String?
+  batch   Batch? @relation(fields: [batchId], references: [id], onDelete: SetNull)
+
+  // Quantities (in base UoM)
+  quantity     Float @default(0) // Current on-hand quantity
+  reservedQty  Float @default(0) // Reserved for orders
+  availableQty Float @default(0) // = quantity - reservedQty (maintained by app)
+
+  // Unit of measure (base UoM of the product)
+  unitOfMeasureId String
+  unitOfMeasure   UnitOfMeasure @relation(fields: [unitOfMeasureId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productVariantId, warehouseId, zoneId, binId, category, batchId])
+  @@index([productVariantId])
+  @@index([warehouseId])
+  @@index([zoneId])
+  @@index([binId])
+  @@index([batchId])
+  @@index([category])
+  @@index([productVariantId, warehouseId])
+  @@index([availableQty])
+}
+
+// ─── Stock Movement Group (SAP: MKPF Material Document Header, Netsis: Fis) ─
+// Groups related movements into a single transaction/document.
+
+model StockMovementGroup {
+  id String @id @default(cuid())
+
+  documentNumber String @unique // Auto-generated document number
+
+  movementType MovementType
+  status       StockMovementStatus @default(DRAFT)
+
+  // For transfers: source and destination warehouses
+  sourceWarehouseId String?
+  sourceWarehouse   Warehouse? @relation("MovementGroupSourceWarehouse", fields: [sourceWarehouseId], references: [id])
+
+  destWarehouseId String?
+  destWarehouse   Warehouse? @relation("MovementGroupDestWarehouse", fields: [destWarehouseId], references: [id])
+
+  // External document reference
+  referenceType   String? // "PURCHASE_ORDER", "SALES_ORDER", "RETURN"
+  referenceId     String?
+  referenceNumber String? // Human-readable ref number
+
+  // Audit
+  performedById String?
+  performedBy   User? @relation(fields: [performedById], references: [id], onDelete: SetNull)
+
+  note     String?
+  postedAt DateTime? // When the document was posted
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  movements StockMovement[]
+
+  @@index([documentNumber])
+  @@index([movementType])
+  @@index([status])
+  @@index([sourceWarehouseId])
+  @@index([destWarehouseId])
+  @@index([performedById])
+  @@index([referenceType, referenceId])
+  @@index([postedAt])
+  @@index([createdAt])
+}
+
+// ─── Stock Movement (SAP: MSEG Material Document Item, Netsis: Stok Hareketi)
+// Individual line item within a stock movement group.
+
+model StockMovement {
+  id String @id @default(cuid())
+
+  groupId String
+  group   StockMovementGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  // WHAT moved
+  productVariantId String
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id])
+
+  // Source location (for issues/transfers out)
+  sourceWarehouseId String?
+  sourceZoneId      String?
+  sourceBinId       String?
+
+  // Destination location (for receipts/transfers in)
+  destWarehouseId String?
+  destZoneId      String?
+  destBinId       String?
+
+  // Category transitions (e.g., QI -> Unrestricted)
+  fromCategory StockCategory?
+  toCategory   StockCategory?
+
+  // Quantity (always positive; direction from movementType)
+  quantity Float
+
+  // Unit of measure
+  unitOfMeasureId String
+  unitOfMeasure   UnitOfMeasure @relation(fields: [unitOfMeasureId], references: [id])
+
+  // Optional batch/serial tracking
+  batchId String?
+  batch   Batch? @relation(fields: [batchId], references: [id], onDelete: SetNull)
+
+  serialNumberId String?
+  serialNumber   SerialNumber? @relation(fields: [serialNumberId], references: [id], onDelete: SetNull)
+
+  // Cost tracking (for valuation)
+  unitCost     Float?
+  currencyCode CurrencyCode?
+
+  // Snapshot: stock quantity after this movement was applied
+  snapshotQtyAfter Float?
+
+  createdAt DateTime @default(now())
+
+  @@index([groupId])
+  @@index([productVariantId])
+  @@index([sourceWarehouseId])
+  @@index([destWarehouseId])
+  @@index([batchId])
+  @@index([serialNumberId])
+  @@index([productVariantId, createdAt])
+  @@index([createdAt])
+}
+
+// ─── Batch / Lot (SAP: MCHA Batch Master, Netsis: Lot/Parti) ───────────────
+
+model Batch {
+  id String @id @default(cuid())
+
+  productVariantId String
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+
+  batchNumber String // SAP: CHARG, Netsis: Lot No
+
+  manufacturingDate DateTime?
+  expirationDate    DateTime?
+  supplierBatchNo   String? // Vendor's batch number
+
+  isActive Boolean @default(true)
+
+  metadata Json? // Extensible attributes (origin, certifications, etc.)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  stockLevels    StockLevel[]
+  stockMovements StockMovement[]
+  serialNumbers  SerialNumber[]
+
+  @@unique([productVariantId, batchNumber])
+  @@index([productVariantId])
+  @@index([batchNumber])
+  @@index([expirationDate])
+  @@index([isActive])
+}
+
+// ─── Serial Number (SAP: SERI, Netsis: Seri No) ────────────────────────────
+
+model SerialNumber {
+  id String @id @default(cuid())
+
+  productVariantId String
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+
+  serialNo String // SAP: SERNR, Netsis: Seri No
+
+  // Optional batch link
+  batchId String?
+  batch   Batch? @relation(fields: [batchId], references: [id], onDelete: SetNull)
+
+  // Current location (denormalized for quick lookup)
+  currentWarehouseId String?
+  currentZoneId      String?
+  currentBinId       String?
+
+  // Status
+  isInStock  Boolean @default(true) // false when issued/sold/scrapped
+  isScrapped Boolean @default(false)
+
+  metadata Json? // Warranty info, manufacturing details, etc.
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  stockMovements StockMovement[]
+
+  @@unique([productVariantId, serialNo])
+  @@index([productVariantId])
+  @@index([serialNo])
+  @@index([batchId])
+  @@index([currentWarehouseId])
+  @@index([isInStock])
+}

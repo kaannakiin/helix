@@ -1,0 +1,105 @@
+// ─── Tag Group ────────────────────────────────────────────────────────────────
+
+model TagGroup {
+  id   String @id @default(cuid())
+  slug String @unique
+
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations TagGroupTranslation[]
+  tags         Tag[]
+
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+// ─── Tag Group Translation ────────────────────────────────────────────────────
+
+model TagGroupTranslation {
+  id String @id @default(cuid())
+
+  tagGroupId String
+  tagGroup   TagGroup @relation(fields: [tagGroupId], references: [id], onDelete: Cascade)
+
+  locale Locale
+
+  name        String
+  description String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tagGroupId, locale])
+  @@index([tagGroupId])
+  @@index([locale])
+}
+
+// ─── Tag ──────────────────────────────────────────────────────────────────────
+
+model Tag {
+  id String @id @default(cuid())
+
+  tagGroupId String
+  tagGroup   TagGroup @relation(fields: [tagGroupId], references: [id], onDelete: Cascade)
+
+  slug String
+
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations TagTranslation[]
+  images       Image[]
+  products     ProductTag[]
+
+  @@unique([tagGroupId, slug])
+  @@index([tagGroupId])
+  @@index([tagGroupId, isActive, sortOrder])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+// ─── Tag Translation ──────────────────────────────────────────────────────────
+
+model TagTranslation {
+  id String @id @default(cuid())
+
+  tagId String
+  tag   Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  locale Locale
+
+  name        String
+  description String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tagId, locale])
+  @@index([tagId])
+  @@index([locale])
+}
+
+// ─── Product ↔ Tag (join table) ───────────────────────────────────────────────
+
+model ProductTag {
+  id String @id @default(cuid())
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  tagId String
+  tag   Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([productId, tagId])
+  @@index([productId])
+  @@index([tagId])
+}

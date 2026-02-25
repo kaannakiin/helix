@@ -1,34 +1,35 @@
-"use client";
+'use client';
 
+import { Badge, Button, Group, Tooltip } from '@mantine/core';
 import type {
+  CellContextMenuEvent,
   ColDef,
+  FilterChangedEvent,
   GridApi,
   GridOptions,
   GridReadyEvent,
   IDatasource,
-  CellContextMenuEvent,
-  FilterChangedEvent,
   ModelUpdatedEvent,
-} from "ag-grid-community";
-import { themeQuartz } from "ag-grid-community";
-import { AgGridReact } from "ag-grid-react";
-import { Badge, Button, Group, Tooltip } from "@mantine/core";
-import { Filter, RefreshCw } from "lucide-react";
-import { useMemo, useState, useCallback, useRef } from "react";
-import { DataTableFooter } from "./DataTableFooter";
-import { FilterDrawer } from "./FilterDrawer";
+} from 'ag-grid-community';
+import { themeQuartz } from 'ag-grid-community';
+import { AgGridReact } from 'ag-grid-react';
+import { Filter, RefreshCw } from 'lucide-react';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import { cn } from '../../utils/cn';
 import {
   DataTableTranslationProvider,
   type DataTableTranslations,
-} from "../context/DataTableTranslationContext";
-import DataTableProvider from "../data-table-provider";
-import { cn } from "../../utils/cn";
-import { createLoadingCellRenderer } from "./LoadingCellRenderer";
-import { ContextMenu } from "./ContextMenu";
-import { useContextMenu } from "../hooks/useContextMenu";
-import type { ContextMenuConfig } from "../types/contextMenu.types";
+} from '../context/DataTableTranslationContext';
+import DataTableProvider from '../data-table-provider';
+import { useContextMenu } from '../hooks/useContextMenu';
+import type { ContextMenuConfig } from '../types/contextMenu.types';
+import { ContextMenu } from './ContextMenu';
+import { DataTableFooter } from './DataTableFooter';
+import { FilterDrawer } from './FilterDrawer';
+import { createLoadingCellRenderer } from './LoadingCellRenderer';
 
 export interface DataTableProps<TData> {
+  tableId?: string;
   columns: ColDef<TData>[];
   datasource: IDatasource;
   gridOptions?: Partial<GridOptions<TData>>;
@@ -43,21 +44,21 @@ export interface DataTableProps<TData> {
 }
 
 const customTheme = themeQuartz.withParams({
-  fontFamily: "var(--mantine-font-family, -apple-system, sans-serif)",
+  fontFamily: 'var(--mantine-font-family, -apple-system, sans-serif)',
   fontSize: 14,
   headerHeight: 48,
   rowHeight: 48,
-  backgroundColor: "var(--mantine-color-body)",
-  foregroundColor: "var(--mantine-color-text)",
-  headerBackgroundColor: "var(--mantine-color-default)",
-  headerTextColor: "var(--mantine-color-text)",
-  oddRowBackgroundColor: "var(--mantine-color-default-hover)",
-  rowHoverColor: "var(--mantine-color-default-hover)",
-  selectedRowBackgroundColor: "var(--mantine-primary-color-light)",
-  borderColor: "var(--mantine-color-default-border)",
+  backgroundColor: 'var(--mantine-color-body)',
+  foregroundColor: 'var(--mantine-color-text)',
+  headerBackgroundColor: 'var(--mantine-color-default)',
+  headerTextColor: 'var(--mantine-color-text)',
+  oddRowBackgroundColor: 'var(--mantine-color-default-hover)',
+  rowHoverColor: 'var(--mantine-color-default-hover)',
+  selectedRowBackgroundColor: 'var(--mantine-primary-color-light)',
+  borderColor: 'var(--mantine-color-default-border)',
   borderRadius: 8,
   wrapperBorderRadius: 8,
-  rangeSelectionBorderColor: "var(--mantine-primary-color-filled)",
+  rangeSelectionBorderColor: 'var(--mantine-primary-color-filled)',
   inputFocusBorder: true,
 });
 
@@ -67,7 +68,7 @@ export function DataTable<TData>({
   gridOptions = {},
   translations,
   className,
-  height = "600px",
+  height = '600px',
   onRowClicked,
   onSelectionChanged,
   debug = false,
@@ -96,7 +97,7 @@ export function DataTable<TData>({
         ...col,
         cellRenderer: createLoadingCellRenderer(col.cellRenderer),
       })),
-    [columns],
+    [columns]
   );
 
   const handleSelectionChanged = useCallback(
@@ -105,40 +106,31 @@ export function DataTable<TData>({
       setSelectedRows(rows);
       onSelectionChanged?.(rows);
     },
-    [onSelectionChanged],
+    [onSelectionChanged]
   );
 
-  const handleModelUpdated = useCallback(
-    (event: ModelUpdatedEvent<TData>) => {
-      const count = event.api.getDisplayedRowCount();
-      setTotalRows(count > 0 ? count : null);
-    },
-    [],
-  );
+  const handleModelUpdated = useCallback((event: ModelUpdatedEvent<TData>) => {
+    const count = event.api.getDisplayedRowCount();
+    setTotalRows(count > 0 ? count : null);
+  }, []);
 
-  const handleGridReady = useCallback(
-    (event: GridReadyEvent<TData>) => {
-      gridApiRef.current = event.api;
-    },
-    [],
-  );
+  const handleGridReady = useCallback((event: GridReadyEvent<TData>) => {
+    gridApiRef.current = event.api;
+  }, []);
 
   const handleFilterChanged = useCallback(
     (event: FilterChangedEvent<TData>) => {
       const model = event.api.getFilterModel();
       setFilterModel(model);
     },
-    [],
+    []
   );
 
-  const handleApplyFilters = useCallback(
-    (model: Record<string, unknown>) => {
-      const api = gridApiRef.current;
-      if (!api) return;
-      api.setFilterModel(model);
-    },
-    [],
-  );
+  const handleApplyFilters = useCallback((model: Record<string, unknown>) => {
+    const api = gridApiRef.current;
+    if (!api) return;
+    api.setFilterModel(model);
+  }, []);
 
   const handleClearAllFilters = useCallback(() => {
     const api = gridApiRef.current;
@@ -165,7 +157,7 @@ export function DataTable<TData>({
   const finalGridOptions = useMemo<GridOptions<TData>>(() => {
     const options: GridOptions<TData> = {
       theme: customTheme,
-      rowModelType: "infinite" as const,
+      rowModelType: 'infinite' as const,
       defaultColDef: {
         sortable: true,
         filter: false,
@@ -229,10 +221,15 @@ export function DataTable<TData>({
       <DataTableProvider>
         <div
           ref={contextMenuEnabled ? wrapperRef : undefined}
-          className={cn("ag-grid-mantine-wrapper", className)}
-          style={{ height, width: "100%", display: "flex", flexDirection: "column" }}
+          className={cn('ag-grid-mantine-wrapper', className)}
+          style={{
+            height,
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
         >
-          <div style={{ flex: 1, minHeight: 0, width: "100%", height: "100%" }}>
+          <div style={{ flex: 1, minHeight: 0, width: '100%', height: '100%' }}>
             <AgGridReact<TData>
               columnDefs={columnsWithLoading}
               datasource={datasource}
@@ -243,9 +240,9 @@ export function DataTable<TData>({
             gap={0}
             wrap="nowrap"
             style={{
-              borderTop: "1px solid var(--mantine-color-default-border)",
-              backgroundColor: "var(--mantine-color-body)",
-              borderRadius: "0 0 8px 8px",
+              borderTop: '1px solid var(--mantine-color-default-border)',
+              backgroundColor: 'var(--mantine-color-body)',
+              borderRadius: '0 0 8px 8px',
             }}
           >
             <DataTableFooter
@@ -268,11 +265,11 @@ export function DataTable<TData>({
                   }
                   onClick={() => setFilterDrawerOpen(true)}
                 >
-                  {translations?.filterDrawer?.title ?? "Filters"}
+                  {translations?.filterDrawer?.title ?? 'Filters'}
                 </Button>
               )}
               <Tooltip
-                label={translations?.footer?.refresh ?? "Refresh"}
+                label={translations?.footer?.refresh ?? 'Refresh'}
                 disabled={refreshDisabled}
               >
                 <Button
@@ -282,7 +279,7 @@ export function DataTable<TData>({
                   onClick={handleRefresh}
                   disabled={refreshDisabled}
                 >
-                  {translations?.footer?.refresh ?? "Refresh"}
+                  {translations?.footer?.refresh ?? 'Refresh'}
                 </Button>
               </Tooltip>
             </Group>

@@ -1,0 +1,42 @@
+// ─── Brand ────────────────────────────────────────────────────────────────────
+
+model Brand {
+  id   String @id @default(cuid())
+  slug String @unique
+
+  websiteUrl String?
+
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations BrandTranslation[]
+  images       Image[]
+  products     Product[]
+
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+// ─── Brand Translation ────────────────────────────────────────────────────────
+
+model BrandTranslation {
+  id String @id @default(cuid())
+
+  brandId String
+  brand   Brand  @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  locale Locale
+
+  name        String
+  description String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([brandId, locale])
+  @@index([brandId])
+  @@index([locale])
+}

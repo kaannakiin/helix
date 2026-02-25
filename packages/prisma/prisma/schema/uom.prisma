@@ -1,0 +1,93 @@
+// ─── Unit of Measure (SAP: T006, Netsis: Birim) ────────────────────────────
+
+model UnitOfMeasure {
+  id String @id @default(cuid())
+
+  code String @unique // ISO/standard: "PC", "KG", "M", "L", "BOX"
+
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations    UnitOfMeasureTranslation[]
+  conversionsFrom UnitConversion[]      @relation("ConversionFrom")
+  conversionsTo   UnitConversion[]      @relation("ConversionTo")
+  productUnits    ProductUnitOfMeasure[]
+  stockLevels     StockLevel[]
+  stockMovements  StockMovement[]
+
+  @@index([code])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+// ─── Unit of Measure Translation ────────────────────────────────────────────
+
+model UnitOfMeasureTranslation {
+  id String @id @default(cuid())
+
+  unitOfMeasureId String
+  unitOfMeasure   UnitOfMeasure @relation(fields: [unitOfMeasureId], references: [id], onDelete: Cascade)
+
+  locale Locale
+
+  name         String // "Piece" / "Adet", "Kilogram" / "Kilogram"
+  abbreviation String // "pc" / "ad", "kg" / "kg"
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([unitOfMeasureId, locale])
+  @@index([unitOfMeasureId])
+  @@index([locale])
+}
+
+// ─── Unit Conversion (SAP: T006A, Netsis: Birim Donusum) ───────────────────
+// Global conversion factors. Example: 1 BOX = 12 PC -> fromUoM=BOX, toUoM=PC, factor=12
+
+model UnitConversion {
+  id String @id @default(cuid())
+
+  fromUoMId String
+  fromUoM   UnitOfMeasure @relation("ConversionFrom", fields: [fromUoMId], references: [id], onDelete: Cascade)
+
+  toUoMId String
+  toUoM   UnitOfMeasure @relation("ConversionTo", fields: [toUoMId], references: [id], onDelete: Cascade)
+
+  factor Float // Multiply fromUoM quantity by this to get toUoM quantity
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([fromUoMId, toUoMId])
+  @@index([fromUoMId])
+  @@index([toUoMId])
+}
+
+// ─── Product Unit of Measure (SAP: MARM, Netsis: Stok Karti Birim) ─────────
+// Product-specific UoM assignments with conversion factors.
+
+model ProductUnitOfMeasure {
+  id String @id @default(cuid())
+
+  productVariantId String
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+
+  unitOfMeasureId String
+  unitOfMeasure   UnitOfMeasure @relation(fields: [unitOfMeasureId], references: [id])
+
+  isBase           Boolean @default(false) // True = base/primary UoM for this variant
+  conversionFactor Float   @default(1)     // 1 of this UoM = conversionFactor of base UoM
+
+  barcode String? // UoM-specific barcode (e.g., box barcode vs piece barcode)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productVariantId, unitOfMeasureId])
+  @@index([productVariantId])
+  @@index([unitOfMeasureId])
+  @@index([productVariantId, isBase])
+}

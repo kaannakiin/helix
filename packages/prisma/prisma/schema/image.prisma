@@ -1,0 +1,54 @@
+// ─── Image (Unified) ──────────────────────────────────────────────────────────
+
+model Image {
+  id String @id @default(cuid())
+
+  // Polymorphic ownership — each image belongs to exactly one entity
+  productId String?
+  product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  // Product images can optionally be associated with a specific variant
+  productVariantId String?
+  productVariant   ProductVariant? @relation(fields: [productVariantId], references: [id], onDelete: SetNull)
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  brandId String?
+  brand   Brand?  @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  tagId String?
+  tag   Tag?    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  variantOptionId String?
+  variantOption   VariantOption? @relation(fields: [variantOptionId], references: [id], onDelete: Cascade)
+
+  productVariantGroupOptionId String?
+  productVariantGroupOption   ProductVariantGroupOption? @relation(fields: [productVariantGroupOptionId], references: [id], onDelete: Cascade)
+
+  url    String  @unique
+  alt    String?
+  width  Int?
+  height Int?
+
+  fileType  FileType @default(IMAGE)
+  sortOrder Int      @default(0)
+  isPrimary Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([productVariantId])
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([tagId])
+  @@index([productId, sortOrder])
+  @@index([categoryId, sortOrder])
+  @@index([brandId, sortOrder])
+  @@index([tagId, sortOrder])
+  @@index([variantOptionId])
+  @@index([variantOptionId, sortOrder])
+  @@index([productVariantGroupOptionId])
+  @@index([productVariantGroupOptionId, sortOrder])
+}

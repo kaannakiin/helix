@@ -52,19 +52,25 @@
   ],
   "references": [
     {
-      "path": "../../packages/constants"
-    },
-    {
       "path": "../../packages/i18n"
     },
     {
-      "path": "../../packages/types"
+      "path": "../../packages/constants"
+    },
+    {
+      "path": "../../packages/utils"
+    },
+    {
+      "path": "../../packages/schemas"
+    },
+    {
+      "path": "../../packages/prisma"
     },
     {
       "path": "../../packages/ui"
     },
     {
-      "path": "../../packages/schemas"
+      "path": "../../packages/types"
     }
   ]
 }

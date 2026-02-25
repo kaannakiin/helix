@@ -1,0 +1,53 @@
+// ─── Rule Engine ──────────────────────────────────────────────────────────────
+
+model RuleTree {
+  id           String           @id @default(cuid())
+  name         String
+  description  String?
+  targetEntity RuleTargetEntity
+  conditions   Json
+  isActive     Boolean          @default(true)
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+
+  customerGroups CustomerGroup[]
+
+  @@index([targetEntity])
+  @@index([isActive])
+  @@index([createdAt])
+}
+
+model CustomerGroup {
+  id          String            @id @default(cuid())
+  name        String
+  description String?
+  color       String?
+  type        CustomerGroupType @default(RULE_BASED)
+
+  ruleTreeId String?
+  ruleTree   RuleTree? @relation(fields: [ruleTreeId], references: [id], onDelete: Cascade)
+
+  members CustomerGroupMember[]
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([type])
+  @@index([ruleTreeId])
+  @@index([isActive])
+  @@index([createdAt])
+}
+
+model CustomerGroupMember {
+  id              String        @id @default(cuid())
+  customerGroupId String
+  customerGroup   CustomerGroup @relation(fields: [customerGroupId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addedAt         DateTime      @default(now())
+
+  @@unique([customerGroupId, userId])
+  @@index([customerGroupId])
+  @@index([userId])
+}

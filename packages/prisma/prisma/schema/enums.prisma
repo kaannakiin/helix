@@ -73,3 +73,124 @@ enum SessionRevokeReason {
   TOKEN_ROTATION_ANOMALY
   EXPIRED
 }
+
+// ─── i18n ─────────────────────────────────────────────────────────────────────
+
+enum Locale {
+  EN
+  TR
+}
+
+// ─── Currency ─────────────────────────────────────────────────────────────────
+
+enum CurrencyCode {
+  TRY
+  USD
+  EUR
+  GBP
+}
+
+// ─── Product ──────────────────────────────────────────────────────────────────
+
+enum ProductType {
+  PHYSICAL
+  DIGITAL
+}
+
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum TrackingStrategy {
+  NONE
+  BATCH
+  SERIAL
+  BATCH_AND_SERIAL
+}
+
+// ─── File ─────────────────────────────────────────────────────────────────────
+
+enum FileType {
+  IMAGE
+  VIDEO
+  DOCUMENT
+  OTHER
+}
+
+// ─── Inventory ────────────────────────────────────────────────────────────────
+
+enum StockCategory {
+  UNRESTRICTED
+  QUALITY_CHECK
+  BLOCKED
+  IN_TRANSIT
+  RESERVED
+}
+
+enum MovementType {
+  GOODS_RECEIPT
+  GOODS_RECEIPT_REVERSAL
+  GOODS_ISSUE
+  GOODS_ISSUE_REVERSAL
+  TRANSFER_OUT
+  TRANSFER_IN
+  STOCK_ADJUSTMENT_IN
+  STOCK_ADJUSTMENT_OUT
+  RETURN_FROM_CUSTOMER
+  RETURN_TO_SUPPLIER
+  QUALITY_RELEASE
+  QUALITY_BLOCK
+  SCRAP
+}
+
+enum StockMovementStatus {
+  DRAFT
+  POSTED
+  CANCELLED
+}
+
+// ─── Variant ──────────────────────────────────────────────────────────────────
+
+enum VariantGroupType {
+  COLOR
+  SIZE
+}
+
+enum VariantGroupDisplayMode {
+  BADGE
+  SELECT
+  IMAGE_GRID
+}
+
+// ─── Warehouse ────────────────────────────────────────────────────────────────
+
+enum WarehouseStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+}
+
+enum BinType {
+  STORAGE
+  RECEIVING
+  SHIPPING
+  QUALITY
+  DAMAGE
+  RETURN
+}
+
+// ─── Rule Engine ──────────────────────────────────────────────────────────────
+
+enum RuleTargetEntity {
+  USER
+  PRODUCT
+  ORDER
+  INVENTORY
+}
+
+enum CustomerGroupType {
+  RULE_BASED
+  MANUAL
+}

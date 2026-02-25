@@ -14,11 +14,11 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./lib/data-keys": {
-      "@org/source": "./src/lib/data-keys.ts",
-      "types": "./dist/lib/data-keys.d.ts",
-      "import": "./dist/lib/data-keys.js",
-      "default": "./dist/lib/data-keys.js"
+    "./*": {
+      "@org/source": "./src/*/index.ts",
+      "types": "./dist/*/index.d.ts",
+      "import": "./dist/*/index.js",
+      "default": "./dist/*/index.js"
     }
   },
   "dependencies": {

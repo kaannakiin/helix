@@ -1,0 +1,117 @@
+model VariantGroup {
+  id String @id @default(cuid())
+
+  type      VariantGroupType @default(SIZE)
+  sortOrder Int              @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations VariantGroupTranslation[]
+  options      VariantOption[]
+  products     ProductVariantGroup[]
+
+  @@index([sortOrder])
+}
+
+model VariantGroupTranslation {
+  id String @id @default(cuid())
+
+  variantGroupId String
+  variantGroup   VariantGroup @relation(fields: [variantGroupId], references: [id], onDelete: Cascade)
+
+  locale Locale
+
+  name String
+  slug String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([variantGroupId, locale])
+  @@index([variantGroupId])
+  @@index([locale])
+}
+
+model VariantOption {
+  id String @id @default(cuid())
+
+  variantGroupId String
+  variantGroup   VariantGroup @relation(fields: [variantGroupId], references: [id], onDelete: Cascade)
+
+  colorCode String?
+
+  sortOrder Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  translations        VariantOptionTranslation[]
+  images              Image[]
+  variantValues       ProductVariantValue[]
+  productGroupOptions ProductVariantGroupOption[]
+
+  @@index([variantGroupId])
+  @@index([variantGroupId, sortOrder])
+}
+
+model VariantOptionTranslation {
+  id String @id @default(cuid())
+
+  variantOptionId String
+  variantOption   VariantOption @relation(fields: [variantOptionId], references: [id], onDelete: Cascade)
+
+  locale Locale
+
+  name String
+  slug String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([variantOptionId, locale])
+  @@index([variantOptionId])
+  @@index([locale])
+}
+
+model ProductVariantGroup {
+  id String @id @default(cuid())
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  variantGroupId String
+  variantGroup   VariantGroup @relation(fields: [variantGroupId], references: [id], onDelete: Cascade)
+
+  sortOrder   Int                      @default(0)
+  displayMode VariantGroupDisplayMode?
+
+  createdAt DateTime @default(now())
+
+  options ProductVariantGroupOption[]
+
+  @@unique([productId, variantGroupId])
+  @@index([productId])
+  @@index([variantGroupId])
+}
+
+model ProductVariantGroupOption {
+  id String @id @default(cuid())
+
+  productVariantGroupId String
+  productVariantGroup   ProductVariantGroup @relation(fields: [productVariantGroupId], references: [id], onDelete: Cascade)
+
+  variantOptionId String
+  variantOption   VariantOption @relation(fields: [variantOptionId], references: [id], onDelete: Cascade)
+
+  sortOrder Int     @default(0)
+  colorCode String?
+
+  createdAt DateTime @default(now())
+
+  images Image[]
+
+  @@unique([productVariantGroupId, variantOptionId])
+  @@index([productVariantGroupId])
+  @@index([variantOptionId])
+}
