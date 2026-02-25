@@ -1,4 +1,4 @@
-import { DATA_ACCESS_KEYS } from '@org/constants/lib/data-keys';
+import { DATA_ACCESS_KEYS } from '@org/constants/data-keys';
 import type { AdminCustomerDetailPrismaType } from '@org/types/admin/customers';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../lib/api/api-client';

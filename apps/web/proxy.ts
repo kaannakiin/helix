@@ -1,29 +1,30 @@
 import {
   ACCESS_TOKEN_COOKIE_NAME,
+  LOCALE_COOKIE_NAME,
+  REFRESH_TOKEN_COOKIE_NAME,
+} from '@org/constants/auth-constants';
+import {
   ADMIN_API_ROUTES,
   ADMIN_ROUTES,
   AUTH_ROUTES,
-  LOCALE_COOKIE_NAME,
   PUBLIC_ROUTES,
-  REFRESH_TOKEN_COOKIE_NAME,
-} from '@org/constants';
+} from '@org/constants/routes-constants';
 import { defaultLocale, supportedLocales } from '@org/i18n';
 import type { TokenPayload } from '@org/types/token';
 import { jwtVerify } from 'jose';
 import { NextResponse, type NextRequest } from 'next/server';
 
-const BACKEND_URL =
-  process.env.BACKEND_INTERNAL_URL || 'http://localhost:3001';
+const BACKEND_URL = process.env.BACKEND_INTERNAL_URL || 'http://localhost:3001';
 
 function isPublicRoute(pathname: string): boolean {
   return PUBLIC_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
+    (route: string) => pathname === route || pathname.startsWith(`${route}/`)
   );
 }
 
 function isAuthRoute(pathname: string): boolean {
   return AUTH_ROUTES.some(
-    (route) => pathname === route || pathname.startsWith(`${route}/`)
+    (route: string) => pathname === route || pathname.startsWith(`${route}/`)
   );
 }
 
@@ -106,13 +107,10 @@ export default async function proxy(request: NextRequest) {
   const locale = resolveLocale(request);
 
   const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE_NAME)?.value;
-  let tokenPayload = accessToken
-    ? await verifyAccessToken(accessToken)
-    : null;
+  let tokenPayload = accessToken ? await verifyAccessToken(accessToken) : null;
   let refreshedCookies: string[] | null = null;
 
   if (!tokenPayload && !isPublicRoute(pathname)) {
-    // API routes: return 401 immediately — axios interceptor handles refresh client-side
     if (pathname.startsWith('/api/')) {
       return NextResponse.json(
         { statusCode: 401, message: 'Unauthorized' },
@@ -120,7 +118,6 @@ export default async function proxy(request: NextRequest) {
       );
     }
 
-    // Page routes: try server-side refresh before redirecting to login
     const refreshResult = await tryRefreshTokens(request);
     if (refreshResult) {
       tokenPayload = refreshResult.tokenPayload;

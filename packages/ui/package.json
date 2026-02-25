@@ -5,9 +5,61 @@
   "type": "module",
   "exports": {
     "./package.json": "./package.json",
-    ".": "./src/index.ts",
-    "./inputs/*": "./src/inputs/*.tsx",
-    "./styles.css": "./src/styles.css"
+    ".": {
+      "@org/source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./dropzone": {
+      "@org/source": "./src/dropzone/index.ts",
+      "types": "./dist/dropzone/index.d.ts",
+      "import": "./src/dropzone/index.ts",
+      "default": "./src/dropzone/index.ts"
+    },
+    "./inputs/phone-input": {
+      "@org/source": "./src/inputs/phone-input/index.ts",
+      "types": "./dist/inputs/phone-input/index.d.ts",
+      "import": "./src/inputs/phone-input/index.ts",
+      "default": "./src/inputs/phone-input/index.ts"
+    },
+    "./inputs/product-seo-card": {
+      "@org/source": "./src/inputs/product-seo-card/index.ts",
+      "types": "./dist/inputs/product-seo-card/index.d.ts",
+      "import": "./src/inputs/product-seo-card/index.ts",
+      "default": "./src/inputs/product-seo-card/index.ts"
+    },
+    "./inputs/relation-input": {
+      "@org/source": "./src/inputs/relation-input/index.ts",
+      "types": "./dist/inputs/relation-input/index.d.ts",
+      "import": "./src/inputs/relation-input/index.ts",
+      "default": "./src/inputs/relation-input/index.ts"
+    },
+    "./inputs/rich-text-editor": {
+      "@org/source": "./src/inputs/rich-text-editor/index.ts",
+      "types": "./dist/inputs/rich-text-editor/index.d.ts",
+      "import": "./src/inputs/rich-text-editor/index.ts",
+      "default": "./src/inputs/rich-text-editor/index.ts"
+    },
+    "./inputs/*": {
+      "@org/source": "./src/inputs/*.tsx",
+      "types": "./dist/inputs/*.d.ts",
+      "import": "./src/inputs/*.tsx",
+      "default": "./src/inputs/*.tsx"
+    },
+    "./styles.css": "./src/styles.css",
+    "./common/*": {
+      "@org/source": "./src/common/*.tsx",
+      "types": "./dist/common/*.d.ts",
+      "import": "./src/common/*.tsx",
+      "default": "./src/common/*.tsx"
+    },
+    "./data-table/*": {
+      "@org/source": "./src/data-table/*.tsx",
+      "types": "./dist/data-table/*.d.ts",
+      "import": "./src/data-table/*.tsx",
+      "default": "./src/data-table/*.tsx"
+    }
   },
   "nx": {
     "name": "ui"
