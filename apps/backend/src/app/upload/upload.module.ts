@@ -12,11 +12,11 @@ import { UploadService } from './upload.service.js';
     NestMinioModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (config: ConfigService) => ({
-        endPoint: config.getOrThrow<string>('MINIO_ENDPOINT'),
-        port: parseInt(config.get<string>('MINIO_PORT', '9001'), 10),
+        endPoint: config.get<string>('MINIO_ENDPOINT', 'localhost'),
+        port: parseInt(config.get<string>('MINIO_PORT', '9000'), 10),
         useSSL: config.get<string>('MINIO_USE_SSL', 'false') === 'true',
-        accessKey: config.getOrThrow<string>('MINIO_ACCESS_KEY'),
-        secretKey: config.getOrThrow<string>('MINIO_SECRET_KEY'),
+        accessKey: config.get<string>('MINIO_ACCESS_KEY', 'minioadmin'),
+        secretKey: config.get<string>('MINIO_SECRET_KEY', 'minioadmin'),
       }),
       inject: [ConfigService],
     }),

@@ -2,8 +2,9 @@
 
 import {
   brandLookupFetcher,
-  categoryLookupFetcher,
-  tagLookupFetcher,
+  categoryTreeFetcher,
+  tagTreeFetcher,
+  taxonomyTreeFetcher,
 } from '@/core/hooks/useAdminLookup';
 import { useAdminProduct } from '@/core/hooks/useAdminProducts';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -34,7 +35,7 @@ import { FormCard } from '@org/ui/common/form-card';
 import LoadingOverlay from '@org/ui/common/loading-overlay';
 import { Dropzone } from '@org/ui/dropzone';
 import { ProductSeoCard } from '@org/ui/inputs/product-seo-card';
-import { RelationInput } from '@org/ui/inputs/relation-input';
+import { RelationModal } from '@org/ui/inputs/relation-modal';
 import { RichTextEditor } from '@org/ui/inputs/rich-text-editor';
 import {
   Activity,
@@ -143,6 +144,7 @@ const AdminProductPage = () => {
           sortOrder: i,
         })) ?? [],
       tagIds: data.tags?.map((t) => t.tag.id) ?? [],
+      googleTaxonomyId: data.googleTaxonomyId ?? null,
       uniqueId: data.id,
     };
   }, [data, isNew]);
@@ -336,14 +338,14 @@ const AdminProductPage = () => {
                     control={control}
                     name="brandId"
                     render={({ field, fieldState }) => (
-                      <RelationInput
+                      <RelationModal
                         queryKey={DATA_ACCESS_KEYS.admin.brands.lookup}
                         fetchOptions={brandLookupFetcher}
-                        value={field.value ?? null}
-                        onChange={field.onChange}
-                        clearable
+                        title={t('brand.label')}
                         label={t('brand.label')}
                         placeholder={t('brand.placeholder')}
+                        value={field.value ?? null}
+                        onChange={field.onChange}
                         error={fieldState.error?.message}
                       />
                     )}
@@ -352,10 +354,14 @@ const AdminProductPage = () => {
                     control={control}
                     name="categories"
                     render={({ field, fieldState }) => (
-                      <RelationInput
+                      <RelationModal
                         queryKey={DATA_ACCESS_KEYS.admin.categories.lookup}
-                        fetchOptions={categoryLookupFetcher}
+                        fetchOptions={categoryTreeFetcher}
                         multiple
+                        tree
+                        title={t('categories.label')}
+                        label={t('categories.label')}
+                        placeholder={t('categories.placeholder')}
                         value={field?.value?.map((c) => c.categoryId) || []}
                         onChange={(ids) =>
                           field.onChange(
@@ -365,8 +371,6 @@ const AdminProductPage = () => {
                             }))
                           )
                         }
-                        label={t('categories.label')}
-                        placeholder={t('categories.placeholder')}
                         error={fieldState.error?.message}
                       />
                     )}
@@ -375,14 +379,37 @@ const AdminProductPage = () => {
                     control={control}
                     name="tagIds"
                     render={({ field, fieldState }) => (
-                      <RelationInput
+                      <RelationModal
                         queryKey={DATA_ACCESS_KEYS.admin.tags.lookup}
-                        fetchOptions={tagLookupFetcher}
+                        fetchOptions={tagTreeFetcher}
                         multiple
-                        value={field?.value || []}
-                        onChange={field.onChange}
+                        tree
+                        title={t('tags.label')}
                         label={t('tags.label')}
                         placeholder={t('tags.placeholder')}
+                        value={field?.value || []}
+                        onChange={field.onChange}
+                        error={fieldState.error?.message}
+                      />
+                    )}
+                  />
+                  <Controller
+                    control={control}
+                    name="googleTaxonomyId"
+                    render={({ field, fieldState }) => (
+                      <RelationModal
+                        queryKey={DATA_ACCESS_KEYS.admin.taxonomy.tree}
+                        fetchOptions={taxonomyTreeFetcher}
+                        tree
+                        title={t('taxonomy.label')}
+                        label={t('taxonomy.label')}
+                        placeholder={t('taxonomy.placeholder')}
+                        value={
+                          field.value != null ? String(field.value) : null
+                        }
+                        onChange={(id) =>
+                          field.onChange(id != null ? Number(id) : null)
+                        }
                         error={fieldState.error?.message}
                       />
                     )}

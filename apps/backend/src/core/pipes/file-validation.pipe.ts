@@ -3,8 +3,8 @@ import {
   Injectable,
   type PipeTransform,
 } from '@nestjs/common';
+import { FileTypeConfigs } from '@org/constants/product-constants';
 import { type FileType } from '@org/prisma/client';
-import { FileTypeConfigs } from '@org/constants/product.constants';
 
 export interface FileValidationOptions {
   allowedTypes: FileType[];

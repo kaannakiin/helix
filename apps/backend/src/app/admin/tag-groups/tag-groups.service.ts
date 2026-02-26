@@ -87,7 +87,7 @@ export class TagGroupsService {
     limit: number;
     page: number;
     lang: Locale;
-  }): Promise<LookupItem[]> {
+  }): Promise<LookupItem[] | PaginatedResponse<LookupItem>> {
     const { q, ids, limit, page, lang } = opts;
 
     if (ids?.length) {
@@ -110,16 +110,89 @@ export class TagGroupsService {
         slug: t.slug,
         imageUrl: t.images[0]?.url,
         group: t.tagGroup.translations[0]?.name ?? t.tagGroup.slug,
-        extra: { tagGroupId: t.tagGroupId },
+        extra: { tagGroupId: t.tagGroupId, ancestorIds: [t.tagGroupId] },
       }));
     }
 
     const skip = (page - 1) * limit;
 
-    const tags = await this.prisma.tag.findMany({
-      where: {
+    const where: Prisma.TagWhereInput = {
+      isActive: true,
+      tagGroup: { isActive: true },
+      ...(q
+        ? {
+            translations: {
+              some: {
+                locale: lang,
+                name: { contains: q, mode: 'insensitive' as const },
+              },
+            },
+          }
+        : {}),
+    };
+
+    const [tags, total] = await Promise.all([
+      this.prisma.tag.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: [
+          { tagGroup: { sortOrder: 'asc' } },
+          { sortOrder: 'asc' },
+        ],
+        include: {
+          translations: { where: { locale: lang } },
+          images: { where: { isPrimary: true }, take: 1 },
+          tagGroup: {
+            include: {
+              translations: { where: { locale: lang } },
+            },
+          },
+        },
+      }),
+      this.prisma.tag.count({ where }),
+    ]);
+
+    return {
+      data: tags.map((t) => ({
+        id: t.id,
+        label: t.translations[0]?.name ?? t.slug,
+        slug: t.slug,
+        imageUrl: t.images[0]?.url,
+        group: t.tagGroup.translations[0]?.name ?? t.tagGroup.slug,
+        extra: { tagGroupId: t.tagGroupId },
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async getTagTree(opts: {
+    q?: string;
+    ids?: string[];
+    tagGroupId?: string;
+    limit: number;
+    page: number;
+    lang: Locale;
+  }): Promise<LookupItem[] | PaginatedResponse<LookupItem>> {
+    const { q, ids, tagGroupId, limit, page, lang } = opts;
+
+    // ids mode → flat resolve (reuse existing lookupTags)
+    if (ids?.length) {
+      return this.lookupTags({ q, ids, limit, page, lang });
+    }
+
+    const skip = (page - 1) * limit;
+
+    // tagGroupId provided → fetch tags of that group (lazy load)
+    if (tagGroupId) {
+      const where: Prisma.TagWhereInput = {
+        tagGroupId,
         isActive: true,
-        tagGroup: { isActive: true },
         ...(q
           ? {
               translations: {
@@ -130,32 +203,99 @@ export class TagGroupsService {
               },
             }
           : {}),
-      },
-      skip,
-      take: limit,
-      orderBy: [
-        { tagGroup: { sortOrder: 'asc' } },
-        { sortOrder: 'asc' },
-      ],
-      include: {
-        translations: { where: { locale: lang } },
-        images: { where: { isPrimary: true }, take: 1 },
-        tagGroup: {
+      };
+
+      const [tags, total] = await Promise.all([
+        this.prisma.tag.findMany({
+          where,
+          skip,
+          take: limit,
+          orderBy: { sortOrder: 'asc' },
           include: {
             translations: { where: { locale: lang } },
+            images: { where: { isPrimary: true }, take: 1 },
           },
-        },
-      },
-    });
+        }),
+        this.prisma.tag.count({ where }),
+      ]);
 
-    return tags.map((t) => ({
-      id: t.id,
-      label: t.translations[0]?.name ?? t.slug,
-      slug: t.slug,
-      imageUrl: t.images[0]?.url,
-      group: t.tagGroup.translations[0]?.name ?? t.tagGroup.slug,
-      extra: { tagGroupId: t.tagGroupId },
-    }));
+      return {
+        data: tags.map((t) => ({
+          id: t.id,
+          label: t.translations[0]?.name ?? t.slug,
+          slug: t.slug,
+          imageUrl: t.images[0]?.url,
+          extra: { childCount: 0 },
+        })),
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    }
+
+    // Root level — tag groups with childCount
+    const where: Prisma.TagGroupWhereInput = {
+      isActive: true,
+      ...(q
+        ? {
+            OR: [
+              {
+                translations: {
+                  some: {
+                    locale: lang,
+                    name: { contains: q, mode: 'insensitive' as const },
+                  },
+                },
+              },
+              {
+                tags: {
+                  some: {
+                    isActive: true,
+                    translations: {
+                      some: {
+                        locale: lang,
+                        name: { contains: q, mode: 'insensitive' as const },
+                      },
+                    },
+                  },
+                },
+              },
+            ],
+          }
+        : {}),
+    };
+
+    const [tagGroups, total] = await Promise.all([
+      this.prisma.tagGroup.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { sortOrder: 'asc' },
+        include: {
+          translations: { where: { locale: lang } },
+          _count: { select: { tags: { where: { isActive: true } } } },
+        },
+      }),
+      this.prisma.tagGroup.count({ where }),
+    ]);
+
+    return {
+      data: tagGroups.map((tg) => ({
+        id: tg.id,
+        label: tg.translations[0]?.name ?? tg.slug,
+        slug: tg.slug,
+        extra: { childCount: tg._count.tags },
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async getTagGroupById(id: string): Promise<AdminTagGroupDetailPrismaType> {

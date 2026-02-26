@@ -1,46 +1,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { prisma } from 'src/prisma.js';
+import { fileURLToPath } from 'url';
+import { Locale } from '../browser.js';
+import { prisma } from '../prisma.js';
 
-async function parseAndSeed(locale: 'en' | 'tr', filename: string) {
-  const filePath = path.join(__dirname, 'taxonomy', filename);
-  if (!fs.existsSync(filePath)) {
-    console.error(`File not found: ${filePath}`);
-    return;
-  }
-
-  const fileContent = fs.readFileSync(filePath, 'utf-8');
-  const lines = fileContent.split('\n').filter((line) => line.trim() !== '');
-
-  // Skip the first line, usually comment like `# Google_Product_Taxonomy_Version: 2021-09-21`
-  if (lines[0].startsWith('#')) {
-    lines.shift();
-  }
-
-  console.log(`Processing ${lines.length} categories for locale ${locale}...`);
-
-  for (const line of lines) {
-    if (!line.includes(' - ')) continue;
-
-    const [idStr, ...pathParts] = line.split(' - ');
-    const id = parseInt(idStr.trim(), 10);
-    const fullPath = pathParts.join(' - ').trim(); // in case ' - ' existed in the name
-
-    // Example path: "Apparel & Accessories > Clothing > Shirts & Tops"
-    const categories = fullPath.split(' > ').map((c) => c.trim());
-    const name = categories[categories.length - 1];
-
-    // Determine parentId based on the path.
-    // However, since Google provides IDs, it's easier to find parent ID by looking up the parent path,
-    // but we can't look up by path effectively across different locales unless we are very careful.
-    // Instead, since the ID is universal across languages, we only really need to establish hierarchy ONCE (e.g. from English),
-    // Or we simply do it by parsing the structure carefully, or wait, if we process line by line (which is sorted shallow to deep),
-    // We can maintain a map of path -> ID during the run.
-  }
-}
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function main() {
-  // Let's first build the hierarchy tree using the English file to get parent IDs, because IDs are universal.
   const enFilePath = path.join(
     __dirname,
     'taxonomy',
@@ -59,8 +26,8 @@ async function main() {
   const pathToId = new Map<string, number>();
   const categoriesToCreate: { id: number; parentId: number | null }[] = [];
   const translationsToCreate: {
-    id: number;
-    locale: string;
+    googleTaxonomyId: number;
+    locale: Locale;
     name: string;
     path: string;
   }[] = [];
@@ -82,7 +49,12 @@ async function main() {
     }
 
     categoriesToCreate.push({ id, parentId });
-    translationsToCreate.push({ id, locale: 'en', name, path: fullPath });
+    translationsToCreate.push({
+      googleTaxonomyId: id,
+      locale: 'EN',
+      name,
+      path: fullPath,
+    });
   }
 
   const trFilePath = path.join(
@@ -105,50 +77,32 @@ async function main() {
       const parts = fullPath.split(' > ').map((p) => p.trim());
       const name = parts[parts.length - 1];
 
-      translationsToCreate.push({ id, locale: 'tr', name, path: fullPath });
+      translationsToCreate.push({
+        googleTaxonomyId: id,
+        locale: 'TR',
+        name,
+        path: fullPath,
+      });
     }
   }
 
-  console.log('Inserting into DB. This might take a minute...');
+  await prisma.googleTaxonomyTranslation.deleteMany();
+  await prisma.googleTaxonomy.deleteMany();
+  console.log('Cleared existing taxonomy data.');
 
-  // Use a transaction and chunks for performance
-  const CATEGORY_CHUNK = 500;
-  for (let i = 0; i < categoriesToCreate.length; i += CATEGORY_CHUNK) {
-    const chunk = categoriesToCreate.slice(i, i + CATEGORY_CHUNK);
-    await prisma.$transaction(
-      chunk.map((cat) =>
-        prisma.googleTaxonomy.upsert({
-          where: { id: cat.id },
-          update: { parentId: cat.parentId },
-          create: { id: cat.id, parentId: cat.parentId },
-        })
-      )
-    );
-  }
+  const CHUNK = 500;
 
-  const TRANSLATION_CHUNK = 1000;
-  for (let i = 0; i < translationsToCreate.length; i += TRANSLATION_CHUNK) {
-    const chunk = translationsToCreate.slice(i, i + TRANSLATION_CHUNK);
-    await prisma.$transaction(
-      chunk.map((tr) =>
-        prisma.googleTaxonomyTranslation.upsert({
-          where: {
-            googleTaxonomyId_locale: {
-              googleTaxonomyId: tr.id,
-              locale: tr.locale as 'EN' | 'TR',
-            },
-          },
-          update: { name: tr.name, path: tr.path },
-          create: {
-            googleTaxonomyId: tr.id,
-            locale: tr.locale as 'EN' | 'TR',
-            name: tr.name,
-            path: tr.path,
-          },
-        })
-      )
-    );
+  for (let i = 0; i < categoriesToCreate.length; i += CHUNK) {
+    const chunk = categoriesToCreate.slice(i, i + CHUNK);
+    await prisma.googleTaxonomy.createMany({ data: chunk });
   }
+  console.log(`Inserted ${categoriesToCreate.length} categories.`);
+
+  for (let i = 0; i < translationsToCreate.length; i += CHUNK) {
+    const chunk = translationsToCreate.slice(i, i + CHUNK);
+    await prisma.googleTaxonomyTranslation.createMany({ data: chunk });
+  }
+  console.log(`Inserted ${translationsToCreate.length} translations.`);
 
   console.log('Google Taxonomy seeding completed successfully.');
 }

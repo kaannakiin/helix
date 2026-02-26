@@ -3,6 +3,19 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+
+function getAncestorIds(item: {
+  parent?: { id: unknown; parent?: unknown } | null;
+}): string[] {
+  const ids: string[] = [];
+  let current: { id: unknown; parent?: unknown } | null | undefined =
+    item.parent;
+  while (current) {
+    ids.unshift(String(current.id));
+    current = (current as { parent?: typeof current }).parent;
+  }
+  return ids;
+}
 import type { Locale, Prisma } from '@org/prisma/client';
 import type { LookupItem } from '@org/schemas/admin/common';
 import {
@@ -91,7 +104,7 @@ export class CategoriesService {
     limit: number;
     page: number;
     lang: Locale;
-  }): Promise<LookupItem[]> {
+  }): Promise<LookupItem[] | PaginatedResponse<LookupItem>> {
     const { q, ids, limit, page, lang } = opts;
 
     if (ids?.length) {
@@ -103,6 +116,17 @@ export class CategoriesService {
           parent: {
             include: {
               translations: { where: { locale: lang } },
+              parent: {
+                include: {
+                  translations: { where: { locale: lang } },
+                  parent: {
+                    include: {
+                      translations: { where: { locale: lang } },
+                      parent: true,
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -116,14 +140,87 @@ export class CategoriesService {
         extra: {
           parentName: c.parent?.translations[0]?.name,
           depth: c.depth,
+          ancestorIds: getAncestorIds(c),
         },
       }));
     }
 
     const skip = (page - 1) * limit;
 
-    const categories = await this.prisma.category.findMany({
-      where: {
+    const where: Prisma.CategoryWhereInput = {
+      isActive: true,
+      ...(q
+        ? {
+            translations: {
+              some: {
+                locale: lang,
+                name: { contains: q, mode: 'insensitive' as const },
+              },
+            },
+          }
+        : {}),
+    };
+
+    const [categories, total] = await Promise.all([
+      this.prisma.category.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { sortOrder: 'asc' },
+        include: {
+          translations: { where: { locale: lang } },
+          images: { where: { isPrimary: true }, take: 1 },
+          parent: {
+            include: {
+              translations: { where: { locale: lang } },
+            },
+          },
+        },
+      }),
+      this.prisma.category.count({ where }),
+    ]);
+
+    return {
+      data: categories.map((c) => ({
+        id: c.id,
+        label: c.translations[0]?.name ?? c.slug,
+        slug: c.slug,
+        imageUrl: c.images[0]?.url,
+        extra: {
+          parentName: c.parent?.translations[0]?.name,
+          depth: c.depth,
+        },
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async getTree(opts: {
+    q?: string;
+    ids?: string[];
+    parentId?: string;
+    limit: number;
+    page: number;
+    lang: Locale;
+  }): Promise<LookupItem[] | PaginatedResponse<LookupItem>> {
+    const { q, ids, parentId, limit, page, lang } = opts;
+
+    // ids mode → resolve flat (reuse existing lookup)
+    if (ids?.length) {
+      return this.lookup({ q, ids, limit, page, lang });
+    }
+
+    const skip = (page - 1) * limit;
+
+    // parentId provided → fetch children of that parent (lazy load)
+    if (parentId) {
+      const where: Prisma.CategoryWhereInput = {
+        parentId,
         isActive: true,
         ...(q
           ? {
@@ -135,31 +232,103 @@ export class CategoriesService {
               },
             }
           : {}),
-      },
-      skip,
-      take: limit,
-      orderBy: { sortOrder: 'asc' },
-      include: {
-        translations: { where: { locale: lang } },
-        images: { where: { isPrimary: true }, take: 1 },
-        parent: {
+      };
+
+      const [categories, total] = await Promise.all([
+        this.prisma.category.findMany({
+          where,
+          skip,
+          take: limit,
+          orderBy: { sortOrder: 'asc' },
           include: {
             translations: { where: { locale: lang } },
+            images: { where: { isPrimary: true }, take: 1 },
+            _count: { select: { children: true } },
           },
-        },
-      },
-    });
+        }),
+        this.prisma.category.count({ where }),
+      ]);
 
-    return categories.map((c) => ({
-      id: c.id,
-      label: c.translations[0]?.name ?? c.slug,
-      slug: c.slug,
-      imageUrl: c.images[0]?.url,
-      extra: {
-        parentName: c.parent?.translations[0]?.name,
-        depth: c.depth,
+      return {
+        data: categories.map((c) => ({
+          id: c.id,
+          label: c.translations[0]?.name ?? c.slug,
+          slug: c.slug,
+          imageUrl: c.images[0]?.url,
+          extra: { childCount: c._count.children },
+        })),
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit),
+        },
+      };
+    }
+
+    // Root level — parentId: null
+    const where: Prisma.CategoryWhereInput = {
+      parentId: null,
+      isActive: true,
+      ...(q
+        ? {
+            OR: [
+              {
+                translations: {
+                  some: {
+                    locale: lang,
+                    name: { contains: q, mode: 'insensitive' as const },
+                  },
+                },
+              },
+              {
+                children: {
+                  some: {
+                    isActive: true,
+                    translations: {
+                      some: {
+                        locale: lang,
+                        name: { contains: q, mode: 'insensitive' as const },
+                      },
+                    },
+                  },
+                },
+              },
+            ],
+          }
+        : {}),
+    };
+
+    const [categories, total] = await Promise.all([
+      this.prisma.category.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { sortOrder: 'asc' },
+        include: {
+          translations: { where: { locale: lang } },
+          images: { where: { isPrimary: true }, take: 1 },
+          _count: { select: { children: true } },
+        },
+      }),
+      this.prisma.category.count({ where }),
+    ]);
+
+    return {
+      data: categories.map((c) => ({
+        id: c.id,
+        label: c.translations[0]?.name ?? c.slug,
+        slug: c.slug,
+        imageUrl: c.images[0]?.url,
+        extra: { childCount: c._count.children },
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
-    }));
+    };
   }
 
   async getCategoryById(id: string): Promise<AdminCategoryDetailPrismaType> {

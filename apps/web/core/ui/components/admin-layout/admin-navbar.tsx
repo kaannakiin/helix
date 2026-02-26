@@ -154,6 +154,7 @@ export function AdminNavbar({
                     }
                     collapsed={collapsed}
                     onClick={onNavigate}
+                    children={item.children}
                   />
                 ))}
               </div>
@@ -181,6 +182,7 @@ export function AdminNavbar({
                     }
                     collapsed={collapsed}
                     onClick={onNavigate}
+                    children={item.children}
                   />
                 ))}
               </MantineNavLink>

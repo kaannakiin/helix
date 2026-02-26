@@ -8,6 +8,7 @@ import {
 } from '@mantine/core';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
+import '@mantine/dropzone/styles.css';
 import '@mantine/spotlight/styles.css';
 import type { TokenPayload } from '@org/types/token';
 import { NextIntlClientProvider } from 'next-intl';

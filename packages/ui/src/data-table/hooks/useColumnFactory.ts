@@ -1,9 +1,5 @@
+import { DateTransformer } from '@org/utils/date-transformer';
 import type { ColDef, ValueGetterParams } from 'ag-grid-community';
-import dayjs from 'dayjs';
-import localizedFormat from 'dayjs/plugin/localizedFormat';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import timezone from 'dayjs/plugin/timezone';
-import utc from 'dayjs/plugin/utc';
 import { useMemo } from 'react';
 import { BadgeCellRenderer } from '../components/BadgeCellRenderer';
 import { BooleanCellRenderer } from '../components/BooleanCellRenderer';
@@ -17,11 +13,6 @@ import {
   useDataTableTranslations,
   type DataTableTranslations,
 } from '../context/DataTableTranslationContext';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
-dayjs.extend(localizedFormat);
-dayjs.extend(relativeTime);
 
 export type ColumnType =
   | 'text'
@@ -132,43 +123,41 @@ export function useColumnFactory(
       width: 100,
     });
 
-    const formatDate = (value: unknown, style: DateStyle, includeTime: boolean): string => {
-      if (!value) return '';
-      const d = dayjs(value as string | Date).tz(tz).locale(locale);
-      if (style === 'relative') return d.fromNow();
-      if (includeTime) {
-        switch (style) {
-          case 'compact': return d.format('l LT');
-          case 'full': return d.format('LLLL');
-          default: return d.format('L LT');
-        }
-      }
-      switch (style) {
-        case 'compact': return d.format('l');
-        case 'full': return d.format('LL');
-        default: return d.format('L');
-      }
-    };
-
-    const buildDateConfig = <T>(style: DateStyle = 'standard'): Partial<ColDef<T>> => ({
+    const buildDateConfig = <T>(
+      style: DateStyle = 'standard'
+    ): Partial<ColDef<T>> => ({
       sortable: true,
       filter: {
         component: DateFilter,
         doesFilterPass: serverSideDoesFilterPass,
       },
-      valueFormatter: (params) => formatDate(params.value, style, false),
+      valueFormatter: (params) =>
+        DateTransformer.formatDate(
+          params.value as string | Date,
+          locale,
+          tz,
+          style
+        ),
       resizable: true,
       flex: 1,
       minWidth: 100,
     });
 
-    const buildDateTimeConfig = <T>(style: DateStyle = 'standard'): Partial<ColDef<T>> => ({
+    const buildDateTimeConfig = <T>(
+      style: DateStyle = 'standard'
+    ): Partial<ColDef<T>> => ({
       sortable: true,
       filter: {
         component: DateFilter,
         doesFilterPass: serverSideDoesFilterPass,
       },
-      valueFormatter: (params) => formatDate(params.value, style, true),
+      valueFormatter: (params) =>
+        DateTransformer.formatDateTime(
+          params.value as string | Date,
+          locale,
+          tz,
+          style
+        ),
       resizable: true,
       flex: 1,
       minWidth: 100,

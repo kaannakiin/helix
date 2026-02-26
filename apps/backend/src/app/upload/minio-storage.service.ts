@@ -1,7 +1,7 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { InjectMinio } from 'nestjs-minio';
 import { Client as MinioClient } from 'minio';
+import { InjectMinio } from 'nestjs-minio';
 
 @Injectable()
 export class MinioStorageService implements OnModuleInit {
@@ -9,13 +9,23 @@ export class MinioStorageService implements OnModuleInit {
 
   constructor(
     @InjectMinio() private readonly minioClient: MinioClient,
-    private readonly config: ConfigService,
+    private readonly config: ConfigService
   ) {
     this.bucket = this.config.getOrThrow<string>('MINIO_BUCKET');
   }
 
   async onModuleInit(): Promise<void> {
-    await this.ensureBucket(this.bucket);
+    try {
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Connection timed out')), 5000)
+      );
+      await Promise.race([this.ensureBucket(this.bucket), timeout]);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(
+        `[MinIO] Could not connect to MinIO: ${msg}. Upload features will not work until MinIO is available.`
+      );
+    }
   }
 
   async ensureBucket(bucketName: string): Promise<void> {
@@ -35,7 +45,7 @@ export class MinioStorageService implements OnModuleInit {
       params.objectName,
       params.buffer,
       params.buffer.length,
-      { 'Content-Type': params.contentType },
+      { 'Content-Type': params.contentType }
     );
     return this.getPublicUrl(params.objectName);
   }

@@ -289,6 +289,7 @@ const productSchemaShape = z.object({
     .default('DRAFT'),
   hasVariants: z.boolean().default(false),
   brandId: cuidSchema.optional().or(z.literal('')),
+  googleTaxonomyId: z.number().int().nullish().default(null),
   translations: z
     .array(ProductTranslationSchema)
     .min(1, { error: V.TRANSLATIONS_MIN }),
@@ -353,6 +354,7 @@ const backendProductSchemaShape = z.object({
     .default('DRAFT'),
   hasVariants: z.boolean().default(false),
   brandId: cuidSchema.optional().or(z.literal('')),
+  googleTaxonomyId: z.number().int().nullable().default(null),
   translations: z
     .array(ProductTranslationSchema)
     .min(1, { error: V.TRANSLATIONS_MIN }),
@@ -386,6 +388,7 @@ export const NEW_PRODUCT_DEFAULT_VALUES: ProductInputType = {
   type: 'PHYSICAL',
   status: 'DRAFT',
   hasVariants: false,
+  googleTaxonomyId: null,
   translations: [{ locale: 'TR', name: '', slug: '' }],
   newImages: [],
   existingImages: [],

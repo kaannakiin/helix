@@ -36,5 +36,9 @@ export const DATA_ACCESS_KEYS = {
       detail: (id: string) => ['admin', 'tags', 'detail', id] as const,
       lookup: ['admin', 'tags', 'lookup'],
     },
+    taxonomy: {
+      lookup: ['admin', 'taxonomy', 'lookup'],
+      tree: ['admin', 'taxonomy', 'tree'],
+    },
   },
 } as const;

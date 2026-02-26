@@ -46,6 +46,22 @@ export class TagGroupsController {
     });
   }
 
+  @Get('tags/tree')
+  @ApiOperation({ summary: 'Get tags as a tree (tag groups with their tags)' })
+  async getTagTree(
+    @Query() query: TagLookupQueryDTO,
+    @Locale() lang: import('@org/prisma/client').Locale,
+  ) {
+    return this.tagGroupsService.getTagTree({
+      q: query.q,
+      ids: query.ids?.split(',').filter(Boolean),
+      tagGroupId: query.tagGroupId,
+      limit: query.limit,
+      page: query.page,
+      lang,
+    });
+  }
+
   @Get('export')
   @ApiOperation({ summary: 'Export tag groups as Excel or CSV' })
   async exportTagGroups(

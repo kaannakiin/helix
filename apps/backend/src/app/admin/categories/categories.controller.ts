@@ -47,6 +47,22 @@ export class CategoriesController {
     });
   }
 
+  @Get('tree')
+  @ApiOperation({ summary: 'Get categories as a tree (top-level parents with children)' })
+  async getCategoryTree(
+    @Query() query: CategoryLookupQueryDTO,
+    @Locale() lang: import('@org/prisma/client').Locale,
+  ) {
+    return this.categoriesService.getTree({
+      q: query.q,
+      ids: query.ids?.split(',').filter(Boolean),
+      parentId: query.parentId,
+      limit: query.limit,
+      page: query.page,
+      lang,
+    });
+  }
+
   @Get('export')
   @ApiOperation({ summary: 'Export categories as Excel or CSV' })
   async exportCategories(

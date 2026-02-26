@@ -1,13 +1,14 @@
 export const ACCESS_TOKEN_COOKIE_NAME = 'token';
 export const REFRESH_TOKEN_COOKIE_NAME = 'refresh_token';
-export const ACCESS_TOKEN_EXPIRY = '30m';
-export const ACCESS_TOKEN_EXPIRY_MS = 30 * 60 * 1000;
+export const ACCESS_TOKEN_EXPIRY = '1m';
+export const ACCESS_TOKEN_EXPIRY_MS = 1 * 60 * 1000;
 export const REFRESH_TOKEN_EXPIRY = '30d';
 export const REFRESH_TOKEN_EXPIRY_DAYS = 30;
 export const SESSION_EXPIRY_DAYS = 7;
 export const MAX_ACTIVE_SESSIONS = 5;
 export const ACCESS_COOKIE_PATH = '/';
 export const REFRESH_COOKIE_PATH = '/';
+export const AUTH_SYNC_COOKIE_NAME = 'auth_refreshed';
 export const LOCALE_COOKIE_NAME = 'LOCALE';
 export const LOCAL_STRATEGY = 'local';
 export const JWT_STRATEGY = 'jwt';

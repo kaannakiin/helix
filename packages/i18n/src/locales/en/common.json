@@ -13,6 +13,10 @@
     "inventory": "Inventory",
     "discounts": "Discounts",
     "reports": "Reports",
+    "brands": "Brands",
+    "categories": "Categories",
+    "tags": "Tags",
+    "variants": "Variants",
     "groups": {
       "main": "Main",
       "commerce": "Commerce",
@@ -45,7 +49,423 @@
     "email_tab": "Email",
     "phone_tab": "Phone"
   },
+  "enums": {
+    "userRole": {
+      "ADMIN": "Admin",
+      "MODERATOR": "Moderator",
+      "USER": "User"
+    },
+    "accountStatus": {
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended",
+      "BANNED": "Banned",
+      "DEACTIVATED": "Deactivated"
+    },
+    "productType": {
+      "PHYSICAL": "Physical",
+      "DIGITAL": "Digital"
+    },
+    "productStatus": {
+      "DRAFT": "Draft",
+      "ACTIVE": "Active",
+      "ARCHIVED": "Archived"
+    },
+    "variantGroupType": {
+      "SIZE": "Size",
+      "COLOR": "Color"
+    },
+    "variantGroupDisplayMode": {
+      "BADGE": "Badge",
+      "SELECT": "Select",
+      "IMAGE_GRID": "Image Grid"
+    },
+    "trackingStrategy": {
+      "NONE": "None",
+      "BATCH": "Batch",
+      "SERIAL": "Serial",
+      "BATCH_AND_SERIAL": "Batch & Serial"
+    }
+  },
+  "relationInput": {
+    "search": "Search...",
+    "empty": "No results found",
+    "selected": "Selected"
+  },
+  "relationModal": {
+    "select": "Select",
+    "search": "Search...",
+    "empty": "No results found",
+    "selected": "{count} selected",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "clear": "Clear all",
+    "loadMore": "Load more"
+  },
+  "dropzone": {
+    "dropzoneLabel": "Drag files here or click to select",
+    "dropzoneSublabel": "Attach files",
+    "rejectLabel": "File not accepted",
+    "removeFile": "Remove file",
+    "previewFile": "Preview",
+    "dragHandle": "Drag to reorder",
+    "previewTitle": "Preview",
+    "noPreview": "No preview available",
+    "rejectionTitle": "Rejected files",
+    "fileTooLarge": "File is too large",
+    "fileInvalidType": "File type not allowed",
+    "tooManyFiles": "Too many files"
+  },
+  "seoCard": {
+    "title": "SEO",
+    "fields": {
+      "slug": {
+        "label": "Slug",
+        "placeholder": "url-friendly-slug"
+      },
+      "metaTitle": {
+        "label": "Meta Title",
+        "placeholder": "Page title for search engines..."
+      },
+      "metaDescription": {
+        "label": "Meta Description",
+        "placeholder": "Brief description for search results..."
+      }
+    },
+    "preview": {
+      "title": "Search Preview",
+      "defaultSlug": "your-slug",
+      "defaultMetaTitle": "Page Title",
+      "defaultMetaDescription": "Page description will appear here..."
+    }
+  },
+  "richTextEditor": {
+    "link": {
+      "placeholder": "https://example.com",
+      "apply": "Apply",
+      "remove": "Remove link",
+      "cancel": "Cancel"
+    },
+    "toolbar": {
+      "bold": "Bold",
+      "italic": "Italic",
+      "underline": "Underline",
+      "strikethrough": "Strikethrough",
+      "code": "Inline Code",
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "bulletList": "Bullet List",
+      "orderedList": "Ordered List",
+      "blockquote": "Blockquote",
+      "horizontalRule": "Horizontal Rule",
+      "link": "Insert Link",
+      "clearFormatting": "Clear Formatting",
+      "undo": "Undo",
+      "redo": "Redo"
+    }
+  },
   "admin": {
+    "products": {
+      "title": "Products",
+      "subtitle": "Manage all products",
+      "new": "New Product",
+      "table": {
+        "name": "Name",
+        "type": "Type",
+        "status": "Status",
+        "brandName": "Brand",
+        "variantCount": "Variants",
+        "categoryCount": "Categories",
+        "tagCount": "Tags",
+        "createdAt": "Created At",
+        "updatedAt": "Updated At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters"
+      },
+      "form": {
+        "newProduct": "New Product",
+        "discard": "Discard",
+        "save": "Save",
+        "generalInfo": "General Information",
+        "name": {
+          "label": "Product Name",
+          "placeholder": "Enter product name..."
+        },
+        "shortDescription": {
+          "label": "Short Description",
+          "placeholder": "Brief summary of the product..."
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Full product description...",
+          "description": "Supports rich text formatting"
+        },
+        "media": {
+          "title": "Media",
+          "description": "Upload product images and videos"
+        },
+        "statusCard": {
+          "title": "Status",
+          "publishing": "Publishing",
+          "hidden": "Draft products are not visible to customers"
+        },
+        "status": {
+          "label": "Status"
+        },
+        "type": {
+          "label": "Product Type"
+        },
+        "organization": "Organization",
+        "brand": {
+          "label": "Brand",
+          "placeholder": "Select brand..."
+        },
+        "categories": {
+          "label": "Categories",
+          "placeholder": "Select categories..."
+        },
+        "tags": {
+          "label": "Tags",
+          "placeholder": "Select tags..."
+        },
+        "taxonomy": {
+          "label": "Google Taxonomy",
+          "placeholder": "Select taxonomy..."
+        },
+        "variants": {
+          "title": "Variants",
+          "description": "Define product variants like size and color",
+          "toggle": "Has Variants",
+          "disabled": "Enable variants to add variant groups",
+          "noGroups": "No variant groups added yet",
+          "addGroup": "Add Variant Group",
+          "lockedHasVariants": "This product has variants. Manage variant groups below.",
+          "lockedNoVariants": "This product has no variants.",
+          "unnamedGroup": "Unnamed Group",
+          "unnamedOption": "Unnamed Option",
+          "cancel": "Cancel",
+          "save": "Save",
+          "noOptions": "No options added yet",
+          "modal": {
+            "title": "Add Variant Group",
+            "existing": "From Library",
+            "new": "Create New",
+            "searchDescription": "Search existing variant groups to reuse them",
+            "searchPlaceholder": "Search groups...",
+            "searchGroups": "Type to search variant groups",
+            "noGroups": "No groups found",
+            "colorGroupExists": "Only one color group allowed",
+            "slugExistsOnProduct": "This group already exists on the product",
+            "slugExistsInDatabase": "A group with this name already exists",
+            "slugCheckFailed": "Could not verify group name. Please try again.",
+            "cancel": "Cancel",
+            "add": "Add",
+            "groupType": "Group Type",
+            "groupName": "Group Name",
+            "groupNamePlaceholder": "Enter group name..."
+          },
+          "groupDrawer": {
+            "name": "Group Name",
+            "namePlaceholder": "Enter group name...",
+            "type": "Group Type",
+            "sizeDescription": "Text-based options like S, M, L, XL",
+            "colorDescription": "Color swatches with hex codes or images",
+            "options": "Options",
+            "addOption": "Add Option",
+            "removedOptions": "Removed Options",
+            "restoreOption": "Restore"
+          }
+        }
+      }
+    },
+    "brands": {
+      "title": "Brands",
+      "subtitle": "Manage all brands",
+      "table": {
+        "name": "Name",
+        "slug": "Slug",
+        "isActive": "Active",
+        "productsCount": "Products",
+        "websiteUrl": "Website",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters"
+      }
+    },
+    "categories": {
+      "title": "Categories",
+      "subtitle": "Manage all categories",
+      "table": {
+        "name": "Name",
+        "slug": "Slug",
+        "parentName": "Parent",
+        "depth": "Depth",
+        "isActive": "Active",
+        "childrenCount": "Children",
+        "productsCount": "Products",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters"
+      },
+      "form": {
+        "newCategory": "New Category",
+        "discard": "Discard",
+        "save": "Save",
+        "generalInfo": "General Information",
+        "name": {
+          "label": "Category Name",
+          "placeholder": "Enter category name..."
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Brief description of the category..."
+        },
+        "media": {
+          "title": "Media",
+          "description": "Upload category image"
+        },
+        "statusCard": {
+          "title": "Status",
+          "activeLabel": "Active"
+        },
+        "organization": "Organization",
+        "parent": {
+          "label": "Parent Category",
+          "placeholder": "Select parent category..."
+        }
+      }
+    },
+    "tags": {
+      "title": "Tag Groups",
+      "subtitle": "Manage all tag groups",
+      "table": {
+        "name": "Name",
+        "slug": "Slug",
+        "isActive": "Active",
+        "tagsCount": "Tags",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters"
+      }
+    },
+    "variants": {
+      "title": "Variant Groups",
+      "subtitle": "Manage all variant groups",
+      "table": {
+        "name": "Name",
+        "optionsCount": "Options",
+        "productsCount": "Products",
+        "createdAt": "Created At",
+        "updatedAt": "Updated At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters"
+      }
+    },
     "customers": {
       "title": "Customers",
       "subtitle": "Manage all user accounts",
@@ -109,6 +529,11 @@
     }
   },
   "dataTable": {
+    "columnVisibility": {
+      "title": "Columns",
+      "showAll": "Show All",
+      "hiddenCount": "{count} hidden"
+    },
     "filters": {
       "reset": "Reset",
       "text": {

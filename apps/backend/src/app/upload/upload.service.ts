@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { FileTypeConfigs } from '@org/constants/product.constants';
+import { FileTypeConfigs } from '@org/constants/product-constants';
 import { FileType } from '@org/prisma/client';
 import type { UploadFileOutput } from '@org/schemas/admin/upload';
 import {

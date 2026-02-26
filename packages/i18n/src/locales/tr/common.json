@@ -13,6 +13,10 @@
     "inventory": "Envanter",
     "discounts": "İndirimler",
     "reports": "Raporlar",
+    "brands": "Markalar",
+    "categories": "Kategoriler",
+    "tags": "Etiketler",
+    "variants": "Varyantlar",
     "groups": {
       "main": "Ana Menü",
       "commerce": "Ticaret",
@@ -45,7 +49,423 @@
     "email_tab": "E-posta",
     "phone_tab": "Telefon"
   },
+  "enums": {
+    "userRole": {
+      "ADMIN": "Admin",
+      "MODERATOR": "Moderatör",
+      "USER": "Kullanıcı"
+    },
+    "accountStatus": {
+      "ACTIVE": "Aktif",
+      "SUSPENDED": "Askıya Alındı",
+      "BANNED": "Yasaklandı",
+      "DEACTIVATED": "Devre Dışı"
+    },
+    "productType": {
+      "PHYSICAL": "Fiziksel",
+      "DIGITAL": "Dijital"
+    },
+    "productStatus": {
+      "DRAFT": "Taslak",
+      "ACTIVE": "Aktif",
+      "ARCHIVED": "Arşivlendi"
+    },
+    "variantGroupType": {
+      "SIZE": "Beden",
+      "COLOR": "Renk"
+    },
+    "variantGroupDisplayMode": {
+      "BADGE": "Rozet",
+      "SELECT": "Seçim",
+      "IMAGE_GRID": "Resim Izgara"
+    },
+    "trackingStrategy": {
+      "NONE": "Yok",
+      "BATCH": "Parti",
+      "SERIAL": "Seri",
+      "BATCH_AND_SERIAL": "Parti & Seri"
+    }
+  },
+  "relationInput": {
+    "search": "Ara...",
+    "empty": "Sonuç bulunamadı",
+    "selected": "Seçildi"
+  },
+  "relationModal": {
+    "select": "Seç",
+    "search": "Ara...",
+    "empty": "Sonuç bulunamadı",
+    "selected": "{count} seçili",
+    "confirm": "Onayla",
+    "cancel": "İptal",
+    "clear": "Tümünü temizle",
+    "loadMore": "Daha fazla"
+  },
+  "dropzone": {
+    "dropzoneLabel": "Dosyaları buraya sürükleyin veya seçmek için tıklayın",
+    "dropzoneSublabel": "Dosya ekle",
+    "rejectLabel": "Dosya kabul edilmedi",
+    "removeFile": "Dosyayı kaldır",
+    "previewFile": "Önizle",
+    "dragHandle": "Yeniden sıralamak için sürükle",
+    "previewTitle": "Önizleme",
+    "noPreview": "Önizleme yok",
+    "rejectionTitle": "Reddedilen dosyalar",
+    "fileTooLarge": "Dosya çok büyük",
+    "fileInvalidType": "Dosya türüne izin verilmiyor",
+    "tooManyFiles": "Çok fazla dosya"
+  },
+  "seoCard": {
+    "title": "SEO",
+    "fields": {
+      "slug": {
+        "label": "Slug",
+        "placeholder": "url-dostu-slug"
+      },
+      "metaTitle": {
+        "label": "Meta Başlık",
+        "placeholder": "Arama motorları için sayfa başlığı..."
+      },
+      "metaDescription": {
+        "label": "Meta Açıklama",
+        "placeholder": "Arama sonuçlarında görünecek kısa açıklama..."
+      }
+    },
+    "preview": {
+      "title": "Arama Önizlemesi",
+      "defaultSlug": "slug-adresiniz",
+      "defaultMetaTitle": "Sayfa Başlığı",
+      "defaultMetaDescription": "Sayfa açıklaması burada görünecek..."
+    }
+  },
+  "richTextEditor": {
+    "link": {
+      "placeholder": "https://ornek.com",
+      "apply": "Uygula",
+      "remove": "Bağlantıyı kaldır",
+      "cancel": "İptal"
+    },
+    "toolbar": {
+      "bold": "Kalın",
+      "italic": "İtalik",
+      "underline": "Altı Çizili",
+      "strikethrough": "Üstü Çizili",
+      "code": "Satır İçi Kod",
+      "heading1": "Başlık 1",
+      "heading2": "Başlık 2",
+      "heading3": "Başlık 3",
+      "bulletList": "Madde İşaretli Liste",
+      "orderedList": "Numaralı Liste",
+      "blockquote": "Alıntı",
+      "horizontalRule": "Yatay Çizgi",
+      "link": "Bağlantı Ekle",
+      "clearFormatting": "Biçimlendirmeyi Temizle",
+      "undo": "Geri Al",
+      "redo": "Yinele"
+    }
+  },
   "admin": {
+    "products": {
+      "title": "Ürünler",
+      "subtitle": "Tüm ürünleri yönetin",
+      "new": "Yeni Ürün",
+      "table": {
+        "name": "Ad",
+        "type": "Tür",
+        "status": "Durum",
+        "brandName": "Marka",
+        "variantCount": "Varyantlar",
+        "categoryCount": "Kategoriler",
+        "tagCount": "Etiketler",
+        "createdAt": "Oluşturulma",
+        "updatedAt": "Güncellenme"
+      },
+      "contextMenu": {
+        "view": "Detayları Görüntüle",
+        "copy": "Kopyala",
+        "copySelected": "Seçilenleri Kopyala",
+        "copyAsTable": "Tablo (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Düz Metin",
+        "exportGroup": "Dışa Aktar",
+        "exportCSV": "CSV Olarak Dışa Aktar",
+        "exportExcel": "Excel Olarak Dışa Aktar"
+      },
+      "footer": {
+        "totalRows": "Toplam: {count}",
+        "selectedRows": "Seçili: {count}",
+        "refresh": "Yenile"
+      },
+      "filterDrawer": {
+        "title": "Filtreler",
+        "clearAll": "Tümünü Temizle",
+        "activeFilters": "{count} aktif",
+        "noFilters": "Filtre bulunmuyor",
+        "apply": "Filtrele"
+      },
+      "form": {
+        "newProduct": "Yeni Ürün",
+        "discard": "Vazgeç",
+        "save": "Kaydet",
+        "generalInfo": "Genel Bilgiler",
+        "name": {
+          "label": "Ürün Adı",
+          "placeholder": "Ürün adını girin..."
+        },
+        "shortDescription": {
+          "label": "Kısa Açıklama",
+          "placeholder": "Ürünün kısa özeti..."
+        },
+        "description": {
+          "label": "Açıklama",
+          "placeholder": "Ürün açıklaması...",
+          "description": "Zengin metin biçimlendirmeyi destekler"
+        },
+        "media": {
+          "title": "Medya",
+          "description": "Ürün fotoğraf ve videolarını yükleyin"
+        },
+        "statusCard": {
+          "title": "Durum",
+          "publishing": "Yayınlama",
+          "hidden": "Taslak ürünler müşterilere görünmez"
+        },
+        "status": {
+          "label": "Durum"
+        },
+        "type": {
+          "label": "Ürün Türü"
+        },
+        "organization": "Organizasyon",
+        "brand": {
+          "label": "Marka",
+          "placeholder": "Marka seçin..."
+        },
+        "categories": {
+          "label": "Kategoriler",
+          "placeholder": "Kategori seçin..."
+        },
+        "tags": {
+          "label": "Etiketler",
+          "placeholder": "Etiket seçin..."
+        },
+        "taxonomy": {
+          "label": "Google Taxonomy",
+          "placeholder": "Taxonomy seçin..."
+        },
+        "variants": {
+          "title": "Varyantlar",
+          "description": "Beden ve renk gibi ürün varyantlarını tanımlayın",
+          "toggle": "Varyantlar Var",
+          "disabled": "Varyant grupları eklemek için varyantları etkinleştirin",
+          "noGroups": "Henüz varyant grubu eklenmedi",
+          "addGroup": "Varyant Grubu Ekle",
+          "lockedHasVariants": "Bu ürünün varyantları var. Aşağıdan varyant gruplarını yönetin.",
+          "lockedNoVariants": "Bu ürünün varyantı yok.",
+          "unnamedGroup": "İsimsiz Grup",
+          "unnamedOption": "İsimsiz Seçenek",
+          "cancel": "İptal",
+          "save": "Kaydet",
+          "noOptions": "Henüz seçenek eklenmedi",
+          "modal": {
+            "title": "Varyant Grubu Ekle",
+            "existing": "Kütüphaneden",
+            "new": "Yeni Oluştur",
+            "searchDescription": "Mevcut varyant gruplarını yeniden kullanmak için arayın",
+            "searchPlaceholder": "Grup ara...",
+            "searchGroups": "Varyant gruplarını aramak için yazın",
+            "noGroups": "Grup bulunamadı",
+            "colorGroupExists": "Yalnızca bir renk grubuna izin verilir",
+            "slugExistsOnProduct": "Bu grup ürünte zaten mevcut",
+            "slugExistsInDatabase": "Bu isimde bir grup zaten var",
+            "slugCheckFailed": "Grup adı doğrulanamadı. Lütfen tekrar deneyin.",
+            "cancel": "İptal",
+            "add": "Ekle",
+            "groupType": "Grup Türü",
+            "groupName": "Grup Adı",
+            "groupNamePlaceholder": "Grup adını girin..."
+          },
+          "groupDrawer": {
+            "name": "Grup Adı",
+            "namePlaceholder": "Grup adını girin...",
+            "type": "Grup Türü",
+            "sizeDescription": "S, M, L, XL gibi metin tabanlı seçenekler",
+            "colorDescription": "Hex kodu veya resim ile renk örnekleri",
+            "options": "Seçenekler",
+            "addOption": "Seçenek Ekle",
+            "removedOptions": "Kaldırılan Seçenekler",
+            "restoreOption": "Geri Yükle"
+          }
+        }
+      }
+    },
+    "brands": {
+      "title": "Markalar",
+      "subtitle": "Tüm markaları yönetin",
+      "table": {
+        "name": "Ad",
+        "slug": "Slug",
+        "isActive": "Aktif",
+        "productsCount": "Ürünler",
+        "websiteUrl": "Web Sitesi",
+        "createdAt": "Oluşturulma"
+      },
+      "contextMenu": {
+        "view": "Detayları Görüntüle",
+        "copy": "Kopyala",
+        "copySelected": "Seçilenleri Kopyala",
+        "copyAsTable": "Tablo (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Düz Metin",
+        "exportGroup": "Dışa Aktar",
+        "exportCSV": "CSV Olarak Dışa Aktar",
+        "exportExcel": "Excel Olarak Dışa Aktar"
+      },
+      "footer": {
+        "totalRows": "Toplam: {count}",
+        "selectedRows": "Seçili: {count}",
+        "refresh": "Yenile"
+      },
+      "filterDrawer": {
+        "title": "Filtreler",
+        "clearAll": "Tümünü Temizle",
+        "activeFilters": "{count} aktif",
+        "noFilters": "Filtre bulunmuyor",
+        "apply": "Filtrele"
+      }
+    },
+    "categories": {
+      "title": "Kategoriler",
+      "subtitle": "Tüm kategorileri yönetin",
+      "table": {
+        "name": "Ad",
+        "slug": "Slug",
+        "parentName": "Üst Kategori",
+        "depth": "Derinlik",
+        "isActive": "Aktif",
+        "childrenCount": "Alt Kategoriler",
+        "productsCount": "Ürünler",
+        "createdAt": "Oluşturulma"
+      },
+      "contextMenu": {
+        "view": "Detayları Görüntüle",
+        "copy": "Kopyala",
+        "copySelected": "Seçilenleri Kopyala",
+        "copyAsTable": "Tablo (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Düz Metin",
+        "exportGroup": "Dışa Aktar",
+        "exportCSV": "CSV Olarak Dışa Aktar",
+        "exportExcel": "Excel Olarak Dışa Aktar"
+      },
+      "footer": {
+        "totalRows": "Toplam: {count}",
+        "selectedRows": "Seçili: {count}",
+        "refresh": "Yenile"
+      },
+      "filterDrawer": {
+        "title": "Filtreler",
+        "clearAll": "Tümünü Temizle",
+        "activeFilters": "{count} aktif",
+        "noFilters": "Filtre bulunmuyor",
+        "apply": "Filtrele"
+      },
+      "form": {
+        "newCategory": "Yeni Kategori",
+        "discard": "Vazgeç",
+        "save": "Kaydet",
+        "generalInfo": "Genel Bilgiler",
+        "name": {
+          "label": "Kategori Adı",
+          "placeholder": "Kategori adını girin..."
+        },
+        "description": {
+          "label": "Açıklama",
+          "placeholder": "Kategorinin kısa açıklaması..."
+        },
+        "media": {
+          "title": "Medya",
+          "description": "Kategori görseli yükleyin"
+        },
+        "statusCard": {
+          "title": "Durum",
+          "activeLabel": "Aktif"
+        },
+        "organization": "Organizasyon",
+        "parent": {
+          "label": "Üst Kategori",
+          "placeholder": "Üst kategori seçin..."
+        }
+      }
+    },
+    "tags": {
+      "title": "Etiket Grupları",
+      "subtitle": "Tüm etiket gruplarını yönetin",
+      "table": {
+        "name": "Ad",
+        "slug": "Slug",
+        "isActive": "Aktif",
+        "tagsCount": "Etiketler",
+        "createdAt": "Oluşturulma"
+      },
+      "contextMenu": {
+        "view": "Detayları Görüntüle",
+        "copy": "Kopyala",
+        "copySelected": "Seçilenleri Kopyala",
+        "copyAsTable": "Tablo (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Düz Metin",
+        "exportGroup": "Dışa Aktar",
+        "exportCSV": "CSV Olarak Dışa Aktar",
+        "exportExcel": "Excel Olarak Dışa Aktar"
+      },
+      "footer": {
+        "totalRows": "Toplam: {count}",
+        "selectedRows": "Seçili: {count}",
+        "refresh": "Yenile"
+      },
+      "filterDrawer": {
+        "title": "Filtreler",
+        "clearAll": "Tümünü Temizle",
+        "activeFilters": "{count} aktif",
+        "noFilters": "Filtre bulunmuyor",
+        "apply": "Filtrele"
+      }
+    },
+    "variants": {
+      "title": "Varyant Grupları",
+      "subtitle": "Tüm varyant gruplarını yönetin",
+      "table": {
+        "name": "Ad",
+        "optionsCount": "Seçenekler",
+        "productsCount": "Ürünler",
+        "createdAt": "Oluşturulma",
+        "updatedAt": "Güncellenme"
+      },
+      "contextMenu": {
+        "view": "Detayları Görüntüle",
+        "copy": "Kopyala",
+        "copySelected": "Seçilenleri Kopyala",
+        "copyAsTable": "Tablo (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Düz Metin",
+        "exportGroup": "Dışa Aktar",
+        "exportCSV": "CSV Olarak Dışa Aktar",
+        "exportExcel": "Excel Olarak Dışa Aktar"
+      },
+      "footer": {
+        "totalRows": "Toplam: {count}",
+        "selectedRows": "Seçili: {count}",
+        "refresh": "Yenile"
+      },
+      "filterDrawer": {
+        "title": "Filtreler",
+        "clearAll": "Tümünü Temizle",
+        "activeFilters": "{count} aktif",
+        "noFilters": "Filtre bulunmuyor",
+        "apply": "Filtrele"
+      }
+    },
     "customers": {
       "title": "Müşteriler",
       "subtitle": "Tüm kullanıcı hesaplarını yönetin",
@@ -109,6 +529,11 @@
     }
   },
   "dataTable": {
+    "columnVisibility": {
+      "title": "Sütunlar",
+      "showAll": "Tümünü Göster",
+      "hiddenCount": "{count} gizli"
+    },
     "filters": {
       "reset": "Sıfırla",
       "text": {

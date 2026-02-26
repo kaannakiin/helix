@@ -1,6 +1,7 @@
 import { format as csvFormat } from '@fast-csv/format';
 import { Injectable } from '@nestjs/common';
 import type { ExportColumnDef } from '@org/types/export';
+import { DateTransformer } from '@org/utils/date-transformer';
 import { stream as excelStream } from 'exceljs';
 import { PassThrough, type Readable } from 'node:stream';
 import type {
@@ -21,8 +22,6 @@ const DEFAULT_LOCALE_STRINGS: ExportLocaleStrings = {
 interface FormatContext {
   locale: string;
   localeStrings: ExportLocaleStrings;
-  dateFormatter: Intl.DateTimeFormat;
-  dateTimeFormatter: Intl.DateTimeFormat;
 }
 
 @Injectable()
@@ -65,23 +64,9 @@ export class ExportService {
     locale?: string,
     localeStrings?: ExportLocaleStrings
   ): FormatContext {
-    const resolvedLocale = locale ?? 'en';
     return {
-      locale: resolvedLocale,
+      locale: locale ?? 'en',
       localeStrings: localeStrings ?? DEFAULT_LOCALE_STRINGS,
-      dateFormatter: new Intl.DateTimeFormat(resolvedLocale, {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-      }),
-      dateTimeFormatter: new Intl.DateTimeFormat(resolvedLocale, {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-      }),
     };
   }
 
@@ -216,14 +201,10 @@ export class ExportService {
         return value
           ? ctx.localeStrings.booleanYes
           : ctx.localeStrings.booleanNo;
-      case 'date': {
-        const date = value instanceof Date ? value : new Date(String(value));
-        return ctx.dateFormatter.format(date);
-      }
-      case 'datetime': {
-        const dt = value instanceof Date ? value : new Date(String(value));
-        return ctx.dateTimeFormatter.format(dt);
-      }
+      case 'date':
+        return DateTransformer.formatDate(value as string | Date, ctx.locale);
+      case 'datetime':
+        return DateTransformer.formatDateTime(value as string | Date, ctx.locale);
       case 'badge':
         if (col.labelMap && typeof value === 'string') {
           return col.labelMap[value] ?? value;

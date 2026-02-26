@@ -1,4 +1,5 @@
 import type { MantineSize, StyleProp } from '@mantine/core';
+import type { PaginatedResponse } from '@org/types/pagination';
 import type { ReactNode } from 'react';
 
 export interface LookupItem {
@@ -10,16 +11,11 @@ export interface LookupItem {
   extra?: Record<string, unknown>;
 }
 
-export interface LookupPage {
-  items: LookupItem[];
-  hasMore: boolean;
-}
-
 export type FetchOptions = (params: {
   q?: string;
   ids?: string[];
   page?: number;
-}) => Promise<LookupItem[] | LookupPage>;
+}) => Promise<LookupItem[] | PaginatedResponse<LookupItem>>;
 
 interface RelationInputBaseProps {
   fetchOptions: FetchOptions;

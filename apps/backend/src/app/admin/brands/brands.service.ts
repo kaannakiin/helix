@@ -85,7 +85,7 @@ export class BrandsService {
     limit: number;
     page: number;
     lang: Locale;
-  }): Promise<LookupItem[]> {
+  }): Promise<LookupItem[] | PaginatedResponse<LookupItem>> {
     const { q, ids, limit, page, lang } = opts;
 
     if (ids?.length) {
@@ -108,36 +108,49 @@ export class BrandsService {
 
     const skip = (page - 1) * limit;
 
-    const brands = await this.prisma.brand.findMany({
-      where: {
-        isActive: true,
-        ...(q
-          ? {
-              translations: {
-                some: {
-                  locale: lang,
-                  name: { contains: q, mode: 'insensitive' as const },
-                },
+    const where: Prisma.BrandWhereInput = {
+      isActive: true,
+      ...(q
+        ? {
+            translations: {
+              some: {
+                locale: lang,
+                name: { contains: q, mode: 'insensitive' as const },
               },
-            }
-          : {}),
-      },
-      skip,
-      take: limit,
-      orderBy: { sortOrder: 'asc' },
-      include: {
-        translations: { where: { locale: lang } },
-        images: { where: { isPrimary: true }, take: 1 },
-      },
-    });
+            },
+          }
+        : {}),
+    };
 
-    return brands.map((b) => ({
-      id: b.id,
-      label: b.translations[0]?.name ?? b.slug,
-      slug: b.slug,
-      imageUrl: b.images[0]?.url,
-      extra: { websiteUrl: b.websiteUrl },
-    }));
+    const [brands, total] = await Promise.all([
+      this.prisma.brand.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy: { sortOrder: 'asc' },
+        include: {
+          translations: { where: { locale: lang } },
+          images: { where: { isPrimary: true }, take: 1 },
+        },
+      }),
+      this.prisma.brand.count({ where }),
+    ]);
+
+    return {
+      data: brands.map((b) => ({
+        id: b.id,
+        label: b.translations[0]?.name ?? b.slug,
+        slug: b.slug,
+        imageUrl: b.images[0]?.url,
+        extra: { websiteUrl: b.websiteUrl },
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async getBrandById(id: string): Promise<AdminBrandListPrismaType> {

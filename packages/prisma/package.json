@@ -30,7 +30,9 @@
   "scripts": {
     "seed:base": "npx tsx src/seeds/base-seed.ts",
     "seed:customers": "npx tsx src/seeds/customers/example-data-customers.ts",
-    "seed:products": "npx tsx src/seeds/products/example-data-products.ts"
+    "seed:products": "npx tsx src/seeds/products/example-data-products.ts",
+    "seed:bulk": "npx tsx src/seeds/products/example-data-bulk.ts",
+    "seed:taxonomy": "npx tsx src/seeds/taxonomy-seed.ts"
   },
   "dependencies": {
     "@node-rs/argon2": "^2.0.2",

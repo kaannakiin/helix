@@ -69,7 +69,8 @@ export function RelationInput(props: RelationInputProps) {
     queryFn: async () => {
       const result = await fetchOptions({ ids: missingIds });
 
-      return Array.isArray(result) ? result : result.items;
+      if (Array.isArray(result)) return result;
+      return 'data' in result ? result.data : [];
     },
     enabled: missingIds.length > 0,
     staleTime: 5 * 60 * 1000,

@@ -3,12 +3,16 @@ import type { LucideIcon } from 'lucide-react';
 import {
   BarChart3,
   FileText,
+  FolderTree,
+  Hash,
+  Layers,
   LayoutDashboard,
   Megaphone,
   Package,
   Percent,
   Settings,
   ShoppingCart,
+  Tag,
   Users,
   Warehouse,
 } from 'lucide-react';
@@ -22,6 +26,7 @@ export interface NavItem {
   visibility: NavVisibility;
   group?: string;
   description?: string;
+  children?: NavItem[];
 }
 
 export const adminNavItems: NavItem[] = [
@@ -49,6 +54,36 @@ export const adminNavItems: NavItem[] = [
     visibility: 'both',
     group: 'commerce',
     description: 'Ürün kataloğunu ve stokları yönet',
+    children: [
+      {
+        key: 'brands',
+        icon: Tag,
+        href: ADMIN_NAV_ROUTES.BRANDS,
+        visibility: 'both',
+        description: 'Markaları listele ve yönet',
+      },
+      {
+        key: 'categories',
+        icon: FolderTree,
+        href: ADMIN_NAV_ROUTES.CATEGORIES,
+        visibility: 'both',
+        description: 'Ürün kategorilerini yönet',
+      },
+      {
+        key: 'tags',
+        icon: Hash,
+        href: ADMIN_NAV_ROUTES.TAGS,
+        visibility: 'both',
+        description: 'Etiket gruplarını yönet',
+      },
+      {
+        key: 'variants',
+        icon: Layers,
+        href: ADMIN_NAV_ROUTES.VARIANTS,
+        visibility: 'both',
+        description: 'Ürün varyantlarını yönet',
+      },
+    ],
   },
   {
     key: 'customers',
@@ -110,6 +145,10 @@ export const adminNavItems: NavItem[] = [
   },
 ];
 
+export function getAllItems(items: NavItem[] = adminNavItems): NavItem[] {
+  return items.flatMap((item) => [item, ...getAllItems(item.children ?? [])]);
+}
+
 export function getNavbarItems(): NavItem[] {
   return adminNavItems.filter(
     (item) => item.visibility === 'navbar' || item.visibility === 'both'
@@ -117,7 +156,7 @@ export function getNavbarItems(): NavItem[] {
 }
 
 export function getSpotlightItems(): NavItem[] {
-  return adminNavItems.filter(
+  return getAllItems().filter(
     (item) => item.visibility === 'spotlight' || item.visibility === 'both'
   );
 }

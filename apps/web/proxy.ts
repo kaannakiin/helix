@@ -13,6 +13,7 @@ import { defaultLocale, supportedLocales } from '@org/i18n';
 import type { TokenPayload } from '@org/types/token';
 import { jwtVerify } from 'jose';
 import { NextResponse, type NextRequest } from 'next/server';
+import { parse as parseSetCookie } from 'set-cookie-parser';
 
 const BACKEND_URL = process.env.BACKEND_INTERNAL_URL || 'http://localhost:3001';
 
@@ -58,9 +59,14 @@ function resolveLocale(request: NextRequest): string {
     : defaultLocale;
 }
 
-async function tryRefreshTokens(
-  request: NextRequest
-): Promise<{ tokenPayload: TokenPayload; setCookieHeaders: string[] } | null> {
+type RefreshResult = {
+  tokenPayload: TokenPayload;
+  setCookieHeaders: string[];
+};
+
+let refreshPromise: Promise<RefreshResult | null> | null = null;
+
+async function doRefresh(request: NextRequest): Promise<RefreshResult | null> {
   const refreshToken = request.cookies.get(REFRESH_TOKEN_COOKIE_NAME)?.value;
   if (!refreshToken) return null;
 
@@ -73,37 +79,69 @@ async function tryRefreshTokens(
       },
     });
 
-    if (!res.ok) return null;
+    console.log('[proxy] refresh status:', res.status);
+    if (!res.ok) {
+      console.log('[proxy] refresh failed body:', await res.text());
+      return null;
+    }
 
     const setCookieHeaders = res.headers.getSetCookie();
+    console.log('[proxy] setCookieHeaders count:', setCookieHeaders.length);
     if (!setCookieHeaders.length) return null;
 
     const newAccessToken = setCookieHeaders
       .find((h) => h.startsWith(`${ACCESS_TOKEN_COOKIE_NAME}=`))
       ?.match(/^[^=]+=([^;]+)/)?.[1];
 
+    console.log('[proxy] newAccessToken present:', !!newAccessToken);
     if (!newAccessToken) return null;
 
     const tokenPayload = await verifyAccessToken(newAccessToken);
+    console.log('[proxy] tokenPayload valid:', !!tokenPayload);
     if (!tokenPayload) return null;
 
     return { tokenPayload, setCookieHeaders };
-  } catch {
+  } catch (e) {
+    console.error('[proxy] refresh exception:', e);
     return null;
   }
+}
+
+async function tryRefreshTokens(request: NextRequest): Promise<RefreshResult | null> {
+  if (refreshPromise) return refreshPromise;
+
+  refreshPromise = doRefresh(request).finally(() => {
+    refreshPromise = null;
+  });
+
+  return refreshPromise;
 }
 
 function applyCookieHeaders(
   response: NextResponse,
   setCookieHeaders: string[]
 ): void {
-  for (const cookie of setCookieHeaders) {
-    response.headers.append('Set-Cookie', cookie);
+  const parsed = parseSetCookie(setCookieHeaders);
+
+  for (const cookie of parsed) {
+    response.cookies.set(cookie.name, cookie.value, {
+      path: cookie.path,
+      maxAge: cookie.maxAge,
+      httpOnly: cookie.httpOnly,
+      secure: cookie.secure,
+      sameSite: cookie.sameSite as 'lax' | 'strict' | 'none' | undefined,
+    });
   }
 }
 
 export default async function proxy(request: NextRequest) {
+  console.log('[proxy] request url:', request.url);
   const { pathname } = request.nextUrl;
+
+  if (pathname.startsWith('/.well-known/')) {
+    return NextResponse.next();
+  }
+
   const locale = resolveLocale(request);
 
   const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE_NAME)?.value;
@@ -112,6 +150,11 @@ export default async function proxy(request: NextRequest) {
 
   if (!tokenPayload && !isPublicRoute(pathname)) {
     if (pathname.startsWith('/api/')) {
+      // API isteklerinde proxy refresh yapmaz — client-side interceptor halletsin.
+      // /api/auth/refresh'i direkt backend'e geçir (rewrite), diğer API'ler 401.
+      if (pathname === '/api/auth/refresh') {
+        return NextResponse.next();
+      }
       return NextResponse.json(
         { statusCode: 401, message: 'Unauthorized' },
         { status: 401 }
@@ -155,6 +198,7 @@ export default async function proxy(request: NextRequest) {
 
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set('X-NEXT-INTL-LOCALE', locale);
+  requestHeaders.set('x-lang', locale);
 
   if (tokenPayload) {
     for (const [key, value] of Object.entries(tokenPayload)) {
@@ -169,6 +213,17 @@ export default async function proxy(request: NextRequest) {
   });
 
   if (refreshedCookies) applyCookieHeaders(response, refreshedCookies);
+
+  const currentLocaleCookie = request.cookies.get(LOCALE_COOKIE_NAME)?.value;
+  if (currentLocaleCookie !== locale) {
+    response.cookies.set(LOCALE_COOKIE_NAME, locale, {
+      path: '/',
+      httpOnly: false,
+      sameSite: 'lax',
+      maxAge: 365 * 24 * 60 * 60,
+      secure: process.env.NODE_ENV === 'production',
+    });
+  }
 
   return response;
 }

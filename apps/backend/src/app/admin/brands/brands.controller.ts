@@ -1,20 +1,17 @@
 import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import type { Locale, Prisma } from '@org/prisma/client';
 import { UserRole } from '@org/prisma/client';
-import type { Prisma } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
-import { I18nContext } from 'nestjs-i18n';
 import type { Response } from 'express';
-import { Locale, Roles } from '../../../core/decorators';
+import { I18nContext } from 'nestjs-i18n';
+import { Roles } from '../../../core/decorators';
+import { LocaleDecorator } from '../../../core/decorators/locale.decorator';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
-import { BrandsService } from './brands.service';
-import {
-  BrandExportQueryDTO,
-  BrandLookupQueryDTO,
-  BrandQueryDTO,
-} from './dto';
 import { BRAND_EXPORT_COLUMNS } from './brands.export-config';
+import { BrandsService } from './brands.service';
+import { BrandExportQueryDTO, BrandLookupQueryDTO, BrandQueryDTO } from './dto';
 
 @ApiTags('Admin - Brands')
 @Controller('admin/brands')
@@ -35,7 +32,7 @@ export class BrandsController {
   @ApiOperation({ summary: 'Lookup brands for selection inputs' })
   async lookupBrands(
     @Query() query: BrandLookupQueryDTO,
-    @Locale() lang: import('@org/prisma/client').Locale,
+    @LocaleDecorator() lang: Locale
   ) {
     return this.brandsService.lookup({
       q: query.q,

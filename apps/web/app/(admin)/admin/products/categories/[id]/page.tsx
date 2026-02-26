@@ -4,7 +4,7 @@ import {
   useAdminCategory,
   useSaveCategory,
 } from '@/core/hooks/useAdminCategory';
-import { categoryLookupFetcher } from '@/core/hooks/useAdminLookup';
+import { categoryTreeFetcher } from '@/core/hooks/useAdminLookup';
 import { useFormErrorTranslator } from '@/core/hooks/useFormErrorTranslator';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
@@ -29,8 +29,7 @@ import { FormCard } from '@org/ui/common/form-card';
 import LoadingOverlay from '@org/ui/common/loading-overlay';
 import { Dropzone } from '@org/ui/dropzone';
 import { ProductSeoCard } from '@org/ui/inputs/product-seo-card';
-import type { FetchOptions } from '@org/ui/inputs/relation-input';
-import { RelationInput } from '@org/ui/inputs/relation-input';
+import { RelationModal } from '@org/ui/inputs/relation-modal';
 import { createId } from '@paralleldrive/cuid2';
 import {
   Activity,
@@ -41,7 +40,7 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 import {
   Controller,
   FormProvider,
@@ -101,17 +100,6 @@ const AdminCategoryFormPage = () => {
   } = methods;
 
   const categoryName = watch('translations.0.name');
-
-  const parentCategoryFetcher = useCallback<FetchOptions>(
-    async (params) => {
-      const results = await categoryLookupFetcher(params);
-      if (isNew) return results;
-      const items = Array.isArray(results) ? results : results.items;
-      const filtered = items.filter((item) => item.id !== id);
-      return Array.isArray(results) ? filtered : { ...results, items: filtered };
-    },
-    [id, isNew]
-  );
 
   const onSubmit: SubmitHandler<CategoryInput> = async (formData) => {
     await saveCategory.mutateAsync(formData as unknown as CategoryOutput);
@@ -252,12 +240,13 @@ const AdminCategoryFormPage = () => {
                   control={control}
                   name="parentId"
                   render={({ field, fieldState }) => (
-                    <RelationInput
+                    <RelationModal
                       queryKey={DATA_ACCESS_KEYS.admin.categories.lookup}
-                      fetchOptions={parentCategoryFetcher}
+                      fetchOptions={categoryTreeFetcher}
+                      tree
                       value={field.value || null}
                       onChange={field.onChange}
-                      clearable
+                      title={t('parent.label')}
                       label={t('parent.label')}
                       placeholder={t('parent.placeholder')}
                       error={te(fieldState.error?.message)}

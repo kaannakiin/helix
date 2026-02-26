@@ -21,7 +21,8 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import type { FetchOptions, LookupItem, LookupPage } from './types';
+import type { PaginatedResponse } from '@org/types/pagination';
+import type { FetchOptions, LookupItem } from './types';
 
 interface SearchComboboxProps {
   queryKey: readonly unknown[];
@@ -37,11 +38,21 @@ interface SearchComboboxProps {
   multiple?: boolean;
 }
 
-function normalizePage(result: LookupItem[] | LookupPage): LookupPage {
+interface NormalizedPage {
+  items: LookupItem[];
+  hasMore: boolean;
+}
+
+function normalizePage(
+  result: LookupItem[] | PaginatedResponse<LookupItem>
+): NormalizedPage {
   if (Array.isArray(result)) {
     return { items: result, hasMore: false };
   }
-  return result;
+  return {
+    items: result.data,
+    hasMore: result.pagination.page < result.pagination.totalPages,
+  };
 }
 
 export function SearchCombobox({
@@ -61,7 +72,6 @@ export function SearchCombobox({
   const [search, setSearch] = useState('');
   const [debouncedSearch] = useDebouncedValue(search, searchDebounce);
   const sentinelRef = useRef<HTMLDivElement>(null);
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const combobox = useCombobox({
     onDropdownClose: () => {
@@ -99,21 +109,25 @@ export function SearchCombobox({
     [data]
   );
 
+  const fetchNextPageRef = useRef(fetchNextPage);
+  fetchNextPageRef.current = fetchNextPage;
+
   useEffect(() => {
-    if (!sentinelRef.current || !hasNextPage || isFetchingNextPage) return;
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting) {
-          fetchNextPage();
+          fetchNextPageRef.current();
         }
       },
-      { root: scrollAreaRef.current, threshold: 0.1 }
+      { threshold: 0.1 }
     );
 
-    observer.observe(sentinelRef.current);
+    observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  }, [hasNextPage]);
 
   const handleOptionSubmit = useCallback(
     (val: string) => {
@@ -224,7 +238,7 @@ export function SearchCombobox({
 
       <Combobox.Dropdown>
         <Combobox.Options>
-          <ScrollArea.Autosize mah={250} type="scroll" ref={scrollAreaRef}>
+          <ScrollArea.Autosize mah={250} type="scroll">
             {renderOptions()}
             {hasNextPage && (
               <div ref={sentinelRef}>
