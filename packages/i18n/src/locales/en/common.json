@@ -17,6 +17,8 @@
     "categories": "Categories",
     "tags": "Tags",
     "variants": "Variants",
+    "definitions": "Definitions",
+    "locations": "Locations",
     "groups": {
       "main": "Main",
       "commerce": "Commerce",
@@ -84,6 +86,11 @@
       "BATCH": "Batch",
       "SERIAL": "Serial",
       "BATCH_AND_SERIAL": "Batch & Serial"
+    },
+    "countryType": {
+      "HAS_STATES": "Has States",
+      "HAS_CITIES_ONLY": "Cities Only",
+      "COUNTRY_ONLY": "Country Only"
     }
   },
   "relationInput": {
@@ -253,6 +260,11 @@
           "label": "Google Taxonomy",
           "placeholder": "Select taxonomy..."
         },
+        "notFound": "Product Not Found",
+        "notFoundDescription": "The product you are looking for does not exist or has been deleted.",
+        "loadError": "Failed to Load Product",
+        "loadErrorDescription": "An error occurred while loading the product. Please try again.",
+        "backToProducts": "Back to Products",
         "variants": {
           "title": "Variants",
           "description": "Define product variants like size and color",
@@ -295,6 +307,48 @@
             "addOption": "Add Option",
             "removedOptions": "Removed Options",
             "restoreOption": "Restore"
+          },
+          "primary": "Primary",
+          "openGroup": "Open Group",
+          "confirmRemoveGroup": "Remove this variant group?",
+          "confirm": "Remove",
+          "removeGroup": "Remove Group"
+        },
+        "combinations": {
+          "title": "Variant Combinations",
+          "description": "Manage SKU, barcode, stock and images for each variant combination",
+          "count": "{count} combinations",
+          "variant": "Variant",
+          "sku": "SKU",
+          "skuPlaceholder": "Enter SKU...",
+          "barcode": "Barcode",
+          "barcodePlaceholder": "Enter barcode...",
+          "isActive": "Active",
+          "trackingStrategy": "Tracking Strategy",
+          "actions": "Actions",
+          "addImage": "Add Image",
+          "selectedCount": "{count} selected",
+          "generateSku": "Generate SKU",
+          "generateBarcode": "Generate Barcode",
+          "bulkEdit": "Bulk Edit",
+          "deselectAll": "Deselect All",
+          "editDrawer": {
+            "title": "Edit Variant",
+            "variantInfo": "Variant Information",
+            "generateSku": "Generate",
+            "generateBarcode": "Generate",
+            "images": "Images",
+            "imagesDescription": "Manage images for this variant",
+            "cancel": "Cancel",
+            "save": "Save"
+          },
+          "bulkDrawer": {
+            "title": "Edit {count} Variants",
+            "description": "Changes will apply to all selected variants",
+            "images": "Images",
+            "imagesDescription": "Replace images for all selected variants",
+            "cancel": "Cancel",
+            "apply": "Apply"
           }
         }
       }
@@ -464,6 +518,34 @@
         "activeFilters": "{count} active",
         "noFilters": "No filters available",
         "apply": "Apply Filters"
+      }
+    },
+    "locations": {
+      "title": "Locations",
+      "subtitle": "Country, state, city, district, and town management",
+      "table": {
+        "flag": "Flag",
+        "country": "Country",
+        "code": "Code",
+        "iso3": "ISO3",
+        "phone": "Phone",
+        "type": "Type",
+        "state": "State",
+        "stateCode": "Code",
+        "city": "City",
+        "district": "District",
+        "town": "Town"
+      },
+      "empty": {
+        "states": "No states",
+        "cities": "No cities",
+        "districts": "No districts",
+        "towns": "No towns"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
       }
     },
     "customers": {

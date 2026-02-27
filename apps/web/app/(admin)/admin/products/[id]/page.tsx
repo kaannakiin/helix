@@ -7,8 +7,10 @@ import {
   taxonomyTreeFetcher,
 } from '@/core/hooks/useAdminLookup';
 import { useAdminProduct } from '@/core/hooks/useAdminProducts';
+import { ApiError } from '@/core/lib/api/api-error';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
+  Alert,
   Button,
   Divider,
   Group,
@@ -18,6 +20,7 @@ import {
   TextInput,
   Textarea,
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { DATA_ACCESS_KEYS } from '@org/constants/data-keys';
 import {
   ProductStatusConfigs,
@@ -31,6 +34,7 @@ import {
   ProductInputType,
   ProductSchema,
 } from '@org/schemas/admin/products';
+import type { VariantGroupInput } from '@org/schemas/admin/variants';
 import { FormCard } from '@org/ui/common/form-card';
 import LoadingOverlay from '@org/ui/common/loading-overlay';
 import { Dropzone } from '@org/ui/dropzone';
@@ -62,7 +66,9 @@ const AdminProductPage = () => {
   const router = useRouter();
   const id = params.id as string;
   const isNew = id === 'new';
-  const { data, isLoading } = useAdminProduct(id);
+  const { data, isLoading, isError, error } = useAdminProduct(id);
+  const apiError = error as ApiError | null;
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const formattedData = useMemo<ProductInputType>(() => {
     if (!data || isNew) return NEW_PRODUCT_DEFAULT_VALUES;
@@ -87,35 +93,45 @@ const AdminProductPage = () => {
           fileType: img.fileType,
           sortOrder: img.sortOrder,
         })) ?? [],
-      variantGroups:
-        data.variantGroups?.map((pvg) => ({
-          uniqueId: pvg.variantGroup.id,
-          type: pvg.variantGroup.type,
-          sortOrder: pvg.sortOrder,
-          displayMode: pvg.displayMode ?? null,
-          translations: pvg.variantGroup.translations.map((tr) => ({
-            locale: tr.locale,
-            name: tr.name,
-            slug: tr.slug,
-          })),
-          options: pvg.variantGroup.options.map((opt) => ({
-            uniqueId: opt.id,
-            colorCode: opt.colorCode ?? '',
-            sortOrder: opt.sortOrder,
-            translations: opt.translations.map((tr) => ({
+      variantGroups: (() => {
+        const usedOptionIds = new Set(
+          (data.variants ?? []).flatMap((v) =>
+            v.optionValues.map((ov) => ov.variantOption.id)
+          )
+        );
+        return (
+          data.variantGroups?.map((pvg) => ({
+            uniqueId: pvg.variantGroup.id,
+            type: pvg.variantGroup.type,
+            sortOrder: pvg.sortOrder,
+            displayMode: pvg.displayMode ?? null,
+            translations: pvg.variantGroup.translations.map((tr) => ({
               locale: tr.locale,
               name: tr.name,
               slug: tr.slug,
             })),
-            images: undefined,
-            existingImages: opt.images.map((img) => ({
-              id: img.id,
-              url: img.url,
-              fileType: img.fileType,
-              sortOrder: img.sortOrder,
-            })),
-          })),
-        })) ?? [],
+            options: pvg.variantGroup.options
+              .filter((opt) => usedOptionIds.has(opt.id))
+              .map((opt) => ({
+                uniqueId: opt.id,
+                colorCode: opt.colorCode ?? '',
+                sortOrder: opt.sortOrder,
+                translations: opt.translations.map((tr) => ({
+                  locale: tr.locale,
+                  name: tr.name,
+                  slug: tr.slug,
+                })),
+                images: undefined,
+                existingImages: opt.images.map((img) => ({
+                  id: img.id,
+                  url: img.url,
+                  fileType: img.fileType,
+                  sortOrder: img.sortOrder,
+                })),
+              })),
+          })) ?? []
+        );
+      })(),
       variants:
         data.variants?.map((v) => ({
           uniqueId: v.id,
@@ -149,16 +165,46 @@ const AdminProductPage = () => {
     };
   }, [data, isNew]);
 
+  const initialOriginalOptionsMap = useMemo(() => {
+    if (!data || isNew) return undefined;
+    const map = new Map<string, VariantGroupInput['options']>();
+    for (const pvg of data.variantGroups ?? []) {
+      map.set(
+        pvg.variantGroup.id,
+        pvg.variantGroup.options.map((opt) => ({
+          uniqueId: opt.id,
+          colorCode: opt.colorCode ?? '',
+          sortOrder: opt.sortOrder,
+          translations: opt.translations.map((tr) => ({
+            locale:
+              tr.locale as VariantGroupInput['options'][number]['translations'][number]['locale'],
+            name: tr.name,
+            slug: tr.slug,
+          })),
+          images: undefined,
+          existingImages: opt.images.map((img) => ({
+            id: img.id,
+            url: img.url,
+            fileType: img.fileType,
+            sortOrder: img.sortOrder,
+          })),
+        }))
+      );
+    }
+    return map;
+  }, [data, isNew]);
+
   const methods = useForm<ProductInputType>({
     resolver: zodResolver(ProductSchema),
-    defaultValues: formattedData ?? NEW_PRODUCT_DEFAULT_VALUES,
+    defaultValues: NEW_PRODUCT_DEFAULT_VALUES,
+    values: formattedData,
   });
 
   const {
     control,
     handleSubmit,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { isSubmitting },
   } = methods;
 
   const productName = watch('translations.0.name');
@@ -167,10 +213,30 @@ const AdminProductPage = () => {
     console.log(data);
   };
 
-  if (isLoading) return <LoadingOverlay />;
+  if (isLoading && !isNew) return <LoadingOverlay />;
+
+  if (!isNew && isError) {
+    return (
+      <Stack p="md" gap="md">
+        <Alert
+          color="red"
+          title={apiError?.isNotFound ? t('notFound') : t('loadError')}
+        >
+          {apiError?.isNotFound
+            ? t('notFoundDescription')
+            : t('loadErrorDescription')}
+        </Alert>
+        <Button
+          variant="default"
+          onClick={() => router.push('/admin/products')}
+        >
+          {t('backToProducts')}
+        </Button>
+      </Stack>
+    );
+  }
 
   const statusOptions = buildEnumOptions(ProductStatusConfigs, tEnums);
-
   const typeOptions = buildEnumOptions(ProductTypeConfigs, tEnums);
 
   return (
@@ -200,13 +266,11 @@ const AdminProductPage = () => {
             </Group>
           </div>
 
-          <Group
-            align="flex-start"
-            gap="lg"
-            wrap="wrap"
-            style={{ flexWrap: 'wrap' }}
-          >
-            <Stack gap="md" style={{ flex: 1, minWidth: 0 }}>
+          <Group align="flex-start" gap="lg" wrap="wrap">
+            <Stack
+              gap="md"
+              style={{ flex: 1, minWidth: isMobile ? '100%' : 400 }}
+            >
               <FormCard
                 title={t('generalInfo')}
                 icon={FileText}
@@ -251,7 +315,10 @@ const AdminProductPage = () => {
                   />
                 </Stack>
               </FormCard>
-              <VariantCreator isNew={isNew} />
+              <VariantCreator
+                isNew={isNew}
+                initialOriginalOptionsMap={initialOriginalOptionsMap}
+              />
 
               <FormCard
                 title={t('media.title')}
@@ -283,7 +350,15 @@ const AdminProductPage = () => {
               />
             </Stack>
 
-            <Stack gap="md" style={{ width: 340, flexShrink: 0 }}>
+            <Stack
+              gap="md"
+              style={{
+                width: isMobile ? '100%' : 340,
+                flexShrink: 0,
+                position: isMobile ? undefined : 'sticky',
+                top: isMobile ? undefined : 'var(--mantine-spacing-md)',
+              }}
+            >
               <FormCard
                 title={t('statusCard.title')}
                 icon={Activity}
@@ -404,9 +479,7 @@ const AdminProductPage = () => {
                         title={t('taxonomy.label')}
                         label={t('taxonomy.label')}
                         placeholder={t('taxonomy.placeholder')}
-                        value={
-                          field.value != null ? String(field.value) : null
-                        }
+                        value={field.value != null ? String(field.value) : null}
                         onChange={(id) =>
                           field.onChange(id != null ? Number(id) : null)
                         }

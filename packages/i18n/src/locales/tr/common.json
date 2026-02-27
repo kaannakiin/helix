@@ -17,6 +17,8 @@
     "categories": "Kategoriler",
     "tags": "Etiketler",
     "variants": "Varyantlar",
+    "definitions": "Tanımlamalar",
+    "locations": "Lokasyonlar",
     "groups": {
       "main": "Ana Menü",
       "commerce": "Ticaret",
@@ -84,6 +86,11 @@
       "BATCH": "Parti",
       "SERIAL": "Seri",
       "BATCH_AND_SERIAL": "Parti & Seri"
+    },
+    "countryType": {
+      "HAS_STATES": "İlleri Var",
+      "HAS_CITIES_ONLY": "Sadece Şehirler",
+      "COUNTRY_ONLY": "Sadece Ülke"
     }
   },
   "relationInput": {
@@ -253,6 +260,11 @@
           "label": "Google Taxonomy",
           "placeholder": "Taxonomy seçin..."
         },
+        "notFound": "Ürün Bulunamadı",
+        "notFoundDescription": "Aradığınız ürün mevcut değil veya silinmiş.",
+        "loadError": "Ürün Yüklenemedi",
+        "loadErrorDescription": "Ürün yüklenirken bir hata oluştu. Lütfen tekrar deneyin.",
+        "backToProducts": "Ürünlere Dön",
         "variants": {
           "title": "Varyantlar",
           "description": "Beden ve renk gibi ürün varyantlarını tanımlayın",
@@ -295,6 +307,48 @@
             "addOption": "Seçenek Ekle",
             "removedOptions": "Kaldırılan Seçenekler",
             "restoreOption": "Geri Yükle"
+          },
+          "primary": "Birincil",
+          "openGroup": "Grubu Aç",
+          "confirmRemoveGroup": "Bu varyant grubunu kaldırmak istediğinizden emin misiniz?",
+          "confirm": "Kaldır",
+          "removeGroup": "Grubu Kaldır"
+        },
+        "combinations": {
+          "title": "Varyant Kombinasyonları",
+          "description": "Her varyant kombinasyonu için SKU, barkod, stok ve görsel yönetin",
+          "count": "{count} kombinasyon",
+          "variant": "Varyant",
+          "sku": "SKU",
+          "skuPlaceholder": "SKU girin...",
+          "barcode": "Barkod",
+          "barcodePlaceholder": "Barkod girin...",
+          "isActive": "Aktif",
+          "trackingStrategy": "Takip Stratejisi",
+          "actions": "İşlemler",
+          "addImage": "Görsel Ekle",
+          "selectedCount": "{count} seçili",
+          "generateSku": "SKU Oluştur",
+          "generateBarcode": "Barkod Oluştur",
+          "bulkEdit": "Toplu Düzenle",
+          "deselectAll": "Seçimi Kaldır",
+          "editDrawer": {
+            "title": "Varyantı Düzenle",
+            "variantInfo": "Varyant Bilgileri",
+            "generateSku": "Oluştur",
+            "generateBarcode": "Oluştur",
+            "images": "Görseller",
+            "imagesDescription": "Bu varyant için görselleri yönetin",
+            "cancel": "İptal",
+            "save": "Kaydet"
+          },
+          "bulkDrawer": {
+            "title": "{count} Varyantı Düzenle",
+            "description": "Değişiklikler seçili tüm varyantlara uygulanacak",
+            "images": "Görseller",
+            "imagesDescription": "Seçili tüm varyantların görsellerini değiştir",
+            "cancel": "İptal",
+            "apply": "Uygula"
           }
         }
       }
@@ -464,6 +518,34 @@
         "activeFilters": "{count} aktif",
         "noFilters": "Filtre bulunmuyor",
         "apply": "Filtrele"
+      }
+    },
+    "locations": {
+      "title": "Lokasyonlar",
+      "subtitle": "Ülke, il, ilçe, mahalle ve köy yönetimi",
+      "table": {
+        "flag": "Bayrak",
+        "country": "Ülke",
+        "code": "Kod",
+        "iso3": "ISO3",
+        "phone": "Telefon",
+        "type": "Tür",
+        "state": "İl",
+        "stateCode": "Kod",
+        "city": "Şehir",
+        "district": "İlçe",
+        "town": "Mahalle"
+      },
+      "empty": {
+        "states": "İl bulunamadı",
+        "cities": "Şehir bulunamadı",
+        "districts": "İlçe bulunamadı",
+        "towns": "Mahalle bulunamadı"
+      },
+      "footer": {
+        "totalRows": "Toplam: {count}",
+        "selectedRows": "Seçili: {count}",
+        "refresh": "Yenile"
       }
     },
     "customers": {

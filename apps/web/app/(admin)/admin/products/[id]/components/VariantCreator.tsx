@@ -46,9 +46,10 @@ import { useVariantCombinations } from './useVariantCombinations';
 
 interface Props {
   isNew: boolean;
+  initialOriginalOptionsMap?: Map<string, VariantGroupInput['options']>;
 }
 
-export const VariantCreator = ({ isNew }: Props) => {
+export const VariantCreator = ({ isNew, initialOriginalOptionsMap }: Props) => {
   const { recalculate } = useVariantCombinations();
   const t = useTranslations('common.admin.products.form');
   const [modalOpen, setModalOpen] = useState(false);
@@ -61,7 +62,7 @@ export const VariantCreator = ({ isNew }: Props) => {
 
   const [originalOptionsMap, setOriginalOptionsMap] = useState<
     Map<string, VariantGroupInput['options']>
-  >(() => new Map());
+  >(() => initialOriginalOptionsMap ?? new Map());
 
   const handleGroupFirstOpen = (
     groupUniqueId: string,
