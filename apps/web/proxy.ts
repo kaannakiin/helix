@@ -79,35 +79,33 @@ async function doRefresh(request: NextRequest): Promise<RefreshResult | null> {
       },
     });
 
-    console.log('[proxy] refresh status:', res.status);
     if (!res.ok) {
-      console.log('[proxy] refresh failed body:', await res.text());
       return null;
     }
 
     const setCookieHeaders = res.headers.getSetCookie();
-    console.log('[proxy] setCookieHeaders count:', setCookieHeaders.length);
+
     if (!setCookieHeaders.length) return null;
 
     const newAccessToken = setCookieHeaders
       .find((h) => h.startsWith(`${ACCESS_TOKEN_COOKIE_NAME}=`))
       ?.match(/^[^=]+=([^;]+)/)?.[1];
 
-    console.log('[proxy] newAccessToken present:', !!newAccessToken);
     if (!newAccessToken) return null;
 
     const tokenPayload = await verifyAccessToken(newAccessToken);
-    console.log('[proxy] tokenPayload valid:', !!tokenPayload);
+
     if (!tokenPayload) return null;
 
     return { tokenPayload, setCookieHeaders };
   } catch (e) {
-    console.error('[proxy] refresh exception:', e);
     return null;
   }
 }
 
-async function tryRefreshTokens(request: NextRequest): Promise<RefreshResult | null> {
+async function tryRefreshTokens(
+  request: NextRequest
+): Promise<RefreshResult | null> {
   if (refreshPromise) return refreshPromise;
 
   refreshPromise = doRefresh(request).finally(() => {
@@ -135,7 +133,6 @@ function applyCookieHeaders(
 }
 
 export default async function proxy(request: NextRequest) {
-  console.log('[proxy] request url:', request.url);
   const { pathname } = request.nextUrl;
 
   if (pathname.startsWith('/.well-known/')) {
@@ -150,8 +147,6 @@ export default async function proxy(request: NextRequest) {
 
   if (!tokenPayload && !isPublicRoute(pathname)) {
     if (pathname.startsWith('/api/')) {
-      // API isteklerinde proxy refresh yapmaz — client-side interceptor halletsin.
-      // /api/auth/refresh'i direkt backend'e geçir (rewrite), diğer API'ler 401.
       if (pathname === '/api/auth/refresh') {
         return NextResponse.next();
       }

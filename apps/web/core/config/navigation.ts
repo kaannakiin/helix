@@ -2,8 +2,10 @@ import { ADMIN_NAV_ROUTES } from '@org/constants/routes-constants';
 import type { LucideIcon } from 'lucide-react';
 import {
   BarChart3,
+  BookOpen,
   FileText,
   FolderTree,
+  Globe,
   Hash,
   Layers,
   LayoutDashboard,
@@ -27,6 +29,8 @@ export interface NavItem {
   group?: string;
   description?: string;
   children?: NavItem[];
+
+  isSection?: boolean;
 }
 
 export const adminNavItems: NavItem[] = [
@@ -54,6 +58,7 @@ export const adminNavItems: NavItem[] = [
     visibility: 'both',
     group: 'commerce',
     description: 'Ürün kataloğunu ve stokları yönet',
+    isSection: false,
     children: [
       {
         key: 'brands',
@@ -117,6 +122,25 @@ export const adminNavItems: NavItem[] = [
     visibility: 'both',
     group: 'marketing',
     description: 'İndirim kodları ve promosyonlar',
+  },
+
+  {
+    key: 'definitions',
+    icon: BookOpen,
+    href: ADMIN_NAV_ROUTES.DEFINITIONS,
+    visibility: 'both',
+    group: 'system',
+    description: 'Sistem tanımlamaları',
+    isSection: true,
+    children: [
+      {
+        key: 'locations',
+        icon: Globe,
+        href: ADMIN_NAV_ROUTES.LOCATIONS,
+        visibility: 'both',
+        description: 'Ülke, şehir ve bölge yönetimi',
+      },
+    ],
   },
 
   {

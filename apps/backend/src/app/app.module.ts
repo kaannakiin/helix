@@ -8,6 +8,7 @@ import { HttpExceptionI18nFilter } from './i18n/http-exception-i18n.filter';
 import { ZodValidationI18nFilter } from './i18n/zod-validation-i18n.filter';
 import { PrismaModule } from './prisma/prisma.module';
 import { AdminModule } from './admin/admin.module';
+import { GeolocationModule } from './geolocation/geolocation.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { AdminModule } from './admin/admin.module';
     PrismaModule,
     AuthModule,
     AdminModule,
+    GeolocationModule,
   ],
   controllers: [],
   providers: [

@@ -4,6 +4,11 @@ export {
 } from './data-table/components/DataTable';
 
 export {
+  ExpandableDataTable,
+  type ExpandableDataTableProps,
+} from './data-table/components/ExpandableDataTable';
+
+export {
   useColumnFactory,
   type ColumnFactoryOptions,
   type ColumnOptions,
@@ -20,6 +25,8 @@ export type {
   DataTableFooterTranslations,
   DataTableSort,
   DataTableSortModel,
+  ExpandableRowConfig,
+  ExpandableRowTranslations,
   PaginatedResponse,
   Pagination,
 } from './data-table/types';

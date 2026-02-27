@@ -181,6 +181,14 @@ enum BinType {
   RETURN
 }
 
+// ─── Geolocation ─────────────────────────────────────────────────────────────
+
+enum CountryType {
+  HAS_STATES
+  HAS_CITIES_ONLY
+  COUNTRY_ONLY
+}
+
 // ─── Rule Engine ──────────────────────────────────────────────────────────────
 
 enum RuleTargetEntity {

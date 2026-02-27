@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import 'dayjs/locale/tr';
 import localizedFormat from 'dayjs/plugin/localizedFormat.js';
 import relativeTime from 'dayjs/plugin/relativeTime.js';
 import timezone from 'dayjs/plugin/timezone.js';
@@ -12,16 +13,10 @@ dayjs.extend(relativeTime);
 export type DateFormatStyle = 'standard' | 'compact' | 'full' | 'relative';
 
 export class DateTransformer {
-  /**
-   * Helper to initialize a dayjs instance with timezone.
-   */
   private static getDayjs(value: string | Date, tz?: string) {
     return tz ? dayjs(value).tz(tz) : dayjs(value);
   }
 
-  /**
-   * Helper to ensure dayjs maps correct locale files (e.g. 'tr-tr' -> 'tr')
-   */
   public static getSafeLocale(locale: string = 'en') {
     const l = locale.toLowerCase();
     if (l.startsWith('tr')) return 'tr';

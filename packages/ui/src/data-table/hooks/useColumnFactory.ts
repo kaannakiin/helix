@@ -197,20 +197,26 @@ export function useColumnFactory(
     const buildBadgeConfig = <T>(
       colorMap: Record<string, string>,
       enumOptions?: Array<{ value: string; label: string }>
-    ): Partial<ColDef<T>> => ({
-      cellRenderer: BadgeCellRenderer,
-      cellRendererParams: { colorMap },
-      sortable: true,
-      filter: enumOptions
-        ? {
-            component: EnumFilter,
-            params: { options: enumOptions },
-            doesFilterPass: serverSideDoesFilterPass,
-          }
-        : false,
-      flex: 1,
-      minWidth: 100,
-    });
+    ): Partial<ColDef<T>> => {
+      const labelMap = enumOptions
+        ? Object.fromEntries(enumOptions.map((o) => [o.value, o.label]))
+        : undefined;
+
+      return {
+        cellRenderer: BadgeCellRenderer,
+        cellRendererParams: { colorMap, labelMap },
+        sortable: true,
+        filter: enumOptions
+          ? {
+              component: EnumFilter,
+              params: { options: enumOptions },
+              doesFilterPass: serverSideDoesFilterPass,
+            }
+          : false,
+        flex: 1,
+        minWidth: 100,
+      };
+    };
 
     const buildLocaleConfig = <T>(): Partial<ColDef<T>> => ({
       sortable: true,

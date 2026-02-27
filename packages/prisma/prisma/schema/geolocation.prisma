@@ -1,18 +1,18 @@
-// ─── Country (ikas: Country, SAP: T005, Netsis: Ulke) ──────────────────────
-
 model Country {
   id   String @id @default(cuid())
-  code String @unique // ISO 3166-1 alpha-2: "TR", "US", "DE"
-  iso3 String @unique // ISO 3166-1 alpha-3: "TUR", "USA", "DEU"
+  code String @unique
+  iso3 String @unique
 
-  phoneCode      String? // "+90", "+1", "+49"
-  currency       String? // "Turkish Lira", "US Dollar"
-  currencyCode   String? // "TRY", "USD"
-  currencySymbol String? // "₺", "$"
-  native         String? // Native name: "Türkiye"
-  region         String? // Continent/region: "Asia", "Europe"
-  subregion      String? // "Western Asia", "Western Europe"
-  emoji          String? // "🇹🇷"
+  phoneCode      String?
+  currency       String?
+  currencyCode   String?
+  currencySymbol String?
+  native         String?
+  region         String?
+  subregion      String?
+  emoji          String?
+
+  countryType CountryType @default(HAS_STATES)
 
   isActive  Boolean @default(true)
   sortOrder Int     @default(0)
@@ -29,8 +29,6 @@ model Country {
   @@index([sortOrder])
 }
 
-// ─── Country Translation (ikas: LocationTranslations) ───────────────────────
-
 model CountryTranslation {
   id String @id @default(cuid())
 
@@ -39,7 +37,7 @@ model CountryTranslation {
 
   locale Locale
 
-  name String // "Turkey" / "Türkiye"
+  name String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -49,18 +47,15 @@ model CountryTranslation {
   @@index([locale])
 }
 
-// ─── State / Il (ikas: State, SAP: T005S, Netsis: Il) ──────────────────────
-// Türkiye: 81 il. Diger ulkeler: eyalet/bolge.
-
 model State {
   id String @id @default(cuid())
 
   countryId String
   country   Country @relation(fields: [countryId], references: [id], onDelete: Cascade)
 
-  name      String  // "İstanbul", "Ankara"
-  native    String? // Native name (if different)
-  stateCode String? // Plaka kodu: "34", "06"
+  name      String
+  native    String?
+  stateCode String?
 
   isActive  Boolean @default(true)
   sortOrder Int     @default(0)
@@ -80,13 +75,11 @@ model State {
   @@index([sortOrder])
 }
 
-// ─── State Translation (ikas: LocationTranslations) ─────────────────────────
-
 model StateTranslation {
   id String @id @default(cuid())
 
   stateId String
-  state   State @relation(fields: [stateId], references: [id], onDelete: Cascade)
+  state   State  @relation(fields: [stateId], references: [id], onDelete: Cascade)
 
   locale Locale
 
@@ -100,20 +93,17 @@ model StateTranslation {
   @@index([locale])
 }
 
-// ─── City / Ilce (ikas: City) ───────────────────────────────────────────────
-// Türkiye: Ilce seviyesi. Ornegin Istanbul > Kadikoy, Besiktas
-
 model City {
   id String @id @default(cuid())
 
   countryId String
   stateId   String
-  state     State @relation(fields: [stateId], references: [id], onDelete: Cascade)
+  state     State  @relation(fields: [stateId], references: [id], onDelete: Cascade)
 
-  name     String  // "Kadıköy", "Beşiktaş", "Çankaya"
-  cityCode String? // City/district code
+  name     String
+  cityCode String?
 
-  latitude  String? // ikas stores as String
+  latitude  String?
   longitude String?
 
   sortOrder Int @default(0)
@@ -134,18 +124,15 @@ model City {
   @@index([sortOrder])
 }
 
-// ─── District / Semt (ikas: District) ───────────────────────────────────────
-// Türkiye: Semt seviyesi. Ornegin Kadikoy > Moda, Caferaga
-
 model District {
   id String @id @default(cuid())
 
   cityId    String
-  city      City @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  city      City   @relation(fields: [cityId], references: [id], onDelete: Cascade)
   countryId String
   stateId   String
 
-  name String // "Moda", "Caferağa"
+  name String
 
   latitude  String?
   longitude String?
@@ -168,16 +155,13 @@ model District {
   @@index([sortOrder])
 }
 
-// ─── Town / Mahalle (ikas: Town) ────────────────────────────────────────────
-// Türkiye: Mahalle seviyesi. En detayli seviye.
-
 model Town {
   id String @id @default(cuid())
 
   districtId String
   district   District @relation(fields: [districtId], references: [id], onDelete: Cascade)
 
-  name String // "Caferağa Mahallesi"
+  name String
 
   sortOrder Int @default(0)
 

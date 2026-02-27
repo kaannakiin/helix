@@ -1,56 +1,29 @@
 'use client';
 
 import { DatesProvider, type DayOfWeek } from '@mantine/dates';
+import { Locale } from '@org/prisma/browser';
 import { DateTransformer } from '@org/utils/date-transformer';
-import dayjs from 'dayjs';
-import 'dayjs/locale/tr';
-import { useLocale } from 'next-intl';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
-export function LocaleProvider({ children }: { children: React.ReactNode }) {
-  const locale = useLocale();
+export function LocaleProvider({
+  children,
+  locale,
+}: {
+  children: React.ReactNode;
+  locale: Locale;
+}) {
   const safeLoc = useMemo(
-    () => DateTransformer.getSafeLocale(locale),
+    () => DateTransformer.getSafeLocale(locale?.toLowerCase() ?? 'tr'),
     [locale]
   );
-  const [isLoaded, setIsLoaded] = useState(safeLoc === 'tr');
 
-  useEffect(() => {
-    let mounted = true;
-    if (safeLoc === 'tr') {
-      dayjs.locale('tr');
-      setIsLoaded(true);
-      return;
-    }
-
-    import(`dayjs/locale/${safeLoc}.js`)
-      .then(() => {
-        if (mounted) {
-          dayjs.locale(safeLoc);
-          setIsLoaded(true);
-        }
-      })
-      .catch((e) => {
-        console.warn(
-          `Day.js locale file for "${safeLoc}" could not be loaded.`,
-          e
-        );
-        if (mounted) setIsLoaded(true);
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, [safeLoc]);
-
-  const currentLocale = isLoaded ? safeLoc : 'tr';
-  const firstDayOfWeek: DayOfWeek = currentLocale === 'en' ? 0 : 1;
+  const firstDayOfWeek: DayOfWeek = safeLoc === 'en' ? 0 : 1;
   const weekendDays: DayOfWeek[] = [0, 6];
 
   return (
     <DatesProvider
       settings={{
-        locale: currentLocale,
+        locale: safeLoc,
         firstDayOfWeek,
         weekendDays,
       }}

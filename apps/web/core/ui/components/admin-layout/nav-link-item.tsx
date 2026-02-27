@@ -17,6 +17,7 @@ interface NavLinkItemProps {
   onClick?: () => void;
   children?: NavItem[];
   depth?: number;
+  isSection?: boolean;
 }
 
 export function NavLinkItem({
@@ -28,6 +29,7 @@ export function NavLinkItem({
   onClick,
   children,
   depth = 0,
+  isSection = false,
 }: NavLinkItemProps) {
   const pathname = usePathname();
   const t = useTranslations('common.nav');
@@ -82,7 +84,7 @@ export function NavLinkItem({
       );
     });
 
-    return [selfLink, ...childLinks];
+    return isSection ? childLinks : [selfLink, ...childLinks];
   };
 
   const navLinkProps =

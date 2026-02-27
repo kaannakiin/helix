@@ -32,7 +32,8 @@
     "seed:customers": "npx tsx src/seeds/customers/example-data-customers.ts",
     "seed:products": "npx tsx src/seeds/products/example-data-products.ts",
     "seed:bulk": "npx tsx src/seeds/products/example-data-bulk.ts",
-    "seed:taxonomy": "npx tsx src/seeds/taxonomy-seed.ts"
+    "seed:taxonomy": "npx tsx src/seeds/taxonomy-seed.ts",
+    "seed:geo": "npx tsx src/seeds/geolocation-seed.ts"
   },
   "dependencies": {
     "@node-rs/argon2": "^2.0.2",

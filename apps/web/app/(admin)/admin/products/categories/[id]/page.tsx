@@ -16,6 +16,7 @@ import {
   TextInput,
   Textarea,
 } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { DATA_ACCESS_KEYS } from '@org/constants/data-keys';
 import { getMimePatterns } from '@org/constants/product-constants';
 import { FileType } from '@org/prisma/browser';
@@ -57,6 +58,7 @@ const AdminCategoryFormPage = () => {
   const isNew = id === 'new';
   const { data, isLoading } = useAdminCategory(id);
   const saveCategory = useSaveCategory();
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const formattedData = useMemo<CategoryInput>(() => {
     if (!data || isNew) {
@@ -135,14 +137,11 @@ const AdminCategoryFormPage = () => {
             </Group>
           </div>
 
-          <Group
-            align="flex-start"
-            gap="lg"
-            wrap="wrap"
-            style={{ flexWrap: 'wrap' }}
-          >
-            {/* Left column — main content */}
-            <Stack gap="md" style={{ flex: 1, minWidth: 0 }}>
+          <Group align="flex-start" gap="lg" wrap="wrap">
+            <Stack
+              gap="md"
+              style={{ flex: 1, minWidth: isMobile ? '100%' : 400 }}
+            >
               <FormCard
                 title={t('generalInfo')}
                 icon={FileText}
@@ -211,8 +210,15 @@ const AdminCategoryFormPage = () => {
               />
             </Stack>
 
-            {/* Right column — sidebar */}
-            <Stack gap="md" style={{ width: 340, flexShrink: 0 }}>
+            <Stack
+              gap="md"
+              style={{
+                width: isMobile ? '100%' : 340,
+                flexShrink: 0,
+                position: isMobile ? undefined : 'sticky',
+                top: isMobile ? undefined : 'var(--mantine-spacing-md)',
+              }}
+            >
               <FormCard
                 title={t('statusCard.title')}
                 icon={Activity}

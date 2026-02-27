@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import type { ContextMenuTranslations } from "../types/contextMenu.types";
+import type { ExpandableRowTranslations } from "../types/expandableRow.types";
 import type { DataTableFooterTranslations } from "../types/footer.types";
 
 export interface DataTableFilterTranslations {
@@ -58,6 +59,7 @@ export interface DataTableTranslations {
   contextMenu?: ContextMenuTranslations;
   footer?: DataTableFooterTranslations;
   filterDrawer?: DataTableFilterDrawerTranslations;
+  expandableRow?: ExpandableRowTranslations;
 }
 
 export const DEFAULT_TRANSLATIONS: DataTableTranslations = {

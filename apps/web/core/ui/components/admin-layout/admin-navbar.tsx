@@ -41,7 +41,6 @@ export function AdminNavbar({
 
   return (
     <AppShell.Navbar className="flex flex-col">
-      {/* Header: Logo + Toggle */}
       <AppShell.Section
         visibleFrom="sm"
         className={`flex items-center relative ${
@@ -65,7 +64,6 @@ export function AdminNavbar({
         )}
       </AppShell.Section>
 
-      {/* Search + Collapse toggle (when collapsed) */}
       <AppShell.Section className={collapsed ? 'p-2' : 'px-3 pt-3 pb-1'}>
         {!collapsed ? (
           <TextInput
@@ -121,7 +119,6 @@ export function AdminNavbar({
         )}
       </AppShell.Section>
 
-      {/* Navigation links */}
       <AppShell.Section grow component={ScrollArea} className="p-2">
         {Array.from(groupedItems.entries()).map(([groupKey, items]) => {
           const groupTitle = t(`groups.${groupKey}`);
@@ -155,6 +152,7 @@ export function AdminNavbar({
                     collapsed={collapsed}
                     onClick={onNavigate}
                     children={item.children}
+                    isSection={item.isSection}
                   />
                 ))}
               </div>
@@ -183,6 +181,7 @@ export function AdminNavbar({
                     collapsed={collapsed}
                     onClick={onNavigate}
                     children={item.children}
+                    isSection={item.isSection}
                   />
                 ))}
               </MantineNavLink>
@@ -191,7 +190,6 @@ export function AdminNavbar({
         })}
       </AppShell.Section>
 
-      {/* Footer: Notifications, Theme, User */}
       <AppShell.Section
         className="p-3 flex flex-col gap-2"
         style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}

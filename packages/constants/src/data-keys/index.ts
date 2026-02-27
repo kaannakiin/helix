@@ -41,4 +41,14 @@ export const DATA_ACCESS_KEYS = {
       tree: ['admin', 'taxonomy', 'tree'],
     },
   },
+  locations: {
+    countries: ['locations', 'countries'],
+    states: (countryId: string) => ['locations', 'states', countryId] as const,
+    cities: (params: { stateId?: string; countryId?: string }) =>
+      ['locations', 'cities', params] as const,
+    districts: (cityId: string) =>
+      ['locations', 'districts', cityId] as const,
+    towns: (districtId: string) =>
+      ['locations', 'towns', districtId] as const,
+  },
 } as const;

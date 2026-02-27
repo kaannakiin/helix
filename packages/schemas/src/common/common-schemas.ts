@@ -2,8 +2,6 @@ import { FileType } from '@org/prisma/browser';
 import { z } from 'zod';
 import { V } from './validation-keys.js';
 
-// DropzoneFile shape kept in sync with @org/ui/dropzone DropzoneFile.
-// Defined inline to avoid circular dependency (schemas → ui → schemas).
 export interface DropzoneFile {
   id: string;
   file: File;
@@ -21,9 +19,9 @@ export const metaTitleSchema = z.string().min(1, { error: V.REQUIRED });
 export const metaDescriptionSchema = z.string().min(1, { error: V.REQUIRED });
 
 export const slugSchema = z
-  .string()
+  .string({ error: V.REQUIRED })
   .trim()
-  .min(1)
+  .min(1, { error: V.REQUIRED })
   .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, { error: V.SLUG_PATTERN });
 
 export const sortOrderSchema = z.number().int().nonnegative().default(0);

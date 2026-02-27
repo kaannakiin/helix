@@ -1,7 +1,7 @@
 export const ACCESS_TOKEN_COOKIE_NAME = 'token';
 export const REFRESH_TOKEN_COOKIE_NAME = 'refresh_token';
-export const ACCESS_TOKEN_EXPIRY = '1m';
-export const ACCESS_TOKEN_EXPIRY_MS = 1 * 60 * 1000;
+export const ACCESS_TOKEN_EXPIRY = '30m';
+export const ACCESS_TOKEN_EXPIRY_MS = 30 * 60 * 1000;
 export const REFRESH_TOKEN_EXPIRY = '30d';
 export const REFRESH_TOKEN_EXPIRY_DAYS = 30;
 export const SESSION_EXPIRY_DAYS = 7;
