@@ -36,7 +36,7 @@ interface TagTreeTableProps {
 }
 
 export const TagTreeTable = ({ tagGroupId, isNew }: TagTreeTableProps) => {
-  const t = useTranslations('common.admin.tags.form.tags');
+  const t = useTranslations('frontend.admin.tags.form.tags');
   const { createColumn } = useColumnFactory();
   const { watch, setValue, getValues } = useFormContext<TagGroupInput>();
 

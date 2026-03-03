@@ -25,7 +25,7 @@ import { useTranslations } from 'next-intl';
 import { useMemo } from 'react';
 
 function TownsPanel({ data }: { data: GeolocationDistrictPrismaType }) {
-  const t = useTranslations('common.admin.locations');
+  const t = useTranslations('frontend.admin.locations');
   const { createColumn } = useColumnFactory();
 
   const { data: towns = [], isLoading } = useTowns(data.id);
@@ -78,7 +78,7 @@ function TownsPanel({ data }: { data: GeolocationDistrictPrismaType }) {
 }
 
 function DistrictsPanel({ data }: { data: GeolocationCityPrismaType }) {
-  const t = useTranslations('common.admin.locations');
+  const t = useTranslations('frontend.admin.locations');
   const { createColumn } = useColumnFactory();
 
   const { data: districts = [], isLoading } = useDistricts(data.id);
@@ -147,7 +147,7 @@ function CitiesPanel({
   data: GeolocationStatePrismaType | GeolocationCountryPrismaType;
   queryParams: { stateId?: string; countryId?: string };
 }) {
-  const t = useTranslations('common.admin.locations');
+  const t = useTranslations('frontend.admin.locations');
   const { createColumn } = useColumnFactory();
 
   const { data: cities = [], isLoading } = useCities(queryParams);
@@ -208,7 +208,7 @@ function CitiesPanel({
 }
 
 function StatesPanel({ data }: { data: GeolocationCountryPrismaType }) {
-  const t = useTranslations('common.admin.locations');
+  const t = useTranslations('frontend.admin.locations');
   const { createColumn } = useColumnFactory();
 
   const { data: states = [], isLoading } = useStates(data.id);
@@ -293,8 +293,8 @@ function CountryDetailPanel({ data }: { data: GeolocationCountryPrismaType }) {
 }
 
 export default function LocationsPage() {
-  const t = useTranslations('common.admin.locations');
-  const tEnums = useTranslations('common.enums');
+  const t = useTranslations('frontend.admin.locations');
+  const tEnums = useTranslations('frontend.enums');
   const { createColumn } = useColumnFactory();
 
   const { data: countries = [], isLoading } = useCountries();

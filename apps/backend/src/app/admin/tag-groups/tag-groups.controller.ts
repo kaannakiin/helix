@@ -110,10 +110,10 @@ export class TagGroupsController {
         locale: lang,
         localeStrings: {
           booleanYes:
-            i18n?.translate('common.export.boolean_yes' as never, { lang }) ??
+            i18n?.translate('backend.export.boolean_yes' as never, { lang }) ??
             'Yes',
           booleanNo:
-            i18n?.translate('common.export.boolean_no' as never, { lang }) ??
+            i18n?.translate('backend.export.boolean_no' as never, { lang }) ??
             'No',
         },
       }

@@ -248,8 +248,8 @@ export const VariantGroupDrawer = ({
   onCommit,
   ...drawerProps
 }: Props) => {
-  const t = useTranslations('common.admin.products.form');
-  const tEnums = useTranslations('common.enums');
+  const t = useTranslations('frontend.admin.products.form');
+  const tEnums = useTranslations('frontend.enums');
   const locale = useLocale();
 
   const { getValues: mainGetValues, setValue: mainSetValue } =

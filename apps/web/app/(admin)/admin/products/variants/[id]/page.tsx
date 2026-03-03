@@ -188,7 +188,7 @@ const SortableOptionRow = ({
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 const AdminVariantGroupFormPage = () => {
-  const t = useTranslations('common.admin.variants.form');
+  const t = useTranslations('frontend.admin.variants.form');
   const params = useParams();
   const router = useRouter();
   const locale = useLocale();

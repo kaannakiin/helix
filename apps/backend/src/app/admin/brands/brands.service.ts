@@ -166,7 +166,7 @@ export class BrandsService {
     });
 
     if (!brand) {
-      throw new NotFoundException('common.errors.brand_not_found');
+      throw new NotFoundException('backend.errors.brand_not_found');
     }
 
     return brand;
@@ -179,7 +179,7 @@ export class BrandsService {
       where: { slug, id: { not: id } },
     });
     if (slugConflict) {
-      throw new ConflictException('common.errors.brand_slug_conflict');
+      throw new ConflictException('backend.errors.brand_slug_conflict');
     }
 
     const existingImageIds = existingImages?.map((img) => img.id) ?? [];

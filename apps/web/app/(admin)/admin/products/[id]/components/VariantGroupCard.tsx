@@ -35,7 +35,7 @@ export const VariantGroupCard = ({
   onOpen,
   onRemove,
 }: Props) => {
-  const t = useTranslations('common.admin.products.form');
+  const t = useTranslations('frontend.admin.products.form');
   const { control } = useFormContext<ProductInputType>();
 
   const {

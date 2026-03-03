@@ -130,9 +130,9 @@ function BooleanBadge({
 }
 
 export default function CustomerDetailPage() {
-  const t = useTranslations('common.admin.customers');
-  const tTable = useTranslations('common.admin.customers.table');
-  const tDetail = useTranslations('common.admin.customers.detail');
+  const t = useTranslations('frontend.admin.customers');
+  const tTable = useTranslations('frontend.admin.customers.table');
+  const tDetail = useTranslations('frontend.admin.customers.detail');
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const { data: user, isLoading, error } = useUserDetail(params.id);

@@ -320,7 +320,7 @@ export class TagGroupsService {
     });
 
     if (!tagGroup) {
-      throw new NotFoundException('common.errors.tag_group_not_found');
+      throw new NotFoundException('backend.errors.tag_group_not_found');
     }
 
     return tagGroup;
@@ -335,7 +335,7 @@ export class TagGroupsService {
       where: { slug, id: { not: id } },
     });
     if (slugConflict) {
-      throw new ConflictException('common.errors.tag_group_slug_conflict');
+      throw new ConflictException('backend.errors.tag_group_slug_conflict');
     }
 
     const tagGroup = await this.prisma.$transaction(async (tx) => {
@@ -442,7 +442,7 @@ export class TagGroupsService {
         select: { depth: true },
       });
       if (!parent) {
-        throw new NotFoundException('common.errors.parent_tag_not_found');
+        throw new NotFoundException('backend.errors.parent_tag_not_found');
       }
       depth = parent.depth + 1;
     }
@@ -456,7 +456,7 @@ export class TagGroupsService {
       },
     });
     if (slugConflict) {
-      throw new ConflictException('common.errors.tag_slug_conflict');
+      throw new ConflictException('backend.errors.tag_slug_conflict');
     }
 
     const existingImageIds = existingImages?.map((img) => img.id) ?? [];
@@ -525,7 +525,7 @@ export class TagGroupsService {
       select: { id: true },
     });
     if (!tag) {
-      throw new NotFoundException('common.errors.tag_not_found');
+      throw new NotFoundException('backend.errors.tag_not_found');
     }
 
     await this.prisma.tag.delete({ where: { id: tagId } });

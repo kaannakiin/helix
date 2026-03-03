@@ -50,7 +50,7 @@ export class AuthService {
         where: { email: data.email },
       });
       if (existing) {
-        throw new ConflictException('common.errors.auth.email_conflict');
+        throw new ConflictException('backend.errors.auth.email_conflict');
       }
     }
 
@@ -59,7 +59,7 @@ export class AuthService {
         where: { phone: data.phone },
       });
       if (existing) {
-        throw new ConflictException('common.errors.auth.phone_conflict');
+        throw new ConflictException('backend.errors.auth.phone_conflict');
       }
     }
 
@@ -107,7 +107,7 @@ export class AuthService {
 
     if (user.status !== 'ACTIVE') {
       throw new ForbiddenException(
-        `common.errors.auth.account_${user.status.toLowerCase()}`
+        `backend.errors.auth.account_${user.status.toLowerCase()}`
       );
     }
 
@@ -267,17 +267,17 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException('common.errors.auth.user_not_found');
+      throw new NotFoundException('backend.errors.auth.user_not_found');
     }
 
     if (!user.password) {
-      throw new BadRequestException('common.errors.auth.no_password_set');
+      throw new BadRequestException('backend.errors.auth.no_password_set');
     }
 
     const isCurrentValid = await argon2Verify(user.password, currentPassword);
     if (!isCurrentValid) {
       throw new BadRequestException(
-        'common.errors.auth.current_password_incorrect'
+        'backend.errors.auth.current_password_incorrect'
       );
     }
 
@@ -314,7 +314,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException('common.errors.auth.user_not_found');
+      throw new NotFoundException('backend.errors.auth.user_not_found');
     }
 
     return user;
@@ -467,7 +467,7 @@ export class AuthService {
 
     if (user.status !== 'ACTIVE') {
       throw new ForbiddenException(
-        `common.errors.auth.account_${user.status.toLowerCase()}`
+        `backend.errors.auth.account_${user.status.toLowerCase()}`
       );
     }
 

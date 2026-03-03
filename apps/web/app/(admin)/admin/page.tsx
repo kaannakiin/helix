@@ -4,7 +4,7 @@ import { Text, Title } from '@mantine/core';
 import { useTranslations } from 'next-intl';
 
 export default function AdminDashboardPage() {
-  const t = useTranslations('common.nav');
+  const t = useTranslations('frontend.nav');
 
   return (
     <div>

@@ -2,7 +2,7 @@
 
 import { useLogin } from '@/core/hooks/useAuth';
 import { useAuthStore } from '@/core/stores/auth.store';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslatedZodResolver } from '@/core/hooks/useTranslatedZodResolver';
 import {
   Anchor,
   Button,
@@ -29,15 +29,16 @@ interface LoginFormProps {
 }
 
 const LoginForm = ({ onSwitch }: LoginFormProps) => {
-  const t = useTranslations('common.auth');
+  const t = useTranslations('frontend.auth');
   const router = useRouter();
   const setUser = useAuthStore((s) => s.setUser);
   const { mutateAsync: login, isPending, error } = useLogin();
 
   const [loginType, setLoginType] = useState<'email' | 'phone'>('email');
+  const resolver = useTranslatedZodResolver(LoginSchema);
 
   const { control, handleSubmit, reset } = useForm<LoginSchemaInputType>({
-    resolver: zodResolver(LoginSchema),
+    resolver,
     defaultValues: {
       type: 'email',
       email: '',

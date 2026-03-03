@@ -15,9 +15,14 @@ export default getRequestConfig(async ({ requestLocale }) => {
         `../../../../packages/i18n/src/locales/${locale}/validation.json`
       )
     ).default,
-    common: (
+    backend: (
       await import(
-        `../../../../packages/i18n/src/locales/${locale}/common.json`
+        `../../../../packages/i18n/src/locales/${locale}/backend.json`
+      )
+    ).default,
+    frontend: (
+      await import(
+        `../../../../packages/i18n/src/locales/${locale}/frontend.json`
       )
     ).default,
   };

@@ -86,7 +86,7 @@ export class CustomersService {
     });
 
     if (!user) {
-      throw new NotFoundException('common.errors.auth.user_not_found');
+      throw new NotFoundException('backend.errors.auth.user_not_found');
     }
 
     return user;

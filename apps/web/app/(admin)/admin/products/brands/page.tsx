@@ -20,13 +20,13 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
 
 export default function BrandsPage() {
-  const t = useTranslations('common.admin.brands');
+  const t = useTranslations('frontend.admin.brands');
   const router = useRouter();
   const locale = useLocale();
-  const tExport = useTranslations('common.export');
-  const tFilters = useTranslations('common.dataTable.filters');
+  const tExport = useTranslations('frontend.export');
+  const tFilters = useTranslations('frontend.dataTable.filters');
   const tColumnVisibility = useTranslations(
-    'common.dataTable.columnVisibility'
+    'frontend.dataTable.columnVisibility'
   );
 
   const filters = useMemo<DataTableFilterTranslations>(

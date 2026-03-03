@@ -94,7 +94,7 @@ const VariantRow = memo(
     onToggleSelect,
     onEdit,
   }: VariantRowProps) => {
-    const t = useTranslations('common.admin.products.form');
+    const t = useTranslations('frontend.admin.products.form');
     const { control } = useFormContext<ProductInputType>();
 
     const optionValueIds = useWatch({
@@ -264,8 +264,8 @@ const VariantRow = memo(
 VariantRow.displayName = 'VariantRow';
 
 export const VariantCombinationTable = () => {
-  const t = useTranslations('common.admin.products.form');
-  const tEnums = useTranslations('common.enums');
+  const t = useTranslations('frontend.admin.products.form');
+  const tEnums = useTranslations('frontend.enums');
   const { control, getValues, setValue } = useFormContext<ProductInputType>();
 
   const { fields } = useFieldArray({

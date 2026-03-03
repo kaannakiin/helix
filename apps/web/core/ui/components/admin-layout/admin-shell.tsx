@@ -2,6 +2,7 @@
 
 import { AppShell, Burger, Group } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
+import { useEffect, useState } from 'react';
 
 import { AdminLogo } from './admin-logo';
 import { AdminNavbar } from './admin-navbar';
@@ -12,20 +13,42 @@ interface AdminShellProps {
 }
 
 export function AdminShell({ children }: AdminShellProps) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const [mobileOpened, { toggle: toggleMobile, close: closeMobile }] =
     useDisclosure(false);
   const [desktopCollapsed, { toggle: toggleDesktop }] = useDisclosure(false);
 
-  const isTablet = useMediaQuery('(min-width: 768px) and (max-width: 1024px)');
-  const isMobile = useMediaQuery('(max-width: 767px)');
+  const isTablet = useMediaQuery(
+    '(min-width: 768px) and (max-width: 1024px)',
+    false,
+    { getInitialValueInEffect: true }
+  );
+  const isMobile = useMediaQuery('(max-width: 767px)', false, {
+    getInitialValueInEffect: true,
+  });
 
-  const effectiveCollapsed = isTablet ? true : desktopCollapsed;
-  const navbarWidth = effectiveCollapsed ? 80 : 260;
+  const effectiveCollapsed = mounted
+    ? isTablet
+      ? true
+      : desktopCollapsed
+    : desktopCollapsed;
+  const navbarWidth = mounted
+    ? effectiveCollapsed
+      ? 80
+      : 260
+    : desktopCollapsed
+    ? 80
+    : 260;
 
   return (
     <>
       <AppShell
-        header={{ height: 60, collapsed: !isMobile }}
+        id="admin-app-shell"
+        header={{ height: 60, collapsed: mounted ? !isMobile : true }}
         navbar={{
           width: navbarWidth,
           breakpoint: 'sm',

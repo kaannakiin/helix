@@ -23,7 +23,7 @@ import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { TagTreeTable } from './components/TagTreeTable';
 
 const AdminTagGroupFormPage = () => {
-  const t = useTranslations('common.admin.tags.form');
+  const t = useTranslations('frontend.admin.tags.form');
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;

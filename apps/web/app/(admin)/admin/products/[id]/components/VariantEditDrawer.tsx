@@ -42,7 +42,7 @@ export const VariantEditDrawer = ({
   trackingOptions,
   ...drawerProps
 }: Props) => {
-  const t = useTranslations('common.admin.products.form');
+  const t = useTranslations('frontend.admin.products.form');
 
   const { getValues: mainGetValues, setValue: mainSetValue } =
     useFormContext<ProductInputType>();

@@ -49,7 +49,7 @@ import {
 } from 'react-hook-form';
 
 const AdminCategoryFormPage = () => {
-  const t = useTranslations('common.admin.categories.form');
+  const t = useTranslations('frontend.admin.categories.form');
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;

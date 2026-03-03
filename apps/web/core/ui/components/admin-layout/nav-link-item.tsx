@@ -32,7 +32,7 @@ export function NavLinkItem({
   isSection = false,
 }: NavLinkItemProps) {
   const pathname = usePathname();
-  const t = useTranslations('common.nav');
+  const t = useTranslations('frontend.nav');
 
   const hasChildren = children && children.length > 0;
 

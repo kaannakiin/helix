@@ -228,7 +228,7 @@ export class TaxonomyService {
     });
 
     if (!item) {
-      throw new NotFoundException('common.errors.taxonomy_not_found');
+      throw new NotFoundException('backend.errors.taxonomy_not_found');
     }
 
     return {

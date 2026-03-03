@@ -89,7 +89,7 @@ export class PriceListsService {
     });
 
     if (!priceList) {
-      throw new NotFoundException('common.errors.price_list_not_found');
+      throw new NotFoundException('backend.errors.price_list_not_found');
     }
 
     return priceList;

@@ -27,7 +27,7 @@ export function AdminHeader({
   onMobileToggle,
   onDesktopToggle,
 }: AdminHeaderProps) {
-  const t = useTranslations('common.nav');
+  const t = useTranslations('frontend.nav');
 
   return (
     <AppShell.Header className="flex items-center justify-between px-4">

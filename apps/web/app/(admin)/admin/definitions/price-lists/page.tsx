@@ -20,12 +20,12 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
 
 export default function PriceListsPage() {
-  const t = useTranslations('common.admin.priceLists');
+  const t = useTranslations('frontend.admin.priceLists');
   const router = useRouter();
-  const tExport = useTranslations('common.export');
-  const tFilters = useTranslations('common.dataTable.filters');
+  const tExport = useTranslations('frontend.export');
+  const tFilters = useTranslations('frontend.dataTable.filters');
   const tColumnVisibility = useTranslations(
-    'common.dataTable.columnVisibility'
+    'frontend.dataTable.columnVisibility'
   );
 
   const filters = useMemo<DataTableFilterTranslations>(

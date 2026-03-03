@@ -1,7 +1,7 @@
 'use client';
 
 import { useRegister } from '@/core/hooks/useAuth';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslatedZodResolver } from '@/core/hooks/useTranslatedZodResolver';
 import {
   Anchor,
   Button,
@@ -27,12 +27,13 @@ interface RegisterFormProps {
 }
 
 const RegisterForm = ({ onSwitch }: RegisterFormProps) => {
-  const t = useTranslations('common.auth');
+  const t = useTranslations('frontend.auth');
   const { mutateAsync: register, isPending, error } = useRegister();
   const [contactType, setContactType] = useState<'email' | 'phone'>('email');
+  const resolver = useTranslatedZodResolver(RegisterSchema);
 
   const { control, handleSubmit, setValue } = useForm<RegisterSchemaInputType>({
-    resolver: zodResolver(RegisterSchema),
+    resolver,
     defaultValues: {
       name: '',
       surname: '',

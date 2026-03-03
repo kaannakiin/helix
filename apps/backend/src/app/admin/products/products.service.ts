@@ -97,7 +97,7 @@ export class ProductsService {
     });
 
     if (!product) {
-      throw new NotFoundException('common.errors.product_not_found');
+      throw new NotFoundException('backend.errors.product_not_found');
     }
 
     return product;
@@ -131,7 +131,7 @@ export class ProductsService {
         },
       });
       if (conflict) {
-        throw new ConflictException('common.errors.product_slug_conflict');
+        throw new ConflictException('backend.errors.product_slug_conflict');
       }
     }
 
@@ -144,7 +144,7 @@ export class ProductsService {
         select: { sku: true },
       });
       if (skuConflicts.length > 0) {
-        throw new ConflictException('common.errors.product_sku_conflict');
+        throw new ConflictException('backend.errors.product_sku_conflict');
       }
     }
 
@@ -177,7 +177,7 @@ export class ProductsService {
         currentProduct.variants.length > 0)
     ) {
       throw new ConflictException(
-        'common.errors.product_has_variants_cannot_disable'
+        'backend.errors.product_has_variants_cannot_disable'
       );
     }
 
@@ -529,7 +529,7 @@ export class ProductsService {
     });
 
     if (!product) {
-      throw new NotFoundException('common.errors.product_not_found');
+      throw new NotFoundException('backend.errors.product_not_found');
     }
 
     await this.uploadService.deleteImagesByOwner('product', id);
@@ -568,7 +568,7 @@ export class ProductsService {
       select: { id: true },
     });
     if (!product) {
-      throw new NotFoundException('common.errors.product_not_found');
+      throw new NotFoundException('backend.errors.product_not_found');
     }
 
     // If uploading to a variant, verify it belongs to this product
@@ -578,12 +578,12 @@ export class ProductsService {
         select: { id: true },
       });
       if (!variant) {
-        throw new NotFoundException('common.errors.product_variant_not_found');
+        throw new NotFoundException('backend.errors.product_variant_not_found');
       }
     } else {
       // ownerType === 'product', ownerId must match productId
       if (ownerId !== productId) {
-        throw new BadRequestException('common.errors.invalid_owner_id');
+        throw new BadRequestException('backend.errors.invalid_owner_id');
       }
     }
 
@@ -594,7 +594,7 @@ export class ProductsService {
       where: { [ownerField]: ownerId },
     });
     if (currentCount + files.length > 10) {
-      throw new BadRequestException('common.errors.files_too_many');
+      throw new BadRequestException('backend.errors.files_too_many');
     }
 
     // Upload each file

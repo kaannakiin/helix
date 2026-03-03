@@ -112,10 +112,10 @@ export class VariantGroupsController {
         locale: lang,
         localeStrings: {
           booleanYes:
-            i18n?.translate('common.export.boolean_yes' as never, { lang }) ??
+            i18n?.translate('backend.export.boolean_yes' as never, { lang }) ??
             'Yes',
           booleanNo:
-            i18n?.translate('common.export.boolean_no' as never, { lang }) ??
+            i18n?.translate('backend.export.boolean_no' as never, { lang }) ??
             'No',
         },
       }
@@ -143,7 +143,7 @@ export class VariantGroupsController {
     @Body() body: { ownerType: string }
   ) {
     if (!file) {
-      throw new BadRequestException('common.errors.no_files_provided');
+      throw new BadRequestException('backend.errors.no_files_provided');
     }
     const ownerType = body.ownerType as
       | 'variantOption'
@@ -152,7 +152,7 @@ export class VariantGroupsController {
       ownerType !== 'variantOption' &&
       ownerType !== 'productVariantGroupOption'
     ) {
-      throw new BadRequestException('common.errors.invalid_owner_type');
+      throw new BadRequestException('backend.errors.invalid_owner_type');
     }
     return this.variantGroupsService.uploadOptionImage({
       optionId,

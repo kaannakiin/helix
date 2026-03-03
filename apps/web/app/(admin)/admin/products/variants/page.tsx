@@ -21,12 +21,12 @@ import { Plus } from 'lucide-react';
 import { useCallback, useMemo, useRef } from 'react';
 
 export default function VariantGroupsPage() {
-  const t = useTranslations('common.admin.variants');
+  const t = useTranslations('frontend.admin.variants');
   const router = useRouter();
   const locale = useLocale();
-  const tFilters = useTranslations('common.dataTable.filters');
+  const tFilters = useTranslations('frontend.dataTable.filters');
   const tColumnVisibility = useTranslations(
-    'common.dataTable.columnVisibility'
+    'frontend.dataTable.columnVisibility'
   );
 
   const filters = useMemo<DataTableFilterTranslations>(

@@ -179,8 +179,8 @@ function eventToLogEntry(event: EvaluationEvent): LogEntry | null {
 }
 
 export default function EvaluationJobDetailPage() {
-  const t = useTranslations('common.admin.evaluationJobs.detail');
-  const tEnums = useTranslations('common.enums');
+  const t = useTranslations('frontend.admin.evaluationJobs.detail');
+  const tEnums = useTranslations('frontend.enums');
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;

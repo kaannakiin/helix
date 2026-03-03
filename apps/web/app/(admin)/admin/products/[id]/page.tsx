@@ -60,8 +60,8 @@ import {
 import { VariantCreator } from './components/VariantCreator';
 
 const AdminProductPage = () => {
-  const t = useTranslations('common.admin.products.form');
-  const tEnums = useTranslations('common.enums');
+  const t = useTranslations('frontend.admin.products.form');
+  const tEnums = useTranslations('frontend.enums');
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;

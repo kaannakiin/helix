@@ -48,7 +48,7 @@ export function TagChildrenPanel({
   isNew = false,
   formTags,
 }: TagChildrenPanelProps) {
-  const t = useTranslations('common.admin.tags.form.tags');
+  const t = useTranslations('frontend.admin.tags.form.tags');
   const { createColumn } = useColumnFactory();
 
   const { data: apiChildren = [], isLoading } = useTagChildren(

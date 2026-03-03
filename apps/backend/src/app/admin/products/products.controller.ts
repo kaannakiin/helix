@@ -59,11 +59,11 @@ export class ProductsController {
     @Body() body: { ownerType: string; ownerId: string; sortOrders?: string }
   ) {
     if (!files || files.length === 0) {
-      throw new BadRequestException('common.errors.no_files_provided');
+      throw new BadRequestException('backend.errors.no_files_provided');
     }
     const ownerType = body.ownerType as 'product' | 'productVariant';
     if (ownerType !== 'product' && ownerType !== 'productVariant') {
-      throw new BadRequestException('common.errors.invalid_owner_type');
+      throw new BadRequestException('backend.errors.invalid_owner_type');
     }
     const sortOrders: number[] = body.sortOrders
       ? JSON.parse(body.sortOrders)
@@ -123,11 +123,11 @@ export class ProductsController {
         locale,
         localeStrings: {
           booleanYes:
-            i18n?.translate('common.export.boolean_yes' as never, {
+            i18n?.translate('backend.export.boolean_yes' as never, {
               lang: locale,
             }) ?? 'Yes',
           booleanNo:
-            i18n?.translate('common.export.boolean_no' as never, {
+            i18n?.translate('backend.export.boolean_no' as never, {
               lang: locale,
             }) ?? 'No',
         },

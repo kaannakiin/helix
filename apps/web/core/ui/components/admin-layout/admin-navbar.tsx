@@ -35,7 +35,7 @@ export function AdminNavbar({
   onMobileToggle,
   onDesktopToggle,
 }: AdminNavbarProps) {
-  const t = useTranslations('common.nav');
+  const t = useTranslations('frontend.nav');
   const pathname = usePathname();
   const groupedItems = getGroupedNavbarItems();
 
@@ -67,6 +67,7 @@ export function AdminNavbar({
       <AppShell.Section className={collapsed ? 'p-2' : 'px-3 pt-3 pb-1'}>
         {!collapsed ? (
           <TextInput
+            id="admin-search-input"
             leftSection={<Search size={16} />}
             rightSection={
               <div className="flex items-center gap-0.5">
@@ -86,7 +87,12 @@ export function AdminNavbar({
           />
         ) : (
           <div className="flex flex-col items-center gap-1">
-            <Tooltip label={t('search_placeholder')} position="right" withArrow>
+            <Tooltip
+              id="admin-search-tooltip"
+              label={t('search_placeholder')}
+              position="right"
+              withArrow
+            >
               <ActionIcon
                 variant="subtle"
                 color="gray"
@@ -99,6 +105,7 @@ export function AdminNavbar({
             </Tooltip>
             {onDesktopToggle && (
               <Tooltip
+                id="admin-toggle-tooltip"
                 label={t('toggle_navigation')}
                 position="right"
                 withArrow

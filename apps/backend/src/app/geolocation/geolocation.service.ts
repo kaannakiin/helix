@@ -51,7 +51,7 @@ export class GeolocationService {
     });
 
     if (!country) {
-      throw new NotFoundException('common.errors.country_not_found');
+      throw new NotFoundException('backend.errors.country_not_found');
     }
 
     return country;
@@ -90,7 +90,7 @@ export class GeolocationService {
   ) {
     if (!opts.stateId && !opts.countryId) {
       throw new BadRequestException(
-        'common.errors.state_or_country_required'
+        'backend.errors.state_or_country_required'
       );
     }
 

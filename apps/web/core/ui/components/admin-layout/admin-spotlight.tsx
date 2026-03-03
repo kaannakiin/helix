@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 
 export function AdminSpotlight() {
-  const t = useTranslations('common.nav');
+  const t = useTranslations('frontend.nav');
   const router = useRouter();
   const spotlightItems = getSpotlightItems();
 

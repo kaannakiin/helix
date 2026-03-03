@@ -29,12 +29,12 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
 
 export default function AdminEvaluationJobsPage() {
-  const t = useTranslations('common.admin.evaluationJobs');
-  const tEnums = useTranslations('common.enums');
+  const t = useTranslations('frontend.admin.evaluationJobs');
+  const tEnums = useTranslations('frontend.enums');
   const router = useRouter();
-  const tFilters = useTranslations('common.dataTable.filters');
+  const tFilters = useTranslations('frontend.dataTable.filters');
   const tColumnVisibility = useTranslations(
-    'common.dataTable.columnVisibility'
+    'frontend.dataTable.columnVisibility'
   );
   const cancelJob = useCancelEvaluationJob();
   const gridApiRef = useRef<GridApi | null>(null);

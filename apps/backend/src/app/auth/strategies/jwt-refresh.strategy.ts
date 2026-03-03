@@ -34,7 +34,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
 
     if (!refreshToken) {
       throw new UnauthorizedException(
-        'common.errors.auth.refresh_token_missing'
+        'backend.errors.auth.refresh_token_missing'
       );
     }
 
@@ -42,7 +42,7 @@ export class JwtRefreshStrategy extends PassportStrategy(
 
     if (!result) {
       throw new UnauthorizedException(
-        'common.errors.auth.invalid_refresh_token'
+        'backend.errors.auth.invalid_refresh_token'
       );
     }
 

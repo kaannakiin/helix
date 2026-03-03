@@ -13,7 +13,7 @@ interface AuthLeftPanelProps {
 }
 
 const AuthLeftPanel = ({ tab, onSwitch }: AuthLeftPanelProps) => {
-  const t = useTranslations('common.auth');
+  const t = useTranslations('frontend.auth');
   const isLogin = tab === 'login';
 
   return (

@@ -1157,30 +1157,5 @@
         }
       }
     }
-  },
-  "export": {
-    "boolean_yes": "Yes",
-    "boolean_no": "No"
-  },
-  "errors": {
-    "generic": "Something went wrong. Please try again.",
-    "auth": {
-      "email_conflict": "Email is already registered.",
-      "phone_conflict": "Phone number is already registered.",
-      "account_suspended": "Account is suspended.",
-      "account_banned": "Account is banned.",
-      "account_deactivated": "Account is deactivated.",
-      "user_not_found": "User not found.",
-      "current_password_incorrect": "Current password is incorrect.",
-      "invalid_credentials": "Invalid credentials.",
-      "refresh_token_missing": "Refresh token missing.",
-      "invalid_refresh_token": "Invalid refresh token.",
-      "no_password_set": "This account uses social login. Please sign in with your social provider."
-    },
-    "customer_group_not_found": "Customer group not found.",
-    "evaluation_manual_group": "Manual customer groups cannot be evaluated with rules.",
-    "evaluation_no_rule_tree": "This customer group has no rule tree configured.",
-    "evaluation_job_not_found": "Evaluation job not found.",
-    "evaluation_job_not_cancellable": "Only pending evaluation jobs can be cancelled."
   }
 }

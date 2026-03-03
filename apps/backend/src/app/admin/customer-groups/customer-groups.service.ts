@@ -99,7 +99,7 @@ export class CustomerGroupsService {
     });
 
     if (!group) {
-      throw new NotFoundException('common.errors.customer_group_not_found');
+      throw new NotFoundException('backend.errors.customer_group_not_found');
     }
 
     return group;
@@ -192,18 +192,18 @@ export class CustomerGroupsService {
     });
 
     if (!group) {
-      throw new NotFoundException('common.errors.customer_group_not_found');
+      throw new NotFoundException('backend.errors.customer_group_not_found');
     }
 
     if (group.type !== 'RULE_BASED') {
       throw new BadRequestException(
-        'common.errors.evaluation_manual_group'
+        'backend.errors.evaluation_manual_group'
       );
     }
 
     if (!group.ruleTree) {
       throw new BadRequestException(
-        'common.errors.evaluation_no_rule_tree'
+        'backend.errors.evaluation_no_rule_tree'
       );
     }
 
@@ -225,7 +225,7 @@ export class CustomerGroupsService {
     });
 
     if (!group) {
-      throw new NotFoundException('common.errors.customer_group_not_found');
+      throw new NotFoundException('backend.errors.customer_group_not_found');
     }
 
     await this.prisma.customerGroup.delete({ where: { id } });

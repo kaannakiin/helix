@@ -21,13 +21,13 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
 
 export default function TagsPage() {
-  const t = useTranslations('common.admin.tags');
+  const t = useTranslations('frontend.admin.tags');
   const router = useRouter();
   const locale = useLocale();
-  const tExport = useTranslations('common.export');
-  const tFilters = useTranslations('common.dataTable.filters');
+  const tExport = useTranslations('frontend.export');
+  const tFilters = useTranslations('frontend.dataTable.filters');
   const tColumnVisibility = useTranslations(
-    'common.dataTable.columnVisibility'
+    'frontend.dataTable.columnVisibility'
   );
 
   const filters = useMemo<DataTableFilterTranslations>(

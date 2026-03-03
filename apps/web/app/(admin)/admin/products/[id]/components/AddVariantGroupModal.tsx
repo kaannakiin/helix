@@ -92,8 +92,8 @@ export const AddVariantGroupModal = ({
   existingGroups,
   hasColorGroup,
 }: Props) => {
-  const t = useTranslations('common.admin.products.form');
-  const tEnums = useTranslations('common.enums');
+  const t = useTranslations('frontend.admin.products.form');
+  const tEnums = useTranslations('frontend.enums');
 
   const [tab, setTab] = useState<Tab>('existing');
   const [searchQuery, setSearchQuery] = useState('');

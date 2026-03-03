@@ -64,8 +64,8 @@ import {
 } from 'react-hook-form';
 
 const AdminCustomerGroupPage = () => {
-  const t = useTranslations('common.admin.customerGroups.form');
-  const tEnums = useTranslations('common.enums');
+  const t = useTranslations('frontend.admin.customerGroups.form');
+  const tEnums = useTranslations('frontend.enums');
   const locale = useLocale();
   const params = useParams();
   const router = useRouter();

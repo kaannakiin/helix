@@ -30,7 +30,7 @@ export const BulkEditDrawer = ({
   trackingOptions,
   ...drawerProps
 }: Props) => {
-  const t = useTranslations('common.admin.products.form');
+  const t = useTranslations('frontend.admin.products.form');
   const { getValues, setValue } = useFormContext<ProductInputType>();
 
   const [isActive, setIsActive] = useState<boolean | null>(null);

@@ -69,7 +69,7 @@ export const TagEditDrawer = ({
   isNew,
   ...drawerProps
 }: TagEditDrawerProps) => {
-  const t = useTranslations('common.admin.tags.form.tags');
+  const t = useTranslations('frontend.admin.tags.form.tags');
   const saveTag = useSaveTag(tagGroupId);
   const resolver = useTranslatedZodResolver(BaseTagSchema);
   const parentForm = useFormContext<TagGroupInput>();

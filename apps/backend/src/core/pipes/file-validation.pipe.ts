@@ -51,14 +51,14 @@ export class FileValidationPipe implements PipeTransform {
       if (file.size > this.maxSize) {
         const maxMB = (this.maxSize / (1024 * 1024)).toFixed(0);
         throw new BadRequestException(
-          `common.errors.file_too_large|{"max":"${maxMB}MB"}`
+          `backend.errors.file_too_large|{"max":"${maxMB}MB"}`
         );
       }
 
       if (!matchesMimePattern(file.mimetype, this.mimePatterns)) {
         const allowed = getAllowedExtensions(this.allowedTypes).join(', ');
         throw new BadRequestException(
-          `common.errors.file_type_not_allowed|{"allowed":"${allowed}"}`
+          `backend.errors.file_type_not_allowed|{"allowed":"${allowed}"}`
         );
       }
     }

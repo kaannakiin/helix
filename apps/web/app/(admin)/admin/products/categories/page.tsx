@@ -20,13 +20,13 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
 
 export default function CategoriesPage() {
-  const t = useTranslations('common.admin.categories');
+  const t = useTranslations('frontend.admin.categories');
   const router = useRouter();
   const locale = useLocale();
-  const tExport = useTranslations('common.export');
-  const tFilters = useTranslations('common.dataTable.filters');
+  const tExport = useTranslations('frontend.export');
+  const tFilters = useTranslations('frontend.dataTable.filters');
   const tColumnVisibility = useTranslations(
-    'common.dataTable.columnVisibility'
+    'frontend.dataTable.columnVisibility'
   );
 
   const filters = useMemo<DataTableFilterTranslations>(

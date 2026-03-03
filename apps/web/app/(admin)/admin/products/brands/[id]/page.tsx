@@ -41,7 +41,7 @@ import {
 } from 'react-hook-form';
 
 const AdminBrandFormPage = () => {
-  const t = useTranslations('common.admin.brands.form');
+  const t = useTranslations('frontend.admin.brands.form');
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;

@@ -158,11 +158,11 @@ export class EvaluationService {
     });
 
     if (!job) {
-      throw new NotFoundException('common.errors.evaluation_job_not_found');
+      throw new NotFoundException('backend.errors.evaluation_job_not_found');
     }
     if (job.status !== 'PENDING') {
       throw new BadRequestException(
-        'common.errors.evaluation_job_not_cancellable'
+        'backend.errors.evaluation_job_not_cancellable'
       );
     }
 
@@ -190,7 +190,7 @@ export class EvaluationService {
       where: { id },
     });
     if (!job) {
-      throw new NotFoundException('common.errors.evaluation_job_not_found');
+      throw new NotFoundException('backend.errors.evaluation_job_not_found');
     }
     return job;
   }

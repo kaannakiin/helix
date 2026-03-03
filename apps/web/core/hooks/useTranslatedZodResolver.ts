@@ -9,7 +9,6 @@ function translateErrors(
   errors: FieldErrors,
   t: (key: string) => string
 ): FieldErrors {
-  // Leaf FieldError — has a string message, translate it
   const asAny = errors as Record<string, unknown>;
   if (typeof asAny.message === 'string') {
     return {
@@ -20,14 +19,12 @@ function translateErrors(
     } as unknown as FieldErrors;
   }
 
-  // Array — preserve array type, recurse into each element
   if (Array.isArray(errors)) {
     return errors.map((entry) =>
       entry == null ? entry : translateErrors(entry as FieldErrors, t)
     ) as unknown as FieldErrors;
   }
 
-  // Plain object — iterate keys and recurse
   const out: Record<string, unknown> = {};
   for (const [key, entry] of Object.entries(errors)) {
     if (entry == null) {

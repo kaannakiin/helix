@@ -1157,30 +1157,5 @@
         }
       }
     }
-  },
-  "export": {
-    "boolean_yes": "Evet",
-    "boolean_no": "Hayır"
-  },
-  "errors": {
-    "generic": "Bir şeyler ters gitti. Lütfen tekrar deneyin.",
-    "auth": {
-      "email_conflict": "Bu e-posta adresi zaten kayıtlı.",
-      "phone_conflict": "Bu telefon numarası zaten kayıtlı.",
-      "account_suspended": "Hesap askıya alınmış.",
-      "account_banned": "Hesap yasaklanmış.",
-      "account_deactivated": "Hesap devre dışı bırakılmış.",
-      "user_not_found": "Kullanıcı bulunamadı.",
-      "current_password_incorrect": "Mevcut şifre yanlış.",
-      "invalid_credentials": "Geçersiz kimlik bilgileri.",
-      "refresh_token_missing": "Yenileme tokeni eksik.",
-      "invalid_refresh_token": "Geçersiz yenileme tokeni.",
-      "no_password_set": "Bu hesap sosyal giriş kullanıyor. Lütfen sosyal hesabınızla giriş yapın."
-    },
-    "customer_group_not_found": "Müşteri grubu bulunamadı.",
-    "evaluation_manual_group": "Manuel müşteri grupları kural ile değerlendirilemez.",
-    "evaluation_no_rule_tree": "Bu müşteri grubunda kural ağacı yapılandırılmamış.",
-    "evaluation_job_not_found": "Değerlendirme işi bulunamadı.",
-    "evaluation_job_not_cancellable": "Yalnızca bekleyen değerlendirme işleri iptal edilebilir."
   }
 }

@@ -25,7 +25,7 @@ export class LocalStrategy extends PassportStrategy(Strategy, LOCAL_STRATEGY) {
     );
 
     if (!user) {
-      throw new UnauthorizedException('common.errors.auth.invalid_credentials');
+      throw new UnauthorizedException('backend.errors.auth.invalid_credentials');
     }
 
     return user;

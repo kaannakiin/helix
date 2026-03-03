@@ -26,12 +26,12 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
 
 export default function CustomersPage() {
-  const t = useTranslations('common.admin.customers');
+  const t = useTranslations('frontend.admin.customers');
   const router = useRouter();
 
-  const tEnums = useTranslations('common.enums');
-  const tExport = useTranslations('common.export');
-  const tFilters = useTranslations('common.dataTable.filters');
+  const tEnums = useTranslations('frontend.enums');
+  const tExport = useTranslations('frontend.export');
+  const tFilters = useTranslations('frontend.dataTable.filters');
 
   const filters = useMemo<DataTableFilterTranslations>(
     () => ({

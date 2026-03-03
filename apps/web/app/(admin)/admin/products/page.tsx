@@ -27,13 +27,13 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
 
 export default function ProductsPage() {
-  const t = useTranslations('common.admin.products');
+  const t = useTranslations('frontend.admin.products');
   const router = useRouter();
   const locale = useLocale();
-  const tEnums = useTranslations('common.enums');
-  const tFilters = useTranslations('common.dataTable.filters');
+  const tEnums = useTranslations('frontend.enums');
+  const tFilters = useTranslations('frontend.dataTable.filters');
   const tColumnVisibility = useTranslations(
-    'common.dataTable.columnVisibility'
+    'frontend.dataTable.columnVisibility'
   );
 
   const filters = useMemo<DataTableFilterTranslations>(

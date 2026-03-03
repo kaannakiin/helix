@@ -30,7 +30,7 @@ export const VariantOptionDrawer = ({
   draftControl,
   ...drawerProps
 }: Props) => {
-  const t = useTranslations('common.admin.products.form');
+  const t = useTranslations('frontend.admin.products.form');
 
   const optionName = useWatch({
     control: draftControl ?? undefined,

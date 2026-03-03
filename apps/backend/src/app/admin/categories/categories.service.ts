@@ -338,7 +338,7 @@ export class CategoriesService {
     });
 
     if (!category) {
-      throw new NotFoundException('common.errors.category_not_found');
+      throw new NotFoundException('backend.errors.category_not_found');
     }
 
     return category;
@@ -354,7 +354,7 @@ export class CategoriesService {
 
     // Prevent self-reference
     if (cleanParentId && cleanParentId === uniqueId) {
-      throw new ConflictException('common.errors.category_self_parent');
+      throw new ConflictException('backend.errors.category_self_parent');
     }
 
     // Calculate depth from parent
@@ -374,7 +374,7 @@ export class CategoriesService {
       where: { slug, id: { not: uniqueId } },
     });
     if (slugConflict) {
-      throw new ConflictException('common.errors.category_slug_conflict');
+      throw new ConflictException('backend.errors.category_slug_conflict');
     }
 
     const existingImageIds = existingImages?.map((img) => img.id) ?? [];

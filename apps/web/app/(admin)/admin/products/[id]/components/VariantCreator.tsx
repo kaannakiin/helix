@@ -51,7 +51,7 @@ interface Props {
 
 export const VariantCreator = ({ isNew, initialOriginalOptionsMap }: Props) => {
   const { recalculate } = useVariantCombinations();
-  const t = useTranslations('common.admin.products.form');
+  const t = useTranslations('frontend.admin.products.form');
   const [modalOpen, setModalOpen] = useState(false);
   const [activeGroupIndex, setActiveGroupIndex] = useState<number | null>(null);
   const [activeOptionIndex, setActiveOptionIndex] = useState<number | null>(

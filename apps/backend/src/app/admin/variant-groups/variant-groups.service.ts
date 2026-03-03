@@ -202,7 +202,7 @@ export class VariantGroupsService {
     });
 
     if (!variantGroup) {
-      throw new NotFoundException('common.errors.variant_group_not_found');
+      throw new NotFoundException('backend.errors.variant_group_not_found');
     }
 
     return variantGroup;
@@ -232,7 +232,7 @@ export class VariantGroupsService {
         });
         if (referencedCount > 0) {
           throw new ConflictException(
-            'common.errors.variant_option_in_use',
+            'backend.errors.variant_option_in_use',
           );
         }
       }
@@ -352,7 +352,7 @@ export class VariantGroupsService {
         select: { id: true },
       });
       if (!option) {
-        throw new NotFoundException('common.errors.variant_option_not_found');
+        throw new NotFoundException('backend.errors.variant_option_not_found');
       }
     } else {
       const pvgOption = await this.prisma.productVariantGroupOption.findUnique({
@@ -361,7 +361,7 @@ export class VariantGroupsService {
       });
       if (!pvgOption) {
         throw new NotFoundException(
-          'common.errors.product_variant_group_option_not_found',
+          'backend.errors.product_variant_group_option_not_found',
         );
       }
     }

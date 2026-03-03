@@ -57,7 +57,7 @@ npx prisma migrate dev             # multi-file schema in prisma/schema/
 - **`packages/schemas`** — Zod validation schemas shared between frontend and backend. Subpath exports: `@org/schemas/*`.
 - **`packages/types`** — Shared TypeScript type definitions.
 - **`packages/constants`** — Shared constants.
-- **`packages/i18n`** — i18n locale files (en, tr) with `common.json` and `validation.json` per locale.
+- **`packages/i18n`** — i18n locale files (en, tr) with three namespaces per locale: `backend.json`, `frontend.json`, `validation.json`.
 
 ### Key Patterns
 
@@ -65,8 +65,13 @@ npx prisma migrate dev             # multi-file schema in prisma/schema/
 - **Custom condition**: `@org/source` in tsconfig and package.json exports enables direct TypeScript source imports during development
 - **Module system**: All packages use ES modules (`"type": "module"`) with `nodenext` module resolution
 - **Backend auth flow**: JWT access + refresh tokens with token family tracking for rotation anomaly detection. RefreshToken model has a self-referential `TokenChain` relation.
-- **Backend i18n**: nestjs-i18n with locale files copied from `@org/i18n` as webpack assets. Custom exception filters (`HttpExceptionI18nFilter`, `ZodValidationI18nFilter`) for translated error responses.
-- **Frontend i18n**: next-intl with request handler at `apps/web/core/i18n/request.ts`. The `@org/i18n` package is transpiled by Next.js.
+- **i18n namespaces**: Three JSON files per locale in `packages/i18n/src/locales/{en,tr}/`:
+  - `backend.json` — Backend-only error messages and export helpers. Keys used in NestJS services/controllers as `'backend.errors.*'` and `'backend.export.*'`.
+  - `frontend.json` — UI labels, nav, admin sections, enums, components. Keys used in React components via `useTranslations('frontend.*')`.
+  - `validation.json` — Zod schema validation error messages. Shared between backend and frontend via V key constants (`packages/schemas/src/common/validation-keys.ts`).
+- **Backend i18n**: nestjs-i18n with locale files copied from `@org/i18n` as webpack assets. Custom exception filters (`HttpExceptionI18nFilter`, `ZodValidationI18nFilter`) translate i18n keys to localized strings before sending HTTP responses.
+- **Frontend i18n**: next-intl with request handler at `apps/web/core/i18n/request.ts`. The `@org/i18n` package is transpiled by Next.js. Client-side Zod validation errors are translated by `useTranslatedZodResolver` hook.
+- **V key pattern**: Zod schemas use `V.KEY_NAME` constants (e.g., `V.EMAIL_INVALID = 'validation.errors.auth.email_invalid'`). Backend translates via `ZodValidationI18nFilter`, frontend via `useTranslatedZodResolver`. When adding new validation messages: add the V key constant, add translations to `validation.json` in both locales.
 - **Test targets** depend on `^build` (dependencies must build before tests run)
 
 ### Environment Variables
