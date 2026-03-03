@@ -40,7 +40,7 @@ export const ResultNode = memo(({ id, data }: NodeProps) => {
   const { action, label } = data as ResultFlowNodeData;
   const selectedNodeId = useTreeStore((s) => s.selectedNodeId);
   const mode = useTreeMode();
-  const t = useTranslations('common.decisionTree');
+  const t = useTranslations('frontend.decisionTree');
   const registry = useActionRegistry();
   const isSelected = selectedNodeId === id;
 

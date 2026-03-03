@@ -50,7 +50,7 @@ function ConditionForm({
   onChange: (index: number, condition: RuleCondition) => void;
   onRemove: (index: number) => void;
 }) {
-  const t = useTranslations('common.decisionTree');
+  const t = useTranslations('frontend.decisionTree');
   const { fieldLabels, operatorLabels } = useFieldLabels();
 
   const fieldOptions = Object.entries(fieldConfig).map(([key]) => ({
@@ -229,7 +229,7 @@ export const ConditionGroupEditDrawer = ({
   fieldConfig,
   ...drawerProps
 }: Props) => {
-  const t = useTranslations('common.decisionTree');
+  const t = useTranslations('frontend.decisionTree');
   const nodes = useTreeStore((s) => s.nodes);
   const selectedNodeId = useTreeStore((s) => s.selectedNodeId);
   const updateConditionGroupNode = useTreeStore(

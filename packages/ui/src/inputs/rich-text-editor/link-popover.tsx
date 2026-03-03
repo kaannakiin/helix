@@ -13,7 +13,7 @@ interface LinkPopoverProps {
 }
 
 const LinkPopover = ({ editor, opened, onClose }: LinkPopoverProps) => {
-  const t = useTranslations('common.richTextEditor.link');
+  const t = useTranslations('frontend.richTextEditor.link');
   const [url, setUrl] = useState('');
 
   useEffect(() => {

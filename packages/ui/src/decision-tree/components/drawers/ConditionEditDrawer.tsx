@@ -31,7 +31,7 @@ interface Props extends DrawerProps {
 }
 
 export const ConditionEditDrawer = ({ fieldConfig, ...drawerProps }: Props) => {
-  const t = useTranslations('common.decisionTree');
+  const t = useTranslations('frontend.decisionTree');
   const { fieldLabels, operatorLabels } = useFieldLabels();
   const nodes = useTreeStore((s) => s.nodes);
   const selectedNodeId = useTreeStore((s) => s.selectedNodeId);

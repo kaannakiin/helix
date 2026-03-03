@@ -18,7 +18,7 @@ import { useActionRegistry, useTreeMode, useTreeStore } from '../../context';
 import type { ResultFlowNodeData } from '../../types';
 
 export const ResultEditDrawer = ({ ...drawerProps }: DrawerProps) => {
-  const t = useTranslations('common.decisionTree');
+  const t = useTranslations('frontend.decisionTree');
   const mode = useTreeMode();
   const registry = useActionRegistry();
   const nodes = useTreeStore((s) => s.nodes);

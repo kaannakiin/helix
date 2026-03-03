@@ -24,7 +24,7 @@ export function RelationDrawerTrigger({
   disabled,
   compact,
 }: RelationDrawerTriggerProps) {
-  const t = useTranslations('common.relationModal');
+  const t = useTranslations('frontend.relationModal');
   const {
     resolvedItems,
     resolving,

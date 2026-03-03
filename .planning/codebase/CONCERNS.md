@@ -59,7 +59,7 @@
   - Audit filter allowed fields per entity via config objects (already done via `MY_FIELD_CONFIG` pattern)
 
 **i18n Error Message Translation Path Traversal:**
-- Risk: Error messages use i18n keys directly (e.g., `'common.errors.brand_not_found'`); translation layer could be exploited
+- Risk: Error messages use i18n keys directly (e.g., `'backend.errors.brand_not_found'`); translation layer could be exploited
 - Files: `apps/backend/src/app/auth/auth.controller.ts`, `apps/backend/src/app/admin/brands/brands.controller.ts`, all admin services
 - Current mitigation: Keys are constants from `common/validation-keys.ts` and hardcoded in code (no user input in keys)
 - Recommendations: Continue restricting keys to compiled constants; never interpolate user input into i18n paths

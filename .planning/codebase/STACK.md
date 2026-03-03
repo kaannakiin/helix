@@ -47,7 +47,7 @@
 **i18n:**
 - next-intl 4.8.3 - Frontend i18n with request handler at `apps/web/core/i18n/request.ts`
 - nestjs-i18n 10.4.9 - Backend i18n with locale file resolution and custom exception filters
-- @org/i18n package - Shared locale files (en, tr) with common.json and validation.json per locale
+- @org/i18n package - Shared locale files (en, tr) with backend.json, frontend.json and validation.json per locale
 
 **Build/Dev Tools:**
 - Webpack 5.105.2 - Backend bundler (configured in `apps/backend/webpack.config.js`)

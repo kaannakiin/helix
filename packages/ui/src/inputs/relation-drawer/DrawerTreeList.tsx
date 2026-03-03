@@ -43,7 +43,7 @@ function normalizeTreePage(
 export function DrawerTreeList({
   renderItem: renderItemProp,
 }: DrawerTreeListProps) {
-  const t = useTranslations('common.relationModal');
+  const t = useTranslations('frontend.relationModal');
   const {
     queryKey,
     fetchOptions,

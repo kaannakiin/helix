@@ -39,7 +39,7 @@ export const FormCard = ({
     >
       <Stack gap={0}>
         <Group justify="space-between" align="flex-start" p="md">
-          <Group align="flex-start" gap="sm">
+          <Group align="center" gap="sm">
             {Icon && (
               <ThemeIcon
                 variant={iconVariant}

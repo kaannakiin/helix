@@ -111,9 +111,9 @@ Only for internal Mantine sub-elements that Tailwind's `className` cannot reach:
 
 ## i18n
 
-- Use `useTranslations('namespace')` from `next-intl` (e.g. `useTranslations('common.auth')`)
+- Use `useTranslations('namespace')` from `next-intl` (e.g. `useTranslations('frontend.auth')`)
 - Locales: `en`, `tr` — files in `@org/i18n`
-- Namespaces: `common.json`, `validation.json`
+- Namespaces: `frontend.json` (UI), `backend.json` (errors), `validation.json` (form errors)
 
 ## File Structure
 

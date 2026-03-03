@@ -39,7 +39,7 @@ const DUMMY_COL = [{ colId: '__fw__', headerName: '' }];
 export function DrawerFlatList({
   renderItem: renderItemProp,
 }: DrawerFlatListProps) {
-  const t = useTranslations('common.relationModal');
+  const t = useTranslations('frontend.relationModal');
   const {
     queryKey,
     fetchOptions,

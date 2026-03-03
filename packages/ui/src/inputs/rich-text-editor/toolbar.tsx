@@ -37,7 +37,7 @@ interface ToolbarButton {
 const ICON_SIZE = 16;
 
 const Toolbar = ({ editor, onLinkClick }: ToolbarProps) => {
-  const t = useTranslations('common.richTextEditor.toolbar');
+  const t = useTranslations('frontend.richTextEditor.toolbar');
 
   const groups: ToolbarButton[][] = [
     [

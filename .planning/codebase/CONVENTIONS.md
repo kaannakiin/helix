@@ -82,7 +82,7 @@
 ## Error Handling
 
 **Patterns:**
-- Always use i18n keys for error messages (never hardcoded strings): `throw new NotFoundException('common.errors.brand_not_found')`
+- Always use i18n keys for error messages (never hardcoded strings): `throw new NotFoundException('backend.errors.brand_not_found')`
 - HTTP exceptions from `@nestjs/common`: `NotFoundException`, `ConflictException`, `BadRequestException`
 - `HttpExceptionI18nFilter` (in `apps/backend/src/app/i18n/`) auto-translates exception messages before HTTP response
 - `ZodValidationI18nFilter` auto-translates Zod validation error messages with field paths
@@ -93,12 +93,12 @@
 ```ts
 // Always throw with i18n key, not hardcoded message
 if (!brand) {
-  throw new NotFoundException('common.errors.brand_not_found');
+  throw new NotFoundException('backend.errors.brand_not_found');
 }
 
 // Conflict detection
 if (slugConflict) {
-  throw new ConflictException('common.errors.brand_slug_conflict');
+  throw new ConflictException('backend.errors.brand_slug_conflict');
 }
 ```
 

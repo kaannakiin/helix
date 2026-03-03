@@ -3,7 +3,7 @@ export type ExportFormat = 'xlsx' | 'csv';
 export interface ExportColumnDef {
   /** ag-grid field name (supports dot notation for nested fields: "_count.sessions") */
   field: string;
-  /** i18n translation key for the column header (e.g. "common.admin.customers.table.name") */
+  /** i18n translation key for the column header (e.g. "frontend.admin.customers.table.name") */
   headerKey: string;
   /** Resolved header text — set at runtime after i18n translation or frontend override */
   header?: string;

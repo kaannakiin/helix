@@ -167,7 +167,7 @@ async getBrandById(id: string): Promise<AdminBrandListPrismaType> {
   });
 
   if (!brand) {
-    throw new NotFoundException('common.errors.brand_not_found');
+    throw new NotFoundException('backend.errors.brand_not_found');
   }
 
   return brand;
@@ -182,10 +182,10 @@ Each entity defines column configuration for Excel/CSV export:
 import type { ExportColumnDef } from '@org/types/export';
 
 export const BRAND_EXPORT_COLUMNS: ExportColumnDef[] = [
-  { field: 'slug', headerKey: 'common.admin.brands.table.slug', type: 'text', width: 20 },
-  { field: 'isActive', headerKey: 'common.admin.brands.table.isActive', type: 'boolean', width: 12 },
-  { field: '_count.products', headerKey: 'common.admin.brands.table.productsCount', type: 'number', width: 12 },
-  { field: 'createdAt', headerKey: 'common.admin.brands.table.createdAt', type: 'datetime', width: 22 },
+  { field: 'slug', headerKey: 'frontend.admin.brands.table.slug', type: 'text', width: 20 },
+  { field: 'isActive', headerKey: 'frontend.admin.brands.table.isActive', type: 'boolean', width: 12 },
+  { field: '_count.products', headerKey: 'frontend.admin.brands.table.productsCount', type: 'number', width: 12 },
+  { field: 'createdAt', headerKey: 'frontend.admin.brands.table.createdAt', type: 'datetime', width: 22 },
 ];
 ```
 
@@ -216,7 +216,7 @@ export type AdminBrandListPrismaType = Prisma.BrandGetPayload<{
 
 ## Error Handling
 
-- Exception messages are always i18n keys: `throw new NotFoundException('common.errors.brand_not_found')`
+- Exception messages are always i18n keys: `throw new NotFoundException('backend.errors.brand_not_found')`
 - `HttpExceptionI18nFilter` auto-translates exception messages before sending HTTP response
 - `ZodValidationI18nFilter` auto-translates Zod validation errors (V keys)
 

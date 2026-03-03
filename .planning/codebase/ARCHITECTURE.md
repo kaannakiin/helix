@@ -95,7 +95,7 @@
 
 **i18n Layer (`packages/i18n/src/locales/`):**
 - Purpose: Locale files (en, tr) shared between backend and frontend
-- Location: `packages/i18n/src/locales/{en,tr}/{common.json,validation.json}`
+- Location: `packages/i18n/src/locales/{en,tr}/{backend.json,frontend.json,validation.json}`
 - Contains: UI strings, error messages, validation messages
 - Depends on: nestjs-i18n (backend), next-intl (frontend)
 - Used by: Exception filters (backend), useTranslations hook (frontend)
@@ -216,7 +216,7 @@
 
 **Patterns:**
 
-- **HTTP Exceptions:** Throw with i18n key as message (e.g., `throw new NotFoundException('common.errors.brand_not_found')`)
+- **HTTP Exceptions:** Throw with i18n key as message (e.g., `throw new NotFoundException('backend.errors.brand_not_found')`)
 - **Filter Translation:** `HttpExceptionI18nFilter` intercepts exception → translates message via i18n service → sends JSON response
 - **Validation Errors:** `ZodValidationI18nFilter` catches Zod validation pipe errors → translates field errors via i18n
 - **Frontend Error Handling:** `ApiError` class wraps status + message + fieldErrors; `apiClient` response interceptor catches 401 for token refresh

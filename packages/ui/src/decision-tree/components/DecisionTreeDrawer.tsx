@@ -45,7 +45,7 @@ export function DecisionTreeDrawer<TAction extends string = string>({
   fieldLabels,
   operatorLabels,
 }: DecisionTreeDrawerProps<TAction>) {
-  const t = useTranslations('common.decisionTree');
+  const t = useTranslations('frontend.decisionTree');
   const tv = useTranslations('validation');
   const storeRef = useRef(createDecisionTreeStore());
   const stack = useDrawersStack(['condition', 'conditionGroup', 'result']);

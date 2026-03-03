@@ -34,7 +34,7 @@ const ProductSeoCard = <T extends FieldValues>({
   defaultValue = {},
 }: ProductSeoCardProps<T>) => {
   const { control } = useFormContext<T>();
-  const t = useTranslations('common.seoCard');
+  const t = useTranslations('frontend.seoCard');
 
   const slug = useWatch({
     control,

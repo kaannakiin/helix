@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { memo } from 'react';
 
 export const StartNode = memo((_props: NodeProps) => {
-  const t = useTranslations('common.decisionTree');
+  const t = useTranslations('frontend.decisionTree');
   const theme = useMantineTheme();
   const { colorScheme } = useMantineColorScheme();
   const isDark = colorScheme === 'dark';

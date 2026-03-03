@@ -22,7 +22,7 @@ export function RelationDrawerContent({
 }: RelationDrawerContentProps) {
   const { opened, close, handleConfirm, tempSelectedIds, multiple } =
     useRelationDrawer();
-  const t = useTranslations('common.relationModal');
+  const t = useTranslations('frontend.relationModal');
 
   const responsiveSize = useMatches({
     base: '100%',

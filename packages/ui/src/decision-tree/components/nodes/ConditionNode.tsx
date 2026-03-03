@@ -30,7 +30,7 @@ const handleStyle = { width: 12, height: 12 };
 export const ConditionNode = memo(({ id, data }: NodeProps) => {
   const { condition } = data as ConditionFlowNodeData;
   const selectedNodeId = useTreeStore((s) => s.selectedNodeId);
-  const t = useTranslations('common.decisionTree');
+  const t = useTranslations('frontend.decisionTree');
   const { fieldLabels, operatorLabels } = useFieldLabels();
   const mode = useTreeMode();
   const isSelected = selectedNodeId === id;

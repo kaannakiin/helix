@@ -41,7 +41,7 @@ interface Props {
 }
 
 export const DecisionTreeCanvas = ({ fieldConfig, onNodeClick }: Props) => {
-  const t = useTranslations('common.decisionTree');
+  const t = useTranslations('frontend.decisionTree');
   const mode = useTreeMode();
   const registry = useActionRegistry();
   const { fieldLabels } = useFieldLabels();
@@ -249,7 +249,7 @@ export const DecisionTreeCanvas = ({ fieldConfig, onNodeClick }: Props) => {
 
 function renderAddResultButton(
   registry: ActionRegistry,
-  t: ReturnType<typeof useTranslations<'common.decisionTree'>>,
+  t: ReturnType<typeof useTranslations<'frontend.decisionTree'>>,
   onAdd: (action: string) => void,
   disabled: boolean,
   mode: DecisionTreeMode

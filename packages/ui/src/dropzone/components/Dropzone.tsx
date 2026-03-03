@@ -55,7 +55,7 @@ export function Dropzone({
   translations,
   className,
 }: DropzoneProps) {
-  const t = useTranslations('common.dropzone');
+  const t = useTranslations('frontend.dropzone');
 
   const resolvedTranslations: DropzoneTranslations = {
     dropzoneLabel: translations?.dropzoneLabel || t('dropzoneLabel'),

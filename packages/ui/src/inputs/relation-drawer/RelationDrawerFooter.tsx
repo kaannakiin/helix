@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl';
 import { useRelationDrawer } from './context';
 
 export function RelationDrawerFooter() {
-  const t = useTranslations('common.relationModal');
+  const t = useTranslations('frontend.relationModal');
   const { handleConfirm, close, tempSelectedIds, multiple } =
     useRelationDrawer();
 

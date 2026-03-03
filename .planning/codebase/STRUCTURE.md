@@ -131,10 +131,12 @@ helix/
 │   │   └── src/
 │   │       └── locales/
 │   │           ├── en/
-│   │           │   ├── common.json # English UI strings
-│   │           │   └── validation.json
+│   │           │   ├── backend.json    # Backend error messages + export helpers
+│   │           │   ├── frontend.json   # UI strings, admin sections, enums
+│   │           │   └── validation.json # Zod form validation errors
 │   │           └── tr/
-│   │               ├── common.json # Turkish UI strings
+│   │               ├── backend.json
+│   │               ├── frontend.json
 │   │               └── validation.json
 │   │
 │   ├── ui/                         # Shared UI components
@@ -206,7 +208,7 @@ helix/
 
 **`packages/i18n/src/locales/`** — Translation files
 - Separate files per language (en, tr)
-- Namespaces: `common.json` (UI), `validation.json` (form errors)
+- Namespaces: `frontend.json` (UI), `backend.json` (errors), `validation.json` (form errors)
 - Shared between backend (nestjs-i18n) and frontend (next-intl)
 
 ## Key File Locations

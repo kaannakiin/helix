@@ -68,7 +68,7 @@ export function SearchCombobox({
   error,
   multiple = false,
 }: SearchComboboxProps) {
-  const t = useTranslations('common.relationInput');
+  const t = useTranslations('frontend.relationInput');
   const [search, setSearch] = useState('');
   const [debouncedSearch] = useDebouncedValue(search, searchDebounce);
   const sentinelRef = useRef<HTMLDivElement>(null);
