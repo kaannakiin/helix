@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -18,7 +19,7 @@ import type { LookupItem } from '@org/schemas/admin/common';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UploadService } from '../../upload/upload.service';
-import type { VariantGroupQueryDTO } from './dto';
+import type { VariantGroupQueryDTO, VariantGroupSaveDTO } from './dto';
 
 @Injectable()
 export class VariantGroupsService {
@@ -205,6 +206,136 @@ export class VariantGroupsService {
     }
 
     return variantGroup;
+  }
+
+  async saveVariantGroup(
+    data: VariantGroupSaveDTO,
+  ): Promise<AdminVariantGroupDetailPrismaType> {
+    const { uniqueId, type, sortOrder, translations, options } = data;
+    const id = uniqueId;
+    const incomingOptionIds = options.map((o) => o.uniqueId);
+
+    return this.prisma.$transaction(async (tx) => {
+      // Check if any removed options are referenced by products
+      const existingOptions = await tx.variantOption.findMany({
+        where: { variantGroupId: id },
+        select: { id: true },
+      });
+      const existingOptionIds = existingOptions.map((o) => o.id);
+      const removedOptionIds = existingOptionIds.filter(
+        (eid) => !incomingOptionIds.includes(eid),
+      );
+
+      if (removedOptionIds.length > 0) {
+        const referencedCount = await tx.productVariantGroupOption.count({
+          where: { variantOptionId: { in: removedOptionIds } },
+        });
+        if (referencedCount > 0) {
+          throw new ConflictException(
+            'common.errors.variant_option_in_use',
+          );
+        }
+      }
+
+      // Delete removed options (cascade: translations, images)
+      if (removedOptionIds.length > 0) {
+        await tx.variantOption.deleteMany({
+          where: { id: { in: removedOptionIds } },
+        });
+      }
+
+      // Delete and recreate group translations
+      await tx.variantGroupTranslation.deleteMany({
+        where: { variantGroupId: id },
+      });
+
+      // Process each option
+      for (const option of options) {
+        const optionId = option.uniqueId;
+
+        // Delete option translations (will recreate)
+        await tx.variantOptionTranslation.deleteMany({
+          where: { variantOptionId: optionId },
+        });
+
+        // Handle existing images
+        const keepImageIds =
+          option.existingImages?.map((img) => img.id) ?? [];
+        await tx.image.deleteMany({
+          where: {
+            variantOptionId: optionId,
+            ...(keepImageIds.length > 0
+              ? { id: { notIn: keepImageIds } }
+              : {}),
+          },
+        });
+
+        for (const img of option.existingImages ?? []) {
+          await tx.image.updateMany({
+            where: { id: img.id, variantOptionId: optionId },
+            data: { sortOrder: img.sortOrder },
+          });
+        }
+
+        // Upsert option
+        await tx.variantOption.upsert({
+          where: { id: optionId },
+          create: {
+            id: optionId,
+            variantGroupId: id,
+            colorCode: option.colorCode || null,
+            sortOrder: option.sortOrder,
+            translations: {
+              create: option.translations.map((tr) => ({
+                locale: tr.locale,
+                name: tr.name,
+                slug: tr.slug,
+              })),
+            },
+          },
+          update: {
+            colorCode: option.colorCode || null,
+            sortOrder: option.sortOrder,
+            translations: {
+              create: option.translations.map((tr) => ({
+                locale: tr.locale,
+                name: tr.name,
+                slug: tr.slug,
+              })),
+            },
+          },
+        });
+      }
+
+      // Upsert the variant group
+      return tx.variantGroup.upsert({
+        where: { id },
+        create: {
+          id,
+          type,
+          sortOrder,
+          translations: {
+            create: translations.map((tr) => ({
+              locale: tr.locale,
+              name: tr.name,
+              slug: tr.slug,
+            })),
+          },
+        },
+        update: {
+          type,
+          sortOrder,
+          translations: {
+            create: translations.map((tr) => ({
+              locale: tr.locale,
+              name: tr.name,
+              slug: tr.slug,
+            })),
+          },
+        },
+        include: AdminVariantGroupDetailPrismaQuery,
+      });
+    });
   }
 
   async uploadOptionImage(opts: {

@@ -78,6 +78,7 @@ model ProductVariant {
   batches        Batch[]
   serialNumbers  SerialNumber[]
   productUnits   ProductUnitOfMeasure[]
+  prices         PriceListPrice[]
 
   @@index([productId])
   @@index([productId, isActive])

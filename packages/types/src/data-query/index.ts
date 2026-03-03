@@ -1,5 +1,3 @@
-// ─── Filter Operation Constants ───
-
 export const TEXT_FILTER_OPS = [
   'contains',
   'equals',
@@ -32,8 +30,6 @@ export const FILTER_TYPES = [
 
 export const SORT_ORDERS = ['asc', 'desc'] as const;
 
-// ─── Filter Operation Types (derived from constants) ───
-
 export type TextFilterOp = (typeof TEXT_FILTER_OPS)[number];
 export type NumberFilterOp = (typeof NUMBER_FILTER_OPS)[number];
 export type DateFilterOp = (typeof DATE_FILTER_OPS)[number];
@@ -41,8 +37,6 @@ export type BooleanFilterOp = (typeof BOOLEAN_FILTER_OPS)[number];
 export type EnumFilterOp = (typeof ENUM_FILTER_OPS)[number];
 export type FilterType = (typeof FILTER_TYPES)[number];
 export type SortOrder = (typeof SORT_ORDERS)[number];
-
-// ─── Filter Condition Types (discriminated union) ───
 
 export interface TextFilterCondition {
   filterType: 'text';
@@ -60,7 +54,7 @@ export interface NumberFilterCondition {
 export interface DateFilterCondition {
   filterType: 'date';
   op: DateFilterOp;
-  value: string; // ISO 8601
+  value: string;
   valueTo?: string;
 }
 
@@ -83,14 +77,12 @@ export type FilterCondition =
   | BooleanFilterCondition
   | EnumFilterCondition;
 
-// ─── Sort ───
-
-export interface SortCondition {
+export interface PlainSortCondition {
   field: string;
   order: SortOrder;
 }
 
-// ─── Full Query ───
+export type SortCondition = PlainSortCondition;
 
 export interface DataQueryParams {
   page: number;
@@ -98,8 +90,6 @@ export interface DataQueryParams {
   filters?: Record<string, FilterCondition>;
   sort?: SortCondition[];
 }
-
-// ─── Field Config (single source of truth per entity) ───
 
 export interface FieldFilterConfig {
   filterType: FilterType;

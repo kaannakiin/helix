@@ -11,6 +11,7 @@
     "@mantine/dates": "^8.3.15",
     "@mantine/dropzone": "^8.3.15",
     "@mantine/hooks": "^8.3.15",
+    "@mantine/modals": "^8.3.15",
     "@mantine/notifications": "^8.3.15",
     "@mantine/spotlight": "^8.3.15",
     "@org/constants": "*",
@@ -18,8 +19,10 @@
     "@org/schemas": "*",
     "@org/types": "*",
     "@org/ui": "*",
+    "@paralleldrive/cuid2": "^3.3.0",
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-query-devtools": "^5.91.3",
+    "@xyflow/react": "^12.10.1",
     "ag-grid-community": "^35.1.0",
     "ag-grid-react": "^35.1.0",
     "axios": "^1.13.5",
@@ -35,6 +38,7 @@
     "zustand": "^5.0.11"
   },
   "devDependencies": {
+    "@dagrejs/dagre": "^2.0.4",
     "@types/set-cookie-parser": "^2.4.10",
     "set-cookie-parser": "^3.0.1"
   }

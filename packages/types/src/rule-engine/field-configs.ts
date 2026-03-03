@@ -9,4 +9,5 @@ export const RULE_TARGET_FIELD_CONFIGS: Record<
   USER: ADMIN_CUSTOMERS_FIELD_CONFIG,
   PRODUCT: {},
   ORDER: {},
+  INVENTORY: {},
 };

@@ -27,6 +27,7 @@ import {
   VariantGroupExportQueryDTO,
   VariantGroupLookupQueryDTO,
   VariantGroupQueryDTO,
+  VariantGroupSaveDTO,
 } from './dto';
 import { VARIANT_GROUP_EXPORT_COLUMNS } from './variant-groups.export-config';
 
@@ -38,6 +39,12 @@ export class VariantGroupsController {
     private readonly variantGroupsService: VariantGroupsService,
     private readonly exportService: ExportService
   ) {}
+
+  @Post('save')
+  @ApiOperation({ summary: 'Create or update a variant group' })
+  async saveVariantGroup(@Body() body: VariantGroupSaveDTO) {
+    return this.variantGroupsService.saveVariantGroup(body);
+  }
 
   @Post('query')
   @ApiOperation({ summary: 'Get paginated list of variant groups' })

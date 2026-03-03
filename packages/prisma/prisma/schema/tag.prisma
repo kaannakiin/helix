@@ -48,6 +48,12 @@ model Tag {
 
   slug String
 
+  parentTagId String?
+  parent      Tag?   @relation("TagHierarchy", fields: [parentTagId], references: [id], onDelete: SetNull)
+  children    Tag[]  @relation("TagHierarchy")
+
+  depth Int @default(0)
+
   isActive  Boolean @default(true)
   sortOrder Int     @default(0)
 
@@ -58,11 +64,14 @@ model Tag {
   images       Image[]
   products     ProductTag[]
 
-  @@unique([tagGroupId, slug])
+  @@unique([tagGroupId, parentTagId, slug])
   @@index([tagGroupId])
   @@index([tagGroupId, isActive, sortOrder])
   @@index([isActive])
   @@index([sortOrder])
+  @@index([parentTagId])
+  @@index([parentTagId, isActive, sortOrder])
+  @@index([depth])
 }
 
 // ─── Tag Translation ──────────────────────────────────────────────────────────

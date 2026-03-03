@@ -1,8 +1,10 @@
 import { ADMIN_NAV_ROUTES } from '@org/constants/routes-constants';
 import type { LucideIcon } from 'lucide-react';
 import {
+  Activity,
   BarChart3,
   BookOpen,
+  DollarSign,
   FileText,
   FolderTree,
   Globe,
@@ -97,6 +99,16 @@ export const adminNavItems: NavItem[] = [
     visibility: 'both',
     group: 'commerce',
     description: 'Müşteri hesapları ve detayları',
+    isSection: false,
+    children: [
+      {
+        key: 'customer_groups',
+        icon: Users,
+        href: ADMIN_NAV_ROUTES.CUSTOMER_GROUPS,
+        visibility: 'both',
+        description: 'Müşteri gruplarını yönet',
+      },
+    ],
   },
   {
     key: 'inventory',
@@ -139,6 +151,20 @@ export const adminNavItems: NavItem[] = [
         href: ADMIN_NAV_ROUTES.LOCATIONS,
         visibility: 'both',
         description: 'Ülke, şehir ve bölge yönetimi',
+      },
+      {
+        key: 'price_lists',
+        icon: DollarSign,
+        href: ADMIN_NAV_ROUTES.PRICE_LISTS,
+        visibility: 'both',
+        description: 'Fiyat listelerini yönet',
+      },
+      {
+        key: 'evaluation_jobs',
+        icon: Activity,
+        href: ADMIN_NAV_ROUTES.EVALUATION_JOBS,
+        visibility: 'both',
+        description: 'İş akışları ve değerlendirme süreçleri',
       },
     ],
   },

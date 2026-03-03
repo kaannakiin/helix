@@ -31,3 +31,12 @@ export const AdminBrandListPrismaQuery = {
 export type AdminBrandListPrismaType = Prisma.BrandGetPayload<{
   include: typeof AdminBrandListPrismaQuery;
 }>;
+
+export const AdminBrandDetailPrismaQuery = {
+  translations: true,
+  images: true,
+} as const satisfies Prisma.BrandInclude;
+
+export type AdminBrandDetailPrismaType = Prisma.BrandGetPayload<{
+  include: typeof AdminBrandDetailPrismaQuery;
+}>;

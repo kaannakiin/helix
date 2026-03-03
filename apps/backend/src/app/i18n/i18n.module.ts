@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import {
-  I18nModule as NestI18nModule,
   AcceptLanguageResolver,
   CookieResolver,
   HeaderResolver,
+  I18nModule as NestI18nModule,
   QueryResolver,
 } from 'nestjs-i18n';
-import { getBackendLocalesPath } from './i18n.paths.js';
+import { getBackendLocalesPath } from './i18n.paths';
 
 @Module({
   imports: [

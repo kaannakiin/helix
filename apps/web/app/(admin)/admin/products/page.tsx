@@ -189,8 +189,7 @@ export default function ProductsPage() {
       }),
       createColumn<AdminProductListPrismaType>('createdAt', {
         headerKey: 'createdAt',
-        type: 'datetime',
-        dateStyle: 'standard',
+        type: 'date',
         minWidth: 170,
       }),
       createColumn<AdminProductListPrismaType>('updatedAt', {
@@ -251,7 +250,7 @@ export default function ProductsPage() {
         }
       },
     }),
-    []
+    [columns]
   );
 
   const handleExport = useCallback(

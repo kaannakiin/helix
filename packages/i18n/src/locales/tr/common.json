@@ -7,6 +7,7 @@
     "orders": "Siparişler",
     "products": "Ürünler",
     "customers": "Müşteriler",
+    "customer_groups": "Müşteri Grupları",
     "analytics": "Analitik",
     "settings": "Ayarlar",
     "marketing": "Pazarlama",
@@ -19,6 +20,8 @@
     "variants": "Varyantlar",
     "definitions": "Tanımlamalar",
     "locations": "Lokasyonlar",
+    "price_lists": "Fiyat Listeleri",
+    "evaluation_jobs": "Değerlendirme İşleri",
     "groups": {
       "main": "Ana Menü",
       "commerce": "Ticaret",
@@ -91,6 +94,27 @@
       "HAS_STATES": "İlleri Var",
       "HAS_CITIES_ONLY": "Sadece Şehirler",
       "COUNTRY_ONLY": "Sadece Ülke"
+    },
+    "customerGroupType": {
+      "MANUAL": "Manuel",
+      "RULE_BASED": "Kural Tabanlı"
+    },
+    "evaluationJobStatus": {
+      "PENDING": "Bekliyor",
+      "RUNNING": "Çalışıyor",
+      "COMPLETED": "Tamamlandı",
+      "FAILED": "Başarısız",
+      "CANCELLED": "İptal Edildi"
+    },
+    "evaluationTrigger": {
+      "SCHEDULED": "Zamanlanmış",
+      "MANUAL": "Manuel"
+    },
+    "ruleTargetEntity": {
+      "USER": "Kullanıcı",
+      "PRODUCT": "Ürün",
+      "ORDER": "Sipariş",
+      "INVENTORY": "Envanter"
     }
   },
   "relationInput": {
@@ -117,10 +141,60 @@
     "dragHandle": "Yeniden sıralamak için sürükle",
     "previewTitle": "Önizleme",
     "noPreview": "Önizleme yok",
-    "rejectionTitle": "Reddedilen dosyalar",
-    "fileTooLarge": "Dosya çok büyük",
+    "rejectionTitle": "Hata",
+    "fileTooLarge": "Dosya boyutu __maxSize__ limitini aşıyor",
     "fileInvalidType": "Dosya türüne izin verilmiyor",
-    "tooManyFiles": "Çok fazla dosya"
+    "tooManyFiles": "En fazla __maxFiles__ dosya yüklenebilir"
+  },
+  "decisionTree": {
+    "startNode": "Başlangıç",
+    "drawerTitle": "Karar Ağacı",
+    "addCondition": "Koşul Ekle",
+    "addConditionGroup": "Grup Ekle",
+    "addResult": "Sonuç Ekle",
+    "deleteSelected": "Seçileni sil",
+    "fitView": "Görünümü sığdır",
+    "saveAndClose": "Kaydet ve Kapat",
+    "cancel": "İptal",
+    "conditionNode": "Koşul",
+    "conditionGroupNode": "Grup",
+    "resultNode": "Sonuç",
+    "yesBranch": "Evet",
+    "noBranch": "Hayır",
+    "editCondition": "Koşulu Düzenle",
+    "editConditionGroup": "Koşul Grubunu Düzenle",
+    "editResult": "Sonucu Düzenle",
+    "selectField": "Alan seçin...",
+    "selectOperator": "Operatör seçin...",
+    "enterValue": "Değer girin...",
+    "enterValueTo": "Bitiş değeri...",
+    "selectAction": "Aksiyon seçin",
+    "addConditionToGroup": "Gruba koşul ekle",
+    "labelPlaceholder": "Etiket (isteğe bağlı)",
+    "save": "Kaydet",
+    "validationFailed": "Doğrulama Hatası",
+    "validationErrorMessage": "Kaydetmeden önce hataları düzeltin.",
+    "unsavedChangesTitle": "Kaydedilmemiş Değişiklikler",
+    "unsavedChangesConfirm": "Kaydedilmemiş değişiklikler var. Kapatmak istediğinize emin misiniz ?",
+    "discard": "Vazgeç",
+    "conditionCount": "{count} koşul",
+    "moreConditions": "+{count} daha",
+    "operators": {
+      "contains": "İçerir",
+      "equals": "Eşittir",
+      "startsWith": "İle başlar",
+      "endsWith": "İle biter",
+      "gt": "Büyüktür",
+      "lt": "Küçüktür",
+      "gte": "Büyük veya eşit",
+      "lte": "Küçük veya eşit",
+      "between": "Arasında",
+      "in": "Birinden"
+    },
+    "actions": {
+      "include": "Dahil Et",
+      "exclude": "Hariç Tut"
+    }
   },
   "seoCard": {
     "title": "SEO",
@@ -310,7 +384,7 @@
           },
           "primary": "Birincil",
           "openGroup": "Grubu Aç",
-          "confirmRemoveGroup": "Bu varyant grubunu kaldırmak istediğinizden emin misiniz?",
+          "confirmRemoveGroup": "Bu varyant grubunu kaldırmak istediğinizden emin misiniz ?",
           "confirm": "Kaldır",
           "removeGroup": "Grubu Kaldır"
         },
@@ -386,6 +460,44 @@
         "activeFilters": "{count} aktif",
         "noFilters": "Filtre bulunmuyor",
         "apply": "Filtrele"
+      },
+      "form": {
+        "newBrand": "Yeni Marka",
+        "discard": "Vazgeç",
+        "save": "Kaydet",
+        "backToBrands": "Markalara Dön",
+        "loadError": "Yüklenemedi",
+        "loadErrorDescription": "Marka yüklenirken bir hata oluştu. Lütfen tekrar deneyin.",
+        "notFound": "Marka Bulunamadı",
+        "notFoundDescription": "Aradığınız marka mevcut değil.",
+        "generalInfo": "Genel Bilgiler",
+        "name": {
+          "label": "Marka Adı",
+          "placeholder": "Marka adını girin..."
+        },
+        "slug": {
+          "label": "Slug",
+          "placeholder": "marka-slug"
+        },
+        "website": {
+          "label": "Web Sitesi URL",
+          "placeholder": "https://ornek.com"
+        },
+        "description": {
+          "label": "Açıklama",
+          "placeholder": "Marka hakkında kısa açıklama..."
+        },
+        "media": {
+          "title": "Medya",
+          "description": "Marka logosu veya görselleri yükleyin (maks. 3)"
+        },
+        "statusCard": {
+          "title": "Durum",
+          "activeLabel": "Aktif"
+        },
+        "sortOrder": {
+          "label": "Sıralama"
+        }
       }
     },
     "categories": {
@@ -455,6 +567,7 @@
     "tags": {
       "title": "Etiket Grupları",
       "subtitle": "Tüm etiket gruplarını yönetin",
+      "new": "Yeni Etiket Grubu",
       "table": {
         "name": "Ad",
         "slug": "Slug",
@@ -484,11 +597,78 @@
         "activeFilters": "{count} aktif",
         "noFilters": "Filtre bulunmuyor",
         "apply": "Filtrele"
+      },
+      "form": {
+        "newTagGroup": "Yeni Etiket Grubu",
+        "discard": "Vazgeç",
+        "save": "Kaydet",
+        "saveAsDraft": "Taslak Olarak Kaydet",
+        "generalInfo": "Genel Bilgiler",
+        "name": {
+          "label": "Etiket Grubu Adı",
+          "placeholder": "Etiket grubu adını girin..."
+        },
+        "description": {
+          "label": "Açıklama",
+          "placeholder": "Etiket grubunun kısa açıklaması..."
+        },
+        "statusCard": {
+          "title": "Durum",
+          "activeLabel": "Aktif"
+        },
+        "tags": {
+          "title": "Etiketler",
+          "description": "Bu gruptaki etiketleri yönetin",
+          "addTag": "Etiket Ekle",
+          "addRootTag": "Kök Etiket Ekle",
+          "addChildTag": "Alt Etiket Ekle",
+          "noTags": "Henüz etiket eklenmedi",
+          "childrenCount": "alt etiket",
+          "unnamedTag": "(isimsiz)",
+          "activeLabel": "Aktif",
+          "tagName": {
+            "label": "Etiket Adı",
+            "placeholder": "Etiket adını girin..."
+          },
+          "tagDescription": {
+            "label": "Açıklama",
+            "placeholder": "Kısa açıklama..."
+          },
+          "removeTag": "Etiketi Kaldır",
+          "deleteTag": "Etiketi Sil",
+          "deleteConfirm": "Bu etiketi ve tüm alt etiketlerini silmek istediğinizden emin misiniz?",
+          "deleteConfirmTitle": "Etiketi Sil",
+          "slug": "Slug",
+          "sortOrder": "Sıralama",
+          "table": {
+            "name": "Ad",
+            "slug": "Slug",
+            "active": "Aktif",
+            "sortOrder": "Sıralama",
+            "children": "Alt Etiketler",
+            "actions": "İşlemler"
+          },
+          "editDrawer": {
+            "editTitle": "Etiketi Düzenle",
+            "newTitle": "Yeni Etiket",
+            "cancel": "İptal",
+            "save": "Kaydet",
+            "errorTitle": "Hata",
+            "errorMessage": "Etiket kaydedilemedi. Lütfen tekrar deneyin.",
+            "imagesAfterSave": "Görseller grup kaydedildikten sonra eklenebilir."
+          },
+          "bulkDelete": "Seçilenleri Sil",
+          "bulkDeleteConfirmTitle": "Seçili Etiketleri Sil",
+          "bulkDeleteConfirm": "Seçili etiketleri ve tüm alt etiketlerini silmek istediğinizden emin misiniz?",
+          "empty": "Alt etiket yok",
+          "savingChildren": "Etiket verileri yükleniyor..."
+        }
       }
     },
     "variants": {
       "title": "Varyant Grupları",
       "subtitle": "Tüm varyant gruplarını yönetin",
+      "new": "Yeni Varyant Grubu",
       "table": {
         "name": "Ad",
         "optionsCount": "Seçenekler",
@@ -518,6 +698,54 @@
         "activeFilters": "{count} aktif",
         "noFilters": "Filtre bulunmuyor",
         "apply": "Filtrele"
+      },
+      "form": {
+        "newVariantGroup": "Yeni Varyant Grubu",
+        "discard": "Vazgeç",
+        "save": "Kaydet",
+        "backToVariants": "Varyant Gruplarına Dön",
+        "loadError": "Yüklenemedi",
+        "loadErrorDescription": "Varyant grubu yüklenirken bir hata oluştu. Lütfen tekrar deneyin.",
+        "notFound": "Varyant Grubu Bulunamadı",
+        "notFoundDescription": "Aradığınız varyant grubu mevcut değil.",
+        "generalInfo": "Genel Bilgiler",
+        "name": {
+          "label": "Grup Adı",
+          "placeholder": "Grup adını girin..."
+        },
+        "type": {
+          "label": "Grup Türü",
+          "size": "Beden",
+          "color": "Renk",
+          "sizeDescription": "S, M, L, XL gibi metin tabanlı seçenekler",
+          "colorDescription": "Hex kodu veya resim ile renk örnekleri"
+        },
+        "statusCard": {
+          "title": "Ayarlar",
+          "sortOrder": {
+            "label": "Sıralama"
+          }
+        },
+        "options": {
+          "title": "Seçenekler",
+          "description": "Bu varyant grubundaki seçenekleri yönetin",
+          "addOption": "Seçenek Ekle",
+          "noOptions": "Henüz seçenek eklenmedi. 'Seçenek Ekle' ile oluşturun.",
+          "unnamedOption": "İsimsiz Seçenek",
+          "optionName": {
+            "label": "Seçenek Adı",
+            "placeholder": "Seçenek adını girin..."
+          },
+          "colorCode": {
+            "label": "Renk Kodu",
+            "placeholder": "#000000"
+          },
+          "optionImage": {
+            "title": "Seçenek Görseli",
+            "description": "Bu seçenek için bir görsel yükleyin (maks 1)"
+          },
+          "deleteConfirm": "Bu seçeneği kaldırmak istediğinizden emin misiniz?"
+        }
       }
     },
     "locations": {
@@ -608,6 +836,280 @@
         "no": "Hayır",
         "notProvided": "Belirtilmemiş"
       }
+    },
+    "priceLists": {
+      "title": "Fiyat Listeleri",
+      "subtitle": "Fiyat listelerini ve kurallarını yönetin",
+      "table": {
+        "name": "Ad",
+        "type": "Tür",
+        "status": "Durum",
+        "currencyCode": "Para Birimi",
+        "isActive": "Aktif",
+        "priority": "Öncelik",
+        "validFrom": "Başlangıç Tarihi",
+        "validTo": "Bitiş Tarihi",
+        "pricesCount": "Fiyatlar",
+        "createdAt": "Oluşturulma Tarihi"
+      },
+      "contextMenu": {
+        "view": "Detayları Görüntüle",
+        "copy": "Kopyala",
+        "copySelected": "Seçilenleri Kopyala",
+        "copyAsTable": "Tablo (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Düz Metin",
+        "exportGroup": "Dışa Aktar",
+        "exportCSV": "CSV Olarak Dışa Aktar",
+        "exportExcel": "Excel Olarak Dışa Aktar"
+      },
+      "footer": {
+        "totalRows": "Toplam: {count}",
+        "selectedRows": "Seçili: {count}",
+        "refresh": "Yenile"
+      },
+      "filterDrawer": {
+        "title": "Filtreler",
+        "clearAll": "Tümünü Temizle",
+        "activeFilters": "{count} aktif",
+        "noFilters": "Filtre bulunmuyor",
+        "apply": "Filtrele"
+      },
+      "enums": {
+        "type": {
+          "BASE": "Temel",
+          "SALE": "İndirim",
+          "CUSTOM": "Özel"
+        },
+        "status": {
+          "ACTIVE": "Aktif",
+          "DRAFT": "Taslak",
+          "ARCHIVED": "Arşivlenmiş"
+        }
+      }
+    },
+    "customerGroups": {
+      "title": "Müşteri Grupları",
+      "subtitle": "Müşteri segmentlerini ve grupları yönetin",
+      "new": "Yeni Grup",
+      "table": {
+        "name": "Ad",
+        "type": "Tür",
+        "isActive": "Aktif",
+        "membersCount": "Üyeler",
+        "lastEvaluatedAt": "Son Çalışma",
+        "createdAt": "Oluşturulma"
+      },
+      "contextMenu": {
+        "view": "Detayları Görüntüle",
+        "copy": "Kopyala",
+        "copySelected": "Seçilenleri Kopyala",
+        "copyAsTable": "Tablo (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Düz Metin",
+        "exportGroup": "Dışa Aktar",
+        "exportCSV": "CSV Olarak Dışa Aktar",
+        "exportExcel": "Excel Olarak Dışa Aktar"
+      },
+      "footer": {
+        "totalRows": "Toplam: {count}",
+        "selectedRows": "Seçili: {count}",
+        "refresh": "Yenile"
+      },
+      "filterDrawer": {
+        "title": "Filtreler",
+        "clearAll": "Temizle",
+        "activeFilters": "{count} aktif",
+        "noFilters": "Filtre mevcut değil",
+        "apply": "Filtreleri Uygula"
+      },
+      "form": {
+        "newCustomerGroup": "Yeni Müşteri Grubu",
+        "discard": "Vazgeç",
+        "save": "Kaydet",
+        "backToList": "Müşteri Gruplarına Dön",
+        "loadError": "Yükleme Hatası",
+        "loadErrorDescription": "Müşteri grubu yüklenirken bir hata oluştu.",
+        "notFound": "Müşteri Grubu Bulunamadı",
+        "notFoundDescription": "Aradığınız müşteri grubu bulunamadı.",
+        "generalInfo": "Genel Bilgiler",
+        "name": { "label": "Grup Adı", "placeholder": "Grup adını girin..." },
+        "description": {
+          "label": "Açıklama",
+          "placeholder": "Kısa açıklama..."
+        },
+        "color": { "label": "Renk" },
+        "type": { "label": "Grup Tipi" },
+        "statusCard": { "title": "Ayarlar", "activeLabel": "Aktif" },
+        "cronExpression": {
+          "label": "Değerlendirme Zamanlaması",
+          "description": "Otomatik yeniden değerlendirme için cron ifadesi"
+        },
+        "ruleTree": {
+          "title": "Kural Koşulları",
+          "description": "Müşterileri otomatik atamak için koşulları tanımlayın"
+        },
+        "confirmSwitch": {
+          "title": "Grup Tipi Değiştirilsin mi?",
+          "toRuleBased": "Kural Bazlı'ya geçiş seçili {count} üyeyi kaldıracak. Bu işlem geri alınamaz.",
+          "toManual": "Manuel'e geçiş karar ağacı yapılandırmasını temizleyecek. Bu işlem geri alınamaz.",
+          "confirm": "Geç ve Temizle",
+          "cancel": "İptal"
+        },
+        "members": {
+          "title": "Üyeler",
+          "description": "Bu gruba manuel olarak müşteri atayın",
+          "label": "Üyeler",
+          "placeholder": "Üye ekle...",
+          "modalTitle": "Üye Seç",
+          "addButton": "Üye Ekle",
+          "removeTooltip": "Gruptan çıkar",
+          "searchPlaceholder": "İsme göre ara...",
+          "nameHeader": "İsim",
+          "emailHeader": "E-posta",
+          "confirm": "Onayla",
+          "cancel": "İptal"
+        },
+        "tree": {
+          "addCondition": "Koşul Ekle",
+          "addConditionGroup": "Grup Ekle",
+          "addResult": "Sonuç Ekle",
+          "deleteSelected": "Seçileni sil",
+          "fitView": "Görünümü sığdır",
+          "saveAndClose": "Kaydet ve Kapat",
+          "cancel": "İptal",
+          "conditionNode": "Koşul",
+          "conditionGroupNode": "Grup",
+          "resultNode": "Sonuç",
+          "yesBranch": "Evet",
+          "noBranch": "Hayır",
+          "editCondition": "Koşulu Düzenle",
+          "editConditionGroup": "Koşul Grubunu Düzenle",
+          "editResult": "Sonucu Düzenle",
+          "selectField": "Alan seçin...",
+          "selectOperator": "Operatör seçin...",
+          "enterValue": "Değer girin...",
+          "enterValueTo": "Bitiş değeri...",
+          "selectAction": "Aksiyon seçin",
+          "addConditionToGroup": "Gruba koşul ekle",
+          "labelPlaceholder": "Etiket (isteğe bağlı)",
+          "save": "Kaydet",
+          "validationFailed": "Doğrulama Hatası",
+          "validationErrorMessage": "Kaydetmeden önce karar ağacı hatalarını düzeltin.",
+          "editTree": "Karar Ağacını Düzenle",
+          "actionInclude": "Dahil Et",
+          "actionExclude": "Hariç Tut"
+        },
+        "fields": {
+          "name": "Ad",
+          "surname": "Soyad",
+          "email": "E-posta",
+          "phone": "Telefon",
+          "role": "Rol",
+          "status": "Durum",
+          "emailVerified": "E-posta Doğrulanmış",
+          "phoneVerified": "Telefon Doğrulanmış",
+          "twoFactorEnabled": "2FA Aktif",
+          "createdAt": "Oluşturulma Tarihi",
+          "lastLoginAt": "Son Giriş",
+          "loginCount": "Giriş Sayısı"
+        },
+        "operators": {
+          "contains": "İçerir",
+          "equals": "Eşittir",
+          "startsWith": "İle başlar",
+          "endsWith": "İle biter",
+          "gt": "Büyüktür",
+          "lt": "Küçüktür",
+          "gte": "Büyük veya eşit",
+          "lte": "Küçük veya eşit",
+          "between": "Arasında",
+          "in": "Birinden"
+        }
+      }
+    },
+    "evaluationJobs": {
+      "title": "Değerlendirme İşleri",
+      "subtitle": "Değerlendirme süreçlerini izle ve yönet",
+      "table": {
+        "status": "Durum",
+        "entityType": "Varlık Tipi",
+        "targetEntity": "Hedef",
+        "triggerType": "Tetikleyici",
+        "triggeredBy": "Tetikleyen",
+        "recordsEvaluated": "Değerlendirilen",
+        "recordsMatched": "Eşleşen",
+        "durationMs": "Süre",
+        "completedAt": "Son Çalışma",
+        "createdAt": "Oluşturulma"
+      },
+      "contextMenu": {
+        "view": "Detayları Görüntüle",
+        "cancel": "İşi İptal Et",
+        "copy": "Kopyala",
+        "copySelected": "Seçilenleri Kopyala",
+        "copyAsTable": "Tablo (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Düz Metin",
+        "exportGroup": "Dışa Aktar",
+        "exportCSV": "CSV Olarak Dışa Aktar",
+        "exportExcel": "Excel Olarak Dışa Aktar"
+      },
+      "footer": {
+        "totalRows": "Toplam: {count}",
+        "selectedRows": "Seçili: {count}",
+        "refresh": "Yenile"
+      },
+      "filterDrawer": {
+        "title": "Filtreler",
+        "clearAll": "Tümünü Temizle",
+        "activeFilters": "{count} aktif",
+        "noFilters": "Filtre bulunmuyor",
+        "apply": "Filtrele"
+      },
+      "detail": {
+        "title": "Değerlendirme İş Detayları",
+        "backToList": "Değerlendirme İşlerine Dön",
+        "loadError": "Yüklenemedi",
+        "loadErrorDescription": "Değerlendirme işi yüklenirken bir hata oluştu.",
+        "notFound": "Değerlendirme İşi Bulunamadı",
+        "notFoundDescription": "Aradığınız değerlendirme işi mevcut değil.",
+        "jobInfo": "İş Bilgileri",
+        "status": "Durum",
+        "entityType": "Varlık Tipi",
+        "entityId": "Varlık ID",
+        "targetEntity": "Hedef Varlık",
+        "triggerType": "Tetikleyici Tipi",
+        "triggeredBy": "Tetikleyen",
+        "attemptCount": "Deneme Sayısı",
+        "timing": "Zamanlama",
+        "createdAt": "Oluşturulma",
+        "startedAt": "Başlangıç",
+        "completedAt": "Tamamlanma",
+        "duration": "Süre",
+        "results": "Sonuçlar",
+        "recordsEvaluated": "Değerlendirilen Kayıtlar",
+        "recordsMatched": "Eşleşen Kayıtlar",
+        "matchRate": "Eşleşme Oranı",
+        "errorLog": "Hata Günlüğü",
+        "executionLog": "Çalışma Logu",
+        "ruleTreeSnapshot": "Kural Ağacı Anlık Görüntüsü",
+        "actions": "İşlemler",
+        "rerun": "Tekrar Çalıştır",
+        "cancel": "İşi İptal Et",
+        "history": "Değerlendirme Geçmişi",
+        "noHistory": "Önceki değerlendirme bulunamadı",
+        "durationFormat": "{seconds}sn",
+        "cancelSuccess": "İş başarıyla iptal edildi",
+        "cancelError": "İş iptal edilemedi",
+        "rerunSuccess": "Değerlendirme başarıyla tetiklendi",
+        "rerunError": "Değerlendirme tetiklenemedi",
+        "currentDuration": "Güncel Süre",
+        "resultsPreview": "Sonuç Önizleme",
+        "abortJob": "İşi Durdur",
+        "streaming": "Canlı",
+        "pendingLabel": "Bekliyor"
+      }
     }
   },
   "dataTable": {
@@ -674,6 +1176,11 @@
       "refresh_token_missing": "Yenileme tokeni eksik.",
       "invalid_refresh_token": "Geçersiz yenileme tokeni.",
       "no_password_set": "Bu hesap sosyal giriş kullanıyor. Lütfen sosyal hesabınızla giriş yapın."
-    }
+    },
+    "customer_group_not_found": "Müşteri grubu bulunamadı.",
+    "evaluation_manual_group": "Manuel müşteri grupları kural ile değerlendirilemez.",
+    "evaluation_no_rule_tree": "Bu müşteri grubunda kural ağacı yapılandırılmamış.",
+    "evaluation_job_not_found": "Değerlendirme işi bulunamadı.",
+    "evaluation_job_not_cancellable": "Yalnızca bekleyen değerlendirme işleri iptal edilebilir."
   }
 }

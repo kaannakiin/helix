@@ -11,7 +11,6 @@ import type {
   IDatasource,
   ModelUpdatedEvent,
 } from 'ag-grid-community';
-import { themeQuartz } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { Filter, RefreshCw } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
@@ -20,7 +19,9 @@ import {
   DataTableTranslationProvider,
   type DataTableTranslations,
 } from '../context/DataTableTranslationContext';
+import { HELIX_COLUMN_TYPES } from '../columnTypeRegistry';
 import DataTableProvider from '../data-table-provider';
+import { dataTableTheme } from '../theme';
 import { useContextMenu } from '../hooks/useContextMenu';
 import type { ContextMenuConfig } from '../types/contextMenu.types';
 import { ContextMenu } from './ContextMenu';
@@ -42,25 +43,6 @@ export interface DataTableProps<TData> {
   contextMenu?: ContextMenuConfig<TData>;
   showFilterDrawer?: boolean;
 }
-
-const customTheme = themeQuartz.withParams({
-  fontFamily: 'var(--mantine-font-family, -apple-system, sans-serif)',
-  fontSize: 14,
-  headerHeight: 48,
-  rowHeight: 48,
-  backgroundColor: 'var(--mantine-color-body)',
-  foregroundColor: 'var(--mantine-color-text)',
-  headerBackgroundColor: 'var(--mantine-color-default)',
-  headerTextColor: 'var(--mantine-color-text)',
-  oddRowBackgroundColor: 'var(--mantine-color-default-hover)',
-  rowHoverColor: 'var(--mantine-color-default-hover)',
-  selectedRowBackgroundColor: 'var(--mantine-primary-color-light)',
-  borderColor: 'var(--mantine-color-default-border)',
-  borderRadius: 8,
-  wrapperBorderRadius: 8,
-  rangeSelectionBorderColor: 'var(--mantine-primary-color-filled)',
-  inputFocusBorder: true,
-});
 
 export function DataTable<TData>({
   columns,
@@ -114,9 +96,13 @@ export function DataTable<TData>({
     setTotalRows(count > 0 ? count : null);
   }, []);
 
-  const handleGridReady = useCallback((event: GridReadyEvent<TData>) => {
-    gridApiRef.current = event.api;
-  }, []);
+  const handleGridReady = useCallback(
+    (event: GridReadyEvent<TData>) => {
+      gridApiRef.current = event.api;
+      gridOptions.onGridReady?.(event);
+    },
+    [gridOptions.onGridReady]
+  );
 
   const handleFilterChanged = useCallback(
     (event: FilterChangedEvent<TData>) => {
@@ -155,8 +141,15 @@ export function DataTable<TData>({
   const activeFilterCount = Object.keys(filterModel).length;
 
   const finalGridOptions = useMemo<GridOptions<TData>>(() => {
+    const { onGridReady: _consumerOnGridReady, ...restGridOptions } =
+      gridOptions;
+
     const options: GridOptions<TData> = {
-      theme: customTheme,
+      theme: dataTableTheme,
+      columnTypes: {
+        ...HELIX_COLUMN_TYPES,
+        ...(restGridOptions.columnTypes ?? {}),
+      },
       rowModelType: 'infinite' as const,
       defaultColDef: {
         sortable: true,
@@ -181,6 +174,7 @@ export function DataTable<TData>({
       enableFilterHandlers: true,
       localeText: translations?.agGrid,
       cellSelection: false,
+      suppressDragLeaveHidesColumns: true,
       suppressContextMenu: true,
       onCellContextMenu: contextMenuEnabled
         ? (event: CellContextMenuEvent<TData>) => handleCellContextMenu(event)
@@ -193,11 +187,11 @@ export function DataTable<TData>({
             }
           }
         : undefined,
+      ...restGridOptions,
       onGridReady: handleGridReady,
       onFilterChanged: handleFilterChanged,
       onModelUpdated: handleModelUpdated,
       onSelectionChanged: handleSelectionChanged,
-      ...gridOptions,
     };
 
     return options;

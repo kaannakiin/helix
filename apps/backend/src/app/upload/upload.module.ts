@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { NestMinioModule } from 'nestjs-minio';
-import { PrismaModule } from '../prisma/prisma.module.js';
-import { ImageProcessorService } from './image-processor.service.js';
-import { MinioStorageService } from './minio-storage.service.js';
-import { UploadController } from './upload.controller.js';
-import { UploadService } from './upload.service.js';
+import { PrismaModule } from '../prisma/prisma.module';
+import { ImageProcessorService } from './image-processor.service';
+import { MinioStorageService } from './minio-storage.service';
+import { UploadController } from './upload.controller';
+import { UploadService } from './upload.service';
 
 @Module({
   imports: [

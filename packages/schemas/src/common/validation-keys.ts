@@ -58,4 +58,48 @@ export const V = {
   PRODUCT_STATUS_REQUIRED: 'validation.errors.common.product_status_required',
   TRACKING_STRATEGY_REQUIRED:
     'validation.errors.common.tracking_strategy_required',
+
+  // ── Pricing ──
+  PRICE_LIST_NAME_REQUIRED:
+    'validation.errors.common.price_list_name_required',
+  PRICE_LIST_CURRENCY_REQUIRED:
+    'validation.errors.common.price_list_currency_required',
+  PRICE_REQUIRED: 'validation.errors.common.price_required',
+  PRICE_NONNEGATIVE: 'validation.errors.common.price_nonnegative',
+  DUPLICATE_VARIANT_PRICE:
+    'validation.errors.common.duplicate_variant_price',
+
+  // ── Customer Groups ──
+  CUSTOMER_GROUP_NAME_REQUIRED:
+    'validation.errors.common.customer_group_name_required',
+  CUSTOMER_GROUP_TYPE_REQUIRED:
+    'validation.errors.common.customer_group_type_required',
+  CUSTOMER_GROUP_RULE_TREE_REQUIRED:
+    'validation.errors.common.customer_group_rule_tree_required',
+  CUSTOMER_GROUP_MEMBERS_MIN:
+    'validation.errors.common.customer_group_members_min',
+  CRON_EXPRESSION_INVALID:
+    'validation.errors.common.cron_expression_invalid',
+
+  // ── Decision Tree ──
+  DECISION_TREE_ROOT_REQUIRED:
+    'validation.errors.common.decision_tree_root_required',
+  DECISION_TREE_NODES_MIN:
+    'validation.errors.common.decision_tree_nodes_min',
+  DECISION_TREE_ROOT_NOT_FOUND:
+    'validation.errors.common.decision_tree_root_not_found',
+  DECISION_TREE_INVALID_BRANCH_REF:
+    'validation.errors.common.decision_tree_invalid_branch_ref',
+  DECISION_TREE_ORPHAN_NODE:
+    'validation.errors.common.decision_tree_orphan_node',
+  DECISION_TREE_MIN_CONDITIONS:
+    'validation.errors.common.decision_tree_min_conditions',
+  DECISION_TREE_SIMPLE_MULTIPLE_RESULTS:
+    'validation.errors.common.decision_tree_simple_multiple_results',
+  DECISION_TREE_SIMPLE_NO_BRANCH_NOT_ALLOWED:
+    'validation.errors.common.decision_tree_simple_no_branch_not_allowed',
+
+  // ── Condition Set ──
+  CONDITION_SET_MIN_CONDITIONS:
+    'validation.errors.common.condition_set_min_conditions',
 } as const;

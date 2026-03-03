@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import { Menu, Portal } from "@mantine/core";
-import { useClickOutside } from "@mantine/hooks";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { Menu, Portal } from '@mantine/core';
+import { useClickOutside } from '@mantine/hooks';
 import {
-  Eye,
-  Copy,
-  FileSpreadsheet,
-  FileDown,
-  Table,
-  Braces,
   AlignLeft,
-} from "lucide-react";
+  Braces,
+  Copy,
+  Eye,
+  FileDown,
+  FileSpreadsheet,
+  Table,
+} from 'lucide-react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type {
   ContextMenuConfig,
   ContextMenuItem,
   ContextMenuParams,
   ContextMenuState,
   ContextMenuTranslations,
-} from "../types/contextMenu.types";
-import { copyToClipboard } from "../utils/clipboardUtils";
+} from '../types/contextMenu.types';
+import { copyToClipboard } from '../utils/clipboardUtils';
 
 interface ContextMenuProps<TData> {
   state: ContextMenuState<TData>;
@@ -30,15 +30,15 @@ interface ContextMenuProps<TData> {
 }
 
 const DEFAULT_TRANSLATIONS: ContextMenuTranslations = {
-  view: "View",
-  copy: "Copy",
-  copySelected: "Copy selected",
-  copyAsTable: "Table (Excel)",
-  copyAsJSON: "JSON",
-  copyAsPlainText: "Plain Text",
-  exportGroup: "Export",
-  exportCSV: "Export as CSV",
-  exportExcel: "Export as Excel",
+  view: 'View',
+  copy: 'Copy',
+  copySelected: 'Copy selected',
+  copyAsTable: 'Table (Excel)',
+  copyAsJSON: 'JSON',
+  copyAsPlainText: 'Plain Text',
+  exportGroup: 'Export',
+  exportCSV: 'Export as CSV',
+  exportExcel: 'Export as Excel',
 };
 
 const VIEWPORT_PADDING = 8;
@@ -55,7 +55,6 @@ export function ContextMenu<TData>({
   const menuRef = useRef<HTMLDivElement>(null);
   const [adjustedPosition, setAdjustedPosition] = useState(state.position);
 
-  // Viewport boundary detection: measure menu after render, then adjust
   useEffect(() => {
     if (!state.isOpen) {
       setAdjustedPosition(state.position);
@@ -103,12 +102,12 @@ export function ContextMenu<TData>({
   const effectiveRows = hasSelection
     ? selectedRows
     : state.row
-      ? [state.row]
-      : [];
+    ? [state.row]
+    : [];
 
   const items: ReactNode[] = [];
 
-  if (config.customItemsPosition === "before" && config.customItems) {
+  if (config.customItemsPosition === 'before' && config.customItems) {
     items.push(...renderCustomItems(config.customItems, params, onClose));
   }
 
@@ -128,18 +127,16 @@ export function ContextMenu<TData>({
         }}
       >
         {t.view}
-      </Menu.Item>,
+      </Menu.Item>
     );
   }
 
-  // Copy section (submenu)
   if (config.showCopy !== false && effectiveRows.length > 0) {
     if (items.length > 0) {
       items.push(<Menu.Divider key="divider-copy" />);
     }
 
     if (config.onCopy) {
-      // Custom handler — single item, no submenu
       items.push(
         <Menu.Item
           key="copy"
@@ -149,13 +146,10 @@ export function ContextMenu<TData>({
             onClose();
           }}
         >
-          {hasSelection
-            ? `${t.copySelected} (${selectedRows.length})`
-            : t.copy}
-        </Menu.Item>,
+          {hasSelection ? `${t.copySelected} (${selectedRows.length})` : t.copy}
+        </Menu.Item>
       );
     } else {
-      // Submenu with format options
       const copyLabel = hasSelection
         ? `${t.copySelected} (${selectedRows.length})`
         : t.copy;
@@ -170,7 +164,7 @@ export function ContextMenu<TData>({
               leftSection={<Table size={14} />}
               onClick={() => {
                 copyToClipboard(effectiveRows, {
-                  format: "text",
+                  format: 'text',
                   columns: config.copyColumns,
                   formatters: config.copyFormatters,
                 });
@@ -182,7 +176,7 @@ export function ContextMenu<TData>({
             <Menu.Item
               leftSection={<Braces size={14} />}
               onClick={() => {
-                copyToClipboard(effectiveRows, { format: "json" });
+                copyToClipboard(effectiveRows, { format: 'json' });
                 onClose();
               }}
             >
@@ -192,7 +186,7 @@ export function ContextMenu<TData>({
               leftSection={<AlignLeft size={14} />}
               onClick={() => {
                 copyToClipboard(effectiveRows, {
-                  format: "plain",
+                  format: 'plain',
                   columns: config.copyColumns,
                   formatters: config.copyFormatters,
                 });
@@ -202,14 +196,12 @@ export function ContextMenu<TData>({
               {t.copyAsPlainText}
             </Menu.Item>
           </Menu.Sub.Dropdown>
-        </Menu.Sub>,
+        </Menu.Sub>
       );
     }
   }
 
-  // Export group
-  const hasExportCSV =
-    config.showExportCSV !== false && !!config.onExportCSV;
+  const hasExportCSV = config.showExportCSV !== false && !!config.onExportCSV;
   const hasExportExcel =
     config.showExportExcel !== false && !!config.onExportExcel;
 
@@ -230,7 +222,7 @@ export function ContextMenu<TData>({
           }}
         >
           {t.exportCSV}
-        </Menu.Item>,
+        </Menu.Item>
       );
     }
 
@@ -245,12 +237,12 @@ export function ContextMenu<TData>({
           }}
         >
           {t.exportExcel}
-        </Menu.Item>,
+        </Menu.Item>
       );
     }
   }
 
-  if (config.customItemsPosition !== "before" && config.customItems) {
+  if (config.customItemsPosition !== 'before' && config.customItems) {
     if (items.length > 0 && config.customItems.length > 0) {
       items.push(<Menu.Divider key="divider-custom" />);
     }
@@ -263,11 +255,13 @@ export function ContextMenu<TData>({
     <Portal>
       <div
         ref={(el) => {
-          (clickOutsideRef as React.MutableRefObject<HTMLDivElement | null>).current = el;
+          (
+            clickOutsideRef as React.MutableRefObject<HTMLDivElement | null>
+          ).current = el;
           menuRef.current = el;
         }}
         style={{
-          position: "fixed",
+          position: 'fixed',
           left: adjustedPosition.x,
           top: adjustedPosition.y,
           zIndex: 9999,
@@ -284,28 +278,28 @@ export function ContextMenu<TData>({
 function renderCustomItems<TData>(
   items: ContextMenuItem<TData>[],
   params: ContextMenuParams<TData>,
-  onClose: () => void,
+  onClose: () => void
 ): ReactNode[] {
   return items
     .filter((item) => {
       const hidden =
-        typeof item.hidden === "function" ? item.hidden(params) : item.hidden;
+        typeof item.hidden === 'function' ? item.hidden(params) : item.hidden;
       return !hidden;
     })
     .map((item) => {
-      if (item.type === "divider") {
+      if (item.type === 'divider') {
         return <Menu.Divider key={item.key} />;
       }
-      if (item.type === "label") {
+      if (item.type === 'label') {
         return (
           <Menu.Label key={item.key}>
-            {typeof item.label === "function" ? item.label(params) : item.label}
+            {typeof item.label === 'function' ? item.label(params) : item.label}
           </Menu.Label>
         );
       }
 
       const disabled =
-        typeof item.disabled === "function"
+        typeof item.disabled === 'function'
           ? item.disabled(params)
           : item.disabled;
 
@@ -320,7 +314,7 @@ function renderCustomItems<TData>(
             onClose();
           }}
         >
-          {typeof item.label === "function" ? item.label(params) : item.label}
+          {typeof item.label === 'function' ? item.label(params) : item.label}
         </Menu.Item>
       );
     });

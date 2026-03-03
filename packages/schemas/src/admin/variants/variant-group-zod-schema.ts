@@ -1,3 +1,4 @@
+import { createId } from '@paralleldrive/cuid2';
 import {
   FileType,
   Locale,
@@ -193,3 +194,11 @@ export type BaseVariantOptionInput = z.input<typeof BaseVariantOptionSchema>;
 export type BaseVariantOptionOutput = z.output<typeof BaseVariantOptionSchema>;
 export type VariantGroupInput = z.input<typeof VariantGroupSchema>;
 export type VariantGroupOutput = z.output<typeof VariantGroupSchema>;
+
+export const NEW_VARIANT_GROUP_DEFAULT_VALUES: VariantGroupInput = {
+  uniqueId: createId(),
+  type: VariantGroupType.SIZE,
+  sortOrder: 0,
+  translations: [{ locale: 'TR', name: '', slug: '' }],
+  options: [],
+};

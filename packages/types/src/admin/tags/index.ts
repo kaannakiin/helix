@@ -33,22 +33,26 @@ export type AdminTagGroupListPrismaType = Prisma.TagGroupGetPayload<{
 
 export const AdminTagGroupDetailPrismaQuery = {
   translations: true,
-  tags: {
-    include: {
-      translations: true,
-      images: { where: { isPrimary: true }, take: 1 },
-    },
-    orderBy: { sortOrder: 'asc' as const },
-  },
 } as const satisfies Prisma.TagGroupInclude;
 
 export type AdminTagGroupDetailPrismaType = Prisma.TagGroupGetPayload<{
   include: typeof AdminTagGroupDetailPrismaQuery;
 }>;
 
+export const AdminTagChildrenPrismaQuery = {
+  translations: true,
+  images: { where: { isPrimary: true }, take: 1 },
+  _count: { select: { children: true } },
+} as const satisfies Prisma.TagInclude;
+
+export type AdminTagChildrenPrismaType = Prisma.TagGetPayload<{
+  include: typeof AdminTagChildrenPrismaQuery;
+}>;
+
 export const ADMIN_TAGS_FIELD_CONFIG = {
   slug: { filterType: 'text' },
   isActive: { filterType: 'boolean' },
+  depth: { filterType: 'number' },
   createdAt: { filterType: 'date' },
   updatedAt: { filterType: 'date' },
 } as const satisfies Record<string, FieldFilterConfig>;
@@ -58,6 +62,7 @@ export type AdminTagsFilterableField = keyof typeof ADMIN_TAGS_FIELD_CONFIG;
 export const ADMIN_TAGS_SORT_FIELDS = [
   'slug',
   'isActive',
+  'depth',
   'sortOrder',
   'createdAt',
   'updatedAt',

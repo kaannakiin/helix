@@ -1,11 +1,6 @@
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 
-// ─── Filter condition to Prisma where clause ───
-
-function textToPrisma(
-  op: string,
-  value: string
-): Record<string, unknown> {
+export function textToPrisma(op: string, value: string): Record<string, unknown> {
   switch (op) {
     case 'contains':
       return { contains: value, mode: 'insensitive' };
@@ -20,7 +15,7 @@ function textToPrisma(
   }
 }
 
-function numberToPrisma(
+export function numberToPrisma(
   op: string,
   value: number,
   valueTo?: number
@@ -43,7 +38,7 @@ function numberToPrisma(
   }
 }
 
-function dateToPrisma(
+export function dateToPrisma(
   op: string,
   value: string,
   valueTo?: string
@@ -62,11 +57,11 @@ function dateToPrisma(
   }
 }
 
-function booleanToPrisma(value: boolean): Record<string, unknown> {
+export function booleanToPrisma(value: boolean): Record<string, unknown> {
   return { equals: value };
 }
 
-function enumToPrisma(
+export function enumToPrisma(
   op: string,
   value: string | string[]
 ): Record<string, unknown> {
@@ -93,8 +88,6 @@ function conditionToPrisma(
   }
 }
 
-// ─── Public API ───
-
 export interface PrismaQueryResult {
   where: Record<string, unknown>;
   orderBy: Record<string, string>[] | Record<string, string>;
@@ -105,7 +98,7 @@ export interface PrismaQueryResult {
 export function buildPrismaQuery(params: {
   page: number;
   limit: number;
-  filters?: Record<string, FilterCondition>;
+  filters?: Record<string, FilterCondition> | Record<string, unknown>;
   sort?: SortCondition[];
   defaultSort?: { field: string; order: 'asc' | 'desc' };
 }): PrismaQueryResult {
@@ -114,11 +107,12 @@ export function buildPrismaQuery(params: {
   const where: Record<string, unknown> = {};
   if (filters) {
     for (const [field, condition] of Object.entries(filters)) {
-      where[field] = conditionToPrisma(condition);
+      where[field] = conditionToPrisma(condition as FilterCondition);
     }
   }
 
   let orderBy: Record<string, string>[] | Record<string, string>;
+
   if (sort && sort.length > 0) {
     orderBy = sort.map((s) => ({ [s.field]: s.order }));
   } else if (defaultSort) {

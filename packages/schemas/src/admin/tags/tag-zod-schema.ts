@@ -13,10 +13,7 @@ import { V } from '../../common/validation-keys.js';
 const checkDuplicateLocales = ({
   issues,
   value,
-}: {
-  issues: z.core.$ZodRawIssue[];
-  value: { translations: Array<{ locale: string }> };
-}) => {
+}: z.core.ParsePayload<{ translations: Array<{ locale: string }> }>) => {
   const localeDupes = findDuplicates(value.translations, (t) => t.locale);
   for (const dupe of localeDupes) {
     issues.push({
@@ -28,10 +25,10 @@ const checkDuplicateLocales = ({
   }
 };
 
-// Base without images — used for backend DTOs and parent schema embedding
 export const BaseTagCoreSchema = z.object({
   id: z.cuid2(),
   slug: slugSchema,
+  parentTagId: cuidSchema.nullable().default(null),
   isActive: z.boolean().default(true),
   sortOrder: sortOrderSchema,
   translations: z
@@ -49,7 +46,6 @@ export const BaseTagCoreSchema = z.object({
   existingImages: z.array(existingImageSchema).default([]),
 });
 
-// Full base with images — used for embedding in TagGroupSchema (frontend)
 export const BaseTagSchema = BaseTagCoreSchema.safeExtend({
   images: dropzoneFileSchema({
     maxFiles: 3,
@@ -58,8 +54,9 @@ export const BaseTagSchema = BaseTagCoreSchema.safeExtend({
   }),
 });
 
-// Backend base — no images field
-export const BackendBaseTagSchema = BaseTagCoreSchema.check(checkDuplicateLocales);
+export const BackendBaseTagSchema = BaseTagCoreSchema.check(
+  checkDuplicateLocales
+);
 
 export const TagSchema = BaseTagSchema.safeExtend({
   tagGroupId: cuidSchema,
@@ -69,3 +66,51 @@ export type BaseTagInput = z.input<typeof BaseTagSchema>;
 export type BaseTagOutput = z.output<typeof BaseTagSchema>;
 export type TagInput = z.input<typeof TagSchema>;
 export type TagOutput = z.output<typeof TagSchema>;
+
+type TagTranslation = Array<{
+  locale: string;
+  name: string;
+  description?: string;
+}>;
+type ExistingImageEntry = Array<{
+  id: string;
+  url: string;
+  fileType: string;
+  sortOrder: number;
+}>;
+
+export type RecursiveTagInput = {
+  id: string;
+  slug: string;
+  parentTagId: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  translations: TagTranslation;
+  existingImages: ExistingImageEntry;
+  images: Array<{ id: string; file: File; fileType: string; order: number }>;
+  children: RecursiveTagInput[];
+};
+
+export type RecursiveBackendTagInput = {
+  id: string;
+  slug: string;
+  parentTagId: string | null;
+  isActive: boolean;
+  sortOrder: number;
+  translations: TagTranslation;
+  existingImages: ExistingImageEntry;
+  children: RecursiveBackendTagInput[];
+};
+
+export const RecursiveTagSchema: z.ZodType<RecursiveTagInput> = z.lazy(() =>
+  BaseTagSchema.safeExtend({
+    children: z.array(RecursiveTagSchema).default([]),
+  })
+);
+
+export const RecursiveBackendTagSchema: z.ZodType<RecursiveBackendTagInput> =
+  z.lazy(() =>
+    BaseTagCoreSchema.safeExtend({
+      children: z.array(RecursiveBackendTagSchema).default([]),
+    })
+  );

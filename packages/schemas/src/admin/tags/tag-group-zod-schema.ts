@@ -1,4 +1,5 @@
 import { Locale } from '@org/prisma/browser';
+import { createId } from '@paralleldrive/cuid2';
 import { z } from 'zod';
 import {
   findDuplicates,
@@ -6,7 +7,10 @@ import {
   sortOrderSchema,
 } from '../../common/common-schemas.js';
 import { V } from '../../common/validation-keys.js';
-import { BaseTagCoreSchema, BaseTagSchema } from './tag-zod-schema.js';
+import {
+  RecursiveBackendTagSchema,
+  RecursiveTagSchema,
+} from './tag-zod-schema.js';
 
 const tagGroupTranslationSchema = z.object({
   locale: z.enum(Locale, { error: V.LOCALE_REQUIRED }),
@@ -17,16 +21,34 @@ const tagGroupTranslationSchema = z.object({
   description: z.string().optional(),
 });
 
+type TagNodeForValidation = {
+  slug: string;
+  translations: Array<{ locale: string; name: string }>;
+  children?: TagNodeForValidation[];
+};
+
+function flatTagsForValidation(
+  tags: TagNodeForValidation[]
+): TagNodeForValidation[] {
+  const result: TagNodeForValidation[] = [];
+  const stack = [...tags];
+  while (stack.length > 0) {
+    const tag = stack.pop()!;
+    result.push(tag);
+    if (Array.isArray(tag.children) && tag.children.length > 0) {
+      stack.push(...tag.children);
+    }
+  }
+  return result;
+}
+
 const checkTagGroup = ({
   issues,
   value,
-}: {
-  issues: z.core.$ZodRawIssue[];
-  value: {
-    translations: Array<{ locale: string }>;
-    tags: Array<{ slug: string; translations: Array<{ locale: string; name: string }> }>;
-  };
-}) => {
+}: z.core.ParsePayload<{
+  translations: Array<{ locale: string }>;
+  tags: TagNodeForValidation[];
+}>) => {
   const groupLocaleDupes = findDuplicates(
     value.translations,
     (t) => t.locale
@@ -40,19 +62,21 @@ const checkTagGroup = ({
     });
   }
 
-  const slugDupes = findDuplicates(value.tags, (tag) => tag.slug);
+  const flatTags = flatTagsForValidation(value.tags);
+
+  const slugDupes = findDuplicates(flatTags, (tag) => tag.slug);
   for (const dupe of slugDupes) {
     issues.push({
       code: 'custom',
-      input: value.tags[dupe.index].slug,
+      input: flatTags[dupe.index].slug,
       message: V.DUPLICATE_SLUG,
       path: ['tags', dupe.index, 'slug'],
     });
   }
 
   const namesByLocale = new Map<string, Map<string, number>>();
-  for (let tagIdx = 0; tagIdx < value.tags.length; tagIdx++) {
-    const tag = value.tags[tagIdx];
+  for (let tagIdx = 0; tagIdx < flatTags.length; tagIdx++) {
+    const tag = flatTags[tagIdx];
     for (let transIdx = 0; transIdx < tag.translations.length; transIdx++) {
       const trans = tag.translations[transIdx];
       const locale = trans.locale;
@@ -76,15 +100,15 @@ const checkTagGroup = ({
     }
   }
 
-  for (let tagIdx = 0; tagIdx < value.tags.length; tagIdx++) {
+  for (let tagIdx = 0; tagIdx < flatTags.length; tagIdx++) {
     const tagLocaleDupes = findDuplicates(
-      value.tags[tagIdx].translations,
+      flatTags[tagIdx].translations,
       (t) => t.locale
     );
     for (const dupe of tagLocaleDupes) {
       issues.push({
         code: 'custom',
-        input: value.tags[tagIdx].translations[dupe.index].locale,
+        input: flatTags[tagIdx].translations[dupe.index].locale,
         message: V.DUPLICATE_LOCALE,
         path: ['tags', tagIdx, 'translations', dupe.index, 'locale'],
       });
@@ -98,7 +122,7 @@ const tagGroupBaseShape = z.object({
   isActive: z.boolean().default(true),
   sortOrder: sortOrderSchema,
   translations: z.array(tagGroupTranslationSchema).min(1, { message: V.TRANSLATIONS_MIN }),
-  tags: z.array(BaseTagSchema).default([]),
+  tags: z.array(RecursiveTagSchema).default([]),
 });
 
 export const TagGroupSchema = tagGroupBaseShape.check(checkTagGroup);
@@ -109,10 +133,19 @@ const backendTagGroupShape = z.object({
   isActive: z.boolean().default(true),
   sortOrder: sortOrderSchema,
   translations: z.array(tagGroupTranslationSchema).min(1, { message: V.TRANSLATIONS_MIN }),
-  tags: z.array(BaseTagCoreSchema).default([]),
+  tags: z.array(RecursiveBackendTagSchema).default([]),
 });
 
 export const BackendTagGroupSchema = backendTagGroupShape.check(checkTagGroup);
 
 export type TagGroupInput = z.input<typeof TagGroupSchema>;
 export type TagGroupOutput = z.output<typeof TagGroupSchema>;
+
+export const NEW_TAG_GROUP_DEFAULT_VALUES: TagGroupInput = {
+  id: createId(),
+  slug: '',
+  isActive: true,
+  sortOrder: 0,
+  translations: [{ locale: 'TR', name: '', description: '' }],
+  tags: [],
+};

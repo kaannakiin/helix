@@ -88,27 +88,24 @@ export const backendProductVariantSchema = z.object({
   existingImages: z.array(existingImageSchema).default([]),
 });
 
-type SharedCheckCtx = {
-  issues: z.core.$ZodRawIssue[];
-  value: {
-    translations: Array<{ locale: string }>;
-    hasVariants: boolean;
-    variantGroups: Array<{
-      uniqueId: string;
-      type: string;
-      options: Array<{ uniqueId: string }>;
-    }>;
-    variants: Array<{
-      uniqueId: string;
-      uniqueKey: string;
-      optionValueIds: string[];
-      sku?: string | undefined;
-    }>;
-    categories: Array<{ categoryId: string }>;
-  };
-};
+type SharedCheckPayload = z.core.ParsePayload<{
+  translations: Array<{ locale: string }>;
+  hasVariants: boolean;
+  variantGroups: Array<{
+    uniqueId: string;
+    type: string;
+    options: Array<{ uniqueId: string }>;
+  }>;
+  variants: Array<{
+    uniqueId: string;
+    uniqueKey: string;
+    optionValueIds: string[];
+    sku?: string | undefined;
+  }>;
+  categories: Array<{ categoryId: string }>;
+}>;
 
-function checkDuplicateLocales({ issues, value }: SharedCheckCtx) {
+function checkDuplicateLocales({ issues, value }: SharedCheckPayload) {
   const dupes = findDuplicates(value.translations, (t) => t.locale);
   for (const dupe of dupes) {
     issues.push({
@@ -120,7 +117,7 @@ function checkDuplicateLocales({ issues, value }: SharedCheckCtx) {
   }
 }
 
-function checkVariantIntegrity({ issues, value }: SharedCheckCtx) {
+function checkVariantIntegrity({ issues, value }: SharedCheckPayload) {
   if (!value.hasVariants) {
     if (value.variantGroups.length > 0) {
       issues.push({
@@ -234,7 +231,7 @@ function checkVariantIntegrity({ issues, value }: SharedCheckCtx) {
   }
 }
 
-function checkDuplicates({ issues, value }: SharedCheckCtx) {
+function checkDuplicates({ issues, value }: SharedCheckPayload) {
   const groupDupes = findDuplicates(value.variantGroups, (g) => g.uniqueId);
   for (const dupe of groupDupes) {
     issues.push({
@@ -308,10 +305,7 @@ const productSchemaShape = z.object({
 function checkImageCounts({
   issues,
   value,
-}: {
-  issues: z.core.$ZodRawIssue[];
-  value: z.output<typeof productSchemaShape>;
-}) {
+}: z.core.ParsePayload<z.output<typeof productSchemaShape>>) {
   const productTotal =
     (value.newImages?.length ?? 0) + (value.existingImages?.length ?? 0);
   if (productTotal > 10) {

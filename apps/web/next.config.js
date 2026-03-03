@@ -21,6 +21,7 @@ const withNextIntl = createNextIntlPlugin(i18nPath);
  **/
 const nextConfig = {
   nx: {},
+  compress: false,
   transpilePackages: ['@org/i18n', '@org/ui', '@org/constants'],
   webpack(config) {
     config.resolve.conditionNames = [

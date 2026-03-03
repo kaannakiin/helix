@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ExportService } from './export.service.js';
+import { ExportService } from './export.service';
 
 @Module({
   providers: [ExportService],

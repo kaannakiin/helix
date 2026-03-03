@@ -5,8 +5,7 @@ import {
   useSaveCategory,
 } from '@/core/hooks/useAdminCategory';
 import { categoryTreeFetcher } from '@/core/hooks/useAdminLookup';
-import { useFormErrorTranslator } from '@/core/hooks/useFormErrorTranslator';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslatedZodResolver } from '@/core/hooks/useTranslatedZodResolver';
 import {
   Button,
   Group,
@@ -30,7 +29,7 @@ import { FormCard } from '@org/ui/common/form-card';
 import LoadingOverlay from '@org/ui/common/loading-overlay';
 import { Dropzone } from '@org/ui/dropzone';
 import { ProductSeoCard } from '@org/ui/inputs/product-seo-card';
-import { RelationModal } from '@org/ui/inputs/relation-modal';
+import { RelationDrawer } from '@org/ui/inputs/relation-drawer';
 import { createId } from '@paralleldrive/cuid2';
 import {
   Activity,
@@ -51,7 +50,6 @@ import {
 
 const AdminCategoryFormPage = () => {
   const t = useTranslations('common.admin.categories.form');
-  const te = useFormErrorTranslator();
   const params = useParams();
   const router = useRouter();
   const id = params.id as string;
@@ -88,8 +86,9 @@ const AdminCategoryFormPage = () => {
     };
   }, [data, isNew]);
 
+  const resolver = useTranslatedZodResolver(CategorySchema);
   const methods = useForm<CategoryInput>({
-    resolver: zodResolver(CategorySchema),
+    resolver,
     defaultValues: NEW_CATEGORY_DEFAULT_VALUES,
     values: formattedData,
   });
@@ -112,7 +111,7 @@ const AdminCategoryFormPage = () => {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Stack gap="lg">
           <div>
             <Group justify="space-between" align="center">
@@ -156,7 +155,7 @@ const AdminCategoryFormPage = () => {
                         {...field}
                         label={t('name.label')}
                         placeholder={t('name.placeholder')}
-                        error={te(fieldState.error?.message)}
+                        error={fieldState.error?.message}
                         required
                       />
                     )}
@@ -170,7 +169,7 @@ const AdminCategoryFormPage = () => {
                         value={field.value ?? ''}
                         label={t('description.label')}
                         placeholder={t('description.placeholder')}
-                        error={te(fieldState.error?.message)}
+                        error={fieldState.error?.message}
                         autosize
                         minRows={3}
                         maxRows={6}
@@ -246,7 +245,7 @@ const AdminCategoryFormPage = () => {
                   control={control}
                   name="parentId"
                   render={({ field, fieldState }) => (
-                    <RelationModal
+                    <RelationDrawer
                       queryKey={DATA_ACCESS_KEYS.admin.categories.lookup}
                       fetchOptions={categoryTreeFetcher}
                       tree
@@ -255,7 +254,7 @@ const AdminCategoryFormPage = () => {
                       title={t('parent.label')}
                       label={t('parent.label')}
                       placeholder={t('parent.placeholder')}
-                      error={te(fieldState.error?.message)}
+                      error={fieldState.error?.message}
                     />
                   )}
                 />

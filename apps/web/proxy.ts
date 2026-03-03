@@ -144,22 +144,38 @@ export default async function proxy(request: NextRequest) {
   const accessToken = request.cookies.get(ACCESS_TOKEN_COOKIE_NAME)?.value;
   let tokenPayload = accessToken ? await verifyAccessToken(accessToken) : null;
   let refreshedCookies: string[] | null = null;
+  let shouldClearRefreshCookie = false;
 
-  if (!tokenPayload && !isPublicRoute(pathname)) {
-    if (pathname.startsWith('/api/')) {
-      if (pathname === '/api/auth/refresh') {
-        return NextResponse.next();
+  if (!tokenPayload) {
+    const hasRefreshToken = !!request.cookies.get(REFRESH_TOKEN_COOKIE_NAME)
+      ?.value;
+
+    if (!isPublicRoute(pathname)) {
+      if (pathname.startsWith('/api/')) {
+        if (pathname === '/api/auth/refresh') {
+          return NextResponse.next();
+        }
+        return NextResponse.json(
+          { statusCode: 401, message: 'Unauthorized' },
+          { status: 401 }
+        );
       }
-      return NextResponse.json(
-        { statusCode: 401, message: 'Unauthorized' },
-        { status: 401 }
-      );
-    }
 
-    const refreshResult = await tryRefreshTokens(request);
-    if (refreshResult) {
-      tokenPayload = refreshResult.tokenPayload;
-      refreshedCookies = refreshResult.setCookieHeaders;
+      const refreshResult = await tryRefreshTokens(request);
+      if (refreshResult) {
+        tokenPayload = refreshResult.tokenPayload;
+        refreshedCookies = refreshResult.setCookieHeaders;
+      } else if (hasRefreshToken) {
+        shouldClearRefreshCookie = true;
+      }
+    } else if (hasRefreshToken) {
+      const refreshResult = await tryRefreshTokens(request);
+      if (refreshResult) {
+        tokenPayload = refreshResult.tokenPayload;
+        refreshedCookies = refreshResult.setCookieHeaders;
+      } else {
+        shouldClearRefreshCookie = true;
+      }
     }
   }
 
@@ -170,6 +186,9 @@ export default async function proxy(request: NextRequest) {
     loginUrl.searchParams.set('callbackUrl', pathname);
     const response = NextResponse.redirect(loginUrl);
     response.headers.set('X-NEXT-INTL-LOCALE', locale);
+    if (shouldClearRefreshCookie) {
+      response.cookies.delete(REFRESH_TOKEN_COOKIE_NAME);
+    }
     return response;
   }
 
@@ -208,6 +227,7 @@ export default async function proxy(request: NextRequest) {
   });
 
   if (refreshedCookies) applyCookieHeaders(response, refreshedCookies);
+  if (shouldClearRefreshCookie) response.cookies.delete(REFRESH_TOKEN_COOKIE_NAME);
 
   const currentLocaleCookie = request.cookies.get(LOCALE_COOKIE_NAME)?.value;
   if (currentLocaleCookie !== locale) {

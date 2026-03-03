@@ -1,9 +1,16 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import type { Locale, Prisma } from '@org/prisma/client';
 import type { LookupItem } from '@org/schemas/admin/common';
+import type { RecursiveBackendTagInput } from '@org/schemas/admin/tags';
 import {
+  AdminTagChildrenPrismaQuery,
   AdminTagGroupDetailPrismaQuery,
   AdminTagGroupListPrismaQuery,
+  type AdminTagChildrenPrismaType,
   type AdminTagGroupDetailPrismaType,
   type AdminTagGroupListPrismaType,
 } from '@org/types/admin/tags';
@@ -11,7 +18,7 @@ import type { FilterCondition } from '@org/types/data-query';
 import type { PaginatedResponse } from '@org/types/pagination';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { PrismaService } from '../../prisma/prisma.service';
-import type { TagGroupQueryDTO } from './dto';
+import type { TagGroupQueryDTO, TagGroupSaveDTO, TagSaveDTO } from './dto';
 
 @Injectable()
 export class TagGroupsService {
@@ -136,10 +143,7 @@ export class TagGroupsService {
         where,
         skip,
         take: limit,
-        orderBy: [
-          { tagGroup: { sortOrder: 'asc' } },
-          { sortOrder: 'asc' },
-        ],
+        orderBy: [{ tagGroup: { sortOrder: 'asc' } }, { sortOrder: 'asc' }],
         include: {
           translations: { where: { locale: lang } },
           images: { where: { isPrimary: true }, take: 1 },
@@ -181,14 +185,12 @@ export class TagGroupsService {
   }): Promise<LookupItem[] | PaginatedResponse<LookupItem>> {
     const { q, ids, tagGroupId, limit, page, lang } = opts;
 
-    // ids mode → flat resolve (reuse existing lookupTags)
     if (ids?.length) {
       return this.lookupTags({ q, ids, limit, page, lang });
     }
 
     const skip = (page - 1) * limit;
 
-    // tagGroupId provided → fetch tags of that group (lazy load)
     if (tagGroupId) {
       const where: Prisma.TagWhereInput = {
         tagGroupId,
@@ -236,7 +238,6 @@ export class TagGroupsService {
       };
     }
 
-    // Root level — tag groups with childCount
     const where: Prisma.TagGroupWhereInput = {
       isActive: true,
       ...(q
@@ -298,6 +299,20 @@ export class TagGroupsService {
     };
   }
 
+  async getTagChildren(
+    tagGroupId: string,
+    parentTagId?: string
+  ): Promise<AdminTagChildrenPrismaType[]> {
+    return this.prisma.tag.findMany({
+      where: {
+        tagGroupId,
+        parentTagId: parentTagId ?? null,
+      },
+      orderBy: { sortOrder: 'asc' },
+      include: AdminTagChildrenPrismaQuery,
+    });
+  }
+
   async getTagGroupById(id: string): Promise<AdminTagGroupDetailPrismaType> {
     const tagGroup = await this.prisma.tagGroup.findUnique({
       where: { id },
@@ -309,5 +324,217 @@ export class TagGroupsService {
     }
 
     return tagGroup;
+  }
+
+  async saveTagGroup(
+    data: TagGroupSaveDTO
+  ): Promise<AdminTagGroupDetailPrismaType> {
+    const { id, slug, isActive, sortOrder, translations, tags } = data;
+
+    const slugConflict = await this.prisma.tagGroup.findFirst({
+      where: { slug, id: { not: id } },
+    });
+    if (slugConflict) {
+      throw new ConflictException('common.errors.tag_group_slug_conflict');
+    }
+
+    const tagGroup = await this.prisma.$transaction(async (tx) => {
+      await tx.tagGroupTranslation.deleteMany({ where: { tagGroupId: id } });
+
+      const group = await tx.tagGroup.upsert({
+        where: { id },
+        create: {
+          id,
+          slug,
+          isActive,
+          sortOrder,
+          translations: {
+            create: translations.map((tr) => ({
+              locale: tr.locale,
+              name: tr.name,
+              description: tr.description ?? null,
+            })),
+          },
+        },
+        update: {
+          slug,
+          isActive,
+          sortOrder,
+          translations: {
+            create: translations.map((tr) => ({
+              locale: tr.locale,
+              name: tr.name,
+              description: tr.description ?? null,
+            })),
+          },
+        },
+        include: AdminTagGroupDetailPrismaQuery,
+      });
+
+      // Bulk tag creation (create mode)
+      if (tags && tags.length > 0) {
+        await this.createTagsRecursively(tx, id, tags, null, 0);
+      }
+
+      return group;
+    });
+
+    return tagGroup;
+  }
+
+  private async createTagsRecursively(
+    tx: Parameters<Parameters<typeof this.prisma.$transaction>[0]>[0],
+    tagGroupId: string,
+    tags: RecursiveBackendTagInput[],
+    parentTagId: string | null,
+    depth: number
+  ): Promise<void> {
+    for (const tagData of tags) {
+      await tx.tag.create({
+        data: {
+          id: tagData.id,
+          tagGroupId,
+          slug: tagData.slug,
+          parentTagId,
+          depth,
+          isActive: tagData.isActive,
+          sortOrder: tagData.sortOrder,
+          translations: {
+            create: tagData.translations.map((tr) => ({
+              locale: tr.locale as Locale,
+              name: tr.name,
+              description: tr.description ?? null,
+            })),
+          },
+        },
+      });
+
+      if (tagData.children?.length) {
+        await this.createTagsRecursively(
+          tx,
+          tagGroupId,
+          tagData.children,
+          tagData.id,
+          depth + 1
+        );
+      }
+    }
+  }
+
+  async saveTag(
+    tagGroupId: string,
+    data: TagSaveDTO
+  ): Promise<AdminTagChildrenPrismaType> {
+    const {
+      id,
+      slug,
+      parentTagId,
+      isActive,
+      sortOrder,
+      translations,
+      existingImages,
+    } = data;
+
+    let depth = 0;
+    if (parentTagId) {
+      const parent = await this.prisma.tag.findUnique({
+        where: { id: parentTagId },
+        select: { depth: true },
+      });
+      if (!parent) {
+        throw new NotFoundException('common.errors.parent_tag_not_found');
+      }
+      depth = parent.depth + 1;
+    }
+
+    const slugConflict = await this.prisma.tag.findFirst({
+      where: {
+        tagGroupId,
+        parentTagId: parentTagId ?? null,
+        slug,
+        id: { not: id },
+      },
+    });
+    if (slugConflict) {
+      throw new ConflictException('common.errors.tag_slug_conflict');
+    }
+
+    const existingImageIds = existingImages?.map((img) => img.id) ?? [];
+
+    return this.prisma.$transaction(async (tx) => {
+      await tx.tagTranslation.deleteMany({ where: { tagId: id } });
+
+      await tx.image.deleteMany({
+        where: {
+          tagId: id,
+          ...(existingImageIds.length > 0
+            ? { id: { notIn: existingImageIds } }
+            : {}),
+        },
+      });
+
+      for (const img of existingImages ?? []) {
+        await tx.image.updateMany({
+          where: { id: img.id, tagId: id },
+          data: { sortOrder: img.sortOrder },
+        });
+      }
+
+      const tag = await tx.tag.upsert({
+        where: { id },
+        create: {
+          id,
+          tagGroupId,
+          slug,
+          parentTagId: parentTagId ?? null,
+          depth,
+          isActive,
+          sortOrder,
+          translations: {
+            create: translations.map((tr) => ({
+              locale: tr.locale as Locale,
+              name: tr.name,
+              description: tr.description ?? null,
+            })),
+          },
+        },
+        update: {
+          slug,
+          parentTagId: parentTagId ?? null,
+          depth,
+          isActive,
+          sortOrder,
+          translations: {
+            create: translations.map((tr) => ({
+              locale: tr.locale as Locale,
+              name: tr.name,
+              description: tr.description ?? null,
+            })),
+          },
+        },
+        include: AdminTagChildrenPrismaQuery,
+      });
+
+      return tag;
+    });
+  }
+
+  async deleteTag(tagId: string): Promise<void> {
+    const tag = await this.prisma.tag.findUnique({
+      where: { id: tagId },
+      select: { id: true },
+    });
+    if (!tag) {
+      throw new NotFoundException('common.errors.tag_not_found');
+    }
+
+    await this.prisma.tag.delete({ where: { id: tagId } });
+  }
+
+  async deleteTags(ids: string[]): Promise<{ count: number }> {
+    const result = await this.prisma.tag.deleteMany({
+      where: { id: { in: ids } },
+    });
+    return { count: result.count };
   }
 }

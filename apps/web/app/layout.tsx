@@ -10,6 +10,9 @@ import {
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/dropzone/styles.css';
+import { ModalsProvider } from '@mantine/modals';
+import { Notifications } from '@mantine/notifications';
+import '@mantine/notifications/styles.css';
 import '@mantine/spotlight/styles.css';
 import { Locale } from '@org/prisma/browser';
 import type { TokenPayload } from '@org/types/token';
@@ -58,11 +61,14 @@ export default async function RootLayout({
           <AuthProvider user={user}>
             <NextIntlClientProvider>
               <MantineProvider defaultColorScheme="auto" theme={theme}>
-                <LocaleProvider
-                  locale={(locale?.toUpperCase() as Locale) || 'TR'}
-                >
-                  {children}
-                </LocaleProvider>
+                <Notifications />
+                <ModalsProvider>
+                  <LocaleProvider
+                    locale={(locale?.toUpperCase() as Locale) || 'TR'}
+                  >
+                    {children}
+                  </LocaleProvider>
+                </ModalsProvider>
               </MantineProvider>
             </NextIntlClientProvider>
           </AuthProvider>

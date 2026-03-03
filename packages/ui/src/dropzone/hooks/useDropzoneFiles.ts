@@ -10,12 +10,14 @@ interface UseDropzoneFilesOptions {
   value: DropzoneFile[] | null | undefined;
   onChange: (files: DropzoneFile[]) => void;
   maxFiles?: number;
+  onTooManyFiles?: (attempted: number, maxFiles: number) => void;
 }
 
 export function useDropzoneFiles({
   value,
   onChange,
   maxFiles,
+  onTooManyFiles,
 }: UseDropzoneFilesOptions) {
   const files = value ?? [];
 
@@ -27,8 +29,14 @@ export function useDropzoneFiles({
 
       if (maxFiles !== undefined) {
         const remaining = maxFiles - currentCount;
-        if (remaining <= 0) return;
-        toAdd = incoming.slice(0, remaining);
+        if (remaining <= 0) {
+          onTooManyFiles?.(incoming.length, maxFiles);
+          return;
+        }
+        if (incoming.length > remaining) {
+          toAdd = incoming.slice(0, remaining);
+          onTooManyFiles?.(incoming.length, maxFiles);
+        }
       }
 
       const newFiles: DropzoneFile[] = toAdd.map((file, i) => ({
@@ -40,7 +48,7 @@ export function useDropzoneFiles({
 
       onChange([...files, ...newFiles]);
     },
-    [files, onChange, maxFiles]
+    [files, onChange, maxFiles, onTooManyFiles]
   );
 
   /** Remove a file by its stable ID */

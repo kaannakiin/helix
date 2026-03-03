@@ -8,6 +8,7 @@ export const DATA_ACCESS_KEYS = {
     customers: {
       list: ['admin', 'customers', 'list'],
       detail: (id: string) => ['admin', 'customers', 'detail', id] as const,
+      lookup: ['admin', 'customers', 'lookup'] as const,
     },
     brands: {
       list: ['admin', 'brands', 'list'],
@@ -35,10 +36,28 @@ export const DATA_ACCESS_KEYS = {
       list: ['admin', 'tags', 'list'],
       detail: (id: string) => ['admin', 'tags', 'detail', id] as const,
       lookup: ['admin', 'tags', 'lookup'],
+      children: (tagGroupId: string, parentTagId: string | null) =>
+        ['admin', 'tags', 'children', tagGroupId, parentTagId ?? 'root'] as const,
     },
     taxonomy: {
       lookup: ['admin', 'taxonomy', 'lookup'],
       tree: ['admin', 'taxonomy', 'tree'],
+    },
+    priceLists: {
+      list: ['admin', 'priceLists', 'list'],
+      detail: (id: string) => ['admin', 'priceLists', 'detail', id] as const,
+    },
+    customerGroups: {
+      list: ['admin', 'customerGroups', 'list'],
+      detail: (id: string) =>
+        ['admin', 'customerGroups', 'detail', id] as const,
+    },
+    evaluationJobs: {
+      list: ['admin', 'evaluationJobs', 'list'],
+      detail: (id: string) =>
+        ['admin', 'evaluationJobs', 'detail', id] as const,
+      entityHistory: (entityType: string, entityId: string) =>
+        ['admin', 'evaluationJobs', 'entityHistory', entityType, entityId] as const,
     },
   },
   locations: {

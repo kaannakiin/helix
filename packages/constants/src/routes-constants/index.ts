@@ -17,6 +17,7 @@ export const ADMIN_NAV_ROUTES = {
   TAGS: '/admin/products/tags',
   VARIANTS: '/admin/products/variants',
   CUSTOMERS: '/admin/customers',
+  CUSTOMER_GROUPS: '/admin/customers/customer-groups',
   ANALYTICS: '/admin/analytics',
   SETTINGS: '/admin/settings',
   MARKETING: '/admin/marketing',
@@ -25,4 +26,6 @@ export const ADMIN_NAV_ROUTES = {
   REPORTS: '/admin/reports',
   DEFINITIONS: '/admin/definitions',
   LOCATIONS: '/admin/definitions/locations',
+  PRICE_LISTS: '/admin/definitions/price-lists',
+  EVALUATION_JOBS: '/admin/definitions/evaluation-jobs',
 } as const;

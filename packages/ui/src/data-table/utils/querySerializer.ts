@@ -1,39 +1,37 @@
-import type { SortModelItem } from "ag-grid-community";
 import type {
   DataQueryParams,
   FilterCondition,
-  SortCondition,
-} from "@org/types/data-query";
-
-// ─── AG-Grid filter model shapes (what our custom filter components emit) ───
+  PlainSortCondition,
+} from '@org/types/data-query';
+import type { SortModelItem } from 'ag-grid-community';
 
 interface AgTextFilterModel {
-  filterType: "text";
+  filterType: 'text';
   type: string;
   filter: string;
 }
 
 interface AgNumberFilterModel {
-  filterType: "number";
+  filterType: 'number';
   type: string;
   filter: number;
   filterTo?: number;
 }
 
 interface AgDateFilterModel {
-  filterType: "date";
+  filterType: 'date';
   type: string;
   dateFrom: string;
   dateTo?: string;
 }
 
 interface AgBooleanFilterModel {
-  filterType: "boolean";
+  filterType: 'boolean';
   filter: boolean;
 }
 
 interface AgCustomFilterModel {
-  filterType: "custom";
+  filterType: 'custom';
   value: string;
 }
 
@@ -46,68 +44,63 @@ type AgFilterModelEntry =
 
 type AgFilterModel = Record<string, AgFilterModelEntry>;
 
-// ─── AG-Grid op name → generic op name mappings ───
-
 const AG_DATE_OP_MAP: Record<string, string> = {
-  equals: "equals",
-  greaterThan: "gt",
-  lessThan: "lt",
-  inRange: "between",
+  equals: 'equals',
+  greaterThan: 'gt',
+  lessThan: 'lt',
+  inRange: 'between',
 };
 
 const AG_NUMBER_OP_MAP: Record<string, string> = {
-  equals: "equals",
-  greaterThan: "gt",
-  lessThan: "lt",
-  greaterThanOrEqual: "gte",
-  lessThanOrEqual: "lte",
-  inRange: "between",
+  equals: 'equals',
+  greaterThan: 'gt',
+  lessThan: 'lt',
+  greaterThanOrEqual: 'gte',
+  lessThanOrEqual: 'lte',
+  inRange: 'between',
 };
 
-// ─── Convert single AG-Grid filter to generic FilterCondition ───
-
-function convertAgFilter(
-  agFilter: AgFilterModelEntry,
-): FilterCondition | null {
+function convertAgFilter(agFilter: AgFilterModelEntry): FilterCondition | null {
   switch (agFilter.filterType) {
-    case "text":
+    case 'text':
       return {
-        filterType: "text",
-        op: (agFilter.type as FilterCondition extends { op: infer O }
-          ? O
-          : never) || "contains",
+        filterType: 'text',
+        op:
+          (agFilter.type as FilterCondition extends { op: infer O }
+            ? O
+            : never) || 'contains',
         value: agFilter.filter,
       } as FilterCondition;
 
-    case "number":
+    case 'number':
       return {
-        filterType: "number",
-        op: AG_NUMBER_OP_MAP[agFilter.type] || "equals",
+        filterType: 'number',
+        op: AG_NUMBER_OP_MAP[agFilter.type] || 'equals',
         value: agFilter.filter,
         ...(agFilter.filterTo !== undefined
           ? { valueTo: agFilter.filterTo }
           : {}),
       } as FilterCondition;
 
-    case "date":
+    case 'date':
       return {
-        filterType: "date",
-        op: AG_DATE_OP_MAP[agFilter.type] || "equals",
+        filterType: 'date',
+        op: AG_DATE_OP_MAP[agFilter.type] || 'equals',
         value: agFilter.dateFrom,
         ...(agFilter.dateTo ? { valueTo: agFilter.dateTo } : {}),
       } as FilterCondition;
 
-    case "boolean":
+    case 'boolean':
       return {
-        filterType: "boolean",
-        op: "equals",
+        filterType: 'boolean',
+        op: 'equals',
         value: agFilter.filter,
       };
 
-    case "custom":
+    case 'custom':
       return {
-        filterType: "enum",
-        op: "equals",
+        filterType: 'enum',
+        op: 'equals',
         value: agFilter.value,
       };
 
@@ -115,8 +108,6 @@ function convertAgFilter(
       return null;
   }
 }
-
-// ─── Public API ───
 
 export function serializeGridQuery(params: {
   startRow: number;
@@ -130,7 +121,6 @@ export function serializeGridQuery(params: {
 
   const query: DataQueryParams = { page, limit };
 
-  // Convert filters
   if (filterModel && Object.keys(filterModel).length > 0) {
     const filters: Record<string, FilterCondition> = {};
     for (const [field, agFilter] of Object.entries(filterModel)) {
@@ -144,11 +134,10 @@ export function serializeGridQuery(params: {
     }
   }
 
-  // Convert sort
   if (sortModel && sortModel.length > 0) {
-    const sort: SortCondition[] = sortModel.map((s) => ({
+    const sort: PlainSortCondition[] = sortModel.map((s) => ({
       field: s.colId,
-      order: s.sort as "asc" | "desc",
+      order: s.sort as 'asc' | 'desc',
     }));
     query.sort = sort;
   }

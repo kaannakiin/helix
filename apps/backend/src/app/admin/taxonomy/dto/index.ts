@@ -1,2 +1,2 @@
-export { TaxonomyLookupQueryDTO } from './taxonomy-lookup-query.dto.js';
-export { TaxonomyTreeQueryDTO } from './taxonomy-tree-query.dto.js';
+export { TaxonomyLookupQueryDTO } from './taxonomy-lookup-query.dto';
+export { TaxonomyTreeQueryDTO } from './taxonomy-tree-query.dto';

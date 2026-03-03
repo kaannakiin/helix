@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   HttpCode,
@@ -7,14 +8,13 @@ import {
   Post,
   UploadedFile,
   UseInterceptors,
-  Body,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { UserRole } from '@org/prisma/client';
-import { Roles } from '../../core/decorators/index.js';
 import type { UploadResult } from '@org/types/admin/upload';
-import { UploadFileDTO } from './dto/index.js';
-import { UploadService } from './upload.service.js';
+import { Roles } from '../../core/decorators/index';
+import { UploadFileDTO } from './dto/index';
+import { UploadService } from './upload.service';
 
 @Controller('admin/upload')
 @Roles(UserRole.ADMIN, UserRole.MODERATOR)
@@ -25,7 +25,7 @@ export class UploadController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(
     @UploadedFile() file: Express.Multer.File,
-    @Body() dto: UploadFileDTO,
+    @Body() dto: UploadFileDTO
   ): Promise<UploadResult> {
     return this.uploadService.uploadFile(file, dto);
   }

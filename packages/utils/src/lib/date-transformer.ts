@@ -88,12 +88,12 @@ export class DateTransformer {
 
     switch (style) {
       case 'compact':
-        return d.format('l LT');
+        return d.format('M/D/YY HH:mm');
       case 'full':
-        return d.format('LLLL');
+        return d.format('dddd, MMMM D, YYYY, HH:mm');
       case 'standard':
       default:
-        return d.format('L LT');
+        return d.format('MM/DD/YYYY HH:mm');
     }
   }
 
@@ -109,6 +109,6 @@ export class DateTransformer {
     if (safeLoc === 'tr') {
       return d.format('HH:mm');
     }
-    return d.format('LT');
+    return d.format('HH:mm');
   }
 }

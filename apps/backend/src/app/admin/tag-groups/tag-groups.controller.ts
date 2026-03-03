@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, Res } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import { UserRole } from '@org/prisma/client';
 import type { Prisma } from '@org/prisma/client';
@@ -10,9 +10,13 @@ import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
 import { TagGroupsService } from './tag-groups.service';
 import {
+  TagBulkDeleteDTO,
+  TagChildrenQueryDTO,
   TagGroupExportQueryDTO,
   TagGroupQueryDTO,
+  TagGroupSaveDTO,
   TagLookupQueryDTO,
+  TagSaveDTO,
 } from './dto';
 import { TAG_GROUP_EXPORT_COLUMNS } from './tag-groups.export-config';
 
@@ -123,6 +127,47 @@ export class TagGroupsController {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 
     result.stream.pipe(res);
+  }
+
+  @Post('save')
+  @ApiOperation({ summary: 'Create or update a tag group (upsert by id)' })
+  async saveTagGroup(@Body() body: TagGroupSaveDTO) {
+    return this.tagGroupsService.saveTagGroup(body);
+  }
+
+  @Post(':id/tags/save')
+  @ApiOperation({ summary: 'Create or update a single tag' })
+  @ApiParam({ name: 'id', description: 'Tag Group ID' })
+  async saveTag(
+    @Param('id') tagGroupId: string,
+    @Body() body: TagSaveDTO,
+  ) {
+    return this.tagGroupsService.saveTag(tagGroupId, body);
+  }
+
+  @Delete(':id/tags/:tagId')
+  @ApiOperation({ summary: 'Delete a single tag' })
+  @ApiParam({ name: 'id', description: 'Tag Group ID' })
+  @ApiParam({ name: 'tagId', description: 'Tag ID' })
+  async deleteTag(@Param('tagId') tagId: string) {
+    return this.tagGroupsService.deleteTag(tagId);
+  }
+
+  @Post(':id/tags/bulk-delete')
+  @ApiOperation({ summary: 'Delete multiple tags at once' })
+  @ApiParam({ name: 'id', description: 'Tag Group ID' })
+  async deleteTags(@Body() body: TagBulkDeleteDTO) {
+    return this.tagGroupsService.deleteTags(body.ids);
+  }
+
+  @Get(':id/tags')
+  @ApiOperation({ summary: 'Get direct child tags of a tag group (lazy load by parentTagId)' })
+  @ApiParam({ name: 'id', description: 'Tag Group ID' })
+  async getTagChildren(
+    @Param('id') id: string,
+    @Query() query: TagChildrenQueryDTO,
+  ) {
+    return this.tagGroupsService.getTagChildren(id, query.parentTagId);
   }
 
   @Get(':id')

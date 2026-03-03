@@ -15,7 +15,6 @@ import { getMimePatterns } from '@org/constants/product-constants';
 import { FileType, VariantGroupType } from '@org/prisma/browser';
 import type { VariantGroupInput } from '@org/schemas/admin/variants';
 import { Dropzone } from '@org/ui/dropzone';
-import { useFormErrorTranslator } from '@/core/hooks/useFormErrorTranslator';
 import { useTranslations } from 'next-intl';
 import { Controller, useWatch, type Control } from 'react-hook-form';
 
@@ -32,7 +31,6 @@ export const VariantOptionDrawer = ({
   ...drawerProps
 }: Props) => {
   const t = useTranslations('common.admin.products.form');
-  const te = useFormErrorTranslator();
 
   const optionName = useWatch({
     control: draftControl ?? undefined,
@@ -76,7 +74,7 @@ export const VariantOptionDrawer = ({
               {...field}
               label={t('variants.optionDrawer.name')}
               placeholder={t('variants.optionDrawer.namePlaceholder')}
-              error={te(fieldState.error?.message)}
+              error={fieldState.error?.message}
             />
           )}
         />
@@ -92,7 +90,7 @@ export const VariantOptionDrawer = ({
                   placeholder="#000000"
                   value={field.value ?? ''}
                   onChange={field.onChange}
-                  error={te(fieldState.error?.message)}
+                  error={fieldState.error?.message}
                   format="hex"
                   swatches={[
                     '#ff0000',

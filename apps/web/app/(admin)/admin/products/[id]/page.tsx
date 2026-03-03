@@ -7,8 +7,8 @@ import {
   taxonomyTreeFetcher,
 } from '@/core/hooks/useAdminLookup';
 import { useAdminProduct } from '@/core/hooks/useAdminProducts';
+import { useTranslatedZodResolver } from '@/core/hooks/useTranslatedZodResolver';
 import { ApiError } from '@/core/lib/api/api-error';
-import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Alert,
   Button,
@@ -39,7 +39,7 @@ import { FormCard } from '@org/ui/common/form-card';
 import LoadingOverlay from '@org/ui/common/loading-overlay';
 import { Dropzone } from '@org/ui/dropzone';
 import { ProductSeoCard } from '@org/ui/inputs/product-seo-card';
-import { RelationModal } from '@org/ui/inputs/relation-modal';
+import { RelationDrawer } from '@org/ui/inputs/relation-drawer';
 import { RichTextEditor } from '@org/ui/inputs/rich-text-editor';
 import {
   Activity,
@@ -194,8 +194,9 @@ const AdminProductPage = () => {
     return map;
   }, [data, isNew]);
 
+  const resolver = useTranslatedZodResolver(ProductSchema);
   const methods = useForm<ProductInputType>({
-    resolver: zodResolver(ProductSchema),
+    resolver,
     defaultValues: NEW_PRODUCT_DEFAULT_VALUES,
     values: formattedData,
   });
@@ -241,7 +242,7 @@ const AdminProductPage = () => {
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Stack gap="lg">
           <div>
             <Group justify="space-between" align="center">
@@ -413,7 +414,7 @@ const AdminProductPage = () => {
                     control={control}
                     name="brandId"
                     render={({ field, fieldState }) => (
-                      <RelationModal
+                      <RelationDrawer
                         queryKey={DATA_ACCESS_KEYS.admin.brands.lookup}
                         fetchOptions={brandLookupFetcher}
                         title={t('brand.label')}
@@ -429,7 +430,7 @@ const AdminProductPage = () => {
                     control={control}
                     name="categories"
                     render={({ field, fieldState }) => (
-                      <RelationModal
+                      <RelationDrawer
                         queryKey={DATA_ACCESS_KEYS.admin.categories.lookup}
                         fetchOptions={categoryTreeFetcher}
                         multiple
@@ -454,7 +455,7 @@ const AdminProductPage = () => {
                     control={control}
                     name="tagIds"
                     render={({ field, fieldState }) => (
-                      <RelationModal
+                      <RelationDrawer
                         queryKey={DATA_ACCESS_KEYS.admin.tags.lookup}
                         fetchOptions={tagTreeFetcher}
                         multiple
@@ -472,7 +473,7 @@ const AdminProductPage = () => {
                     control={control}
                     name="googleTaxonomyId"
                     render={({ field, fieldState }) => (
-                      <RelationModal
+                      <RelationDrawer
                         queryKey={DATA_ACCESS_KEYS.admin.taxonomy.tree}
                         fetchOptions={taxonomyTreeFetcher}
                         tree

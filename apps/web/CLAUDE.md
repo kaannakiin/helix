@@ -6,7 +6,7 @@ Next.js 16 (App Router, Turbopack) · Mantine 8 · React Query 5 · Zustand 5 ·
 
 - Mantine: `from '@mantine/core'`, `from '@mantine/hooks'`, `from '@mantine/dates'`
 - Icons: `from 'lucide-react'`
-- Forms: `from 'react-hook-form'` + `from '@hookform/resolvers/zod'`
+- Forms: `from 'react-hook-form'` + `from '@/core/hooks/useTranslatedZodResolver'`
 - Shared UI (MantineProvider, PhoneInput): `from '@org/ui'`, `from '@org/ui/inputs/phone-input'`
 - Schemas: `from '@org/schemas/auth'`, `from '@org/schemas/common'`
 - Constants: `from '@org/constants'`
@@ -20,9 +20,14 @@ Next.js 16 (App Router, Turbopack) · Mantine 8 · React Query 5 · Zustand 5 ·
 All forms follow this exact structure:
 
 1. Import Zod schema + `InputType` / `OutputType` from `@org/schemas/*`
-2. `useForm<InputType>({ resolver: zodResolver(Schema), defaultValues: {...} })`
+2. Use `useTranslatedZodResolver` (from `@/core/hooks/useTranslatedZodResolver`) instead of raw `zodResolver`:
+   ```tsx
+   const resolver = useTranslatedZodResolver(MySchema);
+   const methods = useForm<InputType>({ resolver, defaultValues: {...} });
+   ```
+   This hook wraps `zodResolver` and auto-translates Zod V-key error messages (e.g. `validation.errors.common.name_required`) into the current locale via next-intl. **DO NOT** import `zodResolver` from `@hookform/resolvers/zod` directly — always use the translated wrapper.
 3. Wrap every field in `<Controller control={control} name="field" render={({ field, fieldState }) => ...} />`
-4. Show errors via `fieldState.error?.message`
+4. Show errors via `fieldState.error?.message` — no manual `te()` translation needed
 5. On submit cast to output type: `data as OutputType`, pass to mutation
 
 For nullable fields use `value={field.value ?? ''}` (TextInput) or `value={field.value ?? undefined}` (PhoneInput).

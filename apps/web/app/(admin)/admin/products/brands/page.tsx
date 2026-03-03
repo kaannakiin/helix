@@ -75,7 +75,6 @@ export default function BrandsPage() {
       filters,
       columns: {
         name: t('table.name'),
-        slug: t('table.slug'),
         isActive: t('table.isActive'),
         productsCount: t('table.productsCount'),
         websiteUrl: t('table.websiteUrl'),
@@ -130,11 +129,6 @@ export default function BrandsPage() {
         },
         sortable: false,
       }),
-      createColumn<AdminBrandListPrismaType>('slug', {
-        headerKey: 'slug',
-        type: 'text',
-        minWidth: 150,
-      }),
       createColumn<AdminBrandListPrismaType>('isActive', {
         headerKey: 'isActive',
         type: 'boolean',
@@ -151,7 +145,7 @@ export default function BrandsPage() {
       }),
       createColumn<AdminBrandListPrismaType>('createdAt', {
         headerKey: 'createdAt',
-        type: 'datetime',
+        type: 'date',
         minWidth: 170,
       }),
     ],
@@ -206,7 +200,7 @@ export default function BrandsPage() {
         }
       },
     }),
-    []
+    [columns]
   );
 
   const handleExport = useCallback(

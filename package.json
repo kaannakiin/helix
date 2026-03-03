@@ -52,5 +52,8 @@
     "typescript": "~5.9.2",
     "typescript-eslint": "^8.40.0",
     "webpack-cli": "^5.1.4"
+  },
+  "optionalDependencies": {
+    "@next/swc-darwin-arm64": "^16.0.11"
   }
 }

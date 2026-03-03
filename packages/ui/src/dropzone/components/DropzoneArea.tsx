@@ -37,12 +37,17 @@ export function DropzoneArea({
     ...translations,
   };
 
+  // maxFiles is intentionally excluded from Mantine — Mantine only checks the
+  // count within a single drop event and has no awareness of already-added files.
+  // The limit is enforced in useDropzoneFiles instead.
+  const { maxFiles: _maxFiles, ...mantineProps } = rest;
+
   return (
     <MantineDropzone
       onDrop={onDrop}
       onReject={onReject}
       className={cn('transition-colors', className)}
-      {...rest}
+      {...mantineProps}
     >
       <Stack align="center" justify="center" gap="xs" mih={120}>
         <MantineDropzone.Accept>

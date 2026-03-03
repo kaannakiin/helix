@@ -1,11 +1,14 @@
 import { DATA_ACCESS_KEYS } from '@org/constants/data-keys';
 import type { LookupItem } from '@org/schemas/admin/common';
 import type { PaginatedResponse } from '@org/types/pagination';
+import type {
+  TreeFetchOptions,
+  TreeNode,
+} from '@org/ui/inputs/relation-drawer';
 import type { FetchOptions } from '@org/ui/inputs/relation-input';
-import type { TreeFetchOptions, TreeNode } from '@org/ui/inputs/relation-modal';
 import { apiClient } from '../lib/api/api-client';
 
-const LOOKUP_LIMIT = 20;
+const LOOKUP_LIMIT = 100;
 
 function createLookupFetcher(endpoint: string): FetchOptions {
   return async (params) => {

@@ -42,7 +42,21 @@
       "multiple_color_groups": "Only one color variant group is allowed.",
       "product_type_required": "Product type is required.",
       "product_status_required": "Product status is required.",
-      "tracking_strategy_required": "Tracking strategy is required."
+      "tracking_strategy_required": "Tracking strategy is required.",
+      "customer_group_name_required": "Customer group name is required.",
+      "customer_group_type_required": "Customer group type is required.",
+      "customer_group_rule_tree_required": "A rule tree or rule tree ID is required for rule-based groups.",
+      "customer_group_members_min": "At least one member is required.",
+      "cron_expression_invalid": "Invalid cron expression.",
+      "condition_set_min_conditions": "At least one condition is required.",
+      "decision_tree_root_required": "A root node is required in the decision tree.",
+      "decision_tree_nodes_min": "At least one node is required in the decision tree.",
+      "decision_tree_root_not_found": "Root node not found in the decision tree.",
+      "decision_tree_invalid_branch_ref": "Branch references a non-existent node.",
+      "decision_tree_orphan_node": "Orphan node detected — not reachable from root.",
+      "decision_tree_min_conditions": "At least two conditions are required in a condition group.",
+      "decision_tree_simple_multiple_results": "Simple mode allows only one result node.",
+      "decision_tree_simple_no_branch_not_allowed": "No-branch is not allowed in simple mode."
     }
   }
 }

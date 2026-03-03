@@ -1,15 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import type { Locale, Prisma } from '@org/prisma/client';
 import type { LookupItem } from '@org/schemas/admin/common';
 import {
+  AdminBrandDetailPrismaQuery,
   AdminBrandListPrismaQuery,
+  type AdminBrandDetailPrismaType,
   type AdminBrandListPrismaType,
 } from '@org/types/admin/brands';
 import type { FilterCondition } from '@org/types/data-query';
 import type { PaginatedResponse } from '@org/types/pagination';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { PrismaService } from '../../prisma/prisma.service';
-import type { BrandQueryDTO } from './dto';
+import type { BrandQueryDTO, BrandSaveDTO } from './dto';
 
 @Injectable()
 export class BrandsService {
@@ -153,15 +159,78 @@ export class BrandsService {
     };
   }
 
-  async getBrandById(id: string): Promise<AdminBrandListPrismaType> {
+  async getBrandById(id: string): Promise<AdminBrandDetailPrismaType> {
     const brand = await this.prisma.brand.findUnique({
       where: { id },
-      include: AdminBrandListPrismaQuery,
+      include: AdminBrandDetailPrismaQuery,
     });
 
     if (!brand) {
       throw new NotFoundException('common.errors.brand_not_found');
     }
+
+    return brand;
+  }
+
+  async saveBrand(data: BrandSaveDTO): Promise<AdminBrandDetailPrismaType> {
+    const { id, slug, websiteUrl, isActive, sortOrder, translations, existingImages } = data;
+
+    const slugConflict = await this.prisma.brand.findFirst({
+      where: { slug, id: { not: id } },
+    });
+    if (slugConflict) {
+      throw new ConflictException('common.errors.brand_slug_conflict');
+    }
+
+    const existingImageIds = existingImages?.map((img) => img.id) ?? [];
+
+    const brand = await this.prisma.$transaction(async (tx) => {
+      await tx.image.deleteMany({
+        where: {
+          brandId: id,
+          ...(existingImageIds.length > 0
+            ? { id: { notIn: existingImageIds } }
+            : {}),
+        },
+      });
+
+      for (const img of existingImages ?? []) {
+        await tx.image.update({
+          where: { id: img.id },
+          data: { sortOrder: img.sortOrder },
+        });
+      }
+
+      await tx.brandTranslation.deleteMany({
+        where: { brandId: id },
+      });
+
+      const translationData = translations.map((tr) => ({
+        locale: tr.locale,
+        name: tr.name,
+        description: tr.description ?? null,
+      }));
+
+      return tx.brand.upsert({
+        where: { id },
+        create: {
+          id,
+          slug,
+          websiteUrl: websiteUrl || null,
+          isActive,
+          sortOrder,
+          translations: { create: translationData },
+        },
+        update: {
+          slug,
+          websiteUrl: websiteUrl || null,
+          isActive,
+          sortOrder,
+          translations: { create: translationData },
+        },
+        include: AdminBrandDetailPrismaQuery,
+      });
+    });
 
     return brand;
   }

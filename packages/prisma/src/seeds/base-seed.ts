@@ -29,6 +29,8 @@ async function baseSeed() {
       name: 'Turkish Lira',
       decimalPlaces: 2,
       sortOrder: 0,
+      isDefault: true,
+      exchangeRate: 1.0,
     },
     {
       code: 'USD' as const,
@@ -36,6 +38,8 @@ async function baseSeed() {
       name: 'US Dollar',
       decimalPlaces: 2,
       sortOrder: 1,
+      isDefault: false,
+      exchangeRate: 38.5,
     },
     {
       code: 'EUR' as const,
@@ -43,6 +47,8 @@ async function baseSeed() {
       name: 'Euro',
       decimalPlaces: 2,
       sortOrder: 2,
+      isDefault: false,
+      exchangeRate: 42.0,
     },
     {
       code: 'GBP' as const,
@@ -50,18 +56,41 @@ async function baseSeed() {
       name: 'British Pound',
       decimalPlaces: 2,
       sortOrder: 3,
+      isDefault: false,
+      exchangeRate: 49.0,
     },
   ];
 
   for (const currency of currencies) {
     await prisma.currency.upsert({
       where: { code: currency.code },
-      update: {},
+      update: {
+        isDefault: currency.isDefault,
+        exchangeRate: currency.exchangeRate,
+      },
       create: currency,
     });
   }
 
   console.log(`Currencies seeded: ${currencies.map((c) => c.code).join(', ')}`);
+
+  // ── BASE PriceList for TRY ──
+  const defaultCurrency = currencies.find((c) => c.isDefault)!;
+
+  await prisma.priceList.upsert({
+    where: { id: 'base-pricelist-try' },
+    update: {},
+    create: {
+      id: 'base-pricelist-try',
+      name: 'Varsayılan TRY',
+      type: 'BASE',
+      status: 'ACTIVE',
+      currencyCode: defaultCurrency.code,
+      isActive: true,
+    },
+  });
+
+  console.log(`BASE PriceList seeded for ${defaultCurrency.code}`);
 
   console.log('Base seed completed!');
 }

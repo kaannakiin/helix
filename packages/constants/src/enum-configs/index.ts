@@ -1,11 +1,15 @@
 import type {
   AccountStatus,
+  CustomerGroupType,
+  EvaluationJobStatus,
+  EvaluationTrigger,
   ProductStatus,
   ProductType,
+  RuleTargetEntity,
   TrackingStrategy,
   UserRole,
-  VariantGroupType,
   VariantGroupDisplayMode,
+  VariantGroupType,
 } from '@org/prisma/client';
 
 export interface EnumConfig {
@@ -44,17 +48,54 @@ export const VariantGroupTypeConfigs: Record<VariantGroupType, EnumConfig> = {
   SIZE: { color: 'blue', labelKey: 'variantGroupType.SIZE' },
 };
 
-export const VariantGroupDisplayModeConfigs: Record<VariantGroupDisplayMode, EnumConfig> = {
+export const VariantGroupDisplayModeConfigs: Record<
+  VariantGroupDisplayMode,
+  EnumConfig
+> = {
   BADGE: { color: 'violet', labelKey: 'variantGroupDisplayMode.BADGE' },
   SELECT: { color: 'blue', labelKey: 'variantGroupDisplayMode.SELECT' },
-  IMAGE_GRID: { color: 'green', labelKey: 'variantGroupDisplayMode.IMAGE_GRID' },
+  IMAGE_GRID: {
+    color: 'green',
+    labelKey: 'variantGroupDisplayMode.IMAGE_GRID',
+  },
+};
+
+export const CustomerGroupTypeConfigs: Record<CustomerGroupType, EnumConfig> = {
+  MANUAL: { color: 'blue', labelKey: 'customerGroupType.MANUAL' },
+  RULE_BASED: { color: 'violet', labelKey: 'customerGroupType.RULE_BASED' },
+};
+
+export const EvaluationJobStatusConfigs: Record<
+  EvaluationJobStatus,
+  EnumConfig
+> = {
+  PENDING: { color: 'yellow', labelKey: 'evaluationJobStatus.PENDING' },
+  RUNNING: { color: 'blue', labelKey: 'evaluationJobStatus.RUNNING' },
+  COMPLETED: { color: 'green', labelKey: 'evaluationJobStatus.COMPLETED' },
+  FAILED: { color: 'red', labelKey: 'evaluationJobStatus.FAILED' },
+  CANCELLED: { color: 'gray', labelKey: 'evaluationJobStatus.CANCELLED' },
+};
+
+export const EvaluationTriggerConfigs: Record<EvaluationTrigger, EnumConfig> = {
+  SCHEDULED: { color: 'violet', labelKey: 'evaluationTrigger.SCHEDULED' },
+  MANUAL: { color: 'teal', labelKey: 'evaluationTrigger.MANUAL' },
+};
+
+export const RuleTargetEntityConfigs: Record<RuleTargetEntity, EnumConfig> = {
+  USER: { color: 'blue', labelKey: 'ruleTargetEntity.USER' },
+  PRODUCT: { color: 'orange', labelKey: 'ruleTargetEntity.PRODUCT' },
+  ORDER: { color: 'green', labelKey: 'ruleTargetEntity.ORDER' },
+  INVENTORY: { color: 'cyan', labelKey: 'ruleTargetEntity.INVENTORY' },
 };
 
 export const TrackingStrategyConfigs: Record<TrackingStrategy, EnumConfig> = {
   NONE: { color: 'gray', labelKey: 'trackingStrategy.NONE' },
   BATCH: { color: 'blue', labelKey: 'trackingStrategy.BATCH' },
   SERIAL: { color: 'violet', labelKey: 'trackingStrategy.SERIAL' },
-  BATCH_AND_SERIAL: { color: 'teal', labelKey: 'trackingStrategy.BATCH_AND_SERIAL' },
+  BATCH_AND_SERIAL: {
+    color: 'teal',
+    labelKey: 'trackingStrategy.BATCH_AND_SERIAL',
+  },
 };
 
 export function buildColorMap<K extends string>(

@@ -55,12 +55,6 @@ export function Dropzone({
   translations,
   className,
 }: DropzoneProps) {
-  const { files, addFiles, removeFile, reorderFiles } = useDropzoneFiles({
-    value,
-    onChange,
-    maxFiles,
-  });
-
   const t = useTranslations('common.dropzone');
 
   const resolvedTranslations: DropzoneTranslations = {
@@ -78,6 +72,22 @@ export function Dropzone({
     tooManyFiles: translations?.tooManyFiles || t('tooManyFiles'),
   };
 
+  const { files, addFiles, removeFile, reorderFiles } = useDropzoneFiles({
+    value,
+    onChange,
+    maxFiles,
+    onTooManyFiles: (_, max) => {
+      notifications.show({
+        color: 'red',
+        title: resolvedTranslations.rejectionTitle,
+        message: resolvedTranslations.tooManyFiles?.replace(
+          '__maxFiles__',
+          String(max),
+        ),
+      });
+    },
+  });
+
   const { preview, openPreview, closePreview } = useFilePreview();
 
   const handleReject = (rejections: FileRejection[]) => {
@@ -87,16 +97,6 @@ export function Dropzone({
       rejections.flatMap((r) => r.errors.map((e) => e.code)),
     );
 
-    if (codes.has('too-many-files')) {
-      notifications.show({
-        color: 'red',
-        title: resolvedTranslations.rejectionTitle,
-        message: resolvedTranslations.tooManyFiles?.replace(
-          '__maxFiles__',
-          String(maxFiles ?? ''),
-        ),
-      });
-    }
     if (codes.has('file-too-large')) {
       notifications.show({
         color: 'red',

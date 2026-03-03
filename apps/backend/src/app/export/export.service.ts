@@ -9,7 +9,7 @@ import type {
   ExportOptions,
   ExportResourceConfig,
   ExportStreamResult,
-} from './types/export.types.js';
+} from './types/export.types';
 
 const EXCEL_BATCH_SIZE = 500;
 const CSV_BATCH_SIZE = 1000;
@@ -204,7 +204,10 @@ export class ExportService {
       case 'date':
         return DateTransformer.formatDate(value as string | Date, ctx.locale);
       case 'datetime':
-        return DateTransformer.formatDateTime(value as string | Date, ctx.locale);
+        return DateTransformer.formatDateTime(
+          value as string | Date,
+          ctx.locale
+        );
       case 'badge':
         if (col.labelMap && typeof value === 'string') {
           return col.labelMap[value] ?? value;

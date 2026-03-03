@@ -207,7 +207,6 @@ export const VariantCreator = ({ isNew, initialOriginalOptionsMap }: Props) => {
                   onChange={(e) =>
                     handleHasVariantsChange(e.currentTarget.checked)
                   }
-                  label={t('variants.toggle')}
                   size="sm"
                 />
               )}

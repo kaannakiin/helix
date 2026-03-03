@@ -11,7 +11,12 @@ import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
 import { BRAND_EXPORT_COLUMNS } from './brands.export-config';
 import { BrandsService } from './brands.service';
-import { BrandExportQueryDTO, BrandLookupQueryDTO, BrandQueryDTO } from './dto';
+import {
+  BrandExportQueryDTO,
+  BrandLookupQueryDTO,
+  BrandQueryDTO,
+  BrandSaveDTO,
+} from './dto';
 
 @ApiTags('Admin - Brands')
 @Controller('admin/brands')
@@ -26,6 +31,12 @@ export class BrandsController {
   @ApiOperation({ summary: 'Get paginated list of brands' })
   async getBrands(@Body() query: BrandQueryDTO) {
     return this.brandsService.getBrands(query);
+  }
+
+  @Post('save')
+  @ApiOperation({ summary: 'Create or update a brand' })
+  async saveBrand(@Body() body: BrandSaveDTO) {
+    return this.brandsService.saveBrand(body);
   }
 
   @Get('lookup')

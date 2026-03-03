@@ -12,16 +12,17 @@ import type {
   RowClickedEvent,
   SortChangedEvent,
 } from 'ag-grid-community';
-import { themeQuartz } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { Filter, RefreshCw } from 'lucide-react';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '../../utils/cn';
 import {
   DataTableTranslationProvider,
   type DataTableTranslations,
 } from '../context/DataTableTranslationContext';
+import { HELIX_COLUMN_TYPES } from '../columnTypeRegistry';
 import DataTableProvider from '../data-table-provider';
+import { dataTableTheme } from '../theme';
 import { useContextMenu } from '../hooks/useContextMenu';
 import { useExpandableRows } from '../hooks/useExpandableRows';
 import type { ContextMenuConfig } from '../types/contextMenu.types';
@@ -47,25 +48,6 @@ export interface ExpandableDataTableProps<TData> {
   loading?: boolean;
   idPrefix?: string;
 }
-
-const customTheme = themeQuartz.withParams({
-  fontFamily: 'var(--mantine-font-family, -apple-system, sans-serif)',
-  fontSize: 14,
-  headerHeight: 48,
-  rowHeight: 48,
-  backgroundColor: 'var(--mantine-color-body)',
-  foregroundColor: 'var(--mantine-color-text)',
-  headerBackgroundColor: 'var(--mantine-color-default)',
-  headerTextColor: 'var(--mantine-color-text)',
-  oddRowBackgroundColor: 'var(--mantine-color-default-hover)',
-  rowHoverColor: 'var(--mantine-color-default-hover)',
-  selectedRowBackgroundColor: 'var(--mantine-primary-color-light)',
-  borderColor: 'var(--mantine-color-default-border)',
-  borderRadius: 8,
-  wrapperBorderRadius: 8,
-  rangeSelectionBorderColor: 'var(--mantine-primary-color-filled)',
-  inputFocusBorder: true,
-});
 
 type AnyGrid = any;
 
@@ -109,6 +91,14 @@ export function ExpandableDataTable<TData>({
     handleRowClicked: expandHandleRowClicked,
   } = useExpandableRows<TData>(expandableRow, idPrefix);
 
+  const prevRowDataRef = useRef(rowData);
+  useEffect(() => {
+    if (prevRowDataRef.current !== rowData && gridApiRef.current) {
+      collapseAll(gridApiRef.current as AnyGrid);
+    }
+    prevRowDataRef.current = rowData;
+  }, [rowData, collapseAll]);
+
   const expandColumn = useMemo<ColDef>(
     () => ({
       colId: '__expand__',
@@ -122,6 +112,11 @@ export function ExpandableDataTable<TData>({
       resizable: false,
       suppressMovable: true,
       pinned: 'left' as const,
+      cellStyle: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
       cellRenderer: ExpandToggleCellRenderer,
       cellRendererParams: {
         isExpandable: expandableRow.isExpandable ?? (() => true),
@@ -212,7 +207,11 @@ export function ExpandableDataTable<TData>({
 
   const finalGridOptions = useMemo<GridOptions>(() => {
     const options: GridOptions = {
-      theme: customTheme,
+      theme: dataTableTheme,
+      columnTypes: {
+        ...HELIX_COLUMN_TYPES,
+        ...((gridOptions as GridOptions).columnTypes ?? {}),
+      },
       defaultColDef: {
         sortable: true,
         filter: false,

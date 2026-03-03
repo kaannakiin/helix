@@ -17,8 +17,10 @@ export function BadgeCellRenderer({
   const label = labelMap?.[value] ?? value;
 
   return (
-    <Badge color={color} variant="light" size="sm">
-      {label}
-    </Badge>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+      <Badge color={color} variant="filled" size="sm">
+        {label}
+      </Badge>
+    </div>
   );
 }

@@ -113,8 +113,15 @@ export function useColumnFactory(
     });
 
     const buildBooleanConfig = <T>(): Partial<ColDef<T>> => ({
+      type: 'booleanColumn',
       cellRenderer: BooleanCellRenderer,
       sortable: true,
+
+      cellStyle: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
       filter: {
         component: BooleanFilter,
         doesFilterPass: serverSideDoesFilterPass,
@@ -126,6 +133,7 @@ export function useColumnFactory(
     const buildDateConfig = <T>(
       style: DateStyle = 'standard'
     ): Partial<ColDef<T>> => ({
+      type: 'dateColumn',
       sortable: true,
       filter: {
         component: DateFilter,
@@ -146,6 +154,7 @@ export function useColumnFactory(
     const buildDateTimeConfig = <T>(
       style: DateStyle = 'standard'
     ): Partial<ColDef<T>> => ({
+      type: 'datetimeColumn',
       sortable: true,
       filter: {
         component: DateFilter,
@@ -203,9 +212,15 @@ export function useColumnFactory(
         : undefined;
 
       return {
+        type: 'badgeColumn',
         cellRenderer: BadgeCellRenderer,
         cellRendererParams: { colorMap, labelMap },
         sortable: true,
+        cellStyle: {
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
         filter: enumOptions
           ? {
               component: EnumFilter,
@@ -219,6 +234,7 @@ export function useColumnFactory(
     };
 
     const buildLocaleConfig = <T>(): Partial<ColDef<T>> => ({
+      type: 'localeColumn',
       sortable: true,
       filter: {
         component: LocaleFilter,
@@ -230,6 +246,7 @@ export function useColumnFactory(
     });
 
     const buildActionConfig = <T>(): Partial<ColDef<T>> => ({
+      type: 'actionColumn',
       sortable: false,
       filter: false,
       resizable: false,

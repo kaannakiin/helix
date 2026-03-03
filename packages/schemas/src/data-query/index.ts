@@ -91,10 +91,12 @@ export function createDataQuerySchema<
 
   const filtersSchema = z.object(filterShape);
 
-  const sortItemSchema = z.object({
+  const plainSortItemSchema = z.object({
     field: z.enum(sortFields as unknown as [string, ...string[]]),
     order: z.enum(SORT_ORDERS),
   });
+
+  const sortItemSchema = plainSortItemSchema;
 
   return z.object({
     page: z.coerce.number().int().min(1).default(1),

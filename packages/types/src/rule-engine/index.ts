@@ -6,14 +6,14 @@ import type {
   TextFilterOp,
 } from '@org/types/data-query';
 
-export const RULE_LOGICAL_OPERATORS = ['AND', 'OR'] as const;
-export type RuleLogicalOperator = (typeof RULE_LOGICAL_OPERATORS)[number];
+export const RuleLogicalOperator = ['AND', 'OR'] as const;
+export type RuleLogicalOperator = (typeof RuleLogicalOperator)[number];
 
-export const RULE_TARGET_ENTITIES = ['USER', 'PRODUCT', 'ORDER'] as const;
-export type RuleTargetEntity = (typeof RULE_TARGET_ENTITIES)[number];
+export const RuleTargetEntity = ['USER', 'PRODUCT', 'ORDER', 'INVENTORY'] as const;
+export type RuleTargetEntity = (typeof RuleTargetEntity)[number];
 
-export const CUSTOMER_GROUP_TYPES = ['RULE_BASED', 'MANUAL'] as const;
-export type CustomerGroupType = (typeof CUSTOMER_GROUP_TYPES)[number];
+export const CustomerGroupType = ['RULE_BASED', 'MANUAL'] as const;
+export type CustomerGroupType = (typeof CustomerGroupType)[number];
 
 export interface TextRuleCondition {
   filterType: 'text';
@@ -59,14 +59,77 @@ export type RuleCondition =
   | BooleanRuleCondition
   | EnumRuleCondition;
 
-export interface RuleGroup {
+// ─── Condition Set (flat evaluation) ─────────────────────────────────────────
+
+export interface ConditionSet {
   operator: RuleLogicalOperator;
-  conditions: Array<RuleCondition | RuleGroup>;
+  conditions: RuleCondition[];
 }
 
-export function isRuleGroup(
-  item: RuleCondition | RuleGroup
-): item is RuleGroup {
-  return 'operator' in item && 'conditions' in item && !('field' in item);
+// ─── Decision Tree ────────────────────────────────────────────────────────────
+
+export const DecisionTreeNodeType = ['condition', 'conditionGroup', 'result'] as const;
+export type DecisionTreeNodeType = (typeof DecisionTreeNodeType)[number];
+
+export const DecisionTreeAction = ['include', 'exclude'] as const;
+export type DecisionTreeAction = (typeof DecisionTreeAction)[number];
+
+export const MembershipAction = ['include', 'exclude'] as const;
+export type MembershipAction = (typeof MembershipAction)[number];
+
+export interface DecisionTreeConditionNode {
+  id: string;
+  type: 'condition';
+  condition: RuleCondition;
+  yesBranch: string | null;
+  noBranch: string | null;
 }
+
+export interface DecisionTreeConditionGroupNode {
+  id: string;
+  type: 'conditionGroup';
+  operator: RuleLogicalOperator;
+  conditions: RuleCondition[];
+  yesBranch: string | null;
+  noBranch: string | null;
+}
+
+export interface DecisionTreeResultNode<TAction extends string = string> {
+  id: string;
+  type: 'result';
+  action: TAction;
+  label?: string;
+}
+
+export type DecisionTreeNode<TAction extends string = string> =
+  | DecisionTreeConditionNode
+  | DecisionTreeConditionGroupNode
+  | DecisionTreeResultNode<TAction>;
+
+export interface DecisionTree<TAction extends string = string> {
+  rootNodeId: string;
+  nodes: DecisionTreeNode<TAction>[];
+}
+
+export type MembershipDecisionTree = DecisionTree<MembershipAction>;
+export type MembershipResultNode = DecisionTreeResultNode<MembershipAction>;
+
+export function isConditionNode<TAction extends string = string>(
+  node: DecisionTreeNode<TAction>
+): node is DecisionTreeConditionNode {
+  return node.type === 'condition';
+}
+
+export function isConditionGroupNode<TAction extends string = string>(
+  node: DecisionTreeNode<TAction>
+): node is DecisionTreeConditionGroupNode {
+  return node.type === 'conditionGroup';
+}
+
+export function isResultNode<TAction extends string = string>(
+  node: DecisionTreeNode<TAction>
+): node is DecisionTreeResultNode<TAction> {
+  return node.type === 'result';
+}
+
 export * from './field-configs.js';

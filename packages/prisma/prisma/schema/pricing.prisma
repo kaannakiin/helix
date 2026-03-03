@@ -1,0 +1,85 @@
+// ─── Price List ──────────────────────────────────────────────────────────────
+
+model PriceList {
+  id   String @id @default(cuid())
+  name String
+
+  type   PriceListType   @default(BASE)
+  status PriceListStatus @default(DRAFT)
+
+  currencyCode CurrencyCode
+
+  parentPriceListId String?
+  parentPriceList   PriceList?  @relation("PriceListInheritance", fields: [parentPriceListId], references: [id], onDelete: SetNull)
+  childPriceLists   PriceList[] @relation("PriceListInheritance")
+
+  adjustmentType  AdjustmentType?
+  adjustmentValue Decimal?
+
+  validFrom DateTime?
+  validTo   DateTime?
+
+  priority    Int     @default(0)
+  description String?
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  prices             PriceListPrice[]
+  customerGroupLinks PriceListCustomerGroup[]
+
+  @@index([currencyCode])
+  @@index([type, currencyCode])
+  @@index([status])
+  @@index([isActive])
+  @@index([priority])
+  @@index([validFrom, validTo])
+  @@index([parentPriceListId])
+}
+
+// ─── Price List Price (variant-level) ────────────────────────────────────────
+
+model PriceListPrice {
+  id String @id @default(cuid())
+
+  priceListId String
+  priceList   PriceList @relation(fields: [priceListId], references: [id], onDelete: Cascade)
+
+  productVariantId String
+  productVariant   ProductVariant @relation(fields: [productVariantId], references: [id], onDelete: Cascade)
+
+  originType PriceOriginType @default(FIXED)
+
+  price          Decimal?
+  compareAtPrice Decimal?
+  costPrice      Decimal?
+
+  adjustmentType  AdjustmentType?
+  adjustmentValue Decimal?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([priceListId, productVariantId])
+  @@index([priceListId])
+  @@index([productVariantId])
+}
+
+// ─── Price List ↔ Customer Group ─────────────────────────────────────────────
+
+model PriceListCustomerGroup {
+  id String @id @default(cuid())
+
+  priceListId String
+  priceList   PriceList @relation(fields: [priceListId], references: [id], onDelete: Cascade)
+
+  customerGroupId String
+  customerGroup   CustomerGroup @relation(fields: [customerGroupId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([priceListId, customerGroupId])
+  @@index([priceListId])
+  @@index([customerGroupId])
+}

@@ -7,6 +7,7 @@
     "orders": "Orders",
     "products": "Products",
     "customers": "Customers",
+    "customer_groups": "Customer Groups",
     "analytics": "Analytics",
     "settings": "Settings",
     "marketing": "Marketing",
@@ -19,6 +20,8 @@
     "variants": "Variants",
     "definitions": "Definitions",
     "locations": "Locations",
+    "price_lists": "Price Lists",
+    "evaluation_jobs": "Evaluation Jobs",
     "groups": {
       "main": "Main",
       "commerce": "Commerce",
@@ -91,6 +94,27 @@
       "HAS_STATES": "Has States",
       "HAS_CITIES_ONLY": "Cities Only",
       "COUNTRY_ONLY": "Country Only"
+    },
+    "customerGroupType": {
+      "MANUAL": "Manual",
+      "RULE_BASED": "Rule Based"
+    },
+    "evaluationJobStatus": {
+      "PENDING": "Pending",
+      "RUNNING": "Running",
+      "COMPLETED": "Completed",
+      "FAILED": "Failed",
+      "CANCELLED": "Cancelled"
+    },
+    "evaluationTrigger": {
+      "SCHEDULED": "Scheduled",
+      "MANUAL": "Manual"
+    },
+    "ruleTargetEntity": {
+      "USER": "User",
+      "PRODUCT": "Product",
+      "ORDER": "Order",
+      "INVENTORY": "Inventory"
     }
   },
   "relationInput": {
@@ -117,10 +141,60 @@
     "dragHandle": "Drag to reorder",
     "previewTitle": "Preview",
     "noPreview": "No preview available",
-    "rejectionTitle": "Rejected files",
-    "fileTooLarge": "File is too large",
+    "rejectionTitle": "Error",
+    "fileTooLarge": "File exceeds the __maxSize__ size limit",
     "fileInvalidType": "File type not allowed",
-    "tooManyFiles": "Too many files"
+    "tooManyFiles": "Maximum __maxFiles__ files allowed"
+  },
+  "decisionTree": {
+    "startNode": "Start",
+    "drawerTitle": "Decision Tree",
+    "addCondition": "Add Condition",
+    "addConditionGroup": "Add Group",
+    "addResult": "Add Result",
+    "deleteSelected": "Delete selected",
+    "fitView": "Fit view",
+    "saveAndClose": "Save & Close",
+    "cancel": "Cancel",
+    "conditionNode": "Condition",
+    "conditionGroupNode": "Group",
+    "resultNode": "Result",
+    "yesBranch": "Yes",
+    "noBranch": "No",
+    "editCondition": "Edit Condition",
+    "editConditionGroup": "Edit Condition Group",
+    "editResult": "Edit Result",
+    "selectField": "Select field...",
+    "selectOperator": "Select operator...",
+    "enterValue": "Enter value...",
+    "enterValueTo": "End value...",
+    "selectAction": "Select action",
+    "addConditionToGroup": "Add condition to group",
+    "labelPlaceholder": "Label (optional)",
+    "save": "Save",
+    "validationFailed": "Validation Failed",
+    "validationErrorMessage": "Please fix the errors before saving.",
+    "unsavedChangesTitle": "Unsaved Changes",
+    "unsavedChangesConfirm": "You have unsaved changes. Are you sure you want to close?",
+    "discard": "Discard",
+    "conditionCount": "{count} condition(s)",
+    "moreConditions": "+{count} more",
+    "operators": {
+      "contains": "Contains",
+      "equals": "Equals",
+      "startsWith": "Starts with",
+      "endsWith": "Ends with",
+      "gt": "Greater than",
+      "lt": "Less than",
+      "gte": "Greater or equal",
+      "lte": "Less or equal",
+      "between": "Between",
+      "in": "One of"
+    },
+    "actions": {
+      "include": "Include",
+      "exclude": "Exclude"
+    }
   },
   "seoCard": {
     "title": "SEO",
@@ -386,6 +460,44 @@
         "activeFilters": "{count} active",
         "noFilters": "No filters available",
         "apply": "Apply Filters"
+      },
+      "form": {
+        "newBrand": "New Brand",
+        "discard": "Discard",
+        "save": "Save",
+        "backToBrands": "Back to Brands",
+        "loadError": "Failed to Load",
+        "loadErrorDescription": "An error occurred while loading the brand. Please try again.",
+        "notFound": "Brand Not Found",
+        "notFoundDescription": "The brand you are looking for does not exist.",
+        "generalInfo": "General Information",
+        "name": {
+          "label": "Brand Name",
+          "placeholder": "Enter brand name..."
+        },
+        "slug": {
+          "label": "Slug",
+          "placeholder": "brand-slug"
+        },
+        "website": {
+          "label": "Website URL",
+          "placeholder": "https://example.com"
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Brief description of the brand..."
+        },
+        "media": {
+          "title": "Media",
+          "description": "Upload brand logo or images (max 3)"
+        },
+        "statusCard": {
+          "title": "Status",
+          "activeLabel": "Active"
+        },
+        "sortOrder": {
+          "label": "Sort Order"
+        }
       }
     },
     "categories": {
@@ -455,6 +567,7 @@
     "tags": {
       "title": "Tag Groups",
       "subtitle": "Manage all tag groups",
+      "new": "New Tag Group",
       "table": {
         "name": "Name",
         "slug": "Slug",
@@ -484,11 +597,78 @@
         "activeFilters": "{count} active",
         "noFilters": "No filters available",
         "apply": "Apply Filters"
+      },
+      "form": {
+        "newTagGroup": "New Tag Group",
+        "discard": "Discard",
+        "save": "Save",
+        "saveAsDraft": "Save as Draft",
+        "generalInfo": "General Information",
+        "name": {
+          "label": "Tag Group Name",
+          "placeholder": "Enter tag group name..."
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Brief description of the tag group..."
+        },
+        "statusCard": {
+          "title": "Status",
+          "activeLabel": "Active"
+        },
+        "tags": {
+          "title": "Tags",
+          "description": "Manage tags in this group",
+          "addTag": "Add Tag",
+          "addRootTag": "Add Root Tag",
+          "addChildTag": "Add Child Tag",
+          "noTags": "No tags added yet",
+          "childrenCount": "children",
+          "unnamedTag": "(unnamed)",
+          "activeLabel": "Active",
+          "tagName": {
+            "label": "Tag Name",
+            "placeholder": "Enter tag name..."
+          },
+          "tagDescription": {
+            "label": "Description",
+            "placeholder": "Brief description..."
+          },
+          "removeTag": "Remove Tag",
+          "deleteTag": "Delete Tag",
+          "deleteConfirm": "Are you sure you want to delete this tag and all its children?",
+          "deleteConfirmTitle": "Delete Tag",
+          "slug": "Slug",
+          "sortOrder": "Sort Order",
+          "table": {
+            "name": "Name",
+            "slug": "Slug",
+            "active": "Active",
+            "sortOrder": "Sort Order",
+            "children": "Children",
+            "actions": "Actions"
+          },
+          "editDrawer": {
+            "editTitle": "Edit Tag",
+            "newTitle": "New Tag",
+            "cancel": "Cancel",
+            "save": "Save",
+            "errorTitle": "Error",
+            "errorMessage": "Failed to save tag. Please try again.",
+            "imagesAfterSave": "Images can be added after saving the tag group."
+          },
+          "bulkDelete": "Delete Selected",
+          "bulkDeleteConfirmTitle": "Delete Selected Tags",
+          "bulkDeleteConfirm": "Are you sure you want to delete the selected tags and all their children?",
+          "empty": "No child tags",
+          "savingChildren": "Loading tag data..."
+        }
       }
     },
     "variants": {
       "title": "Variant Groups",
       "subtitle": "Manage all variant groups",
+      "new": "New Variant Group",
       "table": {
         "name": "Name",
         "optionsCount": "Options",
@@ -518,6 +698,54 @@
         "activeFilters": "{count} active",
         "noFilters": "No filters available",
         "apply": "Apply Filters"
+      },
+      "form": {
+        "newVariantGroup": "New Variant Group",
+        "discard": "Discard",
+        "save": "Save",
+        "backToVariants": "Back to Variant Groups",
+        "loadError": "Failed to Load",
+        "loadErrorDescription": "An error occurred while loading the variant group. Please try again.",
+        "notFound": "Variant Group Not Found",
+        "notFoundDescription": "The variant group you are looking for does not exist.",
+        "generalInfo": "General Information",
+        "name": {
+          "label": "Group Name",
+          "placeholder": "Enter group name..."
+        },
+        "type": {
+          "label": "Group Type",
+          "size": "Size",
+          "color": "Color",
+          "sizeDescription": "Text-based options like S, M, L, XL",
+          "colorDescription": "Color swatches with hex codes or images"
+        },
+        "statusCard": {
+          "title": "Settings",
+          "sortOrder": {
+            "label": "Sort Order"
+          }
+        },
+        "options": {
+          "title": "Options",
+          "description": "Manage options in this variant group",
+          "addOption": "Add Option",
+          "noOptions": "No options added yet. Click 'Add Option' to create one.",
+          "unnamedOption": "Unnamed Option",
+          "optionName": {
+            "label": "Option Name",
+            "placeholder": "Enter option name..."
+          },
+          "colorCode": {
+            "label": "Color Code",
+            "placeholder": "#000000"
+          },
+          "optionImage": {
+            "title": "Option Image",
+            "description": "Upload an image for this option (max 1)"
+          },
+          "deleteConfirm": "Are you sure you want to remove this option?"
+        }
       }
     },
     "locations": {
@@ -608,6 +836,280 @@
         "no": "No",
         "notProvided": "Not provided"
       }
+    },
+    "priceLists": {
+      "title": "Price Lists",
+      "subtitle": "Manage pricing lists and rules",
+      "table": {
+        "name": "Name",
+        "type": "Type",
+        "status": "Status",
+        "currencyCode": "Currency",
+        "isActive": "Active",
+        "priority": "Priority",
+        "validFrom": "Valid From",
+        "validTo": "Valid To",
+        "pricesCount": "Prices",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters"
+      },
+      "enums": {
+        "type": {
+          "BASE": "Base",
+          "SALE": "Sale",
+          "CUSTOM": "Custom"
+        },
+        "status": {
+          "ACTIVE": "Active",
+          "DRAFT": "Draft",
+          "ARCHIVED": "Archived"
+        }
+      }
+    },
+    "customerGroups": {
+      "title": "Customer Groups",
+      "subtitle": "Manage customer segments and groups",
+      "new": "New Group",
+      "table": {
+        "name": "Name",
+        "type": "Type",
+        "isActive": "Active",
+        "membersCount": "Members",
+        "lastEvaluatedAt": "Last Run",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters"
+      },
+      "form": {
+        "newCustomerGroup": "New Customer Group",
+        "discard": "Discard",
+        "save": "Save",
+        "backToList": "Back to Customer Groups",
+        "loadError": "Failed to Load",
+        "loadErrorDescription": "An error occurred while loading the customer group.",
+        "notFound": "Customer Group Not Found",
+        "notFoundDescription": "The customer group you are looking for does not exist.",
+        "generalInfo": "General Information",
+        "name": { "label": "Group Name", "placeholder": "Enter group name..." },
+        "description": {
+          "label": "Description",
+          "placeholder": "Brief description..."
+        },
+        "color": { "label": "Color" },
+        "type": { "label": "Group Type" },
+        "statusCard": { "title": "Settings", "activeLabel": "Active" },
+        "cronExpression": {
+          "label": "Evaluation Schedule",
+          "description": "Cron expression for automatic re-evaluation"
+        },
+        "ruleTree": {
+          "title": "Rule Conditions",
+          "description": "Define conditions to auto-assign customers"
+        },
+        "members": {
+          "title": "Members",
+          "description": "Manually assign customers to this group",
+          "label": "Members",
+          "placeholder": "Add members...",
+          "modalTitle": "Select Members",
+          "addButton": "Add Members",
+          "removeTooltip": "Remove from group",
+          "searchPlaceholder": "Search by name...",
+          "nameHeader": "Name",
+          "emailHeader": "Email",
+          "confirm": "Confirm",
+          "cancel": "Cancel"
+        },
+        "confirmSwitch": {
+          "title": "Switch Group Type?",
+          "toRuleBased": "Switching to Rule Based will remove all {count} selected members. This cannot be undone.",
+          "toManual": "Switching to Manual will clear the decision tree configuration. This cannot be undone.",
+          "confirm": "Switch & Clear",
+          "cancel": "Cancel"
+        },
+        "tree": {
+          "addCondition": "Add Condition",
+          "addConditionGroup": "Add Group",
+          "addResult": "Add Result",
+          "deleteSelected": "Delete selected",
+          "fitView": "Fit view",
+          "saveAndClose": "Save & Close",
+          "cancel": "Cancel",
+          "conditionNode": "Condition",
+          "conditionGroupNode": "Group",
+          "resultNode": "Result",
+          "yesBranch": "Yes",
+          "noBranch": "No",
+          "editCondition": "Edit Condition",
+          "editConditionGroup": "Edit Condition Group",
+          "editResult": "Edit Result",
+          "selectField": "Select field...",
+          "selectOperator": "Select operator...",
+          "enterValue": "Enter value...",
+          "enterValueTo": "End value...",
+          "selectAction": "Select action",
+          "addConditionToGroup": "Add condition to group",
+          "labelPlaceholder": "Label (optional)",
+          "save": "Save",
+          "validationFailed": "Validation Failed",
+          "validationErrorMessage": "Please fix the decision tree errors before saving.",
+          "editTree": "Edit Decision Tree",
+          "actionInclude": "Include",
+          "actionExclude": "Exclude"
+        },
+        "fields": {
+          "name": "Name",
+          "surname": "Surname",
+          "email": "Email",
+          "phone": "Phone",
+          "role": "Role",
+          "status": "Status",
+          "emailVerified": "Email Verified",
+          "phoneVerified": "Phone Verified",
+          "twoFactorEnabled": "2FA Enabled",
+          "createdAt": "Created At",
+          "lastLoginAt": "Last Login",
+          "loginCount": "Login Count"
+        },
+        "operators": {
+          "contains": "Contains",
+          "equals": "Equals",
+          "startsWith": "Starts with",
+          "endsWith": "Ends with",
+          "gt": "Greater than",
+          "lt": "Less than",
+          "gte": "Greater or equal",
+          "lte": "Less or equal",
+          "between": "Between",
+          "in": "One of"
+        }
+      }
+    },
+    "evaluationJobs": {
+      "title": "Evaluation Jobs",
+      "subtitle": "Monitor and manage evaluation processes",
+      "table": {
+        "status": "Status",
+        "entityType": "Entity Type",
+        "targetEntity": "Target",
+        "triggerType": "Trigger",
+        "triggeredBy": "Triggered By",
+        "recordsEvaluated": "Evaluated",
+        "recordsMatched": "Matched",
+        "durationMs": "Duration",
+        "completedAt": "Completed At",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "cancel": "Cancel Job",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters"
+      },
+      "detail": {
+        "title": "Evaluation Job Details",
+        "backToList": "Back to Evaluation Jobs",
+        "loadError": "Failed to Load",
+        "loadErrorDescription": "An error occurred while loading the evaluation job.",
+        "notFound": "Evaluation Job Not Found",
+        "notFoundDescription": "The evaluation job you are looking for does not exist.",
+        "jobInfo": "Job Information",
+        "status": "Status",
+        "entityType": "Entity Type",
+        "entityId": "Entity ID",
+        "targetEntity": "Target Entity",
+        "triggerType": "Trigger Type",
+        "triggeredBy": "Triggered By",
+        "attemptCount": "Attempts",
+        "timing": "Timing",
+        "createdAt": "Created At",
+        "startedAt": "Started At",
+        "completedAt": "Completed At",
+        "duration": "Duration",
+        "results": "Results",
+        "recordsEvaluated": "Records Evaluated",
+        "recordsMatched": "Records Matched",
+        "matchRate": "Match Rate",
+        "errorLog": "Error Log",
+        "executionLog": "Execution Log",
+        "ruleTreeSnapshot": "Rule Tree Snapshot",
+        "actions": "Actions",
+        "rerun": "Re-run Evaluation",
+        "cancel": "Cancel Job",
+        "history": "Evaluation History",
+        "noHistory": "No previous evaluations",
+        "durationFormat": "{seconds}s",
+        "cancelSuccess": "Job cancelled successfully",
+        "cancelError": "Failed to cancel job",
+        "rerunSuccess": "Evaluation triggered successfully",
+        "rerunError": "Failed to trigger evaluation",
+        "currentDuration": "Current Duration",
+        "resultsPreview": "Results Preview",
+        "abortJob": "Abort Job",
+        "streaming": "Streaming",
+        "pendingLabel": "Pending"
+      }
     }
   },
   "dataTable": {
@@ -674,6 +1176,11 @@
       "refresh_token_missing": "Refresh token missing.",
       "invalid_refresh_token": "Invalid refresh token.",
       "no_password_set": "This account uses social login. Please sign in with your social provider."
-    }
+    },
+    "customer_group_not_found": "Customer group not found.",
+    "evaluation_manual_group": "Manual customer groups cannot be evaluated with rules.",
+    "evaluation_no_rule_tree": "This customer group has no rule tree configured.",
+    "evaluation_job_not_found": "Evaluation job not found.",
+    "evaluation_job_not_cancellable": "Only pending evaluation jobs can be cancelled."
   }
 }

@@ -75,7 +75,6 @@ export default function CategoriesPage() {
       filters,
       columns: {
         name: t('table.name'),
-        slug: t('table.slug'),
         parentName: t('table.parentName'),
         depth: t('table.depth'),
         isActive: t('table.isActive'),
@@ -132,11 +131,6 @@ export default function CategoriesPage() {
         },
         sortable: false,
       }),
-      createColumn<AdminCategoryListPrismaType>('slug', {
-        headerKey: 'slug',
-        type: 'text',
-        minWidth: 150,
-      }),
       createColumn<AdminCategoryListPrismaType>(
         'parentName' as keyof AdminCategoryListPrismaType & string,
         {
@@ -176,7 +170,7 @@ export default function CategoriesPage() {
       }),
       createColumn<AdminCategoryListPrismaType>('createdAt', {
         headerKey: 'createdAt',
-        type: 'datetime',
+        type: 'date',
         minWidth: 170,
       }),
     ],
@@ -231,7 +225,7 @@ export default function CategoriesPage() {
         }
       },
     }),
-    []
+    [columns]
   );
 
   const handleExport = useCallback(

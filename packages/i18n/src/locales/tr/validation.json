@@ -42,7 +42,21 @@
       "multiple_color_groups": "Yalnızca bir renk varyant grubuna izin verilir.",
       "product_type_required": "Ürün tipi zorunludur.",
       "product_status_required": "Ürün durumu zorunludur.",
-      "tracking_strategy_required": "Takip stratejisi zorunludur."
+      "tracking_strategy_required": "Takip stratejisi zorunludur.",
+      "customer_group_name_required": "Müşteri grubu adı zorunludur.",
+      "customer_group_type_required": "Müşteri grubu tipi zorunludur.",
+      "customer_group_rule_tree_required": "Kural tabanlı gruplar için bir kural ağacı veya kural ağacı ID'si gereklidir.",
+      "customer_group_members_min": "En az bir üye gereklidir.",
+      "cron_expression_invalid": "Geçersiz cron ifadesi.",
+      "condition_set_min_conditions": "En az bir koşul gereklidir.",
+      "decision_tree_root_required": "Karar ağacında bir kök düğüm gereklidir.",
+      "decision_tree_nodes_min": "Karar ağacında en az bir düğüm gereklidir.",
+      "decision_tree_root_not_found": "Kök düğüm karar ağacında bulunamadı.",
+      "decision_tree_invalid_branch_ref": "Dal, var olmayan bir düğüme referans veriyor.",
+      "decision_tree_orphan_node": "Yetim düğüm tespit edildi — kökten erişilemiyor.",
+      "decision_tree_min_conditions": "Bir koşul grubunda en az iki koşul gereklidir.",
+      "decision_tree_simple_multiple_results": "Basit modda yalnızca bir sonuç düğümüne izin verilir.",
+      "decision_tree_simple_no_branch_not_allowed": "Basit modda hayır dalına izin verilmez."
     }
   }
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslatedZodResolver } from '@/core/hooks/useTranslatedZodResolver';
 import {
   DndContext,
   KeyboardSensor,
@@ -41,7 +41,6 @@ import {
 import { slugify } from '@org/utils/slugify';
 import { createId } from '@paralleldrive/cuid2';
 import { ChevronRight, GripVertical, Plus, RotateCcw, X } from 'lucide-react';
-import { useFormErrorTranslator } from '@/core/hooks/useFormErrorTranslator';
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useRef } from 'react';
 import {
@@ -256,8 +255,9 @@ export const VariantGroupDrawer = ({
   const { getValues: mainGetValues, setValue: mainSetValue } =
     useFormContext<ProductInputType>();
 
+  const resolver = useTranslatedZodResolver(VariantGroupSchema);
   const draftForm = useForm<VariantGroupInput>({
-    resolver: zodResolver(VariantGroupSchema),
+    resolver,
     defaultValues: {
       uniqueId: '',
       type: VariantGroupType.SIZE,
@@ -275,8 +275,6 @@ export const VariantGroupDrawer = ({
     trigger: draftTrigger,
     formState: { errors: draftErrors },
   } = draftForm;
-
-  const te = useFormErrorTranslator();
 
   const prevOpenedRef = useRef(false);
 
@@ -432,7 +430,7 @@ export const VariantGroupDrawer = ({
               }}
               label={t('variants.groupDrawer.name')}
               placeholder={t('variants.groupDrawer.namePlaceholder')}
-              error={te(fieldState.error?.message)}
+              error={fieldState.error?.message}
             />
           )}
         />
@@ -538,10 +536,10 @@ export const VariantGroupDrawer = ({
                     onOpen={() => onOpenOption(optIndex, draftControl)}
                     onRemove={() => removeOption(optIndex)}
                     unnamedLabel={t('variants.unnamedOption')}
-                    error={te(
+                    error={
                       draftErrors.options?.[optIndex]?.translations?.[0]?.name
                         ?.message
-                    )}
+                    }
                   />
                 ))
               )}

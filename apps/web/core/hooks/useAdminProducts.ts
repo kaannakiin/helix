@@ -42,7 +42,7 @@ export const useVariantGroupSearch = (
         {
           params: {
             q: q || undefined,
-            limit: 20,
+            limit: 100,
             ...(exclude?.length ? { exclude: exclude.join(',') } : {}),
           },
         }

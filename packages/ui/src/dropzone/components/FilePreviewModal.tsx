@@ -88,8 +88,6 @@ export function FilePreviewModal({
       centered
       padding={0}
       keepMounted
-      closeOnEscape={false}
-      zIndex={10000}
     >
       {file && url && fileType === 'IMAGE' && (
         <ImagePreview url={url} name={file.file.name} />

@@ -1,4 +1,5 @@
 import { FileType, Locale } from '@org/prisma/browser';
+import { createId } from '@paralleldrive/cuid2';
 import { z } from 'zod';
 import {
   dropzoneFileSchema,
@@ -23,21 +24,18 @@ export const BaseBrandSchema = z.object({
         name: z
           .string({ error: V.NAME_REQUIRED })
           .trim()
-          .min(1, { message: V.NAME_REQUIRED }),
+          .min(1, { error: V.NAME_REQUIRED }),
         description: z.string().optional(),
       })
     )
-    .min(1, { message: V.TRANSLATIONS_MIN }),
+    .min(1, { error: V.TRANSLATIONS_MIN }),
   existingImages: z.array(existingImageSchema).default([]),
 });
 
 const checkBrand = ({
   issues,
   value,
-}: {
-  issues: z.core.$ZodRawIssue[];
-  value: z.output<typeof BaseBrandSchema>;
-}) => {
+}: z.core.ParsePayload<z.output<typeof BaseBrandSchema>>) => {
   const localeDupes = findDuplicates(value.translations, (t) => t.locale);
   for (const dupe of localeDupes) {
     issues.push({
@@ -75,3 +73,14 @@ export const BackendBrandSchema = BaseBrandSchema.check(checkBrand);
 
 export type BrandInput = z.input<typeof BrandSchema>;
 export type BrandOutput = z.output<typeof BrandSchema>;
+
+export const NEW_BRAND_DEFAULT_VALUES: BrandInput = {
+  id: createId(),
+  slug: '',
+  websiteUrl: '',
+  isActive: true,
+  sortOrder: 0,
+  translations: [{ locale: 'TR', name: '', description: '' }],
+  images: [],
+  existingImages: [],
+};

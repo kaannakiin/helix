@@ -10,9 +10,9 @@ import {
   UploadResult,
 } from '@org/types/admin/upload';
 import { createId } from '@paralleldrive/cuid2';
-import { PrismaService } from '../prisma/prisma.service.js';
-import { ImageProcessorService } from './image-processor.service.js';
-import { MinioStorageService } from './minio-storage.service.js';
+import { PrismaService } from '../prisma/prisma.service';
+import { ImageProcessorService } from './image-processor.service';
+import { MinioStorageService } from './minio-storage.service';
 
 function detectFileType(mimeType: string): FileType {
   for (const [type, config] of Object.entries(FileTypeConfigs) as Array<

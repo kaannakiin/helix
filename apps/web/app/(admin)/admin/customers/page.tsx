@@ -3,6 +3,12 @@
 import { apiClient } from '@/core/lib/api/api-client';
 import { downloadExport } from '@/core/lib/api/download';
 import { Stack, Text, Title } from '@mantine/core';
+import {
+  AccountStatusConfigs,
+  UserRoleConfigs,
+  buildColorMap,
+  buildEnumOptions,
+} from '@org/constants/enum-configs';
 import type { AdminCustomersPrismaType } from '@org/types/admin/customers';
 import type { ExportFormat } from '@org/types/export';
 import type { PaginatedResponse } from '@org/types/pagination';
@@ -23,6 +29,7 @@ export default function CustomersPage() {
   const t = useTranslations('common.admin.customers');
   const router = useRouter();
 
+  const tEnums = useTranslations('common.enums');
   const tExport = useTranslations('common.export');
   const tFilters = useTranslations('common.dataTable.filters');
 
@@ -141,34 +148,15 @@ export default function CustomersPage() {
         headerKey: 'role',
         type: 'badge',
         minWidth: 120,
-        colorMap: {
-          ADMIN: 'red',
-          MODERATOR: 'orange',
-          USER: 'blue',
-        },
-        sortable: false,
-        enumOptions: [
-          { value: 'ADMIN', label: 'Admin' },
-          { value: 'MODERATOR', label: 'Moderator' },
-          { value: 'USER', label: 'User' },
-        ],
+        colorMap: buildColorMap(UserRoleConfigs),
+        enumOptions: buildEnumOptions(UserRoleConfigs, tEnums),
       }),
       createColumn<AdminCustomersPrismaType>('status', {
         headerKey: 'status',
         type: 'badge',
         minWidth: 120,
-        colorMap: {
-          ACTIVE: 'green',
-          SUSPENDED: 'yellow',
-          BANNED: 'red',
-          DEACTIVATED: 'gray',
-        },
-        enumOptions: [
-          { value: 'ACTIVE', label: 'Active' },
-          { value: 'SUSPENDED', label: 'Suspended' },
-          { value: 'BANNED', label: 'Banned' },
-          { value: 'DEACTIVATED', label: 'Deactivated' },
-        ],
+        colorMap: buildColorMap(AccountStatusConfigs),
+        enumOptions: buildEnumOptions(AccountStatusConfigs, tEnums),
       }),
       createColumn<AdminCustomersPrismaType>('emailVerified', {
         headerKey: 'emailVerified',
@@ -190,11 +178,11 @@ export default function CustomersPage() {
       }),
       createColumn<AdminCustomersPrismaType>('createdAt', {
         headerKey: 'createdAt',
-        type: 'datetime',
+        type: 'date',
         minWidth: 170,
       }),
     ],
-    [createColumn]
+    [createColumn, tEnums]
   );
 
   const copyColumns = useMemo<CopyColumn[]>(
@@ -250,7 +238,7 @@ export default function CustomersPage() {
         }
       },
     }),
-    []
+    [columns]
   );
 
   const handleExport = useCallback(

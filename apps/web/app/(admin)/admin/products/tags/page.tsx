@@ -2,7 +2,7 @@
 
 import { apiClient } from '@/core/lib/api/api-client';
 import { downloadExport } from '@/core/lib/api/download';
-import { Stack, Text, Title } from '@mantine/core';
+import { Button, Group, Stack, Text, Title } from '@mantine/core';
 import type { AdminTagGroupListPrismaType } from '@org/types/admin/tags';
 import type { ExportFormat } from '@org/types/export';
 import type { PaginatedResponse } from '@org/types/pagination';
@@ -15,6 +15,7 @@ import {
   type DataTableTranslations,
 } from '@org/ui';
 import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
+import { Plus } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
@@ -75,7 +76,6 @@ export default function TagsPage() {
       filters,
       columns: {
         name: t('table.name'),
-        slug: t('table.slug'),
         isActive: t('table.isActive'),
         tagsCount: t('table.tagsCount'),
         createdAt: t('table.createdAt'),
@@ -129,11 +129,6 @@ export default function TagsPage() {
         },
         sortable: false,
       }),
-      createColumn<AdminTagGroupListPrismaType>('slug', {
-        headerKey: 'slug',
-        type: 'text',
-        minWidth: 150,
-      }),
       createColumn<AdminTagGroupListPrismaType>('isActive', {
         headerKey: 'isActive',
         type: 'boolean',
@@ -145,7 +140,7 @@ export default function TagsPage() {
       }),
       createColumn<AdminTagGroupListPrismaType>('createdAt', {
         headerKey: 'createdAt',
-        type: 'datetime',
+        type: 'date',
         minWidth: 170,
       }),
     ],
@@ -200,7 +195,7 @@ export default function TagsPage() {
         }
       },
     }),
-    []
+    [columns]
   );
 
   const handleExport = useCallback(
@@ -238,12 +233,20 @@ export default function TagsPage() {
 
   return (
     <Stack gap="md" className="flex-1">
-      <div>
-        <Title order={2}>{t('title')}</Title>
-        <Text c="dimmed" mt="xs">
-          {t('subtitle')}
-        </Text>
-      </div>
+      <Group justify="space-between" align="flex-start">
+        <div>
+          <Title order={2}>{t('title')}</Title>
+          <Text c="dimmed" mt="xs">
+            {t('subtitle')}
+          </Text>
+        </div>
+        <Button
+          leftSection={<Plus size={16} />}
+          onClick={() => router.push('/admin/products/tags/new')}
+        >
+          {t('new')}
+        </Button>
+      </Group>
 
       <DataTable<AdminTagGroupListPrismaType>
         tableId="tagGroups"

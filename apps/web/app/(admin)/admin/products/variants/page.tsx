@@ -2,7 +2,7 @@
 
 import { apiClient } from '@/core/lib/api/api-client';
 import { downloadExport } from '@/core/lib/api/download';
-import { Stack, Text, Title } from '@mantine/core';
+import { Button, Group, Stack, Text, Title } from '@mantine/core';
 import type { AdminVariantGroupListPrismaType } from '@org/types/admin/variants';
 import type { ExportFormat } from '@org/types/export';
 import type { PaginatedResponse } from '@org/types/pagination';
@@ -17,6 +17,7 @@ import {
 import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
+import { Plus } from 'lucide-react';
 import { useCallback, useMemo, useRef } from 'react';
 
 export default function VariantGroupsPage() {
@@ -140,12 +141,12 @@ export default function VariantGroupsPage() {
       }),
       createColumn<AdminVariantGroupListPrismaType>('createdAt', {
         headerKey: 'createdAt',
-        type: 'datetime',
+        type: 'date',
         minWidth: 170,
       }),
       createColumn<AdminVariantGroupListPrismaType>('updatedAt', {
         headerKey: 'updatedAt',
-        type: 'datetime',
+        type: 'date',
         minWidth: 170,
       }),
     ],
@@ -200,7 +201,7 @@ export default function VariantGroupsPage() {
         }
       },
     }),
-    []
+    [columns]
   );
 
   const handleExport = useCallback(
@@ -238,12 +239,20 @@ export default function VariantGroupsPage() {
 
   return (
     <Stack gap="md" className="flex-1">
-      <div>
-        <Title order={2}>{t('title')}</Title>
-        <Text c="dimmed" mt="xs">
-          {t('subtitle')}
-        </Text>
-      </div>
+      <Group justify="space-between" align="flex-start">
+        <div>
+          <Title order={2}>{t('title')}</Title>
+          <Text c="dimmed" mt="xs">
+            {t('subtitle')}
+          </Text>
+        </div>
+        <Button
+          leftSection={<Plus size={16} />}
+          onClick={() => router.push('/admin/products/variants/new')}
+        >
+          {t('new')}
+        </Button>
+      </Group>
 
       <DataTable<AdminVariantGroupListPrismaType>
         tableId="variantGroups"

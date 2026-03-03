@@ -189,6 +189,30 @@ enum CountryType {
   COUNTRY_ONLY
 }
 
+// ─── Pricing ────────────────────────────────────────────────────────────────
+
+enum PriceListType {
+  BASE
+  SALE
+  CUSTOM
+}
+
+enum PriceListStatus {
+  ACTIVE
+  DRAFT
+  ARCHIVED
+}
+
+enum PriceOriginType {
+  FIXED
+  RELATIVE
+}
+
+enum AdjustmentType {
+  PERCENTAGE
+  FIXED_AMOUNT
+}
+
 // ─── Rule Engine ──────────────────────────────────────────────────────────────
 
 enum RuleTargetEntity {
@@ -200,5 +224,20 @@ enum RuleTargetEntity {
 
 enum CustomerGroupType {
   RULE_BASED
+  MANUAL
+}
+
+// ─── Evaluation ───────────────────────────────────────────────────────────────
+
+enum EvaluationJobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum EvaluationTrigger {
+  SCHEDULED
   MANUAL
 }
