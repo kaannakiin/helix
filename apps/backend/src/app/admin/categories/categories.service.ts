@@ -4,25 +4,12 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-
-function getAncestorIds(item: {
-  parent?: { id: unknown; parent?: unknown } | null;
-}): string[] {
-  const ids: string[] = [];
-  let current: { id: unknown; parent?: unknown } | null | undefined =
-    item.parent;
-  while (current) {
-    ids.unshift(String(current.id));
-    current = (current as { parent?: typeof current }).parent;
-  }
-  return ids;
-}
 import type { Locale, Prisma } from '@org/prisma/client';
 import type { LookupItem } from '@org/schemas/admin/common';
 import {
-  AdminCategoryDetailPrismaQuery,
+  adminCategoryDetailPrismaQuery,
+  adminCategoryListPrismaQuery,
   type AdminCategoryDetailPrismaType,
-  AdminCategoryListPrismaQuery,
   type AdminCategoryListPrismaType,
 } from '@org/types/admin/categories';
 import type { FilterCondition } from '@org/types/data-query';
@@ -36,6 +23,19 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { UploadService } from '../../upload/upload.service';
 import type { CategoryQueryDTO, CategorySaveDTO } from './dto';
 
+function getAncestorIds(item: {
+  parent?: { id: unknown; parent?: unknown } | null;
+}): string[] {
+  const ids: string[] = [];
+  let current: { id: unknown; parent?: unknown } | null | undefined =
+    item.parent;
+  while (current) {
+    ids.unshift(String(current.id));
+    current = (current as { parent?: typeof current }).parent;
+  }
+  return ids;
+}
+
 const MAX_CATEGORY_IMAGES = 5;
 
 @Injectable()
@@ -48,21 +48,28 @@ export class CategoriesService {
   private static readonly COUNT_RELATIONS: CountRelationMap = {
     children: { table: 'Category', fk: 'parentId' },
     products: { table: 'ProductCategory', fk: 'categoryId' },
+    stores: { table: 'CategoryStore', fk: 'categoryId' },
   };
 
   async getCategories(
-    query: CategoryQueryDTO
+    query: CategoryQueryDTO,
+    locale: Locale
   ): Promise<PaginatedResponse<AdminCategoryListPrismaType>> {
     const { page, limit, filters, sort } = query;
 
-    const { where: baseWhere, orderBy, skip, take, countFilters } =
-      buildPrismaQuery({
-        page,
-        limit,
-        filters: filters as Record<string, FilterCondition> | undefined,
-        sort,
-        defaultSort: { field: 'createdAt', order: 'desc' },
-      });
+    const {
+      where: baseWhere,
+      orderBy,
+      skip,
+      take,
+      countFilters,
+    } = buildPrismaQuery({
+      page,
+      limit,
+      filters: filters as Record<string, FilterCondition> | undefined,
+      sort,
+      defaultSort: { field: 'createdAt', order: 'desc' },
+    });
 
     const where = (await resolveCountFilters(
       this.prisma,
@@ -80,7 +87,7 @@ export class CategoriesService {
           | Prisma.CategoryOrderByWithRelationInput[],
         skip,
         take,
-        include: AdminCategoryListPrismaQuery,
+        include: adminCategoryListPrismaQuery(locale),
       }),
       this.prisma.category.count({ where }),
     ]);
@@ -102,7 +109,9 @@ export class CategoriesService {
       | Prisma.CategoryOrderByWithRelationInput
       | Prisma.CategoryOrderByWithRelationInput[];
     batchSize: number;
+    locale: Locale;
   }): AsyncGenerator<AdminCategoryListPrismaType[]> {
+    const { locale } = opts;
     let cursor: string | undefined;
 
     while (true) {
@@ -111,7 +120,7 @@ export class CategoriesService {
         orderBy: opts.orderBy,
         take: opts.batchSize,
         ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
-        include: AdminCategoryListPrismaQuery,
+        include: adminCategoryListPrismaQuery(locale),
       });
 
       if (batch.length === 0) break;
@@ -235,14 +244,12 @@ export class CategoriesService {
   }): Promise<LookupItem[] | PaginatedResponse<LookupItem>> {
     const { q, ids, parentId, limit, page, lang } = opts;
 
-    // ids mode → resolve flat (reuse existing lookup)
     if (ids?.length) {
       return this.lookup({ q, ids, limit, page, lang });
     }
 
     const skip = (page - 1) * limit;
 
-    // parentId provided → fetch children of that parent (lazy load)
     if (parentId) {
       const where: Prisma.CategoryWhereInput = {
         parentId,
@@ -291,7 +298,6 @@ export class CategoriesService {
       };
     }
 
-    // Root level — parentId: null
     const where: Prisma.CategoryWhereInput = {
       parentId: null,
       isActive: true,
@@ -356,10 +362,13 @@ export class CategoriesService {
     };
   }
 
-  async getCategoryById(id: string): Promise<AdminCategoryDetailPrismaType> {
+  async getCategoryById(
+    id: string,
+    locale: Locale
+  ): Promise<AdminCategoryDetailPrismaType> {
     const category = await this.prisma.category.findUnique({
       where: { id },
-      include: AdminCategoryDetailPrismaQuery,
+      include: adminCategoryDetailPrismaQuery(locale),
     });
 
     if (!category) {
@@ -370,19 +379,18 @@ export class CategoriesService {
   }
 
   async saveCategory(
-    data: CategorySaveDTO
+    data: CategorySaveDTO,
+    locale: Locale
   ): Promise<AdminCategoryDetailPrismaType> {
     const { uniqueId, slug, parentId, isActive, translations, existingImages } =
       data;
 
     const cleanParentId = parentId && parentId !== '' ? parentId : null;
 
-    // Prevent self-reference
     if (cleanParentId && cleanParentId === uniqueId) {
       throw new ConflictException('backend.errors.category_self_parent');
     }
 
-    // Calculate depth from parent
     let depth = 0;
     if (cleanParentId) {
       const parent = await this.prisma.category.findUnique({
@@ -394,7 +402,6 @@ export class CategoriesService {
       }
     }
 
-    // Check slug uniqueness (exclude self)
     const slugConflict = await this.prisma.category.findFirst({
       where: { slug, id: { not: uniqueId } },
     });
@@ -405,7 +412,6 @@ export class CategoriesService {
     const existingImageIds = existingImages?.map((img) => img.id) ?? [];
 
     const category = await this.prisma.$transaction(async (tx) => {
-      // Delete images that are no longer in existingImages
       await tx.image.deleteMany({
         where: {
           categoryId: uniqueId,
@@ -415,7 +421,6 @@ export class CategoriesService {
         },
       });
 
-      // Update sortOrder for existing images
       for (const img of existingImages ?? []) {
         await tx.image.update({
           where: { id: img.id },
@@ -423,7 +428,6 @@ export class CategoriesService {
         });
       }
 
-      // Delete all existing translations and recreate
       await tx.categoryTranslation.deleteMany({
         where: { categoryId: uniqueId },
       });
@@ -436,7 +440,6 @@ export class CategoriesService {
         metaDescription: tr.metaDescription ?? null,
       }));
 
-      // Upsert the category
       return tx.category.upsert({
         where: { id: uniqueId },
         create: {
@@ -454,7 +457,7 @@ export class CategoriesService {
           isActive,
           translations: { create: translationData },
         },
-        include: AdminCategoryDetailPrismaQuery,
+        include: adminCategoryDetailPrismaQuery(locale),
       });
     });
 
@@ -491,7 +494,10 @@ export class CategoriesService {
     return result;
   }
 
-  async deleteCategoryImage(categoryId: string, imageId: string): Promise<void> {
+  async deleteCategoryImage(
+    categoryId: string,
+    imageId: string
+  ): Promise<void> {
     const image = await this.prisma.image.findFirst({
       where: { id: imageId, categoryId },
     });

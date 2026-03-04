@@ -3,6 +3,7 @@
 import { useAdminBrand, useSaveBrand } from '@/core/hooks/useAdminBrands';
 import { useImageUpload } from '@/core/hooks/useImageUpload';
 import { useTranslatedZodResolver } from '@/core/hooks/useTranslatedZodResolver';
+import { ApiError } from '@/core/lib/api/api-error';
 import {
   Alert,
   Button,
@@ -83,8 +84,8 @@ const AdminBrandFormPage = () => {
     setExistingFiles(initialExisting);
   }, [initialExisting]);
 
-  const { deletingIds, isUploading, deleteImage, uploadFiles } =
-    useImageUpload({
+  const { deletingIds, isUploading, deleteImage, uploadFiles } = useImageUpload(
+    {
       basePath: `/admin/brands/${brandId}/images`,
       onDeleteError: () => {
         notifications.show({
@@ -100,7 +101,8 @@ const AdminBrandFormPage = () => {
           message: t('loadErrorDescription'),
         });
       },
-    });
+    }
+  );
 
   const handleRemoveExisting = useCallback(
     async (file: RemoteFile) => {
@@ -109,7 +111,7 @@ const AdminBrandFormPage = () => {
         setExistingFiles((prev) => prev.filter((f) => f.id !== file.id));
       }
     },
-    [deleteImage],
+    [deleteImage]
   );
 
   const formattedData = useMemo<BrandInput>(() => {

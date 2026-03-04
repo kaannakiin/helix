@@ -5,6 +5,9 @@ model Warehouse {
   code String @unique // SAP Plant code / Netsis Depo Kodu
   slug String @unique
 
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
   status WarehouseStatus @default(ACTIVE)
 
   // Geolocation references (dropdown selection, not free text)
@@ -40,6 +43,7 @@ model Warehouse {
   movementGroupsFrom StockMovementGroup[] @relation("MovementGroupSourceWarehouse")
   movementGroupsTo   StockMovementGroup[] @relation("MovementGroupDestWarehouse")
 
+  @@index([storeId])
   @@index([code])
   @@index([slug])
   @@index([status])

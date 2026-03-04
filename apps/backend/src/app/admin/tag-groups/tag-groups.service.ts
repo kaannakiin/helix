@@ -7,9 +7,9 @@ import type { Locale, Prisma } from '@org/prisma/client';
 import type { LookupItem } from '@org/schemas/admin/common';
 import type { RecursiveBackendTagInput } from '@org/schemas/admin/tags';
 import {
-  AdminTagChildrenPrismaQuery,
-  AdminTagGroupDetailPrismaQuery,
-  AdminTagGroupListPrismaQuery,
+  adminTagChildrenPrismaQuery,
+  adminTagGroupDetailPrismaQuery,
+  adminTagGroupListPrismaQuery,
   type AdminTagChildrenPrismaType,
   type AdminTagGroupDetailPrismaType,
   type AdminTagGroupListPrismaType,
@@ -33,7 +33,8 @@ export class TagGroupsService {
   };
 
   async getTagGroups(
-    query: TagGroupQueryDTO
+    query: TagGroupQueryDTO,
+    locale: Locale
   ): Promise<PaginatedResponse<AdminTagGroupListPrismaType>> {
     const { page, limit, filters, sort } = query;
 
@@ -62,7 +63,7 @@ export class TagGroupsService {
           | Prisma.TagGroupOrderByWithRelationInput[],
         skip,
         take,
-        include: AdminTagGroupListPrismaQuery,
+        include: adminTagGroupListPrismaQuery(locale),
       }),
       this.prisma.tagGroup.count({ where }),
     ]);
@@ -84,7 +85,9 @@ export class TagGroupsService {
       | Prisma.TagGroupOrderByWithRelationInput
       | Prisma.TagGroupOrderByWithRelationInput[];
     batchSize: number;
+    locale: Locale;
   }): AsyncGenerator<AdminTagGroupListPrismaType[]> {
+    const { locale } = opts;
     let cursor: string | undefined;
 
     while (true) {
@@ -93,7 +96,7 @@ export class TagGroupsService {
         orderBy: opts.orderBy,
         take: opts.batchSize,
         ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
-        include: AdminTagGroupListPrismaQuery,
+        include: adminTagGroupListPrismaQuery(locale),
       });
 
       if (batch.length === 0) break;
@@ -329,6 +332,7 @@ export class TagGroupsService {
 
   async getTagChildren(
     tagGroupId: string,
+    locale: Locale,
     parentTagId?: string
   ): Promise<AdminTagChildrenPrismaType[]> {
     return this.prisma.tag.findMany({
@@ -337,14 +341,14 @@ export class TagGroupsService {
         parentTagId: parentTagId ?? null,
       },
       orderBy: { sortOrder: 'asc' },
-      include: AdminTagChildrenPrismaQuery,
+      include: adminTagChildrenPrismaQuery(locale),
     });
   }
 
-  async getTagGroupById(id: string): Promise<AdminTagGroupDetailPrismaType> {
+  async getTagGroupById(id: string, locale: Locale): Promise<AdminTagGroupDetailPrismaType> {
     const tagGroup = await this.prisma.tagGroup.findUnique({
       where: { id },
-      include: AdminTagGroupDetailPrismaQuery,
+      include: adminTagGroupDetailPrismaQuery(locale),
     });
 
     if (!tagGroup) {
@@ -355,7 +359,8 @@ export class TagGroupsService {
   }
 
   async saveTagGroup(
-    data: TagGroupSaveDTO
+    data: TagGroupSaveDTO,
+    locale: Locale
   ): Promise<AdminTagGroupDetailPrismaType> {
     const { id, slug, isActive, sortOrder, translations, tags } = data;
 
@@ -396,7 +401,7 @@ export class TagGroupsService {
             })),
           },
         },
-        include: AdminTagGroupDetailPrismaQuery,
+        include: adminTagGroupDetailPrismaQuery(locale),
       });
 
       if (tags && tags.length > 0) {
@@ -450,7 +455,8 @@ export class TagGroupsService {
 
   async saveTag(
     tagGroupId: string,
-    data: TagSaveDTO
+    data: TagSaveDTO,
+    locale: Locale
   ): Promise<AdminTagChildrenPrismaType> {
     const {
       id,
@@ -539,7 +545,7 @@ export class TagGroupsService {
             })),
           },
         },
-        include: AdminTagChildrenPrismaQuery,
+        include: adminTagChildrenPrismaQuery(locale),
       });
 
       return tag;

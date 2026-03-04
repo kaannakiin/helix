@@ -19,8 +19,9 @@ import { UserRole } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import type { Response } from 'express';
 import { I18nContext } from 'nestjs-i18n';
-import { Roles } from '../../../core/decorators';
+import { ContentLocale, Roles } from '../../../core/decorators/index.js';
 import { LocaleDecorator } from '../../../core/decorators/locale.decorator';
+import { ContentLocaleInterceptor } from '../../../core/interceptors/content-locale.interceptor.js';
 import { FileValidationPipe } from '../../../core/pipes/file-validation.pipe';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
@@ -33,9 +34,11 @@ import {
   BrandSaveDTO,
 } from './dto';
 
+
 @ApiTags('Admin - Brands')
 @Controller('admin/brands')
 @Roles(UserRole.ADMIN, UserRole.MODERATOR)
+@UseInterceptors(ContentLocaleInterceptor)
 export class BrandsController {
   constructor(
     private readonly brandsService: BrandsService,
@@ -44,14 +47,14 @@ export class BrandsController {
 
   @Post('query')
   @ApiOperation({ summary: 'Get paginated list of brands' })
-  async getBrands(@Body() query: BrandQueryDTO) {
-    return this.brandsService.getBrands(query);
+  async getBrands(@Body() query: BrandQueryDTO, @ContentLocale() locale: Locale) {
+    return this.brandsService.getBrands(query, locale);
   }
 
   @Post('save')
   @ApiOperation({ summary: 'Create or update a brand' })
-  async saveBrand(@Body() body: BrandSaveDTO) {
-    return this.brandsService.saveBrand(body);
+  async saveBrand(@Body() body: BrandSaveDTO, @ContentLocale() locale: Locale) {
+    return this.brandsService.saveBrand(body, locale);
   }
 
   @Get('lookup')
@@ -164,7 +167,7 @@ export class BrandsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get brand by ID' })
   @ApiParam({ name: 'id', description: 'Brand ID' })
-  async getBrandById(@Param('id') id: string) {
-    return this.brandsService.getBrandById(id);
+  async getBrandById(@Param('id') id: string, @ContentLocale() locale: Locale) {
+    return this.brandsService.getBrandById(id, locale);
   }
 }

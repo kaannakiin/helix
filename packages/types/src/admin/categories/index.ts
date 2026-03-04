@@ -1,4 +1,4 @@
-import type { Prisma } from '@org/prisma/browser';
+import type { Locale, Prisma } from '@org/prisma/browser';
 import type { FieldFilterConfig } from '../../data-query/index.js';
 
 export const ADMIN_CATEGORIES_FIELD_CONFIG = {
@@ -9,6 +9,7 @@ export const ADMIN_CATEGORIES_FIELD_CONFIG = {
   updatedAt: { filterType: 'date' },
   '_count.children': { filterType: 'number' },
   '_count.products': { filterType: 'number' },
+  '_count.stores': { filterType: 'number' },
 } as const satisfies Record<string, FieldFilterConfig>;
 
 export type AdminCategoriesFilterableField =
@@ -23,29 +24,33 @@ export const ADMIN_CATEGORIES_SORT_FIELDS = [
   'updatedAt',
   '_count.children',
   '_count.products',
+  '_count.stores',
 ] as const;
 
 export type AdminCategoriesSortField =
   (typeof ADMIN_CATEGORIES_SORT_FIELDS)[number];
 
-export const AdminCategoryListPrismaQuery = {
-  translations: true,
-  images: { where: { isPrimary: true }, take: 1 },
-  parent: { include: { translations: true } },
-  _count: { select: { children: true, products: true } },
-} as const satisfies Prisma.CategoryInclude;
+export const adminCategoryListPrismaQuery = (locale: Locale) =>
+  ({
+    translations: { where: { locale } },
+    images: { where: { isPrimary: true }, take: 1 },
+    parent: { include: { translations: { where: { locale } } } },
+    _count: { select: { children: true, products: true, stores: true } },
+  }) satisfies Prisma.CategoryInclude;
 
 export type AdminCategoryListPrismaType = Prisma.CategoryGetPayload<{
-  include: typeof AdminCategoryListPrismaQuery;
+  include: ReturnType<typeof adminCategoryListPrismaQuery>;
 }>;
 
-export const AdminCategoryDetailPrismaQuery = {
-  translations: true,
-  images: { orderBy: { sortOrder: 'asc' as const } },
-  parent: { include: { translations: true } },
-  _count: { select: { children: true, products: true } },
-} as const satisfies Prisma.CategoryInclude;
+export const adminCategoryDetailPrismaQuery = (locale: Locale) =>
+  ({
+    translations: { where: { locale } },
+    images: { orderBy: { sortOrder: 'asc' as const } },
+    parent: { include: { translations: { where: { locale } } } },
+    stores: true,
+    _count: { select: { children: true, products: true, stores: true } },
+  }) satisfies Prisma.CategoryInclude;
 
 export type AdminCategoryDetailPrismaType = Prisma.CategoryGetPayload<{
-  include: typeof AdminCategoryDetailPrismaQuery;
+  include: ReturnType<typeof adminCategoryDetailPrismaQuery>;
 }>;

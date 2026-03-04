@@ -7,8 +7,8 @@ import {
 import type { Locale, Prisma } from '@org/prisma/client';
 import type { LookupItem } from '@org/schemas/admin/common';
 import {
-  AdminBrandDetailPrismaQuery,
-  AdminBrandListPrismaQuery,
+  adminBrandDetailPrismaQuery,
+  adminBrandListPrismaQuery,
   type AdminBrandDetailPrismaType,
   type AdminBrandListPrismaType,
 } from '@org/types/admin/brands';
@@ -35,7 +35,8 @@ export class BrandsService {
   };
 
   async getBrands(
-    query: BrandQueryDTO
+    query: BrandQueryDTO,
+    locale: Locale
   ): Promise<PaginatedResponse<AdminBrandListPrismaType>> {
     const { page, limit, filters, sort } = query;
 
@@ -64,7 +65,7 @@ export class BrandsService {
           | Prisma.BrandOrderByWithRelationInput[],
         skip,
         take,
-        include: AdminBrandListPrismaQuery,
+        include: adminBrandListPrismaQuery(locale),
       }),
       this.prisma.brand.count({ where }),
     ]);
@@ -86,7 +87,9 @@ export class BrandsService {
       | Prisma.BrandOrderByWithRelationInput
       | Prisma.BrandOrderByWithRelationInput[];
     batchSize: number;
+    locale: Locale;
   }): AsyncGenerator<AdminBrandListPrismaType[]> {
+    const { locale } = opts;
     let cursor: string | undefined;
 
     while (true) {
@@ -95,7 +98,7 @@ export class BrandsService {
         orderBy: opts.orderBy,
         take: opts.batchSize,
         ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
-        include: AdminBrandListPrismaQuery,
+        include: adminBrandListPrismaQuery(locale),
       });
 
       if (batch.length === 0) break;
@@ -181,10 +184,10 @@ export class BrandsService {
     };
   }
 
-  async getBrandById(id: string): Promise<AdminBrandDetailPrismaType> {
+  async getBrandById(id: string, locale: Locale): Promise<AdminBrandDetailPrismaType> {
     const brand = await this.prisma.brand.findUnique({
       where: { id },
-      include: AdminBrandDetailPrismaQuery,
+      include: adminBrandDetailPrismaQuery(locale),
     });
 
     if (!brand) {
@@ -194,7 +197,7 @@ export class BrandsService {
     return brand;
   }
 
-  async saveBrand(data: BrandSaveDTO): Promise<AdminBrandDetailPrismaType> {
+  async saveBrand(data: BrandSaveDTO, locale: Locale): Promise<AdminBrandDetailPrismaType> {
     const { id, slug, websiteUrl, isActive, sortOrder, translations, existingImages } = data;
 
     const slugConflict = await this.prisma.brand.findFirst({
@@ -253,7 +256,7 @@ export class BrandsService {
           sortOrder,
           translations: { create: translationData },
         },
-        include: AdminBrandDetailPrismaQuery,
+        include: adminBrandDetailPrismaQuery(locale),
       });
     });
 

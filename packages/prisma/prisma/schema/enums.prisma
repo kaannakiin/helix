@@ -241,3 +241,29 @@ enum EvaluationTrigger {
   SCHEDULED
   MANUAL
 }
+
+// ─── Store ────────────────────────────────────────────────────────────────────
+
+enum BusinessModel {
+  B2C
+  B2B
+}
+
+enum StoreStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+// ─── Account ──────────────────────────────────────────────────────────────────
+
+enum AccountType {
+  PERSONAL
+  BUSINESS
+}
+
+enum OrgMemberRole {
+  OWNER
+  MANAGER
+  MEMBER
+}

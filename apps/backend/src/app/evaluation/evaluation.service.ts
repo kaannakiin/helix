@@ -1,11 +1,11 @@
 import { InjectQueue } from '@nestjs/bullmq';
 import {
   BadRequestException,
+  Inject,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import type { Prisma } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import type {
@@ -16,9 +16,10 @@ import type {
 } from '@org/types/evaluation';
 import type { RuleTargetEntity } from '@org/types/rule-engine';
 import { Queue } from 'bullmq';
-import Redis from 'ioredis';
-import { buildPrismaQuery } from '../../core/utils/prisma-query-builder';
-import { PrismaService } from '../prisma/prisma.service';
+import type Redis from 'ioredis';
+import { REDIS_CLIENT } from '../redis/redis.constants.js';
+import { buildPrismaQuery } from '../../core/utils/prisma-query-builder.js';
+import { PrismaService } from '../prisma/prisma.service.js';
 
 export const EVALUATION_QUEUE = 'evaluation';
 export const EVALUATION_EVENTS_CHANNEL = 'evaluation:events';
@@ -32,9 +33,9 @@ export class EvaluationService {
   constructor(
     @InjectQueue(EVALUATION_QUEUE) private readonly evaluationQueue: Queue,
     private readonly prisma: PrismaService,
-    private readonly config: ConfigService
+    @Inject(REDIS_CLIENT) publisher: Redis
   ) {
-    this.publisher = new Redis(this.config.getOrThrow<string>('REDIS_URL'));
+    this.publisher = publisher;
   }
 
   async createAndEnqueue(params: {

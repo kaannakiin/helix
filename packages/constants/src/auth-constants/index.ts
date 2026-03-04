@@ -19,3 +19,5 @@ export const INSTAGRAM_STRATEGY = 'instagram';
 export const IS_PUBLIC_KEY = 'isPublic';
 export const ROLES_KEY = 'roles';
 export const LOCALE_HEADER_NAME = 'x-lang';
+export const ACTIVE_STORE_COOKIE = 'x-store-id';
+export const STORE_ID_HEADER = 'x-store-id';

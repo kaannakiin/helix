@@ -8,10 +8,10 @@ import { type FileType } from '@org/prisma/client';
 
 export interface FileValidationOptions {
   allowedTypes: FileType[];
-  maxSize?: number; // bytes, default 5MB
+  maxSize?: number;
 }
 
-const DEFAULT_MAX_SIZE = 5 * 1024 * 1024; // 5MB
+const DEFAULT_MAX_SIZE = 5 * 1024 * 1024;
 
 function matchesMimePattern(mime: string, patterns: string[]): boolean {
   return patterns.some((p) => {

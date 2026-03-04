@@ -6,6 +6,7 @@ import { BrandsModule } from './brands/brands.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CustomersModule } from './customers/customers.module';
 import { ProductsModule } from './products/products.module';
+import { StoresModule } from './stores/stores.module.js';
 import { TagGroupsModule } from './tag-groups/tag-groups.module';
 import { TaxonomyModule } from './taxonomy/taxonomy.module';
 import { PriceListsModule } from './price-lists/price-lists.module';
@@ -24,6 +25,7 @@ import { CustomerGroupsModule } from './customer-groups/customer-groups.module';
     VariantGroupsModule,
     PriceListsModule,
     CustomerGroupsModule,
+    StoresModule,
   ],
   controllers: [AdminController],
   providers: [AdminService],

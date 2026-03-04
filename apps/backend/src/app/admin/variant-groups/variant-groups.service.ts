@@ -1,21 +1,20 @@
 import {
-  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { Locale, type Prisma } from '@org/prisma/client';
-import { slugify } from '@org/utils/slugify';
+import type { LookupItem } from '@org/schemas/admin/common';
+import type { ImageOwnerType } from '@org/types/admin/upload';
 import {
-  AdminVariantGroupDetailPrismaQuery,
-  AdminVariantGroupListPrismaQuery,
+  adminVariantGroupDetailPrismaQuery,
+  adminVariantGroupListPrismaQuery,
   type AdminVariantGroupDetailPrismaType,
   type AdminVariantGroupListPrismaType,
 } from '@org/types/admin/variants';
-import type { ImageOwnerType } from '@org/types/admin/upload';
 import type { FilterCondition } from '@org/types/data-query';
 import type { PaginatedResponse } from '@org/types/pagination';
-import type { LookupItem } from '@org/schemas/admin/common';
+import { slugify } from '@org/utils/slugify';
 import {
   buildPrismaQuery,
   resolveCountFilters,
@@ -29,7 +28,7 @@ import type { VariantGroupQueryDTO, VariantGroupSaveDTO } from './dto';
 export class VariantGroupsService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly uploadService: UploadService,
+    private readonly uploadService: UploadService
   ) {}
 
   private static readonly COUNT_RELATIONS: CountRelationMap = {
@@ -38,18 +37,24 @@ export class VariantGroupsService {
   };
 
   async getVariantGroups(
-    query: VariantGroupQueryDTO
+    query: VariantGroupQueryDTO,
+    locale: Locale
   ): Promise<PaginatedResponse<AdminVariantGroupListPrismaType>> {
     const { page, limit, filters, sort } = query;
 
-    const { where: baseWhere, orderBy, skip, take, countFilters } =
-      buildPrismaQuery({
-        page,
-        limit,
-        filters: filters as Record<string, FilterCondition> | undefined,
-        sort,
-        defaultSort: { field: 'createdAt', order: 'desc' },
-      });
+    const {
+      where: baseWhere,
+      orderBy,
+      skip,
+      take,
+      countFilters,
+    } = buildPrismaQuery({
+      page,
+      limit,
+      filters: filters as Record<string, FilterCondition> | undefined,
+      sort,
+      defaultSort: { field: 'createdAt', order: 'desc' },
+    });
 
     const where = (await resolveCountFilters(
       this.prisma,
@@ -67,7 +72,7 @@ export class VariantGroupsService {
           | Prisma.VariantGroupOrderByWithRelationInput[],
         skip,
         take,
-        include: AdminVariantGroupListPrismaQuery,
+        include: adminVariantGroupListPrismaQuery(locale),
       }),
       this.prisma.variantGroup.count({ where }),
     ]);
@@ -89,7 +94,9 @@ export class VariantGroupsService {
       | Prisma.VariantGroupOrderByWithRelationInput
       | Prisma.VariantGroupOrderByWithRelationInput[];
     batchSize: number;
+    locale: Locale;
   }): AsyncGenerator<AdminVariantGroupListPrismaType[]> {
+    const { locale } = opts;
     let cursor: string | undefined;
 
     while (true) {
@@ -98,7 +105,7 @@ export class VariantGroupsService {
         orderBy: opts.orderBy,
         take: opts.batchSize,
         ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
-        include: AdminVariantGroupListPrismaQuery,
+        include: adminVariantGroupListPrismaQuery(locale),
       });
 
       if (batch.length === 0) break;
@@ -140,7 +147,9 @@ export class VariantGroupsService {
         label: g.translations[0]?.name ?? g.id,
         extra: {
           type: g.type,
-          optionLabels: g.options.map((o) => o.translations[0]?.name ?? '').filter(Boolean),
+          optionLabels: g.options
+            .map((o) => o.translations[0]?.name ?? '')
+            .filter(Boolean),
         },
       }));
     }
@@ -174,7 +183,9 @@ export class VariantGroupsService {
       label: g.translations[0]?.name ?? g.id,
       extra: {
         type: g.type,
-        optionLabels: g.options.map((o) => o.translations[0]?.name ?? '').filter(Boolean),
+        optionLabels: g.options
+          .map((o) => o.translations[0]?.name ?? '')
+          .filter(Boolean),
       },
     }));
   }
@@ -182,7 +193,11 @@ export class VariantGroupsService {
   async checkNameExists(opts: {
     name: string;
     excludeIds?: string[];
-  }): Promise<{ exists: boolean; matchedGroupId?: string; matchedLocale?: string }> {
+  }): Promise<{
+    exists: boolean;
+    matchedGroupId?: string;
+    matchedLocale?: string;
+  }> {
     const { name, excludeIds } = opts;
 
     const slugs = Object.values(Locale).map((locale) =>
@@ -213,10 +228,13 @@ export class VariantGroupsService {
     };
   }
 
-  async getVariantGroupById(id: string): Promise<AdminVariantGroupDetailPrismaType> {
+  async getVariantGroupById(
+    id: string,
+    locale: Locale
+  ): Promise<AdminVariantGroupDetailPrismaType> {
     const variantGroup = await this.prisma.variantGroup.findUnique({
       where: { id },
-      include: AdminVariantGroupDetailPrismaQuery,
+      include: adminVariantGroupDetailPrismaQuery(locale),
     });
 
     if (!variantGroup) {
@@ -228,20 +246,20 @@ export class VariantGroupsService {
 
   async saveVariantGroup(
     data: VariantGroupSaveDTO,
+    locale: Locale
   ): Promise<AdminVariantGroupDetailPrismaType> {
     const { uniqueId, type, sortOrder, translations, options } = data;
     const id = uniqueId;
     const incomingOptionIds = options.map((o) => o.uniqueId);
 
     return this.prisma.$transaction(async (tx) => {
-      // Check if any removed options are referenced by products
       const existingOptions = await tx.variantOption.findMany({
         where: { variantGroupId: id },
         select: { id: true },
       });
       const existingOptionIds = existingOptions.map((o) => o.id);
       const removedOptionIds = existingOptionIds.filter(
-        (eid) => !incomingOptionIds.includes(eid),
+        (eid) => !incomingOptionIds.includes(eid)
       );
 
       if (removedOptionIds.length > 0) {
@@ -249,42 +267,32 @@ export class VariantGroupsService {
           where: { variantOptionId: { in: removedOptionIds } },
         });
         if (referencedCount > 0) {
-          throw new ConflictException(
-            'backend.errors.variant_option_in_use',
-          );
+          throw new ConflictException('backend.errors.variant_option_in_use');
         }
       }
 
-      // Delete removed options (cascade: translations, images)
       if (removedOptionIds.length > 0) {
         await tx.variantOption.deleteMany({
           where: { id: { in: removedOptionIds } },
         });
       }
 
-      // Delete and recreate group translations
       await tx.variantGroupTranslation.deleteMany({
         where: { variantGroupId: id },
       });
 
-      // Process each option
       for (const option of options) {
         const optionId = option.uniqueId;
 
-        // Delete option translations (will recreate)
         await tx.variantOptionTranslation.deleteMany({
           where: { variantOptionId: optionId },
         });
 
-        // Handle existing images
-        const keepImageIds =
-          option.existingImages?.map((img) => img.id) ?? [];
+        const keepImageIds = option.existingImages?.map((img) => img.id) ?? [];
         await tx.image.deleteMany({
           where: {
             variantOptionId: optionId,
-            ...(keepImageIds.length > 0
-              ? { id: { notIn: keepImageIds } }
-              : {}),
+            ...(keepImageIds.length > 0 ? { id: { notIn: keepImageIds } } : {}),
           },
         });
 
@@ -295,7 +303,6 @@ export class VariantGroupsService {
           });
         }
 
-        // Upsert option
         await tx.variantOption.upsert({
           where: { id: optionId },
           create: {
@@ -325,7 +332,6 @@ export class VariantGroupsService {
         });
       }
 
-      // Upsert the variant group
       return tx.variantGroup.upsert({
         where: { id },
         create: {
@@ -351,7 +357,7 @@ export class VariantGroupsService {
             })),
           },
         },
-        include: AdminVariantGroupDetailPrismaQuery,
+        include: adminVariantGroupDetailPrismaQuery(locale),
       });
     });
   }
@@ -363,7 +369,6 @@ export class VariantGroupsService {
   }) {
     const { optionId, ownerType, file } = opts;
 
-    // Verify entity exists
     if (ownerType === 'variantOption') {
       const option = await this.prisma.variantOption.findUnique({
         where: { id: optionId },
@@ -379,18 +384,16 @@ export class VariantGroupsService {
       });
       if (!pvgOption) {
         throw new NotFoundException(
-          'backend.errors.product_variant_group_option_not_found',
+          'backend.errors.product_variant_group_option_not_found'
         );
       }
     }
 
-    // Single image rule: delete existing image before uploading new one
     await this.uploadService.deleteImagesByOwner(
       ownerType as ImageOwnerType,
-      optionId,
+      optionId
     );
 
-    // Upload new image
     const result = await this.uploadService.uploadFile(file, {
       ownerType,
       ownerId: optionId,

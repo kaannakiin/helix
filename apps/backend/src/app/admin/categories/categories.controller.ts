@@ -14,12 +14,13 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import type { Prisma } from '@org/prisma/client';
+import type { Locale as LocaleType, Prisma } from '@org/prisma/client';
 import { UserRole } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import type { Response } from 'express';
 import { I18nContext } from 'nestjs-i18n';
-import { Locale, Roles } from '../../../core/decorators';
+import { ContentLocale, Locale, Roles } from '../../../core/decorators';
+import { ContentLocaleInterceptor } from '../../../core/interceptors/content-locale.interceptor.js';
 import { FileValidationPipe } from '../../../core/pipes/file-validation.pipe';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
@@ -35,6 +36,7 @@ import {
 @ApiTags('Admin - Categories')
 @Controller('admin/categories')
 @Roles(UserRole.ADMIN, UserRole.MODERATOR)
+@UseInterceptors(ContentLocaleInterceptor)
 export class CategoriesController {
   constructor(
     private readonly categoriesService: CategoriesService,
@@ -43,8 +45,8 @@ export class CategoriesController {
 
   @Post('query')
   @ApiOperation({ summary: 'Get paginated list of categories' })
-  async getCategories(@Body() query: CategoryQueryDTO) {
-    return this.categoriesService.getCategories(query);
+  async getCategories(@Body() query: CategoryQueryDTO, @ContentLocale() locale: LocaleType) {
+    return this.categoriesService.getCategories(query, locale);
   }
 
   @Get('lookup')
@@ -114,6 +116,7 @@ export class CategoriesController {
               | Prisma.CategoryOrderByWithRelationInput
               | Prisma.CategoryOrderByWithRelationInput[],
             batchSize,
+            locale: lang.toUpperCase() as LocaleType,
           }),
       },
       {
@@ -145,8 +148,8 @@ export class CategoriesController {
 
   @Post('save')
   @ApiOperation({ summary: 'Create or update a category (upsert by uniqueId)' })
-  async saveCategory(@Body() body: CategorySaveDTO) {
-    return this.categoriesService.saveCategory(body);
+  async saveCategory(@Body() body: CategorySaveDTO, @ContentLocale() locale: LocaleType) {
+    return this.categoriesService.saveCategory(body, locale);
   }
 
   @Post(':id/images')
@@ -181,7 +184,7 @@ export class CategoriesController {
   @Get(':id')
   @ApiOperation({ summary: 'Get category by ID' })
   @ApiParam({ name: 'id', description: 'Category ID' })
-  async getCategoryById(@Param('id') id: string) {
-    return this.categoriesService.getCategoryById(id);
+  async getCategoryById(@Param('id') id: string, @ContentLocale() locale: LocaleType) {
+    return this.categoriesService.getCategoryById(id, locale);
   }
 }

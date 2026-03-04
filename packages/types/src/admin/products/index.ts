@@ -1,4 +1,4 @@
-import type { Prisma } from '@org/prisma/browser';
+import type { Locale, Prisma } from '@org/prisma/browser';
 import type { FieldFilterConfig } from '../../data-query/index.js';
 
 export const ADMIN_PRODUCTS_FIELD_CONFIG = {
@@ -28,61 +28,63 @@ export const ADMIN_PRODUCTS_SORT_FIELDS = [
 export type AdminProductsSortField =
   (typeof ADMIN_PRODUCTS_SORT_FIELDS)[number];
 
-export const AdminProductListPrismaQuery = {
-  translations: true,
-  images: { where: { isPrimary: true }, take: 1 },
-  brand: { include: { translations: true } },
-  _count: { select: { variants: true, categories: true, tags: true } },
-} as const satisfies Prisma.ProductInclude;
+export const adminProductListPrismaQuery = (locale: Locale) =>
+  ({
+    translations: { where: { locale } },
+    images: { where: { isPrimary: true }, take: 1 },
+    brand: { include: { translations: { where: { locale } } } },
+    _count: { select: { variants: true, categories: true, tags: true } },
+  }) satisfies Prisma.ProductInclude;
 
 export type AdminProductListPrismaType = Prisma.ProductGetPayload<{
-  include: typeof AdminProductListPrismaQuery;
+  include: ReturnType<typeof adminProductListPrismaQuery>;
 }>;
 
-export const AdminProductDetailPrismaQuery = {
-  translations: true,
-  images: { orderBy: { sortOrder: 'asc' as const } },
-  brand: { include: { translations: true } },
-  variantGroups: {
-    include: {
-      variantGroup: {
-        include: {
-          translations: true,
-          options: {
-            include: {
-              translations: true,
-              images: { orderBy: { sortOrder: 'asc' as const } },
+export const adminProductDetailPrismaQuery = (locale: Locale) =>
+  ({
+    translations: { where: { locale } },
+    images: { orderBy: { sortOrder: 'asc' as const } },
+    brand: { include: { translations: { where: { locale } } } },
+    variantGroups: {
+      include: {
+        variantGroup: {
+          include: {
+            translations: { where: { locale } },
+            options: {
+              include: {
+                translations: { where: { locale } },
+                images: { orderBy: { sortOrder: 'asc' as const } },
+              },
+              orderBy: { sortOrder: 'asc' as const },
             },
-            orderBy: { sortOrder: 'asc' as const },
           },
         },
-      },
-      options: {
-        include: {
-          images: { orderBy: { sortOrder: 'asc' as const } },
+        options: {
+          include: {
+            images: { orderBy: { sortOrder: 'asc' as const } },
+          },
+          orderBy: { sortOrder: 'asc' as const },
         },
-        orderBy: { sortOrder: 'asc' as const },
       },
+      orderBy: { sortOrder: 'asc' as const },
     },
-    orderBy: { sortOrder: 'asc' as const },
-  },
-  variants: {
-    include: {
-      optionValues: {
-        include: { variantOption: { include: { translations: true } } },
+    variants: {
+      include: {
+        optionValues: {
+          include: { variantOption: { include: { translations: { where: { locale } } } } },
+        },
+        images: true,
       },
-      images: true,
+      orderBy: { sortOrder: 'asc' as const },
     },
-    orderBy: { sortOrder: 'asc' as const },
-  },
-  categories: {
-    include: { category: { include: { translations: true } } },
-  },
-  tags: {
-    include: { tag: { include: { translations: true } } },
-  },
-} as const satisfies Prisma.ProductInclude;
+    categories: {
+      include: { category: { include: { translations: { where: { locale } } } } },
+    },
+    tags: {
+      include: { tag: { include: { translations: { where: { locale } } } } },
+    },
+  }) satisfies Prisma.ProductInclude;
 
 export type AdminProductDetailPrismaType = Prisma.ProductGetPayload<{
-  include: typeof AdminProductDetailPrismaQuery;
+  include: ReturnType<typeof adminProductDetailPrismaQuery>;
 }>;

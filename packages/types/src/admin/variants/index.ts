@@ -1,4 +1,4 @@
-import type { Prisma } from '@org/prisma/browser';
+import type { Locale, Prisma } from '@org/prisma/browser';
 import type { FieldFilterConfig } from '../../data-query/index.js';
 
 export const ADMIN_VARIANT_GROUPS_FIELD_CONFIG = {
@@ -22,27 +22,29 @@ export const ADMIN_VARIANT_GROUPS_SORT_FIELDS = [
 export type AdminVariantGroupsSortField =
   (typeof ADMIN_VARIANT_GROUPS_SORT_FIELDS)[number];
 
-export const AdminVariantGroupListPrismaQuery = {
-  translations: true,
-  _count: { select: { options: true, products: true } },
-} as const satisfies Prisma.VariantGroupInclude;
+export const adminVariantGroupListPrismaQuery = (locale: Locale) =>
+  ({
+    translations: { where: { locale } },
+    _count: { select: { options: true, products: true } },
+  }) satisfies Prisma.VariantGroupInclude;
 
 export type AdminVariantGroupListPrismaType = Prisma.VariantGroupGetPayload<{
-  include: typeof AdminVariantGroupListPrismaQuery;
+  include: ReturnType<typeof adminVariantGroupListPrismaQuery>;
 }>;
 
-export const AdminVariantGroupDetailPrismaQuery = {
-  translations: true,
-  options: {
-    include: {
-      translations: true,
-      images: { orderBy: { sortOrder: 'asc' as const } },
+export const adminVariantGroupDetailPrismaQuery = (locale: Locale) =>
+  ({
+    translations: { where: { locale } },
+    options: {
+      include: {
+        translations: { where: { locale } },
+        images: { orderBy: { sortOrder: 'asc' as const } },
+      },
+      orderBy: { sortOrder: 'asc' as const },
     },
-    orderBy: { sortOrder: 'asc' as const },
-  },
-  _count: { select: { products: true } },
-} as const satisfies Prisma.VariantGroupInclude;
+    _count: { select: { products: true } },
+  }) satisfies Prisma.VariantGroupInclude;
 
 export type AdminVariantGroupDetailPrismaType = Prisma.VariantGroupGetPayload<{
-  include: typeof AdminVariantGroupDetailPrismaQuery;
+  include: ReturnType<typeof adminVariantGroupDetailPrismaQuery>;
 }>;

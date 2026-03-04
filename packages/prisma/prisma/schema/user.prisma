@@ -14,8 +14,9 @@ model User {
 
   avatar String?
 
-  role   UserRole      @default(USER)
-  status AccountStatus @default(ACTIVE)
+  role        UserRole      @default(USER)
+  status      AccountStatus @default(ACTIVE)
+  accountType AccountType   @default(PERSONAL)
 
   twoFactorEnabled Boolean @default(false)
   twoFactorSecret  String?
@@ -34,6 +35,8 @@ model User {
   oauthAccounts            OAuthAccount[]
   stockMovements           StockMovementGroup[]
   customerGroupMemberships CustomerGroupMember[]
+  storeMembers             StoreMember[]
+  organizationMemberships  OrganizationMember[]
 
   @@index([email])
   @@index([phone])

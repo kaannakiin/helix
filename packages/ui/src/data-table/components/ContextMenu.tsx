@@ -1,7 +1,11 @@
 'use client';
 
 import { Menu, Portal } from '@mantine/core';
-import { useClickOutside } from '@mantine/hooks';
+import {
+  useClickOutside,
+  useEventListener,
+  useViewportSize,
+} from '@mantine/hooks';
 import {
   AlignLeft,
   Braces,
@@ -54,24 +58,33 @@ export function ContextMenu<TData>({
   const clickOutsideRef = useClickOutside(onClose);
   const menuRef = useRef<HTMLDivElement>(null);
   const [adjustedPosition, setAdjustedPosition] = useState(state.position);
+  const [visible, setVisible] = useState(false);
+  const { width: vw, height: vh } = useViewportSize();
+
+  useEventListener('resize', onClose);
 
   useEffect(() => {
     if (!state.isOpen) {
+      setVisible(false);
       setAdjustedPosition(state.position);
       return;
     }
+
+    setVisible(false);
 
     const rafId = requestAnimationFrame(() => {
       const menuEl = menuRef.current;
       if (!menuEl) {
         setAdjustedPosition(state.position);
+        setVisible(true);
         return;
       }
 
-      const rect = menuEl.getBoundingClientRect();
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-
+      const dropdown =
+        menuEl.querySelector('.mantine-Menu-dropdown') ??
+        menuEl.firstElementChild ??
+        menuEl;
+      const rect = dropdown.getBoundingClientRect();
       let x = state.position.x;
       let y = state.position.y;
 
@@ -83,12 +96,11 @@ export function ContextMenu<TData>({
       }
 
       setAdjustedPosition({ x, y });
+      setVisible(true);
     });
 
     return () => cancelAnimationFrame(rafId);
-  }, [state.isOpen, state.position]);
-
-  if (!state.isOpen) return null;
+  }, [state.isOpen, state.position, vw, vh]);
 
   const params: ContextMenuParams<TData> = {
     row: state.row,
@@ -249,15 +261,14 @@ export function ContextMenu<TData>({
     items.push(...renderCustomItems(config.customItems, params, onClose));
   }
 
-  if (items.length === 0) return null;
+  const isEmpty = items.length === 0;
 
   return (
     <Portal>
       <div
         ref={(el) => {
-          (
-            clickOutsideRef as React.MutableRefObject<HTMLDivElement | null>
-          ).current = el;
+          (clickOutsideRef as React.RefObject<HTMLDivElement | null>).current =
+            el;
           menuRef.current = el;
         }}
         style={{
@@ -265,6 +276,8 @@ export function ContextMenu<TData>({
           left: adjustedPosition.x,
           top: adjustedPosition.y,
           zIndex: 9999,
+          visibility: visible && !isEmpty ? 'visible' : 'hidden',
+          pointerEvents: visible && !isEmpty ? 'auto' : 'none',
         }}
       >
         <Menu opened={true} onClose={onClose} withinPortal={false}>

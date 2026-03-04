@@ -7,6 +7,9 @@ model CustomerGroup {
   color       String?
   type        CustomerGroupType @default(RULE_BASED)
 
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
   ruleTreeId String?
   ruleTree   RuleTree? @relation(fields: [ruleTreeId], references: [id], onDelete: Cascade)
 
@@ -20,6 +23,7 @@ model CustomerGroup {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([storeId])
   @@index([type])
   @@index([ruleTreeId])
   @@index([isActive])
@@ -30,11 +34,20 @@ model CustomerGroupMember {
   id              String        @id @default(cuid())
   customerGroupId String
   customerGroup   CustomerGroup @relation(fields: [customerGroupId], references: [id], onDelete: Cascade)
-  userId          String
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  addedAt         DateTime      @default(now())
+
+  // B2C: userId dolu, organizationId null
+  // B2B: organizationId dolu, userId null veya dolu (org adına bireysel üye)
+  userId         String?
+  user           User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  addedAt DateTime @default(now())
 
   @@unique([customerGroupId, userId])
+  @@unique([customerGroupId, organizationId])
   @@index([customerGroupId])
   @@index([userId])
+  @@index([organizationId])
 }

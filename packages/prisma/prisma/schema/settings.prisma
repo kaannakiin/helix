@@ -1,0 +1,31 @@
+// ─── Store ────────────────────────────────────────────────────────────────────
+
+model Store {
+  id            String        @id @default(cuid())
+  name          String
+  slug          String        @unique
+  businessModel BusinessModel @default(B2C)
+  status        StoreStatus   @default(ACTIVE)
+
+  defaultLocale Locale       @default(TR)
+  currency      CurrencyCode @default(TRY)
+  timezone      String?
+  description   String?
+  logoUrl       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members        StoreMember[]
+  organizations  Organization[]
+  products       ProductStore[]
+  priceLists     PriceList[]
+  customerGroups CustomerGroup[]
+  warehouses     Warehouse[]
+  categoryStores CategoryStore[]
+  ruleTrees      RuleTree[]
+
+  @@index([businessModel])
+  @@index([status])
+  @@map("stores")
+}

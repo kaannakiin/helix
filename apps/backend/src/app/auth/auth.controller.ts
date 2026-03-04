@@ -236,9 +236,7 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   @Get('google')
   @ApiOperation({ summary: 'Initiate Google OAuth login' })
-  googleLogin(): void {
-    // Guard handles the redirect automatically
-  }
+  googleLogin(): void {}
 
   @Public()
   @UseGuards(GoogleAuthGuard)
@@ -264,9 +262,7 @@ export class AuthController {
   @UseGuards(FacebookAuthGuard)
   @Get('facebook')
   @ApiOperation({ summary: 'Initiate Facebook OAuth login' })
-  facebookLogin(): void {
-    // Guard handles the redirect automatically
-  }
+  facebookLogin(): void {}
 
   @Public()
   @UseGuards(FacebookAuthGuard)
@@ -292,9 +288,7 @@ export class AuthController {
   @UseGuards(InstagramAuthGuard)
   @Get('instagram')
   @ApiOperation({ summary: 'Initiate Instagram OAuth login' })
-  instagramLogin(): void {
-    // Guard handles the redirect automatically
-  }
+  instagramLogin(): void {}
 
   @Public()
   @UseGuards(InstagramAuthGuard)

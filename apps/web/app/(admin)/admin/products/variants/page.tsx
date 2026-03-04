@@ -15,7 +15,7 @@ import {
   type DataTableTranslations,
 } from '@org/ui';
 import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { Plus } from 'lucide-react';
 import { useCallback, useMemo, useRef } from 'react';
@@ -23,7 +23,6 @@ import { useCallback, useMemo, useRef } from 'react';
 export default function VariantGroupsPage() {
   const t = useTranslations('frontend.admin.variants');
   const router = useRouter();
-  const locale = useLocale();
   const tFilters = useTranslations('frontend.dataTable.filters');
   const tColumnVisibility = useTranslations(
     'frontend.dataTable.columnVisibility'
@@ -122,13 +121,7 @@ export default function VariantGroupsPage() {
         headerKey: 'name',
         type: 'text',
         minWidth: 200,
-        valueGetter: (params) => {
-          if (!params.data?.translations?.length) return '';
-          const match = params.data.translations.find(
-            (tr) => tr.locale.toLowerCase() === locale.toLowerCase()
-          );
-          return match?.name ?? params.data.translations[0]?.name ?? '';
-        },
+        valueGetter: (params) => params.data?.translations?.[0]?.name ?? '',
         sortable: false,
       }),
       createColumn<AdminVariantGroupListPrismaType>('_count.options', {
@@ -152,7 +145,7 @@ export default function VariantGroupsPage() {
         minWidth: 170,
       }),
     ],
-    [createColumn, locale]
+    [createColumn]
   );
 
   const copyColumns = useMemo<CopyColumn[]>(

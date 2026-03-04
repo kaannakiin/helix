@@ -962,14 +962,24 @@
         "notFound": "Müşteri Grubu Bulunamadı",
         "notFoundDescription": "Aradığınız müşteri grubu bulunamadı.",
         "generalInfo": "Genel Bilgiler",
-        "name": { "label": "Grup Adı", "placeholder": "Grup adını girin..." },
+        "name": {
+          "label": "Grup Adı",
+          "placeholder": "Grup adını girin..."
+        },
         "description": {
           "label": "Açıklama",
           "placeholder": "Kısa açıklama..."
         },
-        "color": { "label": "Renk" },
-        "type": { "label": "Grup Tipi" },
-        "statusCard": { "title": "Ayarlar", "activeLabel": "Aktif" },
+        "color": {
+          "label": "Renk"
+        },
+        "type": {
+          "label": "Grup Tipi"
+        },
+        "statusCard": {
+          "title": "Ayarlar",
+          "activeLabel": "Aktif"
+        },
         "cronExpression": {
           "label": "Değerlendirme Zamanlaması",
           "description": "Otomatik yeniden değerlendirme için cron ifadesi"
@@ -1140,6 +1150,38 @@
         "abortJob": "İşi Durdur",
         "streaming": "Canlı",
         "pendingLabel": "Bekliyor"
+      }
+    },
+    "storeSelect": {
+      "title": "Mağaza Seçimi",
+      "loading": "Mağazalar yükleniyor...",
+      "b2b_section": "B2B",
+      "b2c_section": "B2C",
+      "confirm_button": "Mağazaya Git"
+    },
+    "settings": {
+      "title": "Mağaza Ayarları",
+      "subtitle": "Mağaza yapılandırmanızı yönetin",
+      "form": {
+        "storeName": {
+          "label": "Mağaza Adı",
+          "placeholder": "Mağazam"
+        },
+        "defaultLocale": {
+          "label": "Varsayılan İçerik Dili",
+          "placeholder": "Dil seçin..."
+        },
+        "currency": {
+          "label": "Para Birimi",
+          "placeholder": "örn. TRY"
+        },
+        "timezone": {
+          "label": "Saat Dilimi",
+          "placeholder": "örn. Europe/Istanbul"
+        },
+        "submit": "Ayarları Kaydet",
+        "success": "Ayarlar başarıyla kaydedildi.",
+        "error": "Ayarlar kaydedilemedi."
       }
     }
   },

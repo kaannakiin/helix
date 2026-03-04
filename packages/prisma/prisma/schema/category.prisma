@@ -19,6 +19,7 @@ model Category {
   translations CategoryTranslation[]
   images       Image[]
   products     ProductCategory[]
+  stores       CategoryStore[]
 
   @@index([parentId])
   @@index([parentId, isActive, sortOrder])
@@ -48,6 +49,24 @@ model CategoryTranslation {
   @@unique([categoryId, locale])
   @@index([categoryId])
   @@index([locale])
+}
+
+// ─── Category ↔ Store (visibility junction) ─────────────────────────────────
+
+model CategoryStore {
+  id         String   @id @default(cuid())
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  storeId    String
+  store      Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  isVisible Boolean  @default(true)
+  addedAt   DateTime @default(now())
+
+  @@unique([categoryId, storeId])
+  @@index([categoryId])
+  @@index([storeId])
+  @@map("category_stores")
 }
 
 // ─── Product ↔ Category (join table) ──────────────────────────────────────────

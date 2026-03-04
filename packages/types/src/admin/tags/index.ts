@@ -1,4 +1,4 @@
-import type { Prisma } from '@org/prisma/browser';
+import type { Locale, Prisma } from '@org/prisma/browser';
 import type { FieldFilterConfig } from '../../data-query/index.js';
 
 export const ADMIN_TAG_GROUPS_FIELD_CONFIG = {
@@ -24,31 +24,34 @@ export const ADMIN_TAG_GROUPS_SORT_FIELDS = [
 export type AdminTagGroupsSortField =
   (typeof ADMIN_TAG_GROUPS_SORT_FIELDS)[number];
 
-export const AdminTagGroupListPrismaQuery = {
-  translations: true,
-  _count: { select: { tags: true } },
-} as const satisfies Prisma.TagGroupInclude;
+export const adminTagGroupListPrismaQuery = (locale: Locale) =>
+  ({
+    translations: { where: { locale } },
+    _count: { select: { tags: true } },
+  }) satisfies Prisma.TagGroupInclude;
 
 export type AdminTagGroupListPrismaType = Prisma.TagGroupGetPayload<{
-  include: typeof AdminTagGroupListPrismaQuery;
+  include: ReturnType<typeof adminTagGroupListPrismaQuery>;
 }>;
 
-export const AdminTagGroupDetailPrismaQuery = {
-  translations: true,
-} as const satisfies Prisma.TagGroupInclude;
+export const adminTagGroupDetailPrismaQuery = (locale: Locale) =>
+  ({
+    translations: { where: { locale } },
+  }) satisfies Prisma.TagGroupInclude;
 
 export type AdminTagGroupDetailPrismaType = Prisma.TagGroupGetPayload<{
-  include: typeof AdminTagGroupDetailPrismaQuery;
+  include: ReturnType<typeof adminTagGroupDetailPrismaQuery>;
 }>;
 
-export const AdminTagChildrenPrismaQuery = {
-  translations: true,
-  images: { where: { isPrimary: true }, take: 1 },
-  _count: { select: { children: true } },
-} as const satisfies Prisma.TagInclude;
+export const adminTagChildrenPrismaQuery = (locale: Locale) =>
+  ({
+    translations: { where: { locale } },
+    images: { where: { isPrimary: true }, take: 1 },
+    _count: { select: { children: true } },
+  }) satisfies Prisma.TagInclude;
 
 export type AdminTagChildrenPrismaType = Prisma.TagGetPayload<{
-  include: typeof AdminTagChildrenPrismaQuery;
+  include: ReturnType<typeof adminTagChildrenPrismaQuery>;
 }>;
 
 export const ADMIN_TAGS_FIELD_CONFIG = {

@@ -4,10 +4,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import type { Prisma } from '@org/prisma/client';
+import type { Locale, Prisma } from '@org/prisma/client';
 import {
-  AdminProductDetailPrismaQuery,
-  AdminProductListPrismaQuery,
+  adminProductDetailPrismaQuery,
+  adminProductListPrismaQuery,
   type AdminProductDetailPrismaType,
   type AdminProductListPrismaType,
 } from '@org/types/admin/products';
@@ -37,18 +37,24 @@ export class ProductsService {
   };
 
   async getProducts(
-    query: ProductQueryDTO
+    query: ProductQueryDTO,
+    locale: Locale
   ): Promise<PaginatedResponse<AdminProductListPrismaType>> {
     const { page, limit, filters, sort } = query;
 
-    const { where: baseWhere, orderBy, skip, take, countFilters } =
-      buildPrismaQuery({
-        page,
-        limit,
-        filters: filters as Record<string, FilterCondition> | undefined,
-        sort,
-        defaultSort: { field: 'createdAt', order: 'desc' },
-      });
+    const {
+      where: baseWhere,
+      orderBy,
+      skip,
+      take,
+      countFilters,
+    } = buildPrismaQuery({
+      page,
+      limit,
+      filters: filters as Record<string, FilterCondition> | undefined,
+      sort,
+      defaultSort: { field: 'createdAt', order: 'desc' },
+    });
 
     const where = (await resolveCountFilters(
       this.prisma,
@@ -66,7 +72,7 @@ export class ProductsService {
           | Prisma.ProductOrderByWithRelationInput[],
         skip,
         take,
-        include: AdminProductListPrismaQuery,
+        include: adminProductListPrismaQuery(locale),
       }),
       this.prisma.product.count({ where }),
     ]);
@@ -88,7 +94,9 @@ export class ProductsService {
       | Prisma.ProductOrderByWithRelationInput
       | Prisma.ProductOrderByWithRelationInput[];
     batchSize: number;
+    locale: Locale;
   }): AsyncGenerator<AdminProductListPrismaType[]> {
+    const { locale } = opts;
     let cursor: string | undefined;
 
     while (true) {
@@ -97,7 +105,7 @@ export class ProductsService {
         orderBy: opts.orderBy,
         take: opts.batchSize,
         ...(cursor ? { skip: 1, cursor: { id: cursor } } : {}),
-        include: AdminProductListPrismaQuery,
+        include: adminProductListPrismaQuery(locale),
       });
 
       if (batch.length === 0) break;
@@ -109,10 +117,13 @@ export class ProductsService {
     }
   }
 
-  async getProductById(id: string): Promise<AdminProductDetailPrismaType> {
+  async getProductById(
+    id: string,
+    locale: Locale
+  ): Promise<AdminProductDetailPrismaType> {
     const product = await this.prisma.product.findUnique({
       where: { id },
-      include: AdminProductDetailPrismaQuery,
+      include: adminProductDetailPrismaQuery(locale),
     });
 
     if (!product) {
@@ -123,7 +134,8 @@ export class ProductsService {
   }
 
   async saveProduct(
-    data: ProductSaveDTO
+    data: ProductSaveDTO,
+    locale: Locale
   ): Promise<AdminProductDetailPrismaType> {
     const {
       uniqueId,
@@ -522,7 +534,7 @@ export class ProductsService {
           brandId: cleanBrandId,
           translations: { create: translationData },
         },
-        include: AdminProductDetailPrismaQuery,
+        include: adminProductDetailPrismaQuery(locale),
       });
     });
 
@@ -572,10 +584,7 @@ export class ProductsService {
     await this.prisma.product.delete({ where: { id } });
   }
 
-  async deleteProductImage(
-    productId: string,
-    imageId: string
-  ): Promise<void> {
+  async deleteProductImage(productId: string, imageId: string): Promise<void> {
     const image = await this.prisma.image.findUnique({
       where: { id: imageId },
       select: {
@@ -589,7 +598,6 @@ export class ProductsService {
       throw new NotFoundException('backend.errors.image_not_found');
     }
 
-    // Ownership validation — image must belong to this product tree
     if (image.productId) {
       if (image.productId !== productId) {
         throw new NotFoundException('backend.errors.image_not_found');
@@ -602,13 +610,12 @@ export class ProductsService {
         throw new NotFoundException('backend.errors.image_not_found');
       }
     } else if (image.productVariantGroupOptionId) {
-      const pvgOption =
-        await this.prisma.productVariantGroupOption.findFirst({
-          where: {
-            id: image.productVariantGroupOptionId,
-            productVariantGroup: { productId },
-          },
-        });
+      const pvgOption = await this.prisma.productVariantGroupOption.findFirst({
+        where: {
+          id: image.productVariantGroupOptionId,
+          productVariantGroup: { productId },
+        },
+      });
       if (!pvgOption) {
         throw new NotFoundException('backend.errors.image_not_found');
       }
@@ -616,19 +623,17 @@ export class ProductsService {
       throw new NotFoundException('backend.errors.image_not_found');
     }
 
-    // Build owner filter for sortOrder normalization
     const ownerFilter: Record<string, string> = image.productId
       ? { productId: image.productId }
       : image.productVariantId
-        ? { productVariantId: image.productVariantId }
-        : {
-            productVariantGroupOptionId:
-              image.productVariantGroupOptionId as string,
-          };
+      ? { productVariantId: image.productVariantId }
+      : {
+          productVariantGroupOptionId:
+            image.productVariantGroupOptionId as string,
+        };
 
     await this.uploadService.deleteImage(imageId);
 
-    // Re-index sortOrder for remaining images
     const remaining = await this.prisma.image.findMany({
       where: ownerFilter,
       orderBy: { sortOrder: 'asc' },
@@ -652,7 +657,6 @@ export class ProductsService {
   }) {
     const { productId, ownerType, ownerId, files, sortOrders } = opts;
 
-    // Verify product exists
     const product = await this.prisma.product.findUnique({
       where: { id: productId },
       select: { id: true },
@@ -661,36 +665,30 @@ export class ProductsService {
       throw new NotFoundException('backend.errors.product_not_found');
     }
 
-    // Ownership validation
     if (ownerType === 'productVariant') {
       const variant = await this.prisma.productVariant.findFirst({
         where: { id: ownerId, productId },
         select: { id: true },
       });
       if (!variant) {
-        throw new NotFoundException(
-          'backend.errors.product_variant_not_found'
-        );
+        throw new NotFoundException('backend.errors.product_variant_not_found');
       }
     } else if (ownerType === 'productVariantGroupOption') {
-      const pvgOption =
-        await this.prisma.productVariantGroupOption.findFirst({
-          where: { id: ownerId, productVariantGroup: { productId } },
-          select: { id: true },
-        });
+      const pvgOption = await this.prisma.productVariantGroupOption.findFirst({
+        where: { id: ownerId, productVariantGroup: { productId } },
+        select: { id: true },
+      });
       if (!pvgOption) {
         throw new NotFoundException(
           'backend.errors.product_variant_group_option_not_found'
         );
       }
     } else {
-      // ownerType === 'product', ownerId must match productId
       if (ownerId !== productId) {
         throw new BadRequestException('backend.errors.invalid_owner_id');
       }
     }
 
-    // Check max limit (1 for variant group options, 10 for others)
     const ownerFieldMap: Record<string, string> = {
       product: 'productId',
       productVariant: 'productVariantId',
@@ -705,7 +703,6 @@ export class ProductsService {
       throw new BadRequestException('backend.errors.files_too_many');
     }
 
-    // Upload each file
     const results = [];
     for (let i = 0; i < files.length; i++) {
       const result = await this.uploadService.uploadFile(files[i], {
@@ -715,7 +712,6 @@ export class ProductsService {
         isNeedThumbnail: false,
       });
 
-      // Update sortOrder
       await this.prisma.image.update({
         where: { id: result.imageId },
         data: { sortOrder: sortOrders[i] ?? i },

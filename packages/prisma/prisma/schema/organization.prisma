@@ -1,0 +1,57 @@
+// ─── Organization ─────────────────────────────────────────────────────────────
+
+model Organization {
+  id      String @id @default(cuid())
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  name    String
+  taxId   String?
+  email   String?
+  phone   String?
+  address String?
+  logoUrl String?
+
+  isActive Boolean @default(true)
+
+  parentOrgId String?
+  parentOrg   Organization?  @relation("OrgHierarchy", fields: [parentOrgId], references: [id], onDelete: SetNull)
+  childOrgs   Organization[] @relation("OrgHierarchy")
+
+  customerGroupMemberships CustomerGroupMember[]
+  members                  OrganizationMember[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId])
+  @@index([parentOrgId])
+  @@index([isActive])
+  @@map("organizations")
+}
+
+// ─── Organization Member ──────────────────────────────────────────────────────
+
+model OrganizationMember {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  role OrgMemberRole @default(MEMBER)
+
+  parentMemberId String?
+  parentMember   OrganizationMember?  @relation("MemberTree", fields: [parentMemberId], references: [id], onDelete: SetNull)
+  subordinates   OrganizationMember[] @relation("MemberTree")
+
+  joinedAt DateTime @default(now())
+  isActive Boolean  @default(true)
+
+  @@unique([organizationId, userId])
+  @@index([organizationId])
+  @@index([userId])
+  @@index([parentMemberId])
+  @@index([role])
+  @@map("organization_members")
+}

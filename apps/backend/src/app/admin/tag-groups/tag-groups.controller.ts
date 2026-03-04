@@ -1,11 +1,12 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query, Res, UseInterceptors } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import type { Locale as LocaleType, Prisma } from '@org/prisma/client';
 import { UserRole } from '@org/prisma/client';
-import type { Prisma } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import { I18nContext } from 'nestjs-i18n';
 import type { Response } from 'express';
-import { Locale, Roles } from '../../../core/decorators';
+import { ContentLocale, Locale, Roles } from '../../../core/decorators';
+import { ContentLocaleInterceptor } from '../../../core/interceptors/content-locale.interceptor.js';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
 import { TagGroupsService } from './tag-groups.service';
@@ -23,6 +24,7 @@ import { TAG_GROUP_EXPORT_COLUMNS } from './tag-groups.export-config';
 @ApiTags('Admin - Tag Groups')
 @Controller('admin/tag-groups')
 @Roles(UserRole.ADMIN, UserRole.MODERATOR)
+@UseInterceptors(ContentLocaleInterceptor)
 export class TagGroupsController {
   constructor(
     private readonly tagGroupsService: TagGroupsService,
@@ -31,8 +33,8 @@ export class TagGroupsController {
 
   @Post('query')
   @ApiOperation({ summary: 'Get paginated list of tag groups' })
-  async getTagGroups(@Body() query: TagGroupQueryDTO) {
-    return this.tagGroupsService.getTagGroups(query);
+  async getTagGroups(@Body() query: TagGroupQueryDTO, @ContentLocale() locale: LocaleType) {
+    return this.tagGroupsService.getTagGroups(query, locale);
   }
 
   @Get('tags/lookup')
@@ -101,6 +103,7 @@ export class TagGroupsController {
               | Prisma.TagGroupOrderByWithRelationInput
               | Prisma.TagGroupOrderByWithRelationInput[],
             batchSize,
+            locale: lang.toUpperCase() as LocaleType,
           }),
       },
       {
@@ -132,8 +135,8 @@ export class TagGroupsController {
 
   @Post('save')
   @ApiOperation({ summary: 'Create or update a tag group (upsert by id)' })
-  async saveTagGroup(@Body() body: TagGroupSaveDTO) {
-    return this.tagGroupsService.saveTagGroup(body);
+  async saveTagGroup(@Body() body: TagGroupSaveDTO, @ContentLocale() locale: LocaleType) {
+    return this.tagGroupsService.saveTagGroup(body, locale);
   }
 
   @Post(':id/tags/save')
@@ -142,8 +145,9 @@ export class TagGroupsController {
   async saveTag(
     @Param('id') tagGroupId: string,
     @Body() body: TagSaveDTO,
+    @ContentLocale() locale: LocaleType,
   ) {
-    return this.tagGroupsService.saveTag(tagGroupId, body);
+    return this.tagGroupsService.saveTag(tagGroupId, body, locale);
   }
 
   @Delete(':id/tags/:tagId')
@@ -167,14 +171,15 @@ export class TagGroupsController {
   async getTagChildren(
     @Param('id') id: string,
     @Query() query: TagChildrenQueryDTO,
+    @ContentLocale() locale: LocaleType,
   ) {
-    return this.tagGroupsService.getTagChildren(id, query.parentTagId);
+    return this.tagGroupsService.getTagChildren(id, locale, query.parentTagId);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get tag group by ID' })
   @ApiParam({ name: 'id', description: 'Tag Group ID' })
-  async getTagGroupById(@Param('id') id: string) {
-    return this.tagGroupsService.getTagGroupById(id);
+  async getTagGroupById(@Param('id') id: string, @ContentLocale() locale: LocaleType) {
+    return this.tagGroupsService.getTagGroupById(id, locale);
   }
 }

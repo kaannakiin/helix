@@ -1,14 +1,15 @@
 import {
+  Inject,
   Injectable,
   Logger,
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import type { EvaluationEvent } from '@org/types/evaluation';
 import Redis from 'ioredis';
 import { Observable, Subject, filter, map } from 'rxjs';
-import { EVALUATION_EVENTS_CHANNEL } from './evaluation.service';
+import { REDIS_CLIENT } from '../redis/redis.constants.js';
+import { EVALUATION_EVENTS_CHANNEL } from './evaluation.service.js';
 
 @Injectable()
 export class EvaluationSseService implements OnModuleInit, OnModuleDestroy {
@@ -16,8 +17,8 @@ export class EvaluationSseService implements OnModuleInit, OnModuleDestroy {
   private readonly subscriber: Redis;
   private readonly events$ = new Subject<EvaluationEvent>();
 
-  constructor(private readonly config: ConfigService) {
-    this.subscriber = new Redis(this.config.getOrThrow<string>('REDIS_URL'));
+  constructor(@Inject(REDIS_CLIENT) redis: Redis) {
+    this.subscriber = redis.duplicate();
   }
 
   onModuleInit() {

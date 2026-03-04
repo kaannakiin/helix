@@ -222,6 +222,11 @@ export default async function proxy(request: NextRequest) {
     }
   }
 
+  const storeId = request.cookies.get('x-store-id')?.value;
+  if (storeId) {
+    requestHeaders.set('X-Store-Id', storeId);
+  }
+
   const response = NextResponse.next({
     request: { headers: requestHeaders },
   });

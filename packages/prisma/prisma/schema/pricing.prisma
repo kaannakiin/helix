@@ -4,6 +4,9 @@ model PriceList {
   id   String @id @default(cuid())
   name String
 
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
   type   PriceListType   @default(BASE)
   status PriceListStatus @default(DRAFT)
 
@@ -29,6 +32,7 @@ model PriceList {
   prices             PriceListPrice[]
   customerGroupLinks PriceListCustomerGroup[]
 
+  @@index([storeId])
   @@index([currencyCode])
   @@index([type, currencyCode])
   @@index([status])

@@ -1,6 +1,7 @@
 "use client";
 
 import type { CellContextMenuEvent } from "ag-grid-community";
+import { useEventListener } from "@mantine/hooks";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { ContextMenuState } from "../types/contextMenu.types";
 
@@ -48,18 +49,11 @@ export function useContextMenu<TData>(
     };
   }, [enabled]);
 
-  useEffect(() => {
-    if (!state.isOpen) return;
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setState((prev) => ({ ...prev, isOpen: false }));
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [state.isOpen]);
+  useEventListener("keydown", (e: KeyboardEvent) => {
+    if (e.key === "Escape" && state.isOpen) {
+      setState((prev) => ({ ...prev, isOpen: false }));
+    }
+  });
 
   const handleCellContextMenu = useCallback(
     (event: CellContextMenuEvent<TData>) => {

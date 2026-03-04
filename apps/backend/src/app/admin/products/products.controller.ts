@@ -15,12 +15,13 @@ import {
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import type { Prisma } from '@org/prisma/client';
+import type { Locale as LocaleType, Prisma } from '@org/prisma/client';
 import { UserRole } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import type { Response } from 'express';
 import { I18nContext } from 'nestjs-i18n';
-import { Locale, Roles } from '../../../core/decorators';
+import { ContentLocale, Locale, Roles } from '../../../core/decorators';
+import { ContentLocaleInterceptor } from '../../../core/interceptors/content-locale.interceptor.js';
 import { FileValidationPipe } from '../../../core/pipes/file-validation.pipe';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
@@ -31,6 +32,7 @@ import { ProductsService } from './products.service';
 @ApiTags('Admin - Products')
 @Controller('admin/products')
 @Roles(UserRole.ADMIN, UserRole.MODERATOR)
+@UseInterceptors(ContentLocaleInterceptor)
 export class ProductsController {
   constructor(
     private readonly productsService: ProductsService,
@@ -39,14 +41,14 @@ export class ProductsController {
 
   @Post('query')
   @ApiOperation({ summary: 'Get paginated list of products' })
-  async getProducts(@Body() query: ProductQueryDTO) {
-    return this.productsService.getProducts(query);
+  async getProducts(@Body() query: ProductQueryDTO, @ContentLocale() locale: LocaleType) {
+    return this.productsService.getProducts(query, locale);
   }
 
   @Post('save')
   @ApiOperation({ summary: 'Create or update a product (upsert by uniqueId)' })
-  async saveProduct(@Body() body: ProductSaveDTO) {
-    return this.productsService.saveProduct(body);
+  async saveProduct(@Body() body: ProductSaveDTO, @ContentLocale() locale: LocaleType) {
+    return this.productsService.saveProduct(body, locale);
   }
 
   @Post(':id/images')
@@ -134,6 +136,7 @@ export class ProductsController {
               | Prisma.ProductOrderByWithRelationInput
               | Prisma.ProductOrderByWithRelationInput[],
             batchSize,
+            locale: locale.toUpperCase() as LocaleType,
           }),
       },
       {
@@ -168,8 +171,8 @@ export class ProductsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get product by ID' })
   @ApiParam({ name: 'id', description: 'Product ID' })
-  async getProductById(@Param('id') id: string) {
-    return this.productsService.getProductById(id);
+  async getProductById(@Param('id') id: string, @ContentLocale() locale: LocaleType) {
+    return this.productsService.getProductById(id, locale);
   }
 
   @Delete(':id')

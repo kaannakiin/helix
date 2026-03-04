@@ -133,13 +133,7 @@ export default function ProductsPage() {
         headerKey: 'name',
         type: 'text',
         minWidth: 200,
-        valueGetter: (params) => {
-          if (!params.data?.translations?.length) return '';
-          const match = params.data.translations.find(
-            (tr) => tr.locale.toLowerCase() === locale.toLowerCase()
-          );
-          return match?.name ?? params.data.translations[0]?.name ?? '';
-        },
+        valueGetter: (params) => params.data?.translations?.[0]?.name ?? '',
         sortable: false,
       }),
       createColumn<AdminProductListPrismaType>('type', {
@@ -162,14 +156,7 @@ export default function ProductsPage() {
           headerKey: 'brandName',
           type: 'text',
           minWidth: 150,
-          valueGetter: (params) => {
-            const brand = params.data?.brand;
-            if (!brand?.translations?.length) return '—';
-            const match = brand.translations.find(
-              (tr) => tr.locale.toLowerCase() === locale.toLowerCase()
-            );
-            return match?.name ?? brand.translations[0]?.name ?? '—';
-          },
+          valueGetter: (params) => params.data?.brand?.translations?.[0]?.name ?? '—',
           sortable: false,
           filter: false,
         }
@@ -201,7 +188,7 @@ export default function ProductsPage() {
         minWidth: 170,
       }),
     ],
-    [createColumn, locale, tEnums]
+    [createColumn, tEnums]
   );
 
   const copyColumns = useMemo<CopyColumn[]>(

@@ -16,14 +16,14 @@ import {
 } from '@org/ui';
 import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
 import { Plus } from 'lucide-react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
 
 export default function TagsPage() {
   const t = useTranslations('frontend.admin.tags');
   const router = useRouter();
-  const locale = useLocale();
+
   const tExport = useTranslations('frontend.export');
   const tFilters = useTranslations('frontend.dataTable.filters');
   const tColumnVisibility = useTranslations(
@@ -122,13 +122,7 @@ export default function TagsPage() {
         headerKey: 'name',
         type: 'text',
         minWidth: 200,
-        valueGetter: (params) => {
-          if (!params.data?.translations?.length) return '';
-          const match = params.data.translations.find(
-            (tr) => tr.locale.toLowerCase() === locale.toLowerCase()
-          );
-          return match?.name ?? params.data.translations[0]?.name ?? '';
-        },
+        valueGetter: (params) => params.data?.translations?.[0]?.name ?? '',
         sortable: false,
       }),
       createColumn<AdminTagGroupListPrismaType>('isActive', {
@@ -146,7 +140,7 @@ export default function TagsPage() {
         minWidth: 170,
       }),
     ],
-    [createColumn, locale]
+    [createColumn]
   );
 
   const copyColumns = useMemo<CopyColumn[]>(

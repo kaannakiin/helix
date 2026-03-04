@@ -1,4 +1,4 @@
-import type { Prisma } from '@org/prisma/browser';
+import type { Locale, Prisma } from '@org/prisma/browser';
 import type { FieldFilterConfig } from '../../data-query/index.js';
 
 export const ADMIN_BRANDS_FIELD_CONFIG = {
@@ -24,21 +24,23 @@ export const ADMIN_BRANDS_SORT_FIELDS = [
 export type AdminBrandsSortField =
   (typeof ADMIN_BRANDS_SORT_FIELDS)[number];
 
-export const AdminBrandListPrismaQuery = {
-  translations: true,
-  images: { where: { isPrimary: true }, take: 1 },
-  _count: { select: { products: true } },
-} as const satisfies Prisma.BrandInclude;
+export const adminBrandListPrismaQuery = (locale: Locale) =>
+  ({
+    translations: { where: { locale } },
+    images: { where: { isPrimary: true }, take: 1 },
+    _count: { select: { products: true } },
+  }) satisfies Prisma.BrandInclude;
 
 export type AdminBrandListPrismaType = Prisma.BrandGetPayload<{
-  include: typeof AdminBrandListPrismaQuery;
+  include: ReturnType<typeof adminBrandListPrismaQuery>;
 }>;
 
-export const AdminBrandDetailPrismaQuery = {
-  translations: true,
-  images: true,
-} as const satisfies Prisma.BrandInclude;
+export const adminBrandDetailPrismaQuery = (locale: Locale) =>
+  ({
+    translations: { where: { locale } },
+    images: true,
+  }) satisfies Prisma.BrandInclude;
 
 export type AdminBrandDetailPrismaType = Prisma.BrandGetPayload<{
-  include: typeof AdminBrandDetailPrismaQuery;
+  include: ReturnType<typeof adminBrandDetailPrismaQuery>;
 }>;

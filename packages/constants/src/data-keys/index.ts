@@ -59,6 +59,10 @@ export const DATA_ACCESS_KEYS = {
       entityHistory: (entityType: string, entityId: string) =>
         ['admin', 'evaluationJobs', 'entityHistory', entityType, entityId] as const,
     },
+    stores: {
+      list: ['admin', 'stores', 'list'] as const,
+      detail: (id: string) => ['admin', 'stores', 'detail', id] as const,
+    },
   },
   locations: {
     countries: ['locations', 'countries'],

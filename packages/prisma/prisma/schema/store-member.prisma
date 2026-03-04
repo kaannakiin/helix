@@ -1,0 +1,19 @@
+// ─── Store Member ─────────────────────────────────────────────────────────────
+
+model StoreMember {
+  id      String @id @default(cuid())
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  userId  String
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  accountType AccountType @default(PERSONAL)
+
+  joinedAt DateTime @default(now())
+  isActive Boolean  @default(true)
+
+  @@unique([storeId, userId])
+  @@index([storeId])
+  @@index([userId])
+  @@map("store_members")
+}

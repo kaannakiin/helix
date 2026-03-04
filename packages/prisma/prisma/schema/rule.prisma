@@ -10,8 +10,12 @@ model RuleTree {
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @updatedAt
 
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
   customerGroups CustomerGroup[]
 
+  @@index([storeId])
   @@index([targetEntity])
   @@index([isActive])
   @@index([createdAt])

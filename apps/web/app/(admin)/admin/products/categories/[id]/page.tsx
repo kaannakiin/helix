@@ -71,13 +71,15 @@ const AdminCategoryFormPage = () => {
 
   const [existingFiles, setExistingFiles] = useState<RemoteFile[]>([]);
 
-  const { deletingIds, isUploading, deleteImage, uploadFiles } = useImageUpload({
-    basePath: `/admin/categories/${id}/images`,
-    onDeleteError: () =>
-      notifications.show({ color: 'red', message: t('imageDeleteError') }),
-    onUploadError: () =>
-      notifications.show({ color: 'red', message: t('imageUploadError') }),
-  });
+  const { deletingIds, isUploading, deleteImage, uploadFiles } = useImageUpload(
+    {
+      basePath: `/admin/categories/${id}/images`,
+      onDeleteError: () =>
+        notifications.show({ color: 'red', message: t('imageDeleteError') }),
+      onUploadError: () =>
+        notifications.show({ color: 'red', message: t('imageUploadError') }),
+    }
+  );
 
   const formattedData = useMemo<CategoryInput>(() => {
     if (!data || isNew) {
@@ -150,7 +152,11 @@ const AdminCategoryFormPage = () => {
   const onSubmit: SubmitHandler<CategoryInput> = async (formData) => {
     try {
       const newImages = formData.images ?? [];
-      let uploadResults: { imageId: string; url: string; fileType: string }[] = [];
+      let uploadResults: {
+        imageId: string;
+        url: string;
+        fileType: FileType;
+      }[] = [];
       if (newImages.length > 0) {
         uploadResults = await uploadFiles(newImages);
       }
@@ -172,7 +178,7 @@ const AdminCategoryFormPage = () => {
 
       await saveCategory.mutateAsync({
         ...(formData as unknown as CategoryOutput),
-        images: undefined,
+        images: [] as unknown as CategoryOutput['images'],
         existingImages: allExisting,
       });
       router.push('/admin/products/categories');

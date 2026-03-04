@@ -61,7 +61,6 @@ export class DeviceService {
   }
 
   async deleteDevice(deviceId: string) {
-    // Revoke all sessions for this device first
     await this.prisma.session.updateMany({
       where: { deviceId, isActive: true },
       data: {

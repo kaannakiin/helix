@@ -12,12 +12,13 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import type { Locale as LocaleType, Prisma } from '@org/prisma/client';
 import { UserRole } from '@org/prisma/client';
-import type { Prisma } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import { I18nContext } from 'nestjs-i18n';
 import type { Response } from 'express';
-import { Locale, Roles } from '../../../core/decorators';
+import { ContentLocale, Locale, Roles } from '../../../core/decorators';
+import { ContentLocaleInterceptor } from '../../../core/interceptors/content-locale.interceptor.js';
 import { FileValidationPipe } from '../../../core/pipes/file-validation.pipe';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
@@ -34,6 +35,7 @@ import { VARIANT_GROUP_EXPORT_COLUMNS } from './variant-groups.export-config';
 @ApiTags('Admin - Variant Groups')
 @Controller('admin/variant-groups')
 @Roles(UserRole.ADMIN, UserRole.MODERATOR)
+@UseInterceptors(ContentLocaleInterceptor)
 export class VariantGroupsController {
   constructor(
     private readonly variantGroupsService: VariantGroupsService,
@@ -42,14 +44,14 @@ export class VariantGroupsController {
 
   @Post('save')
   @ApiOperation({ summary: 'Create or update a variant group' })
-  async saveVariantGroup(@Body() body: VariantGroupSaveDTO) {
-    return this.variantGroupsService.saveVariantGroup(body);
+  async saveVariantGroup(@Body() body: VariantGroupSaveDTO, @ContentLocale() locale: LocaleType) {
+    return this.variantGroupsService.saveVariantGroup(body, locale);
   }
 
   @Post('query')
   @ApiOperation({ summary: 'Get paginated list of variant groups' })
-  async getVariantGroups(@Body() query: VariantGroupQueryDTO) {
-    return this.variantGroupsService.getVariantGroups(query);
+  async getVariantGroups(@Body() query: VariantGroupQueryDTO, @ContentLocale() locale: LocaleType) {
+    return this.variantGroupsService.getVariantGroups(query, locale);
   }
 
   @Get('lookup')
@@ -102,6 +104,7 @@ export class VariantGroupsController {
               | Prisma.VariantGroupOrderByWithRelationInput
               | Prisma.VariantGroupOrderByWithRelationInput[],
             batchSize,
+            locale: lang.toUpperCase() as LocaleType,
           }),
       },
       {
@@ -173,7 +176,7 @@ export class VariantGroupsController {
   @Get(':id')
   @ApiOperation({ summary: 'Get variant group by ID' })
   @ApiParam({ name: 'id', description: 'Variant Group ID' })
-  async getVariantGroupById(@Param('id') id: string) {
-    return this.variantGroupsService.getVariantGroupById(id);
+  async getVariantGroupById(@Param('id') id: string, @ContentLocale() locale: LocaleType) {
+    return this.variantGroupsService.getVariantGroupById(id, locale);
   }
 }

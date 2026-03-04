@@ -87,6 +87,7 @@ async function baseSeed() {
       status: 'ACTIVE',
       currencyCode: defaultCurrency.code,
       isActive: true,
+      storeId: 'store-b2b-merkez',
     },
   });
 

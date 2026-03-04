@@ -15,14 +15,14 @@ import {
   type DataTableTranslations,
 } from '@org/ui';
 import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
-import { useLocale, useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
 
 export default function BrandsPage() {
   const t = useTranslations('frontend.admin.brands');
   const router = useRouter();
-  const locale = useLocale();
+
   const tExport = useTranslations('frontend.export');
   const tFilters = useTranslations('frontend.dataTable.filters');
   const tColumnVisibility = useTranslations(
@@ -122,13 +122,7 @@ export default function BrandsPage() {
         headerKey: 'name',
         type: 'text',
         minWidth: 200,
-        valueGetter: (params) => {
-          if (!params.data?.translations?.length) return '';
-          const match = params.data.translations.find(
-            (tr) => tr.locale.toLowerCase() === locale.toLowerCase()
-          );
-          return match?.name ?? params.data.translations[0]?.name ?? '';
-        },
+        valueGetter: (params) => params.data?.translations?.[0]?.name ?? '',
         sortable: false,
       }),
       createColumn<AdminBrandListPrismaType>('isActive', {
@@ -151,7 +145,7 @@ export default function BrandsPage() {
         minWidth: 170,
       }),
     ],
-    [createColumn, locale]
+    [createColumn]
   );
 
   const copyColumns = useMemo<CopyColumn[]>(

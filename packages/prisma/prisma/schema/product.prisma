@@ -17,6 +17,7 @@ model Product {
   variants      ProductVariant[]
   categories    ProductCategory[]
   tags          ProductTag[]
+  stores        ProductStore[]
 
   googleTaxonomyId Int?
   googleTaxonomy   GoogleTaxonomy? @relation(fields: [googleTaxonomyId], references: [id], onDelete: SetNull)
@@ -85,6 +86,24 @@ model ProductVariant {
   @@index([sku])
   @@index([barcode])
   @@index([sortOrder])
+}
+
+// ─── Product ↔ Store (visibility junction) ───────────────────────────────────
+
+model ProductStore {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  storeId   String
+  store     Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  isVisible Boolean  @default(true)
+  addedAt   DateTime @default(now())
+
+  @@unique([productId, storeId])
+  @@index([productId])
+  @@index([storeId])
+  @@map("product_stores")
 }
 
 // ─── Product Variant Value (variant ↔ option selection link) ─────────────────
