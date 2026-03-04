@@ -14,7 +14,11 @@ import {
 import type { ImageOwnerType } from '@org/types/admin/upload';
 import type { FilterCondition } from '@org/types/data-query';
 import type { PaginatedResponse } from '@org/types/pagination';
-import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
+import {
+  buildPrismaQuery,
+  resolveCountFilters,
+  type CountRelationMap,
+} from '../../../core/utils/prisma-query-builder';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UploadService } from '../../upload/upload.service';
 import type { ProductQueryDTO, ProductSaveDTO } from './dto';
@@ -26,22 +30,37 @@ export class ProductsService {
     private readonly uploadService: UploadService
   ) {}
 
+  private static readonly COUNT_RELATIONS: CountRelationMap = {
+    variants: { table: 'ProductVariant', fk: 'productId' },
+    categories: { table: 'ProductCategory', fk: 'productId' },
+    tags: { table: 'ProductTag', fk: 'productId' },
+  };
+
   async getProducts(
     query: ProductQueryDTO
   ): Promise<PaginatedResponse<AdminProductListPrismaType>> {
     const { page, limit, filters, sort } = query;
 
-    const { where, orderBy, skip, take } = buildPrismaQuery({
-      page,
-      limit,
-      filters: filters as Record<string, FilterCondition> | undefined,
-      sort,
-      defaultSort: { field: 'createdAt', order: 'desc' },
-    });
+    const { where: baseWhere, orderBy, skip, take, countFilters } =
+      buildPrismaQuery({
+        page,
+        limit,
+        filters: filters as Record<string, FilterCondition> | undefined,
+        sort,
+        defaultSort: { field: 'createdAt', order: 'desc' },
+      });
+
+    const where = (await resolveCountFilters(
+      this.prisma,
+      'Product',
+      ProductsService.COUNT_RELATIONS,
+      countFilters,
+      baseWhere
+    )) as Prisma.ProductWhereInput;
 
     const [items, total] = await Promise.all([
       this.prisma.product.findMany({
-        where: where as Prisma.ProductWhereInput,
+        where,
         orderBy: orderBy as
           | Prisma.ProductOrderByWithRelationInput
           | Prisma.ProductOrderByWithRelationInput[],
@@ -49,7 +68,7 @@ export class ProductsService {
         take,
         include: AdminProductListPrismaQuery,
       }),
-      this.prisma.product.count({ where: where as Prisma.ProductWhereInput }),
+      this.prisma.product.count({ where }),
     ]);
 
     return {
@@ -553,9 +572,80 @@ export class ProductsService {
     await this.prisma.product.delete({ where: { id } });
   }
 
+  async deleteProductImage(
+    productId: string,
+    imageId: string
+  ): Promise<void> {
+    const image = await this.prisma.image.findUnique({
+      where: { id: imageId },
+      select: {
+        id: true,
+        productId: true,
+        productVariantId: true,
+        productVariantGroupOptionId: true,
+      },
+    });
+    if (!image) {
+      throw new NotFoundException('backend.errors.image_not_found');
+    }
+
+    // Ownership validation — image must belong to this product tree
+    if (image.productId) {
+      if (image.productId !== productId) {
+        throw new NotFoundException('backend.errors.image_not_found');
+      }
+    } else if (image.productVariantId) {
+      const variant = await this.prisma.productVariant.findFirst({
+        where: { id: image.productVariantId, productId },
+      });
+      if (!variant) {
+        throw new NotFoundException('backend.errors.image_not_found');
+      }
+    } else if (image.productVariantGroupOptionId) {
+      const pvgOption =
+        await this.prisma.productVariantGroupOption.findFirst({
+          where: {
+            id: image.productVariantGroupOptionId,
+            productVariantGroup: { productId },
+          },
+        });
+      if (!pvgOption) {
+        throw new NotFoundException('backend.errors.image_not_found');
+      }
+    } else {
+      throw new NotFoundException('backend.errors.image_not_found');
+    }
+
+    // Build owner filter for sortOrder normalization
+    const ownerFilter: Record<string, string> = image.productId
+      ? { productId: image.productId }
+      : image.productVariantId
+        ? { productVariantId: image.productVariantId }
+        : {
+            productVariantGroupOptionId:
+              image.productVariantGroupOptionId as string,
+          };
+
+    await this.uploadService.deleteImage(imageId);
+
+    // Re-index sortOrder for remaining images
+    const remaining = await this.prisma.image.findMany({
+      where: ownerFilter,
+      orderBy: { sortOrder: 'asc' },
+    });
+    for (let i = 0; i < remaining.length; i++) {
+      if (remaining[i].sortOrder !== i) {
+        await this.prisma.image.update({
+          where: { id: remaining[i].id },
+          data: { sortOrder: i },
+        });
+      }
+    }
+  }
+
   async uploadProductImages(opts: {
     productId: string;
-    ownerType: 'product' | 'productVariant';
+    ownerType: 'product' | 'productVariant' | 'productVariantGroupOption';
     ownerId: string;
     files: Express.Multer.File[];
     sortOrders: number[];
@@ -571,14 +661,27 @@ export class ProductsService {
       throw new NotFoundException('backend.errors.product_not_found');
     }
 
-    // If uploading to a variant, verify it belongs to this product
+    // Ownership validation
     if (ownerType === 'productVariant') {
       const variant = await this.prisma.productVariant.findFirst({
         where: { id: ownerId, productId },
         select: { id: true },
       });
       if (!variant) {
-        throw new NotFoundException('backend.errors.product_variant_not_found');
+        throw new NotFoundException(
+          'backend.errors.product_variant_not_found'
+        );
+      }
+    } else if (ownerType === 'productVariantGroupOption') {
+      const pvgOption =
+        await this.prisma.productVariantGroupOption.findFirst({
+          where: { id: ownerId, productVariantGroup: { productId } },
+          select: { id: true },
+        });
+      if (!pvgOption) {
+        throw new NotFoundException(
+          'backend.errors.product_variant_group_option_not_found'
+        );
       }
     } else {
       // ownerType === 'product', ownerId must match productId
@@ -587,13 +690,18 @@ export class ProductsService {
       }
     }
 
-    // Check max 10 limit
-    const ownerField =
-      ownerType === 'product' ? 'productId' : 'productVariantId';
+    // Check max limit (1 for variant group options, 10 for others)
+    const ownerFieldMap: Record<string, string> = {
+      product: 'productId',
+      productVariant: 'productVariantId',
+      productVariantGroupOption: 'productVariantGroupOptionId',
+    };
+    const ownerField = ownerFieldMap[ownerType];
+    const maxLimit = ownerType === 'productVariantGroupOption' ? 1 : 10;
     const currentCount = await this.prisma.image.count({
       where: { [ownerField]: ownerId },
     });
-    if (currentCount + files.length > 10) {
+    if (currentCount + files.length > maxLimit) {
       throw new BadRequestException('backend.errors.files_too_many');
     }
 

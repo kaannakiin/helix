@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef } from "react";
-import { Button, Group, NumberInput, Select, Stack } from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
-import { useDataTableTranslations } from "../context/DataTableTranslationContext";
+import { useState, useEffect, useRef } from 'react';
+import { Group, NumberInput, SegmentedControl, Stack } from '@mantine/core';
+import { useDebouncedValue } from '@mantine/hooks';
+import { useDataTableTranslations } from '../context/DataTableTranslationContext';
 
 interface NumberFilterModel {
-  filterType: "number";
+  filterType: 'number';
   type: string;
   filter: number;
   filterTo?: number;
@@ -21,12 +21,12 @@ export function NumberFilter({ model, onModelChange }: NumberFilterProps) {
   const onModelChangeRef = useRef(onModelChange);
   onModelChangeRef.current = onModelChange;
 
-  const [filterType, setFilterType] = useState(model?.type || "equals");
+  const [filterType, setFilterType] = useState(model?.type || 'equals');
   const [localValue, setLocalValue] = useState<number | string>(
-    model?.filter ?? "",
+    model?.filter ?? '',
   );
   const [localValueTo, setLocalValueTo] = useState<number | string>(
-    model?.filterTo ?? "",
+    model?.filterTo ?? '',
   );
 
   const [debouncedValue] = useDebouncedValue(localValue, 300);
@@ -34,20 +34,10 @@ export function NumberFilter({ model, onModelChange }: NumberFilterProps) {
 
   const isExternalUpdate = useRef(false);
 
-  const FILTER_TYPES = [
-    { value: "equals", label: t.filters.number?.equals ?? "Equals" },
-    {
-      value: "greaterThan",
-      label: t.filters.number?.greaterThan ?? "Greater than",
-    },
-    { value: "lessThan", label: t.filters.number?.lessThan ?? "Less than" },
-    { value: "inRange", label: t.filters.number?.inRange ?? "Between" },
-  ];
-
   useEffect(() => {
-    const modelValue = model?.filter ?? "";
-    const modelValueTo = model?.filterTo ?? "";
-    const modelType = model?.type || "equals";
+    const modelValue = model?.filter ?? '';
+    const modelValueTo = model?.filterTo ?? '';
+    const modelType = model?.type || 'equals';
 
     const valueChanged = modelValue !== localValue;
     const valueToChanged = modelValueTo !== localValueTo;
@@ -67,7 +57,7 @@ export function NumberFilter({ model, onModelChange }: NumberFilterProps) {
       return;
     }
 
-    if (debouncedValue === "" || debouncedValue === undefined) {
+    if (debouncedValue === '' || debouncedValue === undefined) {
       onModelChangeRef.current(null);
       return;
     }
@@ -79,14 +69,14 @@ export function NumberFilter({ model, onModelChange }: NumberFilterProps) {
     }
 
     const newModel: NumberFilterModel = {
-      filterType: "number",
+      filterType: 'number',
       type: filterType,
       filter: numValue,
     };
 
     if (
-      filterType === "inRange" &&
-      debouncedValueTo !== "" &&
+      filterType === 'inRange' &&
+      debouncedValueTo !== '' &&
       debouncedValueTo !== undefined
     ) {
       const numValueTo = Number(debouncedValueTo);
@@ -98,48 +88,56 @@ export function NumberFilter({ model, onModelChange }: NumberFilterProps) {
     onModelChangeRef.current(newModel);
   }, [debouncedValue, debouncedValueTo, filterType]);
 
-  const handleFilterTypeChange = (type: string | null) => {
-    if (!type) return;
+  const handleFilterTypeChange = (type: string) => {
     setFilterType(type);
   };
 
   const handleReset = () => {
-    setLocalValue("");
-    setLocalValueTo("");
-    setFilterType("equals");
+    setLocalValue('');
+    setLocalValueTo('');
+    setFilterType('equals');
     onModelChange(null);
   };
 
   return (
     <Stack gap="xs" p="xs">
-      <Select
-        data={FILTER_TYPES}
+      <SegmentedControl
+        fullWidth
+        size="xs"
         value={filterType}
         onChange={handleFilterTypeChange}
-        size="xs"
-        comboboxProps={{ withinPortal: false }}
+        data={[
+          { value: 'equals', label: '=' },
+          { value: 'greaterThan', label: '>' },
+          { value: 'lessThan', label: '<' },
+          { value: 'inRange', label: '\u2194' },
+        ]}
       />
-      <NumberInput
-        placeholder={t.filters.number?.placeholder ?? "Value..."}
-        value={localValue}
-        onChange={setLocalValue}
-        size="xs"
-      />
-      {filterType === "inRange" && (
+      {filterType === 'inRange' ? (
+        <Group gap="xs" grow>
+          <NumberInput
+            placeholder={t.filters.number?.placeholder ?? 'Value...'}
+            value={localValue}
+            onChange={setLocalValue}
+            size="xs"
+          />
+          <NumberInput
+            placeholder={t.filters.number?.placeholderTo ?? 'To...'}
+            value={localValueTo}
+            onChange={setLocalValueTo}
+            size="xs"
+          />
+        </Group>
+      ) : (
         <NumberInput
-          placeholder={t.filters.number?.placeholderTo ?? "To..."}
-          value={localValueTo}
-          onChange={setLocalValueTo}
+          placeholder={t.filters.number?.placeholder ?? 'Value...'}
+          value={localValue}
+          onChange={setLocalValue}
           size="xs"
         />
       )}
-      <Group gap="xs" grow>
-        <Button size="xs" variant="subtle" onClick={handleReset}>
-          {t.filters.reset}
-        </Button>
-      </Group>
     </Stack>
   );
 }
 
-NumberFilter.displayName = "NumberFilter";
+NumberFilter.displayName = 'NumberFilter';

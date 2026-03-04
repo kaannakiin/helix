@@ -140,7 +140,7 @@ const RichTextEditor = <T extends FieldValues>({
   defaultValue,
 }: RichTextEditorProps<T>) => {
   const { control } = useFormContext<T>();
-  const t = useTranslations('common');
+  const t = useTranslations('frontend');
 
   return (
     <Controller

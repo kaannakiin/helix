@@ -1,11 +1,11 @@
-import { useState, useEffect, useRef } from "react";
-import { Button, Group, Stack, Select } from "@mantine/core";
-import { DateTimePicker } from "@mantine/dates";
-import { useDebouncedValue } from "@mantine/hooks";
-import { useDataTableTranslations } from "../context/DataTableTranslationContext";
+import { Group, SegmentedControl, Stack } from '@mantine/core';
+import { DatePickerInput } from '@mantine/dates';
+import { useDebouncedValue } from '@mantine/hooks';
+import { useEffect, useRef, useState } from 'react';
+import { useDataTableTranslations } from '../context/DataTableTranslationContext';
 
 interface DateFilterModel {
-  filterType: "date";
+  filterType: 'date';
   type: string;
   dateFrom: string;
   dateTo?: string;
@@ -16,18 +16,37 @@ interface DateFilterProps {
   onModelChange: (model: DateFilterModel | null) => void;
 }
 
+function toDateString(iso: string | undefined | null): string | null {
+  if (!iso) return null;
+  try {
+    const d = new Date(iso);
+    return d.toISOString().split('T')[0];
+  } catch {
+    return null;
+  }
+}
+
+function toISO(dateStr: string | null): string | null {
+  if (!dateStr) return null;
+  try {
+    return new Date(dateStr).toISOString();
+  } catch {
+    return null;
+  }
+}
+
 export function DateFilter({ model, onModelChange }: DateFilterProps) {
   const t = useDataTableTranslations();
 
   const onModelChangeRef = useRef(onModelChange);
   onModelChangeRef.current = onModelChange;
 
-  const [filterType, setFilterType] = useState(model?.type || "equals");
-  const [localDateFrom, setLocalDateFrom] = useState<Date | null>(
-    model?.dateFrom ? new Date(model.dateFrom) : null,
+  const [filterType, setFilterType] = useState(model?.type || 'equals');
+  const [localDateFrom, setLocalDateFrom] = useState<string | null>(
+    toDateString(model?.dateFrom)
   );
-  const [localDateTo, setLocalDateTo] = useState<Date | null>(
-    model?.dateTo ? new Date(model.dateTo) : null,
+  const [localDateTo, setLocalDateTo] = useState<string | null>(
+    toDateString(model?.dateTo)
   );
 
   const [debouncedDateFrom] = useDebouncedValue(localDateFrom, 300);
@@ -35,21 +54,13 @@ export function DateFilter({ model, onModelChange }: DateFilterProps) {
 
   const isExternalUpdate = useRef(false);
 
-  const FILTER_TYPES = [
-    { value: "equals", label: t.filters.date.equals },
-    { value: "greaterThan", label: t.filters.date.greaterThan },
-    { value: "lessThan", label: t.filters.date.lessThan },
-    { value: "inRange", label: t.filters.date.inRange },
-  ];
-
   useEffect(() => {
-    const modelDateFrom = model?.dateFrom ? new Date(model.dateFrom) : null;
-    const modelDateTo = model?.dateTo ? new Date(model.dateTo) : null;
-    const modelType = model?.type || "equals";
+    const modelDateFrom = toDateString(model?.dateFrom);
+    const modelDateTo = toDateString(model?.dateTo);
+    const modelType = model?.type || 'equals';
 
-    const dateFromChanged =
-      modelDateFrom?.getTime() !== localDateFrom?.getTime();
-    const dateToChanged = modelDateTo?.getTime() !== localDateTo?.getTime();
+    const dateFromChanged = modelDateFrom !== localDateFrom;
+    const dateToChanged = modelDateTo !== localDateTo;
     const typeChanged = modelType !== filterType;
 
     if (dateFromChanged || dateToChanged || typeChanged) {
@@ -71,73 +82,85 @@ export function DateFilter({ model, onModelChange }: DateFilterProps) {
       return;
     }
 
+    const isoFrom = toISO(debouncedDateFrom);
+    if (!isoFrom) {
+      onModelChangeRef.current(null);
+      return;
+    }
+
     const newModel: DateFilterModel = {
-      filterType: "date",
+      filterType: 'date',
       type: filterType,
-      dateFrom: debouncedDateFrom.toISOString(),
+      dateFrom: isoFrom,
     };
 
-    if (filterType === "inRange" && debouncedDateTo) {
-      newModel.dateTo = debouncedDateTo.toISOString();
+    if (filterType === 'inRange' && debouncedDateTo) {
+      const isoTo = toISO(debouncedDateTo);
+      if (isoTo) {
+        newModel.dateTo = isoTo;
+      }
     }
 
     onModelChangeRef.current(newModel);
   }, [debouncedDateFrom, debouncedDateTo, filterType]);
 
-  const handleFilterTypeChange = (type: string | null) => {
-    if (!type) return;
+  const handleFilterTypeChange = (type: string) => {
     setFilterType(type);
   };
 
   const handleDateFromChange = (value: string | null) => {
-    setLocalDateFrom(value ? new Date(value) : null);
+    setLocalDateFrom(value);
   };
 
   const handleDateToChange = (value: string | null) => {
-    setLocalDateTo(value ? new Date(value) : null);
-  };
-
-  const handleReset = () => {
-    setLocalDateFrom(null);
-    setLocalDateTo(null);
-    setFilterType("equals");
-    onModelChange(null);
+    setLocalDateTo(value);
   };
 
   return (
     <Stack gap="xs" p="xs">
-      <Select
-        data={FILTER_TYPES}
+      <SegmentedControl
+        fullWidth
+        size="xs"
         value={filterType}
         onChange={handleFilterTypeChange}
-        size="xs"
-        comboboxProps={{ withinPortal: false }}
+        data={[
+          { value: 'equals', label: t.filters.date.equals },
+          { value: 'greaterThan', label: t.filters.date.greaterThan },
+          { value: 'lessThan', label: t.filters.date.lessThan },
+          { value: 'inRange', label: t.filters.date.inRange },
+        ]}
       />
-      <DateTimePicker
-        placeholder={t.filters.date.placeholder}
-        value={localDateFrom}
-        onChange={handleDateFromChange}
-        size="xs"
-        clearable
-        popoverProps={{ withinPortal: false }}
-      />
-      {filterType === "inRange" && (
-        <DateTimePicker
-          placeholder={t.filters.date.placeholderTo}
-          value={localDateTo}
-          onChange={handleDateToChange}
+      {filterType === 'inRange' ? (
+        <Group gap="xs" grow>
+          <DatePickerInput
+            placeholder={t.filters.date.placeholder}
+            value={localDateFrom}
+            onChange={handleDateFromChange}
+            size="xs"
+            clearable
+            popoverProps={{ withinPortal: false }}
+          />
+          <DatePickerInput
+            placeholder={t.filters.date.placeholderTo}
+            value={localDateTo}
+            onChange={handleDateToChange}
+            size="xs"
+            clearable
+            popoverProps={{ withinPortal: false }}
+          />
+        </Group>
+      ) : (
+        <DatePickerInput
+          placeholder={t.filters.date.placeholder}
+          value={localDateFrom}
+          onChange={handleDateFromChange}
           size="xs"
           clearable
           popoverProps={{ withinPortal: false }}
         />
       )}
-      <Group gap="xs" grow>
-        <Button size="xs" variant="subtle" onClick={handleReset}>
-          {t.filters.reset}
-        </Button>
-      </Group>
     </Stack>
   );
 }
 
-DateFilter.displayName = "DateFilter";
+DateFilter.displayName = 'DateFilter';

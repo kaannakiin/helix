@@ -12,7 +12,11 @@ import {
 } from '@org/types/admin/customer-groups';
 import type { FilterCondition } from '@org/types/data-query';
 import type { PaginatedResponse } from '@org/types/pagination';
-import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
+import {
+  buildPrismaQuery,
+  resolveCountFilters,
+  type CountRelationMap,
+} from '../../../core/utils/prisma-query-builder';
 import { PrismaService } from '../../prisma/prisma.service';
 import { EvaluationService } from '../../evaluation/evaluation.service';
 import type { CustomerGroupQueryDTO, CustomerGroupSaveDTO } from './dto';
@@ -24,22 +28,35 @@ export class CustomerGroupsService {
     private readonly evaluationService: EvaluationService
   ) {}
 
+  private static readonly COUNT_RELATIONS: CountRelationMap = {
+    members: { table: 'CustomerGroupMember', fk: 'customerGroupId' },
+  };
+
   async getCustomerGroups(
     query: CustomerGroupQueryDTO
   ): Promise<PaginatedResponse<AdminCustomerGroupListPrismaType>> {
     const { page, limit, filters, sort } = query;
 
-    const { where, orderBy, skip, take } = buildPrismaQuery({
-      page,
-      limit,
-      filters: filters as Record<string, FilterCondition> | undefined,
-      sort,
-      defaultSort: { field: 'createdAt', order: 'desc' },
-    });
+    const { where: baseWhere, orderBy, skip, take, countFilters } =
+      buildPrismaQuery({
+        page,
+        limit,
+        filters: filters as Record<string, FilterCondition> | undefined,
+        sort,
+        defaultSort: { field: 'createdAt', order: 'desc' },
+      });
+
+    const where = (await resolveCountFilters(
+      this.prisma,
+      'CustomerGroup',
+      CustomerGroupsService.COUNT_RELATIONS,
+      countFilters,
+      baseWhere
+    )) as Prisma.CustomerGroupWhereInput;
 
     const [items, total] = await Promise.all([
       this.prisma.customerGroup.findMany({
-        where: where as Prisma.CustomerGroupWhereInput,
+        where,
         orderBy: orderBy as
           | Prisma.CustomerGroupOrderByWithRelationInput
           | Prisma.CustomerGroupOrderByWithRelationInput[],
@@ -47,9 +64,7 @@ export class CustomerGroupsService {
         take,
         include: AdminCustomerGroupListPrismaQuery,
       }),
-      this.prisma.customerGroup.count({
-        where: where as Prisma.CustomerGroupWhereInput,
-      }),
+      this.prisma.customerGroup.count({ where }),
     ]);
 
     return {

@@ -38,6 +38,14 @@ export function useFilePreview() {
     });
   }, []);
 
+  const openPreviewWithUrl = useCallback((url: string, fileType: FileType) => {
+    if (urlRef.current) {
+      URL.revokeObjectURL(urlRef.current);
+      urlRef.current = null;
+    }
+    setState({ isOpen: true, file: null, url, fileType });
+  }, []);
+
   const closePreview = useCallback(() => {
     if (urlRef.current) {
       URL.revokeObjectURL(urlRef.current);
@@ -54,5 +62,5 @@ export function useFilePreview() {
     };
   }, []);
 
-  return { preview: state, openPreview, closePreview };
+  return { preview: state, openPreview, openPreviewWithUrl, closePreview };
 }

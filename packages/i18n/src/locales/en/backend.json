@@ -42,6 +42,8 @@
     "taxonomy_not_found": "Taxonomy not found.",
     "country_not_found": "Country not found.",
     "state_or_country_required": "State or country is required.",
+    "max_images_exceeded": "Maximum number of images exceeded.",
+    "image_not_found": "Image not found.",
     "no_files_provided": "No files provided.",
     "invalid_owner_type": "Invalid owner type.",
     "invalid_owner_id": "Invalid owner ID.",

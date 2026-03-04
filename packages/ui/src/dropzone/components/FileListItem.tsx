@@ -2,18 +2,24 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { ActionIcon, Group, Paper, Text } from '@mantine/core';
+import { ActionIcon, Group, Image, Loader, Paper, Text } from '@mantine/core';
 import { Eye, GripVertical, Trash2 } from 'lucide-react';
-import type { DropzoneFile, DropzoneTranslations } from '../types';
-import { formatFileSize, getFileIcon } from '../utils/file-helpers';
+import type { DropzoneTranslations, UnifiedFile } from '../types';
+import { isRemoteFile } from '../types';
+import {
+  extractFilenameFromUrl,
+  formatFileSize,
+  getFileIcon,
+} from '../utils/file-helpers';
 
 interface FileListItemProps {
-  file: DropzoneFile;
+  file: UnifiedFile;
   index: number;
-  onPreview: (file: DropzoneFile) => void;
-  onRemove: (id: string) => void;
+  onPreview: (file: UnifiedFile) => void;
+  onRemove: (file: UnifiedFile) => void;
   translations?: DropzoneTranslations;
   disabled?: boolean;
+  isDeleting?: boolean;
 }
 
 export function FileListItem({
@@ -23,8 +29,10 @@ export function FileListItem({
   onRemove,
   translations,
   disabled = false,
+  isDeleting = false,
 }: FileListItemProps) {
   const Icon = getFileIcon(file.fileType);
+  const remote = isRemoteFile(file);
 
   const {
     attributes,
@@ -35,7 +43,7 @@ export function FileListItem({
     isDragging,
   } = useSortable({
     id: file.id,
-    disabled,
+    disabled: disabled || isDeleting,
   });
 
   const style = {
@@ -44,6 +52,12 @@ export function FileListItem({
     zIndex: isDragging ? 1 : 0,
   };
 
+  const displayName = remote
+    ? extractFilenameFromUrl(file.url)
+    : file.file.name;
+
+  const displaySize = remote ? null : formatFileSize(file.file.size);
+
   return (
     <Paper
       ref={setNodeRef}
@@ -51,32 +65,50 @@ export function FileListItem({
       withBorder
       p="xs"
       shadow={isDragging ? 'md' : undefined}
-      opacity={disabled ? 0.5 : 1}
+      opacity={disabled || isDeleting ? 0.5 : 1}
     >
       <Group gap="sm" wrap="nowrap">
         <div
           {...attributes}
           {...listeners}
-          style={{ display: 'flex', cursor: disabled ? 'not-allowed' : 'grab' }}
+          style={{
+            display: 'flex',
+            cursor: disabled || isDeleting ? 'not-allowed' : 'grab',
+          }}
           aria-label={translations?.dragHandle ?? 'Drag to reorder'}
         >
           <GripVertical size={16} />
         </div>
 
-        <Icon size={18} style={{ flexShrink: 0 }} />
+        {remote && file.fileType === 'IMAGE' ? (
+          <Image
+            src={file.url}
+            alt={displayName}
+            w={32}
+            h={32}
+            radius={4}
+            fit="cover"
+            style={{ flexShrink: 0 }}
+          />
+        ) : (
+          <Icon size={18} style={{ flexShrink: 0 }} />
+        )}
 
         <Text size="sm" truncate flex={1}>
-          {file.file.name}
+          {displayName}
         </Text>
 
-        <Text size="xs" c="dimmed" style={{ flexShrink: 0 }}>
-          {formatFileSize(file.file.size)}
-        </Text>
+        {displaySize && (
+          <Text size="xs" c="dimmed" style={{ flexShrink: 0 }}>
+            {displaySize}
+          </Text>
+        )}
 
         <ActionIcon
           variant="subtle"
           size="sm"
           onClick={() => onPreview(file)}
+          disabled={isDeleting}
           aria-label={translations?.previewFile ?? 'Preview file'}
         >
           <Eye size={16} />
@@ -86,11 +118,11 @@ export function FileListItem({
           variant="subtle"
           color="red"
           size="sm"
-          onClick={() => onRemove(file.id)}
-          disabled={disabled}
+          onClick={() => onRemove(file)}
+          disabled={disabled || isDeleting}
           aria-label={translations?.removeFile ?? 'Remove file'}
         >
-          <Trash2 size={16} />
+          {isDeleting ? <Loader size={14} /> : <Trash2 size={16} />}
         </ActionIcon>
       </Group>
     </Paper>

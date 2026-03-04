@@ -28,6 +28,7 @@ import { VariantGroupType } from '@org/prisma/browser';
 import type { ProductInputType } from '@org/schemas/admin/products';
 import type { VariantGroupInput } from '@org/schemas/admin/variants';
 import { FormCard } from '@org/ui/common/form-card';
+import type { RemoteFile } from '@org/ui/dropzone';
 import { Info, Layers, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useMemo, useState } from 'react';
@@ -47,9 +48,16 @@ import { useVariantCombinations } from './useVariantCombinations';
 interface Props {
   isNew: boolean;
   initialOriginalOptionsMap?: Map<string, VariantGroupInput['options']>;
+  deleteImage: (file: RemoteFile) => Promise<boolean>;
+  deletingIds: Set<string>;
 }
 
-export const VariantCreator = ({ isNew, initialOriginalOptionsMap }: Props) => {
+export const VariantCreator = ({
+  isNew,
+  initialOriginalOptionsMap,
+  deleteImage,
+  deletingIds,
+}: Props) => {
   const { recalculate } = useVariantCombinations();
   const t = useTranslations('frontend.admin.products.form');
   const [modalOpen, setModalOpen] = useState(false);
@@ -335,7 +343,10 @@ export const VariantCreator = ({ isNew, initialOriginalOptionsMap }: Props) => {
         />
       </FormCard>
 
-      <VariantCombinationTable />
+      <VariantCombinationTable
+        deleteImage={deleteImage}
+        deletingIds={deletingIds}
+      />
 
       <AddVariantGroupModal
         opened={modalOpen}
@@ -366,6 +377,8 @@ export const VariantCreator = ({ isNew, initialOriginalOptionsMap }: Props) => {
           optionIndex={activeOptionIndex ?? 0}
           onCommit={recalculate}
           draftControl={activeDraftControl}
+          deleteImage={deleteImage}
+          deletingIds={deletingIds}
         />
       </Drawer.Stack>
     </>

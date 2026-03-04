@@ -18,6 +18,9 @@
       "path": "../prisma/tsconfig.lib.json"
     },
     {
+      "path": "../constants/tsconfig.lib.json"
+    },
+    {
       "path": "../utils/tsconfig.lib.json"
     },
     {

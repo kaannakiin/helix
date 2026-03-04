@@ -16,7 +16,11 @@ import type { ImageOwnerType } from '@org/types/admin/upload';
 import type { FilterCondition } from '@org/types/data-query';
 import type { PaginatedResponse } from '@org/types/pagination';
 import type { LookupItem } from '@org/schemas/admin/common';
-import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
+import {
+  buildPrismaQuery,
+  resolveCountFilters,
+  type CountRelationMap,
+} from '../../../core/utils/prisma-query-builder';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UploadService } from '../../upload/upload.service';
 import type { VariantGroupQueryDTO, VariantGroupSaveDTO } from './dto';
@@ -28,22 +32,36 @@ export class VariantGroupsService {
     private readonly uploadService: UploadService,
   ) {}
 
+  private static readonly COUNT_RELATIONS: CountRelationMap = {
+    options: { table: 'VariantOption', fk: 'variantGroupId' },
+    products: { table: 'ProductVariantGroup', fk: 'variantGroupId' },
+  };
+
   async getVariantGroups(
     query: VariantGroupQueryDTO
   ): Promise<PaginatedResponse<AdminVariantGroupListPrismaType>> {
     const { page, limit, filters, sort } = query;
 
-    const { where, orderBy, skip, take } = buildPrismaQuery({
-      page,
-      limit,
-      filters: filters as Record<string, FilterCondition> | undefined,
-      sort,
-      defaultSort: { field: 'createdAt', order: 'desc' },
-    });
+    const { where: baseWhere, orderBy, skip, take, countFilters } =
+      buildPrismaQuery({
+        page,
+        limit,
+        filters: filters as Record<string, FilterCondition> | undefined,
+        sort,
+        defaultSort: { field: 'createdAt', order: 'desc' },
+      });
+
+    const where = (await resolveCountFilters(
+      this.prisma,
+      'VariantGroup',
+      VariantGroupsService.COUNT_RELATIONS,
+      countFilters,
+      baseWhere
+    )) as Prisma.VariantGroupWhereInput;
 
     const [items, total] = await Promise.all([
       this.prisma.variantGroup.findMany({
-        where: where as Prisma.VariantGroupWhereInput,
+        where,
         orderBy: orderBy as
           | Prisma.VariantGroupOrderByWithRelationInput
           | Prisma.VariantGroupOrderByWithRelationInput[],
@@ -51,7 +69,7 @@ export class VariantGroupsService {
         take,
         include: AdminVariantGroupListPrismaQuery,
       }),
-      this.prisma.variantGroup.count({ where: where as Prisma.VariantGroupWhereInput }),
+      this.prisma.variantGroup.count({ where }),
     ]);
 
     return {

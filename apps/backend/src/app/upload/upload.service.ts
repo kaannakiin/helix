@@ -10,6 +10,7 @@ import {
   UploadResult,
 } from '@org/types/admin/upload';
 import { createId } from '@paralleldrive/cuid2';
+import { deriveObjectName } from '../../core/utils/image.util';
 import { PrismaService } from '../prisma/prisma.service';
 import { ImageProcessorService } from './image-processor.service';
 import { MinioStorageService } from './minio-storage.service';
@@ -113,17 +114,17 @@ export class UploadService {
     }
 
     const objectName = this.minioStorage.extractObjectName(image.url);
-    await this.minioStorage.deleteFile(objectName);
+    const isMinioObject =
+      !objectName.startsWith('http://') && !objectName.startsWith('https://');
 
-    // thumbnail varsa sil (konvansiyon: url içinde .webp → -thumbnail.webp)
-    if (image.fileType === FileType.IMAGE) {
-      const thumbnailObjectName = objectName
-        .replace('.webp', '-thumbnail.webp')
-        .replace(/\.(jpg|jpeg|png|gif)$/, '-thumbnail.webp');
-      try {
-        await this.minioStorage.deleteFile(thumbnailObjectName);
-      } catch {
-        // thumbnail olmayabilir, hata görmezden gel
+    if (isMinioObject) {
+      await this.minioStorage.deleteFile(objectName);
+
+      if (image.fileType === FileType.IMAGE) {
+        const thumbnailObjectName = deriveObjectName(objectName, '-thumbnail.webp');
+        try {
+          await this.minioStorage.deleteFile(thumbnailObjectName);
+        } catch {}
       }
     }
 

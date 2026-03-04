@@ -83,6 +83,7 @@ const ProductSeoCard = <T extends FieldValues>({
               render={({ field, fieldState }) => (
                 <TextInput
                   {...field}
+                  value={field.value ?? ''}
                   label={t('fields.metaTitle.label')}
                   placeholder={t('fields.metaTitle.placeholder')}
                   error={fieldState.error?.message}
@@ -99,6 +100,7 @@ const ProductSeoCard = <T extends FieldValues>({
               render={({ field, fieldState }) => (
                 <Textarea
                   {...field}
+                  value={field.value ?? ''}
                   label={t('fields.metaDescription.label')}
                   placeholder={t('fields.metaDescription.placeholder')}
                   rows={4}

@@ -16,7 +16,11 @@ import {
 } from '@org/types/admin/tags';
 import type { FilterCondition } from '@org/types/data-query';
 import type { PaginatedResponse } from '@org/types/pagination';
-import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
+import {
+  buildPrismaQuery,
+  resolveCountFilters,
+  type CountRelationMap,
+} from '../../../core/utils/prisma-query-builder';
 import { PrismaService } from '../../prisma/prisma.service';
 import type { TagGroupQueryDTO, TagGroupSaveDTO, TagSaveDTO } from './dto';
 
@@ -24,22 +28,35 @@ import type { TagGroupQueryDTO, TagGroupSaveDTO, TagSaveDTO } from './dto';
 export class TagGroupsService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private static readonly COUNT_RELATIONS: CountRelationMap = {
+    tags: { table: 'Tag', fk: 'tagGroupId' },
+  };
+
   async getTagGroups(
     query: TagGroupQueryDTO
   ): Promise<PaginatedResponse<AdminTagGroupListPrismaType>> {
     const { page, limit, filters, sort } = query;
 
-    const { where, orderBy, skip, take } = buildPrismaQuery({
-      page,
-      limit,
-      filters: filters as Record<string, FilterCondition> | undefined,
-      sort,
-      defaultSort: { field: 'createdAt', order: 'desc' },
-    });
+    const { where: baseWhere, orderBy, skip, take, countFilters } =
+      buildPrismaQuery({
+        page,
+        limit,
+        filters: filters as Record<string, FilterCondition> | undefined,
+        sort,
+        defaultSort: { field: 'createdAt', order: 'desc' },
+      });
+
+    const where = (await resolveCountFilters(
+      this.prisma,
+      'TagGroup',
+      TagGroupsService.COUNT_RELATIONS,
+      countFilters,
+      baseWhere
+    )) as Prisma.TagGroupWhereInput;
 
     const [items, total] = await Promise.all([
       this.prisma.tagGroup.findMany({
-        where: where as Prisma.TagGroupWhereInput,
+        where,
         orderBy: orderBy as
           | Prisma.TagGroupOrderByWithRelationInput
           | Prisma.TagGroupOrderByWithRelationInput[],
@@ -47,7 +64,7 @@ export class TagGroupsService {
         take,
         include: AdminTagGroupListPrismaQuery,
       }),
-      this.prisma.tagGroup.count({ where: where as Prisma.TagGroupWhereInput }),
+      this.prisma.tagGroup.count({ where }),
     ]);
 
     return {
@@ -179,11 +196,12 @@ export class TagGroupsService {
     q?: string;
     ids?: string[];
     tagGroupId?: string;
+    parentTagId?: string;
     limit: number;
     page: number;
     lang: Locale;
   }): Promise<LookupItem[] | PaginatedResponse<LookupItem>> {
-    const { q, ids, tagGroupId, limit, page, lang } = opts;
+    const { q, ids, tagGroupId, parentTagId, limit, page, lang } = opts;
 
     if (ids?.length) {
       return this.lookupTags({ q, ids, limit, page, lang });
@@ -192,19 +210,22 @@ export class TagGroupsService {
     const skip = (page - 1) * limit;
 
     if (tagGroupId) {
+      const translationFilter = q
+        ? {
+            translations: {
+              some: {
+                locale: lang,
+                name: { contains: q, mode: 'insensitive' as const },
+              },
+            },
+          }
+        : {};
+
       const where: Prisma.TagWhereInput = {
         tagGroupId,
+        parentTagId: parentTagId ?? null,
         isActive: true,
-        ...(q
-          ? {
-              translations: {
-                some: {
-                  locale: lang,
-                  name: { contains: q, mode: 'insensitive' as const },
-                },
-              },
-            }
-          : {}),
+        ...translationFilter,
       };
 
       const [tags, total] = await Promise.all([
@@ -216,6 +237,7 @@ export class TagGroupsService {
           include: {
             translations: { where: { locale: lang } },
             images: { where: { isPrimary: true }, take: 1 },
+            _count: { select: { children: { where: { isActive: true } } } },
           },
         }),
         this.prisma.tag.count({ where }),
@@ -227,7 +249,11 @@ export class TagGroupsService {
           label: t.translations[0]?.name ?? t.slug,
           slug: t.slug,
           imageUrl: t.images[0]?.url,
-          extra: { childCount: 0 },
+          extra: {
+            childCount: t._count.children,
+            tagGroupId,
+            ancestorIds: [tagGroupId],
+          },
         })),
         pagination: {
           page,
@@ -277,7 +303,9 @@ export class TagGroupsService {
         orderBy: { sortOrder: 'asc' },
         include: {
           translations: { where: { locale: lang } },
-          _count: { select: { tags: { where: { isActive: true } } } },
+          _count: {
+            select: { tags: { where: { isActive: true, parentTagId: null } } },
+          },
         },
       }),
       this.prisma.tagGroup.count({ where }),
@@ -371,7 +399,6 @@ export class TagGroupsService {
         include: AdminTagGroupDetailPrismaQuery,
       });
 
-      // Bulk tag creation (create mode)
       if (tags && tags.length > 0) {
         await this.createTagsRecursively(tx, id, tags, null, 0);
       }

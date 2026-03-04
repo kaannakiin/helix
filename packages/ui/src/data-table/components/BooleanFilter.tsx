@@ -1,4 +1,4 @@
-import { Button, Group, Select, Stack } from '@mantine/core';
+import { SegmentedControl, Stack } from '@mantine/core';
 import { useDataTableTranslations } from '../context/DataTableTranslationContext';
 
 interface BooleanFilterModel {
@@ -14,15 +14,10 @@ interface BooleanFilterProps {
 export function BooleanFilter({ model, onModelChange }: BooleanFilterProps) {
   const t = useDataTableTranslations();
 
-  const value = model ? (model.filter ? 'true' : 'false') : null;
+  const value = model ? (model.filter ? 'true' : 'false') : '';
 
-  const BOOLEAN_OPTIONS = [
-    { value: 'true', label: t.filters.boolean.yes },
-    { value: 'false', label: t.filters.boolean.no },
-  ];
-
-  const handleChange = (newValue: string | null) => {
-    if (newValue === null) {
+  const handleChange = (newValue: string) => {
+    if (newValue === '') {
       onModelChange(null);
     } else {
       onModelChange({
@@ -32,26 +27,19 @@ export function BooleanFilter({ model, onModelChange }: BooleanFilterProps) {
     }
   };
 
-  const handleReset = () => {
-    onModelChange(null);
-  };
-
   return (
     <Stack gap="xs" p="xs">
-      <Select
-        placeholder={t.filters.boolean.placeholder}
-        data={BOOLEAN_OPTIONS}
+      <SegmentedControl
+        fullWidth
+        size="xs"
         value={value}
         onChange={handleChange}
-        size="xs"
-        clearable
-        comboboxProps={{ withinPortal: false }}
+        data={[
+          { value: '', label: t.filters.reset },
+          { value: 'true', label: t.filters.boolean.yes },
+          { value: 'false', label: t.filters.boolean.no },
+        ]}
       />
-      <Group gap="xs" grow>
-        <Button size="xs" variant="subtle" onClick={handleReset}>
-          {t.filters.reset}
-        </Button>
-      </Group>
     </Stack>
   );
 }

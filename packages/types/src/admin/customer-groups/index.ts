@@ -8,6 +8,7 @@ export const ADMIN_CUSTOMER_GROUPS_FIELD_CONFIG = {
   lastEvaluatedAt: { filterType: 'date' },
   createdAt: { filterType: 'date' },
   updatedAt: { filterType: 'date' },
+  '_count.members': { filterType: 'number' },
 } as const satisfies Record<string, FieldFilterConfig>;
 
 export type AdminCustomerGroupsFilterableField =
@@ -20,6 +21,7 @@ export const ADMIN_CUSTOMER_GROUPS_SORT_FIELDS = [
   'lastEvaluatedAt',
   'createdAt',
   'updatedAt',
+  '_count.members',
 ] as const;
 
 export type AdminCustomerGroupsSortField =

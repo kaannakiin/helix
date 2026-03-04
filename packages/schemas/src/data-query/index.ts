@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE_SIZE } from '@org/constants';
 import type { FieldFilterConfig } from '@org/types/data-query';
 import {
   BOOLEAN_FILTER_OPS,
@@ -79,7 +80,7 @@ export function createDataQuerySchema<
   TFields extends Record<string, FieldFilterConfig>,
   TSortFields extends readonly string[]
 >(config: { fields: TFields; sortFields: TSortFields; maxLimit?: number }) {
-  const { fields, sortFields, maxLimit = 100 } = config;
+  const { fields, sortFields, maxLimit = DEFAULT_PAGE_SIZE } = config;
 
   const filterShape: Record<string, z.ZodOptional<z.ZodTypeAny>> = {};
   for (const [fieldName, fieldConfig] of Object.entries(fields)) {

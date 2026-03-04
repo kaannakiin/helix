@@ -103,12 +103,26 @@ export function DrawerTreeList({
     autoExpandedRef.current = false;
   }, [debouncedSearch]);
 
+  const nodeExtrasRef = useRef<Map<string, Record<string, unknown>>>(new Map());
+
   const fetchChildren = useCallback(
-    async (nodeId: string, page = 1, append = false) => {
+    async (
+      nodeId: string,
+      nodeExtra?: Record<string, unknown>,
+      page = 1,
+      append = false
+    ) => {
       if (loadingNodes.has(nodeId)) return;
+      if (nodeExtra) {
+        nodeExtrasRef.current.set(nodeId, nodeExtra);
+      }
       setLoadingNodes((prev) => new Set(prev).add(nodeId));
       try {
-        const result = await treeFetchOptions({ parentId: nodeId, page });
+        const result = await treeFetchOptions({
+          parentId: nodeId,
+          parentExtra: nodeExtrasRef.current.get(nodeId),
+          page,
+        });
         const { items, hasMore } = normalizeTreePage(result);
         setNodeChildren((prev) => {
           const existing = append ? prev.get(nodeId) ?? [] : [];
@@ -146,7 +160,7 @@ export function DrawerTreeList({
     autoExpandedRef.current = true;
     setOpenedNodes((prev) => new Set([...prev, ...allAncestorIds]));
     for (const ancestorId of allAncestorIds) {
-      void fetchChildrenRef.current(ancestorId, 1, false);
+      void fetchChildrenRef.current(ancestorId, undefined, 1, false);
     }
   }, [resolvedItems, isLoading]);
 
@@ -249,7 +263,12 @@ export function DrawerTreeList({
               if (nowOpen) {
                 next.add(node.id);
                 if (!nodeChildren.has(node.id)) {
-                  void fetchChildren(node.id, 1, false);
+                  void fetchChildren(
+                    node.id,
+                    node.extra as Record<string, unknown> | undefined,
+                    1,
+                    false
+                  );
                 }
               } else {
                 next.delete(node.id);
@@ -307,7 +326,12 @@ export function DrawerTreeList({
                       variant="subtle"
                       loading={isNodeLoading}
                       onClick={() =>
-                        fetchChildren(node.id, currentPage + 1, true)
+                        fetchChildren(
+                          node.id,
+                          node.extra as Record<string, unknown> | undefined,
+                          currentPage + 1,
+                          true
+                        )
                       }
                       mt={4}
                     >

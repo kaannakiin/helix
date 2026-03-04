@@ -115,6 +115,8 @@ export default function CustomersPage() {
         activeFilters: t.raw('filterDrawer.activeFilters'),
         noFilters: t('filterDrawer.noFilters'),
         apply: t('filterDrawer.apply'),
+        searchPlaceholder: t('filterDrawer.searchPlaceholder'),
+        appliedFilters: t('filterDrawer.appliedFilters'),
       },
     }),
     [t]

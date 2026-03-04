@@ -4,7 +4,7 @@ import type {
   AdminTagChildrenPrismaType,
   AdminTagGroupDetailPrismaType,
 } from '@org/types/admin/tags';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from '../lib/api/api-client';
 
 export const useAdminTagGroup = (id: string) => {
@@ -39,9 +39,10 @@ export const useTagChildren = (
   });
 };
 
-export const useSaveTagGroup = () => {
-  const queryClient = useQueryClient();
-
+export const useSaveTagGroup = (options?: {
+  onSuccess?: (result: AdminTagGroupDetailPrismaType) => void;
+  onError?: (err: Error) => void;
+}) => {
   return useMutation({
     mutationFn: async (data: TagGroupOutput) => {
       const res = await apiClient.post<AdminTagGroupDetailPrismaType>(
@@ -50,20 +51,23 @@ export const useSaveTagGroup = () => {
       );
       return res.data;
     },
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({
+    onSuccess: (result, _vars, _mutateResult, context) => {
+      context.client.invalidateQueries({
         queryKey: DATA_ACCESS_KEYS.admin.tags.detail(result.id),
       });
-      queryClient.invalidateQueries({
+      context.client.invalidateQueries({
         queryKey: DATA_ACCESS_KEYS.admin.tags.list,
       });
+      options?.onSuccess?.(result);
     },
+    onError: (err) => options?.onError?.(err as Error),
   });
 };
 
-export const useSaveTag = (tagGroupId: string) => {
-  const queryClient = useQueryClient();
-
+export const useSaveTag = (tagGroupId: string, options?: {
+  onSuccess?: (result: AdminTagChildrenPrismaType) => void;
+  onError?: (err: Error) => void;
+}) => {
   return useMutation({
     mutationFn: async (data: BaseTagOutput) => {
       const res = await apiClient.post<AdminTagChildrenPrismaType>(
@@ -72,42 +76,48 @@ export const useSaveTag = (tagGroupId: string) => {
       );
       return res.data;
     },
-    onSuccess: (_result, variables) => {
+    onSuccess: (result, variables, _mutateResult, context) => {
       const parentId = variables.parentTagId ?? null;
-      queryClient.invalidateQueries({
+      context.client.invalidateQueries({
         queryKey: DATA_ACCESS_KEYS.admin.tags.children(tagGroupId, parentId),
       });
       // Also invalidate parent's children count (parent's sibling list)
       if (parentId) {
         // Find the parent's parent to invalidate the list containing the parent
-        queryClient.invalidateQueries({
+        context.client.invalidateQueries({
           queryKey: DATA_ACCESS_KEYS.admin.tags.children(tagGroupId, parentId),
           exact: false,
         });
       }
+      options?.onSuccess?.(result);
     },
+    onError: (err) => options?.onError?.(err as Error),
   });
 };
 
-export const useDeleteTag = (tagGroupId: string) => {
-  const queryClient = useQueryClient();
-
+export const useDeleteTag = (tagGroupId: string, options?: {
+  onSuccess?: () => void;
+  onError?: (err: Error) => void;
+}) => {
   return useMutation({
     mutationFn: async ({ tagId, parentTagId }: { tagId: string; parentTagId: string | null }) => {
       await apiClient.delete(`/admin/tag-groups/${tagGroupId}/tags/${tagId}`);
       return { tagId, parentTagId };
     },
-    onSuccess: (_result, { parentTagId }) => {
-      queryClient.invalidateQueries({
+    onSuccess: (_result, { parentTagId }, _mutateResult, context) => {
+      context.client.invalidateQueries({
         queryKey: DATA_ACCESS_KEYS.admin.tags.children(tagGroupId, parentTagId),
       });
+      options?.onSuccess?.();
     },
+    onError: (err) => options?.onError?.(err as Error),
   });
 };
 
-export const useBulkDeleteTags = (tagGroupId: string) => {
-  const queryClient = useQueryClient();
-
+export const useBulkDeleteTags = (tagGroupId: string, options?: {
+  onSuccess?: () => void;
+  onError?: (err: Error) => void;
+}) => {
   return useMutation({
     mutationFn: async (ids: string[]) => {
       const res = await apiClient.post<{ count: number }>(
@@ -116,9 +126,9 @@ export const useBulkDeleteTags = (tagGroupId: string) => {
       );
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: (_result, _vars, _mutateResult, context) => {
       // Invalidate all children queries for this tag group
-      queryClient.invalidateQueries({
+      context.client.invalidateQueries({
         predicate: (query) => {
           const key = query.queryKey;
           return (
@@ -130,6 +140,8 @@ export const useBulkDeleteTags = (tagGroupId: string) => {
           );
         },
       });
+      options?.onSuccess?.();
     },
+    onError: (err) => options?.onError?.(err as Error),
   });
 };

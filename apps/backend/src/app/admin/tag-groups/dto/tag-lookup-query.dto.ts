@@ -4,6 +4,7 @@ import { z } from 'zod/v4';
 
 export const TagLookupQuerySchema = LookupQuerySchema.extend({
   tagGroupId: z.string().optional(),
+  parentTagId: z.string().optional(),
 });
 
 export class TagLookupQueryDTO extends (createZodDto(

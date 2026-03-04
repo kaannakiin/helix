@@ -4,6 +4,8 @@ import type { FieldFilterConfig } from '../../data-query/index.js';
 export const ADMIN_VARIANT_GROUPS_FIELD_CONFIG = {
   createdAt: { filterType: 'date' },
   updatedAt: { filterType: 'date' },
+  '_count.options': { filterType: 'number' },
+  '_count.products': { filterType: 'number' },
 } as const satisfies Record<string, FieldFilterConfig>;
 
 export type AdminVariantGroupsFilterableField =
@@ -13,6 +15,8 @@ export const ADMIN_VARIANT_GROUPS_SORT_FIELDS = [
   'sortOrder',
   'createdAt',
   'updatedAt',
+  '_count.options',
+  '_count.products',
 ] as const;
 
 export type AdminVariantGroupsSortField =

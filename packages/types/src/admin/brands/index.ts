@@ -6,6 +6,7 @@ export const ADMIN_BRANDS_FIELD_CONFIG = {
   isActive: { filterType: 'boolean' },
   createdAt: { filterType: 'date' },
   updatedAt: { filterType: 'date' },
+  '_count.products': { filterType: 'number' },
 } as const satisfies Record<string, FieldFilterConfig>;
 
 export type AdminBrandsFilterableField =
@@ -17,6 +18,7 @@ export const ADMIN_BRANDS_SORT_FIELDS = [
   'sortOrder',
   'createdAt',
   'updatedAt',
+  '_count.products',
 ] as const;
 
 export type AdminBrandsSortField =

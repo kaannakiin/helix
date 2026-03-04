@@ -4,7 +4,6 @@ import { NestMinioModule } from 'nestjs-minio';
 import { PrismaModule } from '../prisma/prisma.module';
 import { ImageProcessorService } from './image-processor.service';
 import { MinioStorageService } from './minio-storage.service';
-import { UploadController } from './upload.controller';
 import { UploadService } from './upload.service';
 
 @Module({
@@ -23,7 +22,6 @@ import { UploadService } from './upload.service';
     PrismaModule,
   ],
   providers: [MinioStorageService, ImageProcessorService, UploadService],
-  controllers: [UploadController],
   exports: [UploadService],
 })
 export class UploadModule {}

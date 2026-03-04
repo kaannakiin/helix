@@ -1,7 +1,7 @@
 import { DATA_ACCESS_KEYS } from '@org/constants/data-keys';
 import type { VariantGroupOutput } from '@org/schemas/admin/variants';
 import type { AdminVariantGroupDetailPrismaType } from '@org/types/admin/variants';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from '../lib/api/api-client';
 
 export const useAdminVariantGroup = (id: string) => {
@@ -17,9 +17,10 @@ export const useAdminVariantGroup = (id: string) => {
   });
 };
 
-export const useSaveVariantGroup = () => {
-  const queryClient = useQueryClient();
-
+export const useSaveVariantGroup = (options?: {
+  onSuccess?: (result: AdminVariantGroupDetailPrismaType) => void;
+  onError?: (err: Error) => void;
+}) => {
   return useMutation({
     mutationFn: async (data: VariantGroupOutput) => {
       const res = await apiClient.post<AdminVariantGroupDetailPrismaType>(
@@ -28,13 +29,15 @@ export const useSaveVariantGroup = () => {
       );
       return res.data;
     },
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({
+    onSuccess: (result, _vars, _mutateResult, context) => {
+      context.client.removeQueries({
         queryKey: DATA_ACCESS_KEYS.admin.variants.detail(result.id),
       });
-      queryClient.invalidateQueries({
+      context.client.invalidateQueries({
         queryKey: DATA_ACCESS_KEYS.admin.variants.list,
       });
+      options?.onSuccess?.(result);
     },
+    onError: (err) => options?.onError?.(err as Error),
   });
 };

@@ -7,6 +7,8 @@ export const ADMIN_CATEGORIES_FIELD_CONFIG = {
   depth: { filterType: 'number' },
   createdAt: { filterType: 'date' },
   updatedAt: { filterType: 'date' },
+  '_count.children': { filterType: 'number' },
+  '_count.products': { filterType: 'number' },
 } as const satisfies Record<string, FieldFilterConfig>;
 
 export type AdminCategoriesFilterableField =
@@ -19,6 +21,8 @@ export const ADMIN_CATEGORIES_SORT_FIELDS = [
   'sortOrder',
   'createdAt',
   'updatedAt',
+  '_count.children',
+  '_count.products',
 ] as const;
 
 export type AdminCategoriesSortField =

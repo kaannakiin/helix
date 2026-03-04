@@ -6,6 +6,9 @@ export const ADMIN_PRODUCTS_FIELD_CONFIG = {
   status: { filterType: 'enum', values: ['DRAFT', 'ACTIVE', 'ARCHIVED'] },
   createdAt: { filterType: 'date' },
   updatedAt: { filterType: 'date' },
+  '_count.variants': { filterType: 'number' },
+  '_count.categories': { filterType: 'number' },
+  '_count.tags': { filterType: 'number' },
 } as const satisfies Record<string, FieldFilterConfig>;
 
 export type AdminProductsFilterableField =
@@ -17,6 +20,9 @@ export const ADMIN_PRODUCTS_SORT_FIELDS = [
   'sortOrder',
   'createdAt',
   'updatedAt',
+  '_count.variants',
+  '_count.categories',
+  '_count.tags',
 ] as const;
 
 export type AdminProductsSortField =

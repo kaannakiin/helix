@@ -14,20 +14,25 @@ import {
 import { getMimePatterns } from '@org/constants/product-constants';
 import { FileType, VariantGroupType } from '@org/prisma/browser';
 import type { VariantGroupInput } from '@org/schemas/admin/variants';
-import { Dropzone } from '@org/ui/dropzone';
+import { Dropzone, type RemoteFile } from '@org/ui/dropzone';
 import { useTranslations } from 'next-intl';
+import { useEffect, useRef, useState } from 'react';
 import { Controller, useWatch, type Control } from 'react-hook-form';
 
 interface Props extends DrawerProps {
   optionIndex: number;
   onCommit: () => void;
   draftControl: Control<VariantGroupInput> | null;
+  deleteImage: (file: RemoteFile) => Promise<boolean>;
+  deletingIds: Set<string>;
 }
 
 export const VariantOptionDrawer = ({
   optionIndex,
   onCommit,
   draftControl,
+  deleteImage,
+  deletingIds,
   ...drawerProps
 }: Props) => {
   const t = useTranslations('frontend.admin.products.form');
@@ -43,6 +48,39 @@ export const VariantOptionDrawer = ({
   });
 
   const isColor = groupType === VariantGroupType.COLOR;
+
+  const [optionExistingFiles, setOptionExistingFiles] = useState<RemoteFile[]>(
+    []
+  );
+  const existingFilesSyncedRef = useRef(false);
+
+  const existingImagesRaw = useWatch({
+    control: draftControl ?? undefined,
+    name: `options.${optionIndex}.existingImages`,
+  });
+
+  useEffect(() => {
+    if (drawerProps.opened && !existingFilesSyncedRef.current) {
+      const raw = (existingImagesRaw ?? []) as Array<{
+        id: string;
+        url: string;
+        fileType: string;
+        sortOrder?: number;
+      }>;
+      setOptionExistingFiles(
+        raw.map((img, i) => ({
+          id: img.id,
+          url: img.url,
+          fileType: img.fileType as any,
+          order: img.sortOrder ?? i,
+        }))
+      );
+      existingFilesSyncedRef.current = true;
+    }
+    if (!drawerProps.opened) {
+      existingFilesSyncedRef.current = false;
+    }
+  }, [drawerProps.opened, existingImagesRaw]);
 
   const handleSave = () => {
     drawerProps.onClose();
@@ -108,14 +146,36 @@ export const VariantOptionDrawer = ({
 
             <Controller
               control={draftControl}
-              name={`options.${optionIndex}.images`}
-              render={({ field }) => (
-                <Dropzone
-                  value={field.value}
-                  onChange={field.onChange}
-                  accept={getMimePatterns([FileType.IMAGE])}
-                  maxSize={5 * 1024 * 1024}
-                  maxFiles={1}
+              name={`options.${optionIndex}.existingImages`}
+              render={({ field: existingField }) => (
+                <Controller
+                  control={draftControl}
+                  name={`options.${optionIndex}.images`}
+                  render={({ field }) => (
+                    <Dropzone
+                      value={field.value}
+                      onChange={field.onChange}
+                      existingFiles={optionExistingFiles}
+                      onRemoveExisting={async (file) => {
+                        const ok = await deleteImage(file);
+                        if (ok) {
+                          const updated = optionExistingFiles.filter(
+                            (f) => f.id !== file.id
+                          );
+                          setOptionExistingFiles(updated);
+                          existingField.onChange(
+                            (existingField.value ?? []).filter(
+                              (img: any) => img.id !== file.id
+                            )
+                          );
+                        }
+                      }}
+                      deletingIds={deletingIds}
+                      accept={getMimePatterns([FileType.IMAGE])}
+                      maxSize={5 * 1024 * 1024}
+                      maxFiles={1}
+                    />
+                  )}
                 />
               )}
             />

@@ -1,26 +1,37 @@
-"use client";
+'use client';
 
 import {
-  Accordion,
   Badge,
+  Box,
   Button,
+  Divider,
   Drawer,
   Group,
+  Pill,
   ScrollArea,
   Stack,
   Text,
-} from "@mantine/core";
-import { Filter, Search, Trash2 } from "lucide-react";
-import { createElement, useCallback, useEffect, useMemo, useState } from "react";
-import type { ColDef } from "ag-grid-community";
-import type { DataTableFilterDrawerTranslations } from "../store/data-table-translation-store";
+  TextInput,
+} from '@mantine/core';
+import type { ColDef } from 'ag-grid-community';
+import { Filter, Search, Trash2 } from 'lucide-react';
+import {
+  createElement,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import type { DataTableFilterDrawerTranslations } from '../store/data-table-translation-store';
 
 const DEFAULT_DRAWER_TRANSLATIONS: DataTableFilterDrawerTranslations = {
-  title: "Filters",
-  clearAll: "Clear All",
-  activeFilters: "{count} active",
-  noFilters: "No filters available",
-  apply: "Apply Filters",
+  title: 'Filters',
+  clearAll: 'Clear All',
+  activeFilters: '{count} active',
+  noFilters: 'No filters available',
+  apply: 'Apply Filters',
+  searchPlaceholder: 'Search filters...',
+  appliedFilters: 'Applied Filters',
 };
 
 interface FilterColumnInfo {
@@ -46,7 +57,7 @@ interface FilterDrawerProps<TData> {
 }
 
 function extractFilterColumns<TData>(
-  columns: ColDef<TData>[],
+  columns: ColDef<TData>[]
 ): FilterColumnInfo[] {
   const result: FilterColumnInfo[] = [];
 
@@ -55,7 +66,12 @@ function extractFilterColumns<TData>(
     if (!field) continue;
 
     const rawFilter = col.filter;
-    if (!rawFilter || typeof rawFilter === "boolean" || typeof rawFilter === "string") continue;
+    if (
+      !rawFilter ||
+      typeof rawFilter === 'boolean' ||
+      typeof rawFilter === 'string'
+    )
+      continue;
 
     const filter = rawFilter as {
       component?: React.ComponentType<unknown>;
@@ -66,16 +82,12 @@ function extractFilterColumns<TData>(
     result.push({
       field,
       headerName: (col.headerName as string) ?? field,
-      filterComponent: filter.component as FilterColumnInfo["filterComponent"],
+      filterComponent: filter.component as FilterColumnInfo['filterComponent'],
       filterParams: filter.params,
     });
   }
 
   return result;
-}
-
-function formatActiveLabel(template: string, count: number): string {
-  return template.replace("{count}", String(count));
 }
 
 export function FilterDrawer<TData>({
@@ -88,28 +100,34 @@ export function FilterDrawer<TData>({
   translations,
 }: FilterDrawerProps<TData>) {
   const t = translations ?? DEFAULT_DRAWER_TRANSLATIONS;
-
   const filterColumns = useMemo(() => extractFilterColumns(columns), [columns]);
-
-  // Local draft state — synced from grid when drawer opens
   const [draftModel, setDraftModel] = useState<Record<string, unknown>>({});
+  const [searchTerm, setSearchTerm] = useState('');
 
-  // Sync draft from grid's filterModel when drawer opens
   useEffect(() => {
     if (opened) {
       setDraftModel({ ...filterModel });
+      setSearchTerm('');
     }
   }, [opened, filterModel]);
 
   const draftCount = useMemo(
     () => Object.keys(draftModel).length,
-    [draftModel],
+    [draftModel]
   );
 
   const activeCount = useMemo(
     () => Object.keys(filterModel).length,
-    [filterModel],
+    [filterModel]
   );
+
+  const visibleColumns = useMemo(() => {
+    if (!searchTerm) return filterColumns;
+    const term = searchTerm.toLowerCase();
+    return filterColumns.filter((col) =>
+      col.headerName.toLowerCase().includes(term)
+    );
+  }, [filterColumns, searchTerm]);
 
   const handleLocalFilterChange = useCallback(
     (field: string) => (model: unknown) => {
@@ -123,7 +141,7 @@ export function FilterDrawer<TData>({
         return next;
       });
     },
-    [],
+    []
   );
 
   const handleApply = useCallback(() => {
@@ -136,11 +154,6 @@ export function FilterDrawer<TData>({
     onClearAll();
     onClose();
   }, [onClearAll, onClose]);
-
-  const draftFields = useMemo(
-    () => new Set(Object.keys(draftModel)),
-    [draftModel],
-  );
 
   if (filterColumns.length === 0) {
     return (
@@ -184,39 +197,63 @@ export function FilterDrawer<TData>({
       }
     >
       <Stack gap="md" h="100%" justify="space-between">
+        <TextInput
+          placeholder={t.searchPlaceholder}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.currentTarget.value)}
+          leftSection={<Search size={14} />}
+          size="xs"
+        />
+
+        {draftCount > 0 && (
+          <Box>
+            <Text size="xs" fw={600} c="dimmed" mb={4} tt="uppercase">
+              {t.appliedFilters}
+            </Text>
+            <Group gap="xs" wrap="wrap">
+              {Object.keys(draftModel).map((field) => {
+                const col = filterColumns.find((c) => c.field === field);
+                return (
+                  <Pill
+                    key={field}
+                    size="sm"
+                    withRemoveButton
+                    onRemove={() => handleLocalFilterChange(field)(null)}
+                  >
+                    {col?.headerName ?? field}
+                  </Pill>
+                );
+              })}
+            </Group>
+          </Box>
+        )}
+
+        <Divider />
+
         <ScrollArea style={{ flex: 1 }} offsetScrollbars>
-          <Accordion variant="separated" multiple>
-            {filterColumns.map((col) => {
-              const isActive = draftFields.has(col.field);
-              return (
-                <Accordion.Item key={col.field} value={col.field}>
-                  <Accordion.Control>
-                    <Group gap="sm" wrap="nowrap">
-                      <Text size="sm" fw={500}>
-                        {col.headerName}
-                      </Text>
-                      {isActive && (
-                        <Badge
-                          size="xs"
-                          variant="dot"
-                          color="blue"
-                        >
-                          {formatActiveLabel(t.activeFilters, 1)}
-                        </Badge>
-                      )}
-                    </Group>
-                  </Accordion.Control>
-                  <Accordion.Panel>
-                    {createElement(col.filterComponent, {
-                      model: draftModel[col.field] ?? null,
-                      onModelChange: handleLocalFilterChange(col.field),
-                      ...col.filterParams,
-                    })}
-                  </Accordion.Panel>
-                </Accordion.Item>
-              );
-            })}
-          </Accordion>
+          <Stack gap={0}>
+            {visibleColumns.map((col, i) => (
+              <Box key={col.field}>
+                {i > 0 && <Divider my="xs" />}
+                <Text
+                  size="xs"
+                  fw={600}
+                  c="dimmed"
+                  px="xs"
+                  pt="xs"
+                  pb={4}
+                  tt="uppercase"
+                >
+                  {col.headerName}
+                </Text>
+                {createElement(col.filterComponent, {
+                  model: draftModel[col.field] ?? null,
+                  onModelChange: handleLocalFilterChange(col.field),
+                  ...col.filterParams,
+                })}
+              </Box>
+            ))}
+          </Stack>
         </ScrollArea>
 
         <Stack gap="xs">

@@ -4,7 +4,7 @@ import type { AdminCustomersPrismaType } from '@org/types/admin/customers';
 import type { PaginatedResponse } from '@org/types/pagination';
 import type { MemberFetchOptions } from '@org/ui/inputs/member-selector';
 import type { DrawerFetchOptions } from '@org/ui/inputs/relation-drawer';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { apiClient } from '../lib/api/api-client';
 
@@ -104,7 +104,6 @@ export const useAdminCustomerGroup = (id: string) => {
 };
 
 export const useSaveCustomerGroup = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (data: CustomerGroupOutput) => {
       const res = await apiClient.post<CustomerGroupDetailResponse>(
@@ -113,11 +112,11 @@ export const useSaveCustomerGroup = () => {
       );
       return res.data;
     },
-    onSuccess: (result) => {
-      queryClient.invalidateQueries({
+    onSuccess: (result, _vars, _mutateResult, context) => {
+      context.client.invalidateQueries({
         queryKey: DATA_ACCESS_KEYS.admin.customerGroups.detail(result.id),
       });
-      queryClient.invalidateQueries({
+      context.client.invalidateQueries({
         queryKey: DATA_ACCESS_KEYS.admin.customerGroups.list,
       });
     },

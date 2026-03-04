@@ -21,7 +21,7 @@ import {
 } from '@org/schemas/auth';
 import { PhoneInput } from '@org/ui/inputs/phone-input';
 import { useTranslations } from 'next-intl';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 interface LoginFormProps {
@@ -31,6 +31,8 @@ interface LoginFormProps {
 const LoginForm = ({ onSwitch }: LoginFormProps) => {
   const t = useTranslations('frontend.auth');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
   const setUser = useAuthStore((s) => s.setUser);
   const { mutateAsync: login, isPending, error } = useLogin();
 
@@ -60,7 +62,7 @@ const LoginForm = ({ onSwitch }: LoginFormProps) => {
     await login(data as LoginSchemaOutputType, {
       onSuccess: (res) => {
         setUser(res.user);
-        router.push('/');
+        router.push(callbackUrl);
       },
     });
   };

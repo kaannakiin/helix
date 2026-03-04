@@ -1,7 +1,7 @@
 import { DATA_ACCESS_KEYS } from '@org/constants/data-keys';
 import type { EvaluationJobStatus } from '@org/types/evaluation';
 import type { RuleTargetEntity } from '@org/types/rule-engine';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiClient } from '../lib/api/api-client';
 
 export interface EvaluationJobDetailResponse {
@@ -58,17 +58,16 @@ export const useEvaluationJobHistory = (
 };
 
 export const useCancelEvaluationJob = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (jobId: string) => {
       const res = await apiClient.post(`/admin/evaluation-jobs/${jobId}/cancel`);
       return res.data;
     },
-    onSuccess: (_result, jobId) => {
-      queryClient.invalidateQueries({
+    onSuccess: (_result, jobId, _mutateResult, context) => {
+      context.client.invalidateQueries({
         queryKey: DATA_ACCESS_KEYS.admin.evaluationJobs.detail(jobId),
       });
-      queryClient.invalidateQueries({
+      context.client.invalidateQueries({
         queryKey: DATA_ACCESS_KEYS.admin.evaluationJobs.list,
       });
     },
@@ -76,7 +75,6 @@ export const useCancelEvaluationJob = () => {
 };
 
 export const useRerunEvaluation = () => {
-  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (entityId: string) => {
       const res = await apiClient.post<{ jobId: string }>(
@@ -84,8 +82,8 @@ export const useRerunEvaluation = () => {
       );
       return res.data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
+    onSuccess: (_result, _vars, _mutateResult, context) => {
+      context.client.invalidateQueries({
         queryKey: DATA_ACCESS_KEYS.admin.evaluationJobs.list,
       });
     },

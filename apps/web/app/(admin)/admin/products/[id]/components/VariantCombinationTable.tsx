@@ -22,9 +22,9 @@ import {
   buildEnumOptions,
 } from '@org/constants/enum-configs';
 import { VariantGroupType } from '@org/prisma/browser';
-import type { DropzoneFile } from '@org/ui/dropzone';
 import type { ProductInputType } from '@org/schemas/admin/products';
 import { FormCard } from '@org/ui/common/form-card';
+import type { RemoteFile } from '@org/ui/dropzone';
 import {
   generateEan13Barcode,
   generateSku,
@@ -122,7 +122,6 @@ const VariantRow = memo(
       <Table.Tr
         bg={isSelected ? 'var(--mantine-primary-color-light)' : undefined}
       >
-        {/* Checkbox */}
         <Table.Td style={{ width: 40 }}>
           <Checkbox
             checked={isSelected}
@@ -131,7 +130,6 @@ const VariantRow = memo(
           />
         </Table.Td>
 
-        {/* Image thumbnail / + icon */}
         <Table.Td style={{ width: 48 }}>
           <Tooltip
             label={t('combinations.addImage')}
@@ -153,7 +151,6 @@ const VariantRow = memo(
           </Tooltip>
         </Table.Td>
 
-        {/* Variant options (consolidated) */}
         <Table.Td>
           <Group gap={6} wrap="nowrap">
             {optionValueIds?.map((optId, i) => {
@@ -181,7 +178,6 @@ const VariantRow = memo(
           </Group>
         </Table.Td>
 
-        {/* SKU — inline TextInput */}
         <Table.Td>
           <Controller
             control={control}
@@ -199,7 +195,6 @@ const VariantRow = memo(
           />
         </Table.Td>
 
-        {/* Barcode — inline TextInput */}
         <Table.Td>
           <Controller
             control={control}
@@ -217,7 +212,6 @@ const VariantRow = memo(
           />
         </Table.Td>
 
-        {/* isActive — inline Switch */}
         <Table.Td>
           <Controller
             control={control}
@@ -232,7 +226,6 @@ const VariantRow = memo(
           />
         </Table.Td>
 
-        {/* Tracking Strategy — inline Select */}
         <Table.Td>
           <Controller
             control={control}
@@ -250,7 +243,6 @@ const VariantRow = memo(
           />
         </Table.Td>
 
-        {/* Actions */}
         <Table.Td style={{ width: 50 }}>
           <ActionIcon variant="subtle" size="sm" onClick={() => onEdit(index)}>
             <Pencil size={14} />
@@ -263,7 +255,15 @@ const VariantRow = memo(
 
 VariantRow.displayName = 'VariantRow';
 
-export const VariantCombinationTable = () => {
+interface VariantCombinationTableProps {
+  deleteImage: (file: RemoteFile) => Promise<boolean>;
+  deletingIds: Set<string>;
+}
+
+export const VariantCombinationTable = ({
+  deleteImage,
+  deletingIds,
+}: VariantCombinationTableProps) => {
   const t = useTranslations('frontend.admin.products.form');
   const tEnums = useTranslations('frontend.enums');
   const { control, getValues, setValue } = useFormContext<ProductInputType>();
@@ -287,7 +287,6 @@ export const VariantCombinationTable = () => {
     [tEnums]
   );
 
-  // --- Selection state ---
   const [selectedIndices, setSelectedIndices] = useState<Set<number>>(
     new Set()
   );
@@ -311,7 +310,6 @@ export const VariantCombinationTable = () => {
     );
   }, [fields]);
 
-  // --- Edit Drawer ---
   const [editDrawerOpened, editDrawerHandlers] = useDisclosure(false);
   const [editingVariantIndex, setEditingVariantIndex] = useState<number>(0);
 
@@ -323,10 +321,8 @@ export const VariantCombinationTable = () => {
     [editDrawerHandlers]
   );
 
-  // --- Bulk Edit Drawer ---
   const [bulkDrawerOpened, bulkDrawerHandlers] = useDisclosure(false);
 
-  // --- Bulk Generate ---
   const handleBulkGenerateSku = useCallback(() => {
     const productSlug = getValues('translations.0.slug') || '';
     selectedIndices.forEach((index) => {
@@ -358,7 +354,6 @@ export const VariantCombinationTable = () => {
       title={t('combinations.title')}
       description={t('combinations.description')}
     >
-      {/* Bulk Action Toolbar */}
       {someSelected && (
         <Group
           justify="space-between"
@@ -443,16 +438,16 @@ export const VariantCombinationTable = () => {
         {t('combinations.count', { count: fields.length })}
       </Text>
 
-      {/* Edit Drawer */}
       <VariantEditDrawer
         opened={editDrawerOpened}
         onClose={editDrawerHandlers.close}
         variantIndex={editingVariantIndex}
         optionLookup={optionLookup}
         trackingOptions={trackingOptions}
+        deleteImage={deleteImage}
+        deletingIds={deletingIds}
       />
 
-      {/* Bulk Edit Drawer */}
       <BulkEditDrawer
         opened={bulkDrawerOpened}
         onClose={bulkDrawerHandlers.close}

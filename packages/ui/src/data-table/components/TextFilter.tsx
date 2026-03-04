@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
-import { TextInput, Button, Group, Stack } from "@mantine/core";
-import { useDebouncedCallback } from "@mantine/hooks";
-import { useDataTableTranslations } from "../context/DataTableTranslationContext";
+import { useState, useEffect } from 'react';
+import { ActionIcon, Stack, TextInput } from '@mantine/core';
+import { useDebouncedCallback } from '@mantine/hooks';
+import { Search, X } from 'lucide-react';
+import { useDataTableTranslations } from '../context/DataTableTranslationContext';
 
 interface TextFilterModel {
-  filterType: "text";
+  filterType: 'text';
   type: string;
   filter: string;
 }
@@ -16,24 +17,24 @@ interface TextFilterProps {
 
 export function TextFilter({ model, onModelChange }: TextFilterProps) {
   const t = useDataTableTranslations();
-  const filterType = model?.type || "contains";
+  const filterType = model?.type || 'contains';
 
-  const [localValue, setLocalValue] = useState(model?.filter || "");
+  const [localValue, setLocalValue] = useState(model?.filter || '');
 
   // Sync external model changes to local state (e.g., Clear Filters button)
   useEffect(() => {
-    const modelValue = model?.filter || "";
+    const modelValue = model?.filter || '';
     if (modelValue !== localValue) {
       setLocalValue(modelValue);
     }
   }, [model?.filter]);
 
   const debouncedOnModelChange = useDebouncedCallback((value: string) => {
-    if (value === "") {
+    if (value === '') {
       onModelChange(null);
     } else {
       onModelChange({
-        filterType: "text",
+        filterType: 'text',
         type: filterType,
         filter: value,
       });
@@ -46,7 +47,7 @@ export function TextFilter({ model, onModelChange }: TextFilterProps) {
   };
 
   const handleReset = () => {
-    setLocalValue("");
+    setLocalValue('');
     onModelChange(null);
   };
 
@@ -57,14 +58,17 @@ export function TextFilter({ model, onModelChange }: TextFilterProps) {
         value={localValue}
         onChange={(e) => handleTextChange(e.currentTarget.value)}
         size="xs"
+        leftSection={<Search size={14} />}
+        rightSection={
+          localValue ? (
+            <ActionIcon size="xs" variant="subtle" onClick={handleReset}>
+              <X size={12} />
+            </ActionIcon>
+          ) : null
+        }
       />
-      <Group gap="xs" grow>
-        <Button size="xs" variant="subtle" onClick={handleReset}>
-          {t.filters.reset}
-        </Button>
-      </Group>
     </Stack>
   );
 }
 
-TextFilter.displayName = "TextFilter";
+TextFilter.displayName = 'TextFilter';

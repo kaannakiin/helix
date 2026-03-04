@@ -310,7 +310,7 @@ export function useColumnFactory(
             colId: field,
             valueGetter: (params: ValueGetterParams<T>) =>
               getNestedValue(params.data, field) ?? 0,
-            sortable: false,
+            sortable: field.startsWith('_count.'),
           }
         : {
             field: field as ColDef<T>['field'],

@@ -5,6 +5,7 @@ import {
   useSaveCategory,
 } from '@/core/hooks/useAdminCategory';
 import { categoryTreeFetcher } from '@/core/hooks/useAdminLookup';
+import { useImageUpload } from '@/core/hooks/useImageUpload';
 import { useTranslatedZodResolver } from '@/core/hooks/useTranslatedZodResolver';
 import {
   Button,
@@ -16,6 +17,7 @@ import {
   Textarea,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
 import { DATA_ACCESS_KEYS } from '@org/constants/data-keys';
 import { getMimePatterns } from '@org/constants/product-constants';
 import { FileType } from '@org/prisma/browser';
@@ -27,7 +29,7 @@ import {
 } from '@org/schemas/admin/categories';
 import { FormCard } from '@org/ui/common/form-card';
 import LoadingOverlay from '@org/ui/common/loading-overlay';
-import { Dropzone } from '@org/ui/dropzone';
+import { Dropzone, type RemoteFile } from '@org/ui/dropzone';
 import { ProductSeoCard } from '@org/ui/inputs/product-seo-card';
 import { RelationDrawer } from '@org/ui/inputs/relation-drawer';
 import { createId } from '@paralleldrive/cuid2';
@@ -40,7 +42,7 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   Controller,
   FormProvider,
@@ -55,8 +57,27 @@ const AdminCategoryFormPage = () => {
   const id = params.id as string;
   const isNew = id === 'new';
   const { data, isLoading } = useAdminCategory(id);
-  const saveCategory = useSaveCategory();
+  const saveCategory = useSaveCategory({
+    onSuccess: () =>
+      notifications.show({ color: 'green', message: t('saveSuccess') }),
+    onError: (err) =>
+      notifications.show({
+        color: 'red',
+        title: t('loadError'),
+        message: err?.message ?? t('loadErrorDescription'),
+      }),
+  });
   const isMobile = useMediaQuery('(max-width: 768px)');
+
+  const [existingFiles, setExistingFiles] = useState<RemoteFile[]>([]);
+
+  const { deletingIds, isUploading, deleteImage, uploadFiles } = useImageUpload({
+    basePath: `/admin/categories/${id}/images`,
+    onDeleteError: () =>
+      notifications.show({ color: 'red', message: t('imageDeleteError') }),
+    onUploadError: () =>
+      notifications.show({ color: 'red', message: t('imageUploadError') }),
+  });
 
   const formattedData = useMemo<CategoryInput>(() => {
     if (!data || isNew) {
@@ -86,6 +107,30 @@ const AdminCategoryFormPage = () => {
     };
   }, [data, isNew]);
 
+  const initialExisting = useMemo<RemoteFile[]>(() => {
+    if (!data || isNew) return [];
+    return (
+      data.images?.map((img) => ({
+        id: img.id,
+        url: img.url,
+        fileType: img.fileType,
+        order: img.sortOrder,
+      })) ?? []
+    );
+  }, [data, isNew]);
+
+  useMemo(() => {
+    setExistingFiles(initialExisting);
+  }, [initialExisting]);
+
+  const handleRemoveExisting = useCallback(
+    async (file: RemoteFile) => {
+      const ok = await deleteImage(file);
+      if (ok) setExistingFiles((prev) => prev.filter((f) => f.id !== file.id));
+    },
+    [deleteImage]
+  );
+
   const resolver = useTranslatedZodResolver(CategorySchema);
   const methods = useForm<CategoryInput>({
     resolver,
@@ -103,8 +148,37 @@ const AdminCategoryFormPage = () => {
   const categoryName = watch('translations.0.name');
 
   const onSubmit: SubmitHandler<CategoryInput> = async (formData) => {
-    await saveCategory.mutateAsync(formData as unknown as CategoryOutput);
-    router.push('/admin/products/categories');
+    try {
+      const newImages = formData.images ?? [];
+      let uploadResults: { imageId: string; url: string; fileType: string }[] = [];
+      if (newImages.length > 0) {
+        uploadResults = await uploadFiles(newImages);
+      }
+
+      const allExisting = [
+        ...existingFiles.map((f, i) => ({
+          id: f.id,
+          url: f.url,
+          fileType: f.fileType,
+          sortOrder: i,
+        })),
+        ...uploadResults.map((r, i) => ({
+          id: r.imageId,
+          url: r.url,
+          fileType: r.fileType,
+          sortOrder: existingFiles.length + i,
+        })),
+      ];
+
+      await saveCategory.mutateAsync({
+        ...(formData as unknown as CategoryOutput),
+        images: undefined,
+        existingImages: allExisting,
+      });
+      router.push('/admin/products/categories');
+    } catch {
+      // handled by useSaveCategory onError callback
+    }
   };
 
   if (isLoading && !isNew) return <LoadingOverlay />;
@@ -196,6 +270,11 @@ const AdminCategoryFormPage = () => {
                       maxSize={5 * 1024 * 1024}
                       multiple
                       maxFiles={5}
+                      existingFiles={existingFiles}
+                      onRemoveExisting={handleRemoveExisting}
+                      onReorderExisting={setExistingFiles}
+                      deletingIds={deletingIds}
+                      loading={isUploading}
                     />
                   )}
                 />

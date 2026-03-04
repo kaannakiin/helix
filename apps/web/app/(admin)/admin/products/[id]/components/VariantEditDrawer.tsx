@@ -20,13 +20,13 @@ import type {
   ProductInputType,
   ProductVariantInputType,
 } from '@org/schemas/admin/products';
-import { Dropzone } from '@org/ui/dropzone';
+import { Dropzone, type RemoteFile } from '@org/ui/dropzone';
 import {
   generateEan13Barcode,
   generateSku,
 } from '@org/utils/products/sku-barcode-generator';
 import { useTranslations } from 'next-intl';
-import { Fragment, useEffect, useRef } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, useForm, useFormContext } from 'react-hook-form';
 import type { OptionLookupEntry } from './VariantCombinationTable';
 
@@ -34,12 +34,16 @@ interface Props extends Omit<DrawerProps, 'title'> {
   variantIndex: number;
   optionLookup: Map<string, OptionLookupEntry>;
   trackingOptions: Array<{ value: string; label: string }>;
+  deleteImage: (file: RemoteFile) => Promise<boolean>;
+  deletingIds: Set<string>;
 }
 
 export const VariantEditDrawer = ({
   variantIndex,
   optionLookup,
   trackingOptions,
+  deleteImage,
+  deletingIds,
   ...drawerProps
 }: Props) => {
   const t = useTranslations('frontend.admin.products.form');
@@ -70,6 +74,8 @@ export const VariantEditDrawer = ({
     watch,
   } = draftForm;
 
+  const [variantExistingFiles, setVariantExistingFiles] = useState<RemoteFile[]>([]);
+
   const prevOpenedRef = useRef(false);
 
   useEffect(() => {
@@ -77,19 +83,66 @@ export const VariantEditDrawer = ({
       const current = mainGetValues(`variants.${variantIndex}`);
       if (current) {
         draftReset(current as ProductVariantInputType);
+        const existing: RemoteFile[] =
+          (current.existingImages ?? []).map((img, i) => ({
+            id: img.id,
+            url: img.url,
+            fileType: img.fileType,
+            order: img.sortOrder ?? i,
+          }));
+        setVariantExistingFiles(existing);
       }
     }
     prevOpenedRef.current = drawerProps.opened ?? false;
   }, [drawerProps.opened, variantIndex, mainGetValues, draftReset]);
 
+  const handleRemoveExisting = useCallback(
+    async (file: RemoteFile) => {
+      const ok = await deleteImage(file);
+      if (ok) {
+        setVariantExistingFiles((prev) => prev.filter((f) => f.id !== file.id));
+        draftSetValue(
+          'existingImages',
+          (draftGetValues('existingImages') ?? []).filter((img) => img.id !== file.id),
+          { shouldDirty: true }
+        );
+      }
+    },
+    [deleteImage, draftSetValue, draftGetValues]
+  );
+
+  const handleReorderExisting = useCallback(
+    (reordered: RemoteFile[]) => {
+      setVariantExistingFiles(reordered);
+      draftSetValue(
+        'existingImages',
+        reordered.map((f, i) => ({
+          id: f.id,
+          url: f.url,
+          fileType: f.fileType,
+          sortOrder: i,
+        })),
+        { shouldDirty: true }
+      );
+    },
+    [draftSetValue]
+  );
+
   const optionValueIds = watch('optionValueIds');
 
   const handleSave = () => {
     const draftValues = draftGetValues();
-    mainSetValue(`variants.${variantIndex}`, draftValues as any, {
-      shouldDirty: true,
-      shouldValidate: false,
-    });
+    const existingImages = variantExistingFiles.map((f, i) => ({
+      id: f.id,
+      url: f.url,
+      fileType: f.fileType,
+      sortOrder: i,
+    }));
+    mainSetValue(
+      `variants.${variantIndex}`,
+      { ...draftValues, existingImages } as any,
+      { shouldDirty: true, shouldValidate: false }
+    );
     drawerProps.onClose();
   };
 
@@ -249,6 +302,10 @@ export const VariantEditDrawer = ({
               <Dropzone
                 value={field.value}
                 onChange={field.onChange}
+                existingFiles={variantExistingFiles}
+                onRemoveExisting={handleRemoveExisting}
+                onReorderExisting={handleReorderExisting}
+                deletingIds={deletingIds}
                 accept={getMimePatterns([FileType.IMAGE, FileType.VIDEO])}
                 maxSize={5 * 1024 * 1024}
                 maxFiles={10}

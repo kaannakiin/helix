@@ -1,6 +1,10 @@
+import { Prisma } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 
-export function textToPrisma(op: string, value: string): Record<string, unknown> {
+export function textToPrisma(
+  op: string,
+  value: string
+): Record<string, unknown> {
   switch (op) {
     case 'contains':
       return { contains: value, mode: 'insensitive' };
@@ -88,11 +92,17 @@ function conditionToPrisma(
   }
 }
 
+export interface CountFilter {
+  relation: string;
+  condition: Record<string, unknown>;
+}
+
 export interface PrismaQueryResult {
   where: Record<string, unknown>;
-  orderBy: Record<string, string>[] | Record<string, string>;
+  orderBy: Record<string, unknown>[] | Record<string, unknown>;
   skip: number;
   take: number;
+  countFilters: CountFilter[];
 }
 
 export function buildPrismaQuery(params: {
@@ -105,16 +115,36 @@ export function buildPrismaQuery(params: {
   const { page, limit, filters, sort, defaultSort } = params;
 
   const where: Record<string, unknown> = {};
+  const countFilters: CountFilter[] = [];
+
   if (filters) {
     for (const [field, condition] of Object.entries(filters)) {
-      where[field] = conditionToPrisma(condition as FilterCondition);
+      if (field.startsWith('_count.')) {
+        const relation = field.split('.')[1];
+        countFilters.push({
+          relation,
+          condition: numberToPrisma(
+            (condition as FilterCondition & { op: string }).op,
+            (condition as FilterCondition & { value: number }).value,
+            (condition as FilterCondition & { valueTo?: number }).valueTo
+          ),
+        });
+      } else {
+        where[field] = conditionToPrisma(condition as FilterCondition);
+      }
     }
   }
 
-  let orderBy: Record<string, string>[] | Record<string, string>;
+  let orderBy: Record<string, unknown>[] | Record<string, unknown>;
 
   if (sort && sort.length > 0) {
-    orderBy = sort.map((s) => ({ [s.field]: s.order }));
+    orderBy = sort.map((s) => {
+      if (s.field.includes('.')) {
+        const [parent, child] = s.field.split('.');
+        return { [parent]: { [child]: s.order } };
+      }
+      return { [s.field]: s.order };
+    });
   } else if (defaultSort) {
     orderBy = { [defaultSort.field]: defaultSort.order };
   } else {
@@ -126,5 +156,83 @@ export function buildPrismaQuery(params: {
     orderBy,
     skip: (page - 1) * limit,
     take: limit,
+    countFilters,
   };
+}
+
+export interface CountRelationMap {
+  [relation: string]: { table: string; fk: string };
+}
+
+const SAFE_IDENTIFIER = /^[A-Za-z_][A-Za-z0-9_]*$/;
+
+function assertSafeIdentifier(name: string): void {
+  if (!SAFE_IDENTIFIER.test(name)) {
+    throw new Error(`Unsafe SQL identifier: ${name}`);
+  }
+}
+
+function buildHavingClause(cond: Record<string, unknown>): Prisma.Sql {
+  const parts: Prisma.Sql[] = [];
+  for (const [op, val] of Object.entries(cond)) {
+    const value = Number(val);
+    switch (op) {
+      case 'equals':
+        parts.push(Prisma.sql`COUNT(*) = ${value}`);
+        break;
+      case 'gt':
+        parts.push(Prisma.sql`COUNT(*) > ${value}`);
+        break;
+      case 'lt':
+        parts.push(Prisma.sql`COUNT(*) < ${value}`);
+        break;
+      case 'gte':
+        parts.push(Prisma.sql`COUNT(*) >= ${value}`);
+        break;
+      case 'lte':
+        parts.push(Prisma.sql`COUNT(*) <= ${value}`);
+        break;
+    }
+  }
+  return Prisma.join(parts, ' AND ');
+}
+
+export async function resolveCountFilters(
+  prisma: { $queryRaw: (query: Prisma.Sql) => Promise<unknown> },
+  tableName: string,
+  relationMap: CountRelationMap,
+  countFilters: CountFilter[],
+  where: Record<string, unknown>
+): Promise<Record<string, unknown>> {
+  if (countFilters.length === 0) return where;
+
+  for (const cf of countFilters) {
+    const rel = relationMap[cf.relation];
+    if (!rel) continue;
+
+    assertSafeIdentifier(tableName);
+    assertSafeIdentifier(rel.table);
+    assertSafeIdentifier(rel.fk);
+
+    const tbl = Prisma.raw(`"${tableName}"`);
+    const relTbl = Prisma.raw(`"${rel.table}"`);
+    const fk = Prisma.raw(`"${rel.fk}"`);
+    const having = buildHavingClause(cf.condition);
+
+    const rows = (await prisma.$queryRaw(Prisma.sql`
+      SELECT p."id"
+      FROM ${tbl} p
+      LEFT JOIN ${relTbl} r ON r.${fk} = p."id"
+      GROUP BY p."id"
+      HAVING ${having}
+    `)) as { id: string }[];
+
+    const ids = rows.map((r) => r.id);
+
+    where = {
+      AND: [where, { id: { in: ids } }],
+    };
+  }
+
+  return where;
 }

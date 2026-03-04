@@ -4,8 +4,6 @@ import type { LookupItem } from '../relation-input/types';
 
 export type { LookupItem };
 
-// --- Grid display props ---
-
 export interface RelationDrawerGridDisplayProps {
   renderItem?: (item: LookupItem) => ReactNode;
   rowHeight?: number;
@@ -28,9 +26,8 @@ export type TreeFetchOptions = (params: {
   ids?: string[];
   page?: number;
   parentId?: string;
+  parentExtra?: Record<string, unknown>;
 }) => Promise<LookupItem[] | PaginatedResponse<TreeNode>>;
-
-// --- Compound component props ---
 
 export interface RelationDrawerRootBaseProps {
   fetchOptions: FetchOptions | TreeFetchOptions;
@@ -80,8 +77,6 @@ export type RelationDrawerRootProps =
   | RootSingleTreeProps
   | RootMultipleTreeProps;
 
-// --- Trigger props ---
-
 export interface RelationDrawerTriggerProps {
   label?: string;
   description?: string;
@@ -89,19 +84,14 @@ export interface RelationDrawerTriggerProps {
   error?: string;
   required?: boolean;
   disabled?: boolean;
-  /** When true, renders only the trigger button without Input.Wrapper or selected items display. Useful for placing the trigger in a FormCard header. */
   compact?: boolean;
 }
-
-// --- Content props ---
 
 export interface RelationDrawerContentProps {
   title: string;
   children: ReactNode;
   size?: string;
 }
-
-// --- List props ---
 
 export interface DrawerFlatListProps {
   renderItem?: (item: LookupItem) => ReactNode;
@@ -110,8 +100,6 @@ export interface DrawerFlatListProps {
 export interface DrawerTreeListProps {
   renderItem?: (item: LookupItem) => ReactNode;
 }
-
-// --- All-in-one convenience props ---
 
 interface RelationDrawerBaseProps {
   fetchOptions: FetchOptions | TreeFetchOptions;

@@ -1,4 +1,18 @@
-import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Query,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Locale, Prisma } from '@org/prisma/client';
 import { UserRole } from '@org/prisma/client';
@@ -7,6 +21,7 @@ import type { Response } from 'express';
 import { I18nContext } from 'nestjs-i18n';
 import { Roles } from '../../../core/decorators';
 import { LocaleDecorator } from '../../../core/decorators/locale.decorator';
+import { FileValidationPipe } from '../../../core/pipes/file-validation.pipe';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
 import { BRAND_EXPORT_COLUMNS } from './brands.export-config';
@@ -115,6 +130,35 @@ export class BrandsController {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
 
     result.stream.pipe(res);
+  }
+
+  @Post(':id/images')
+  @ApiOperation({ summary: 'Upload an image for a brand' })
+  @ApiParam({ name: 'id', description: 'Brand ID' })
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadBrandImage(
+    @Param('id') id: string,
+    @UploadedFile(
+      new FileValidationPipe({
+        allowedTypes: ['IMAGE'],
+        maxSize: 5 * 1024 * 1024,
+      })
+    )
+    file: Express.Multer.File
+  ) {
+    return this.brandsService.uploadBrandImage(id, file);
+  }
+
+  @Delete(':id/images/:imageId')
+  @ApiOperation({ summary: 'Delete a brand image' })
+  @ApiParam({ name: 'id', description: 'Brand ID' })
+  @ApiParam({ name: 'imageId', description: 'Image ID' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteBrandImage(
+    @Param('id') brandId: string,
+    @Param('imageId') imageId: string
+  ) {
+    return this.brandsService.deleteBrandImage(brandId, imageId);
   }
 
   @Get(':id')

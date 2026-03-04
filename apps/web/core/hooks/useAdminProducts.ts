@@ -1,9 +1,14 @@
 import { DATA_ACCESS_KEYS } from '@org/constants/data-keys';
 import { VariantGroupType } from '@org/prisma/browser';
 import type { LookupItem } from '@org/schemas/admin/common';
+import type { ProductOutputType } from '@org/schemas/admin/products';
 import type { AdminProductDetailPrismaType } from '@org/types/admin/products';
 import type { AdminVariantGroupDetailPrismaType } from '@org/types/admin/variants';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { apiClient } from '../lib/api/api-client';
 
 export interface VariantGroupLookupItem extends LookupItem {
@@ -14,6 +19,27 @@ export interface VariantGroupLookupItem extends LookupItem {
 }
 
 export const useAdminProducts = () => {};
+
+export const useSaveProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: ProductOutputType) => {
+      const res = await apiClient.post<AdminProductDetailPrismaType>(
+        '/admin/products/save',
+        data
+      );
+      return res.data;
+    },
+    onSuccess: (result) => {
+      queryClient.removeQueries({
+        queryKey: DATA_ACCESS_KEYS.admin.products.detail(result.id),
+      });
+      queryClient.invalidateQueries({
+        queryKey: DATA_ACCESS_KEYS.admin.products.list,
+      });
+    },
+  });
+};
 
 export const useAdminProduct = (id: string) => {
   return useQuery({

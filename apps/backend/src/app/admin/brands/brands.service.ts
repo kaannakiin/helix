@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -13,30 +14,51 @@ import {
 } from '@org/types/admin/brands';
 import type { FilterCondition } from '@org/types/data-query';
 import type { PaginatedResponse } from '@org/types/pagination';
-import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
+import {
+  buildPrismaQuery,
+  resolveCountFilters,
+  type CountRelationMap,
+} from '../../../core/utils/prisma-query-builder';
 import { PrismaService } from '../../prisma/prisma.service';
+import { UploadService } from '../../upload/upload.service';
 import type { BrandQueryDTO, BrandSaveDTO } from './dto';
 
 @Injectable()
 export class BrandsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly uploadService: UploadService
+  ) {}
+
+  private static readonly COUNT_RELATIONS: CountRelationMap = {
+    products: { table: 'Product', fk: 'brandId' },
+  };
 
   async getBrands(
     query: BrandQueryDTO
   ): Promise<PaginatedResponse<AdminBrandListPrismaType>> {
     const { page, limit, filters, sort } = query;
 
-    const { where, orderBy, skip, take } = buildPrismaQuery({
-      page,
-      limit,
-      filters: filters as Record<string, FilterCondition> | undefined,
-      sort,
-      defaultSort: { field: 'createdAt', order: 'desc' },
-    });
+    const { where: baseWhere, orderBy, skip, take, countFilters } =
+      buildPrismaQuery({
+        page,
+        limit,
+        filters: filters as Record<string, FilterCondition> | undefined,
+        sort,
+        defaultSort: { field: 'createdAt', order: 'desc' },
+      });
+
+    const where = (await resolveCountFilters(
+      this.prisma,
+      'Brand',
+      BrandsService.COUNT_RELATIONS,
+      countFilters,
+      baseWhere
+    )) as Prisma.BrandWhereInput;
 
     const [items, total] = await Promise.all([
       this.prisma.brand.findMany({
-        where: where as Prisma.BrandWhereInput,
+        where,
         orderBy: orderBy as
           | Prisma.BrandOrderByWithRelationInput
           | Prisma.BrandOrderByWithRelationInput[],
@@ -44,7 +66,7 @@ export class BrandsService {
         take,
         include: AdminBrandListPrismaQuery,
       }),
-      this.prisma.brand.count({ where: where as Prisma.BrandWhereInput }),
+      this.prisma.brand.count({ where }),
     ]);
 
     return {
@@ -194,10 +216,13 @@ export class BrandsService {
         },
       });
 
-      for (const img of existingImages ?? []) {
+      const sortedExisting = [...(existingImages ?? [])].sort(
+        (a, b) => a.sortOrder - b.sortOrder
+      );
+      for (let i = 0; i < sortedExisting.length; i++) {
         await tx.image.update({
-          where: { id: img.id },
-          data: { sortOrder: img.sortOrder },
+          where: { id: sortedExisting[i].id },
+          data: { sortOrder: i },
         });
       }
 
@@ -233,5 +258,59 @@ export class BrandsService {
     });
 
     return brand;
+  }
+
+  async uploadBrandImage(brandId: string, file: Express.Multer.File) {
+    const brand = await this.prisma.brand.findUnique({
+      where: { id: brandId },
+    });
+    if (!brand) {
+      throw new NotFoundException('backend.errors.brand_not_found');
+    }
+
+    const imageCount = await this.prisma.image.count({
+      where: { brandId },
+    });
+    if (imageCount >= 3) {
+      throw new BadRequestException('backend.errors.max_images_exceeded');
+    }
+
+    const result = await this.uploadService.uploadFile(file, {
+      ownerType: 'brand',
+      ownerId: brandId,
+      isNeedWebp: true,
+      isNeedThumbnail: false,
+    });
+
+    await this.prisma.image.update({
+      where: { id: result.imageId },
+      data: { sortOrder: imageCount },
+    });
+
+    return result;
+  }
+
+  async deleteBrandImage(brandId: string, imageId: string): Promise<void> {
+    const image = await this.prisma.image.findFirst({
+      where: { id: imageId, brandId },
+    });
+    if (!image) {
+      throw new NotFoundException('backend.errors.image_not_found');
+    }
+
+    await this.uploadService.deleteImage(imageId);
+
+    const remaining = await this.prisma.image.findMany({
+      where: { brandId },
+      orderBy: { sortOrder: 'asc' },
+    });
+    for (let i = 0; i < remaining.length; i++) {
+      if (remaining[i].sortOrder !== i) {
+        await this.prisma.image.update({
+          where: { id: remaining[i].id },
+          data: { sortOrder: i },
+        });
+      }
+    }
   }
 }

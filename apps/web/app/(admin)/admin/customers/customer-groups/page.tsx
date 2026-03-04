@@ -106,6 +106,8 @@ export default function AdminCustomerGroupsPage() {
         activeFilters: t.raw('filterDrawer.activeFilters'),
         noFilters: t('filterDrawer.noFilters'),
         apply: t('filterDrawer.apply'),
+        searchPlaceholder: t('filterDrawer.searchPlaceholder'),
+        appliedFilters: t('filterDrawer.appliedFilters'),
       },
       columnVisibility: {
         title: tColumnVisibility('title'),

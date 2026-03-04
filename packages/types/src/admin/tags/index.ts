@@ -6,6 +6,7 @@ export const ADMIN_TAG_GROUPS_FIELD_CONFIG = {
   isActive: { filterType: 'boolean' },
   createdAt: { filterType: 'date' },
   updatedAt: { filterType: 'date' },
+  '_count.tags': { filterType: 'number' },
 } as const satisfies Record<string, FieldFilterConfig>;
 
 export type AdminTagGroupsFilterableField =
@@ -17,6 +18,7 @@ export const ADMIN_TAG_GROUPS_SORT_FIELDS = [
   'sortOrder',
   'createdAt',
   'updatedAt',
+  '_count.tags',
 ] as const;
 
 export type AdminTagGroupsSortField =

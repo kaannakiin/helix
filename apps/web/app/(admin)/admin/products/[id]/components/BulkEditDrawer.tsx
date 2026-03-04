@@ -14,8 +14,8 @@ import {
 import { getMimePatterns } from '@org/constants/product-constants';
 import { FileType } from '@org/prisma/browser';
 import type { ProductInputType } from '@org/schemas/admin/products';
-import { Dropzone } from '@org/ui/dropzone';
 import type { DropzoneFile } from '@org/ui/dropzone';
+import { Dropzone } from '@org/ui/dropzone';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { useFormContext } from 'react-hook-form';
@@ -34,9 +34,7 @@ export const BulkEditDrawer = ({
   const { getValues, setValue } = useFormContext<ProductInputType>();
 
   const [isActive, setIsActive] = useState<boolean | null>(null);
-  const [trackingStrategy, setTrackingStrategy] = useState<string | null>(
-    null,
-  );
+  const [trackingStrategy, setTrackingStrategy] = useState<string | null>(null);
   const [bulkImages, setBulkImages] = useState<DropzoneFile[]>([]);
 
   const resetFields = () => {
@@ -59,7 +57,7 @@ export const BulkEditDrawer = ({
         setValue(
           `variants.${index}.trackingStrategy`,
           trackingStrategy as any,
-          { shouldDirty: true },
+          { shouldDirty: true }
         );
       }
       if (bulkImages.length > 0) {
@@ -100,7 +98,6 @@ export const BulkEditDrawer = ({
 
         <Divider />
 
-        {/* isActive */}
         <div>
           <Group justify="space-between" mb={4}>
             <Text size="sm" fw={500}>
@@ -120,16 +117,11 @@ export const BulkEditDrawer = ({
           <Switch
             checked={isActive ?? true}
             onChange={(e) => setIsActive(e.currentTarget.checked)}
-            label={
-              isActive === null ? '—' : isActive ? 'Active' : 'Inactive'
-            }
-            styles={
-              isActive === null ? { track: { opacity: 0.4 } } : undefined
-            }
+            label={isActive === null ? '—' : isActive ? 'Active' : 'Inactive'}
+            styles={isActive === null ? { track: { opacity: 0.4 } } : undefined}
           />
         </div>
 
-        {/* Tracking Strategy */}
         <div>
           <Group justify="space-between" mb={4}>
             <Text size="sm" fw={500}>
@@ -158,7 +150,6 @@ export const BulkEditDrawer = ({
 
         <Divider />
 
-        {/* Bulk Images */}
         <div>
           <Text size="sm" fw={500} mb={4}>
             {t('combinations.bulkDrawer.images')}
@@ -177,7 +168,6 @@ export const BulkEditDrawer = ({
 
         <Divider />
 
-        {/* Footer */}
         <Group justify="flex-end">
           <Button variant="default" onClick={handleCancel}>
             {t('combinations.bulkDrawer.cancel')}

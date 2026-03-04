@@ -1,8 +1,8 @@
 'use client';
 
 import { useAdminBrand, useSaveBrand } from '@/core/hooks/useAdminBrands';
+import { useImageUpload } from '@/core/hooks/useImageUpload';
 import { useTranslatedZodResolver } from '@/core/hooks/useTranslatedZodResolver';
-import { ApiError } from '@/core/lib/api/api-error';
 import {
   Alert,
   Button,
@@ -27,12 +27,12 @@ import {
 } from '@org/schemas/admin/brands';
 import { FormCard } from '@org/ui/common/form-card';
 import LoadingOverlay from '@org/ui/common/loading-overlay';
-import { Dropzone } from '@org/ui/dropzone';
+import { Dropzone, type RemoteFile } from '@org/ui/dropzone';
 import { createId } from '@paralleldrive/cuid2';
 import { Activity, FileText, Image as ImageIcon, Save } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   Controller,
   FormProvider,
@@ -48,12 +48,73 @@ const AdminBrandFormPage = () => {
   const isNew = id === 'new';
   const { data, isLoading, isError, error } = useAdminBrand(id);
   const apiError = error as ApiError | null;
-  const saveBrand = useSaveBrand();
+  const saveBrand = useSaveBrand({
+    onSuccess: () =>
+      notifications.show({ color: 'green', message: t('saveSuccess') }),
+    onError: (err) =>
+      notifications.show({
+        color: 'red',
+        title: t('loadError'),
+        message: err?.message ?? t('loadErrorDescription'),
+      }),
+  });
   const isMobile = useMediaQuery('(max-width: 768px)');
+
+  const brandId = useMemo(() => {
+    if (!isNew && data?.id) return data.id;
+    return createId();
+  }, [data, isNew]);
+
+  const [existingFiles, setExistingFiles] = useState<RemoteFile[]>([]);
+
+  const initialExisting = useMemo<RemoteFile[]>(() => {
+    if (!data || isNew) return [];
+    return (
+      data.images?.map((img) => ({
+        id: img.id,
+        url: img.url,
+        fileType: img.fileType,
+        order: img.sortOrder,
+      })) ?? []
+    );
+  }, [data, isNew]);
+
+  useMemo(() => {
+    setExistingFiles(initialExisting);
+  }, [initialExisting]);
+
+  const { deletingIds, isUploading, deleteImage, uploadFiles } =
+    useImageUpload({
+      basePath: `/admin/brands/${brandId}/images`,
+      onDeleteError: () => {
+        notifications.show({
+          color: 'red',
+          title: t('loadError'),
+          message: t('loadErrorDescription'),
+        });
+      },
+      onUploadError: () => {
+        notifications.show({
+          color: 'red',
+          title: t('loadError'),
+          message: t('loadErrorDescription'),
+        });
+      },
+    });
+
+  const handleRemoveExisting = useCallback(
+    async (file: RemoteFile) => {
+      const ok = await deleteImage(file);
+      if (ok) {
+        setExistingFiles((prev) => prev.filter((f) => f.id !== file.id));
+      }
+    },
+    [deleteImage],
+  );
 
   const formattedData = useMemo<BrandInput>(() => {
     if (!data || isNew) {
-      return { ...NEW_BRAND_DEFAULT_VALUES, id: createId() };
+      return { ...NEW_BRAND_DEFAULT_VALUES, id: brandId };
     }
 
     return {
@@ -76,7 +137,7 @@ const AdminBrandFormPage = () => {
           sortOrder: img.sortOrder,
         })) ?? [],
     };
-  }, [data, isNew]);
+  }, [data, isNew, brandId]);
 
   const resolver = useTranslatedZodResolver(BrandSchema);
   const methods = useForm<BrandInput>({
@@ -96,15 +157,43 @@ const AdminBrandFormPage = () => {
 
   const onSubmit: SubmitHandler<BrandInput> = async (formData) => {
     try {
-      await saveBrand.mutateAsync(formData as unknown as BrandOutput);
+      const newImages = formData.images ?? [];
+
+      // 1. Yeni image'leri yükle — sonuçları al
+      let uploadResults: { imageId: string; url: string; fileType: string }[] =
+        [];
+      if (newImages.length > 0) {
+        uploadResults = await uploadFiles(newImages);
+      }
+
+      // 2. existingFiles + upload sonuçlarını birleştir
+      const allExisting = [
+        ...existingFiles.map((f, i) => ({
+          id: f.id,
+          url: f.url,
+          fileType: f.fileType,
+          sortOrder: i,
+        })),
+        ...uploadResults.map((r, i) => ({
+          id: r.imageId,
+          url: r.url,
+          fileType: r.fileType,
+          sortOrder: existingFiles.length + i,
+        })),
+      ];
+
+      // 3. Brand'i kaydet (images olmadan, sadece existingImages)
+      const saveData = {
+        ...formData,
+        id: brandId,
+        images: undefined,
+        existingImages: allExisting,
+      };
+
+      await saveBrand.mutateAsync(saveData as unknown as BrandOutput);
       router.push('/admin/products/brands');
-    } catch (err) {
-      const apiErr = err as ApiError;
-      notifications.show({
-        color: 'red',
-        title: t('loadError'),
-        message: apiErr?.message ?? t('loadErrorDescription'),
-      });
+    } catch {
+      // handled by useSaveBrand onError callback
     }
   };
 
@@ -244,6 +333,11 @@ const AdminBrandFormPage = () => {
                         maxSize={5 * 1024 * 1024}
                         multiple
                         maxFiles={3}
+                        existingFiles={existingFiles}
+                        onRemoveExisting={handleRemoveExisting}
+                        onReorderExisting={setExistingFiles}
+                        deletingIds={deletingIds}
+                        loading={isUploading}
                       />
                       {fieldState.error?.message && (
                         <Text size="xs" c="red">

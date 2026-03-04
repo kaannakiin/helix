@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -26,30 +27,54 @@ import {
 } from '@org/types/admin/categories';
 import type { FilterCondition } from '@org/types/data-query';
 import type { PaginatedResponse } from '@org/types/pagination';
-import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
+import {
+  buildPrismaQuery,
+  resolveCountFilters,
+  type CountRelationMap,
+} from '../../../core/utils/prisma-query-builder';
 import { PrismaService } from '../../prisma/prisma.service';
+import { UploadService } from '../../upload/upload.service';
 import type { CategoryQueryDTO, CategorySaveDTO } from './dto';
+
+const MAX_CATEGORY_IMAGES = 5;
 
 @Injectable()
 export class CategoriesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly uploadService: UploadService
+  ) {}
+
+  private static readonly COUNT_RELATIONS: CountRelationMap = {
+    children: { table: 'Category', fk: 'parentId' },
+    products: { table: 'ProductCategory', fk: 'categoryId' },
+  };
 
   async getCategories(
     query: CategoryQueryDTO
   ): Promise<PaginatedResponse<AdminCategoryListPrismaType>> {
     const { page, limit, filters, sort } = query;
 
-    const { where, orderBy, skip, take } = buildPrismaQuery({
-      page,
-      limit,
-      filters: filters as Record<string, FilterCondition> | undefined,
-      sort,
-      defaultSort: { field: 'createdAt', order: 'desc' },
-    });
+    const { where: baseWhere, orderBy, skip, take, countFilters } =
+      buildPrismaQuery({
+        page,
+        limit,
+        filters: filters as Record<string, FilterCondition> | undefined,
+        sort,
+        defaultSort: { field: 'createdAt', order: 'desc' },
+      });
+
+    const where = (await resolveCountFilters(
+      this.prisma,
+      'Category',
+      CategoriesService.COUNT_RELATIONS,
+      countFilters,
+      baseWhere
+    )) as Prisma.CategoryWhereInput;
 
     const [items, total] = await Promise.all([
       this.prisma.category.findMany({
-        where: where as Prisma.CategoryWhereInput,
+        where,
         orderBy: orderBy as
           | Prisma.CategoryOrderByWithRelationInput
           | Prisma.CategoryOrderByWithRelationInput[],
@@ -57,7 +82,7 @@ export class CategoriesService {
         take,
         include: AdminCategoryListPrismaQuery,
       }),
-      this.prisma.category.count({ where: where as Prisma.CategoryWhereInput }),
+      this.prisma.category.count({ where }),
     ]);
 
     return {
@@ -434,5 +459,57 @@ export class CategoriesService {
     });
 
     return category;
+  }
+
+  async uploadCategoryImage(categoryId: string, file: Express.Multer.File) {
+    const category = await this.prisma.category.findUnique({
+      where: { id: categoryId },
+    });
+    if (!category) {
+      throw new NotFoundException('backend.errors.category_not_found');
+    }
+
+    const imageCount = await this.prisma.image.count({
+      where: { categoryId },
+    });
+    if (imageCount >= MAX_CATEGORY_IMAGES) {
+      throw new BadRequestException('backend.errors.max_images_exceeded');
+    }
+
+    const result = await this.uploadService.uploadFile(file, {
+      ownerType: 'category',
+      ownerId: categoryId,
+      isNeedWebp: true,
+      isNeedThumbnail: false,
+    });
+
+    await this.prisma.image.update({
+      where: { id: result.imageId },
+      data: { sortOrder: imageCount },
+    });
+
+    return result;
+  }
+
+  async deleteCategoryImage(categoryId: string, imageId: string): Promise<void> {
+    const image = await this.prisma.image.findFirst({
+      where: { id: imageId, categoryId },
+    });
+    if (!image) {
+      throw new NotFoundException('backend.errors.image_not_found');
+    }
+
+    await this.uploadService.deleteImage(imageId);
+
+    const remaining = await this.prisma.image.findMany({
+      where: { categoryId },
+      orderBy: { sortOrder: 'asc' },
+    });
+    for (let i = 0; i < remaining.length; i++) {
+      await this.prisma.image.update({
+        where: { id: remaining[i].id },
+        data: { sortOrder: i },
+      });
+    }
   }
 }

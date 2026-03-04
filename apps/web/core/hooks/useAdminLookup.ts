@@ -57,10 +57,40 @@ export const categoryTreeFetcher = createTreeFetcher('/admin/categories/tree');
 export const tagLookupFetcher = createLookupFetcher(
   '/admin/tag-groups/tags/lookup'
 );
-export const tagTreeFetcher = createTreeFetcher(
-  '/admin/tag-groups/tags/tree',
-  'tagGroupId'
-);
+export const tagTreeFetcher: TreeFetchOptions = async (params) => {
+  const { parentId, parentExtra, ...rest } = params;
+
+  let tagGroupId: string | undefined;
+  let parentTagId: string | undefined;
+
+  if (parentId) {
+    const extraTagGroupId = parentExtra?.tagGroupId as string | undefined;
+    if (extraTagGroupId) {
+      // parent bir Tag — tagGroupId extra'dan gelir, parentTagId = parentId
+      tagGroupId = extraTagGroupId;
+      parentTagId = parentId;
+    } else {
+      // parent bir TagGroup — tagGroupId = parentId
+      tagGroupId = parentId;
+    }
+  }
+
+  const res = await apiClient.get<TreeNode[] | PaginatedResponse<TreeNode>>(
+    '/admin/tag-groups/tags/tree',
+    {
+      params: {
+        ...(rest.q ? { q: rest.q } : {}),
+        ...(rest.ids?.length ? { ids: rest.ids.join(',') } : {}),
+        ...(rest.page ? { page: rest.page } : {}),
+        ...(tagGroupId ? { tagGroupId } : {}),
+        ...(parentTagId ? { parentTagId } : {}),
+        limit: LOOKUP_LIMIT,
+      },
+    }
+  );
+
+  return res.data;
+};
 export const variantGroupLookupFetcher = createLookupFetcher(
   '/admin/variant-groups/lookup'
 );

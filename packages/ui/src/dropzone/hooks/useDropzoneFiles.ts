@@ -10,6 +10,8 @@ interface UseDropzoneFilesOptions {
   value: DropzoneFile[] | null | undefined;
   onChange: (files: DropzoneFile[]) => void;
   maxFiles?: number;
+
+  existingCount?: number;
   onTooManyFiles?: (attempted: number, maxFiles: number) => void;
 }
 
@@ -17,18 +19,19 @@ export function useDropzoneFiles({
   value,
   onChange,
   maxFiles,
+  existingCount = 0,
   onTooManyFiles,
 }: UseDropzoneFilesOptions) {
   const files = value ?? [];
 
-  /** Add new files from a drop/select event */
   const addFiles = useCallback(
     (incoming: FileWithPath[]) => {
       const currentCount = files.length;
+      const totalCount = currentCount + existingCount;
       let toAdd = incoming;
 
       if (maxFiles !== undefined) {
-        const remaining = maxFiles - currentCount;
+        const remaining = maxFiles - totalCount;
         if (remaining <= 0) {
           onTooManyFiles?.(incoming.length, maxFiles);
           return;
@@ -48,10 +51,9 @@ export function useDropzoneFiles({
 
       onChange([...files, ...newFiles]);
     },
-    [files, onChange, maxFiles, onTooManyFiles]
+    [files, onChange, maxFiles, existingCount, onTooManyFiles]
   );
 
-  /** Remove a file by its stable ID */
   const removeFile = useCallback(
     (id: string) => {
       const updated = files
@@ -62,7 +64,6 @@ export function useDropzoneFiles({
     [files, onChange]
   );
 
-  /** Reorder after a drag-and-drop event */
   const reorderFiles = useCallback(
     (sourceIndex: number, destinationIndex: number) => {
       const reordered = Array.from(files);

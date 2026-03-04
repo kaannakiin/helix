@@ -1,8 +1,8 @@
-import { create } from "zustand";
-import { immer } from "zustand/middleware/immer";
-import type { ContextMenuTranslations } from "../types/contextMenu.types";
-import type { ExpandableRowTranslations } from "../types/expandableRow.types";
-import type { DataTableFooterTranslations } from "../types/footer.types";
+import { create } from 'zustand';
+import { immer } from 'zustand/middleware/immer';
+import type { ContextMenuTranslations } from '../types/contextMenu.types';
+import type { ExpandableRowTranslations } from '../types/expandableRow.types';
+import type { DataTableFooterTranslations } from '../types/footer.types';
 
 export interface DataTableFilterTranslations {
   reset: string;
@@ -50,6 +50,8 @@ export interface DataTableFilterDrawerTranslations {
   activeFilters: string;
   noFilters: string;
   apply: string;
+  searchPlaceholder: string;
+  appliedFilters: string;
 }
 
 export interface DataTableTranslations {
@@ -64,41 +66,41 @@ export interface DataTableTranslations {
 
 export const DEFAULT_TRANSLATIONS: DataTableTranslations = {
   filters: {
-    reset: "Reset",
+    reset: 'Reset',
     text: {
-      placeholder: "Filter...",
+      placeholder: 'Filter...',
     },
     date: {
-      placeholder: "Select date...",
-      placeholderTo: "Select end date...",
-      equals: "Equals",
-      greaterThan: "After",
-      lessThan: "Before",
-      inRange: "Between",
+      placeholder: 'Select date...',
+      placeholderTo: 'Select end date...',
+      equals: 'Equals',
+      greaterThan: 'After',
+      lessThan: 'Before',
+      inRange: 'Between',
     },
     boolean: {
-      placeholder: "Select...",
-      yes: "Yes",
-      no: "No",
+      placeholder: 'Select...',
+      yes: 'Yes',
+      no: 'No',
     },
     number: {
-      placeholder: "Value...",
-      placeholderTo: "To...",
-      equals: "Equals",
-      greaterThan: "Greater than",
-      lessThan: "Less than",
-      inRange: "Between",
+      placeholder: 'Value...',
+      placeholderTo: 'To...',
+      equals: 'Equals',
+      greaterThan: 'Greater than',
+      lessThan: 'Less than',
+      inRange: 'Between',
     },
     locale: {
-      placeholder: "Select locale...",
+      placeholder: 'Select locale...',
       labels: {
-        en: "English",
-        tr: "Turkish",
-        de: "German",
-        fr: "French",
-        es: "Spanish",
-        it: "Italian",
-        nl: "Dutch",
+        en: 'English',
+        tr: 'Turkish',
+        de: 'German',
+        fr: 'French',
+        es: 'Spanish',
+        it: 'Italian',
+        nl: 'Dutch',
       },
     },
   },
@@ -110,22 +112,19 @@ interface DataTableTranslationState {
   mergeTranslations: (partial: Partial<DataTableTranslations>) => void;
 }
 
-export const useDataTableTranslationStore =
-  create<DataTableTranslationState>()(
-    immer((set) => ({
-      translations: DEFAULT_TRANSLATIONS,
-
-      setTranslations: (translations) =>
-        set((state) => {
-          state.translations = translations;
-        }),
-
-      mergeTranslations: (partial) =>
-        set((state) => {
-          Object.assign(state.translations, partial);
-        }),
-    })),
-  );
+export const useDataTableTranslationStore = create<DataTableTranslationState>()(
+  immer((set) => ({
+    translations: DEFAULT_TRANSLATIONS,
+    setTranslations: (translations) =>
+      set((state) => {
+        state.translations = translations;
+      }),
+    mergeTranslations: (partial) =>
+      set((state) => {
+        Object.assign(state.translations, partial);
+      }),
+  }))
+);
 
 export function useDataTableTranslations(): DataTableTranslations {
   return useDataTableTranslationStore((s) => s.translations);

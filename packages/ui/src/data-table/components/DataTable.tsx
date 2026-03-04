@@ -12,6 +12,7 @@ import type {
   ModelUpdatedEvent,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
+import { DEFAULT_PAGE_SIZE } from '@org/constants';
 import { Filter, RefreshCw } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { cn } from '../../utils/cn';
@@ -42,6 +43,7 @@ export interface DataTableProps<TData> {
   debug?: boolean;
   contextMenu?: ContextMenuConfig<TData>;
   showFilterDrawer?: boolean;
+  pageSize?: number;
 }
 
 export function DataTable<TData>({
@@ -56,6 +58,7 @@ export function DataTable<TData>({
   debug = false,
   contextMenu,
   showFilterDrawer = false,
+  pageSize = DEFAULT_PAGE_SIZE,
 }: DataTableProps<TData>) {
   const contextMenuEnabled = contextMenu?.enabled !== false && contextMenu;
 
@@ -130,13 +133,17 @@ export function DataTable<TData>({
     const api = gridApiRef.current;
     if (!api || refreshDisabled) return;
 
-    api.purgeInfiniteCache();
+    api.setFilterModel({});
+    api.applyColumnState({ defaultState: { sort: null } });
+    setFilterModel({});
+    api.setGridOption('datasource', datasource);
+    setTimeout(() => api.ensureIndexVisible(0), 0);
 
     setRefreshDisabled(true);
     refreshTimerRef.current = setTimeout(() => {
       setRefreshDisabled(false);
     }, REFRESH_COOLDOWN_MS);
-  }, [refreshDisabled]);
+  }, [refreshDisabled, datasource]);
 
   const activeFilterCount = Object.keys(filterModel).length;
 
@@ -165,10 +172,10 @@ export function DataTable<TData>({
       pagination: false,
       animateRows: true,
       enableCellTextSelection: true,
-      cacheBlockSize: 100,
+      cacheBlockSize: pageSize,
       cacheOverflowSize: 5,
       maxConcurrentDatasourceRequests: 1,
-      infiniteInitialRowCount: 100,
+      infiniteInitialRowCount: pageSize,
       maxBlocksInCache: 10,
       reactiveCustomComponents: true,
       enableFilterHandlers: true,
@@ -208,6 +215,7 @@ export function DataTable<TData>({
     handleCellContextMenu,
     closeMenu,
     showFilterDrawer,
+    pageSize,
   ]);
 
   return (

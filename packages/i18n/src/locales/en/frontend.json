@@ -282,7 +282,9 @@
         "clearAll": "Clear All",
         "activeFilters": "{count} active",
         "noFilters": "No filters available",
-        "apply": "Apply Filters"
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
       },
       "form": {
         "newProduct": "New Product",
@@ -459,7 +461,9 @@
         "clearAll": "Clear All",
         "activeFilters": "{count} active",
         "noFilters": "No filters available",
-        "apply": "Apply Filters"
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
       },
       "form": {
         "newBrand": "New Brand",
@@ -497,7 +501,9 @@
         },
         "sortOrder": {
           "label": "Sort Order"
-        }
+        },
+        "saveSuccess": "Brand saved successfully.",
+        "saveError": "Failed to save brand."
       }
     },
     "categories": {
@@ -534,7 +540,9 @@
         "clearAll": "Clear All",
         "activeFilters": "{count} active",
         "noFilters": "No filters available",
-        "apply": "Apply Filters"
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
       },
       "form": {
         "newCategory": "New Category",
@@ -561,7 +569,13 @@
         "parent": {
           "label": "Parent Category",
           "placeholder": "Select parent category..."
-        }
+        },
+        "loadError": "Failed to Load",
+        "loadErrorDescription": "An error occurred while loading the category. Please try again.",
+        "saveSuccess": "Category saved successfully.",
+        "saveError": "Failed to save category.",
+        "imageDeleteError": "Failed to delete image.",
+        "imageUploadError": "Failed to upload image."
       }
     },
     "tags": {
@@ -596,7 +610,9 @@
         "clearAll": "Clear All",
         "activeFilters": "{count} active",
         "noFilters": "No filters available",
-        "apply": "Apply Filters"
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
       },
       "form": {
         "newTagGroup": "New Tag Group",
@@ -662,7 +678,13 @@
           "bulkDeleteConfirm": "Are you sure you want to delete the selected tags and all their children?",
           "empty": "No child tags",
           "savingChildren": "Loading tag data..."
-        }
+        },
+        "saveSuccess": "Tag group saved successfully.",
+        "tagSaveSuccess": "Tag saved successfully.",
+        "tagDeleteSuccess": "Tag deleted successfully.",
+        "tagBulkDeleteSuccess": "Tags deleted successfully.",
+        "tagSaveError": "Failed to save tag.",
+        "tagDeleteError": "Failed to delete tag."
       }
     },
     "variants": {
@@ -697,7 +719,9 @@
         "clearAll": "Clear All",
         "activeFilters": "{count} active",
         "noFilters": "No filters available",
-        "apply": "Apply Filters"
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
       },
       "form": {
         "newVariantGroup": "New Variant Group",
@@ -745,7 +769,8 @@
             "description": "Upload an image for this option (max 1)"
           },
           "deleteConfirm": "Are you sure you want to remove this option?"
-        }
+        },
+        "saveSuccess": "Variant group saved successfully."
       }
     },
     "locations": {
@@ -815,7 +840,9 @@
         "clearAll": "Clear All",
         "activeFilters": "{count} active",
         "noFilters": "No filters available",
-        "apply": "Apply Filters"
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
       },
       "detail": {
         "title": "Customer Details",
@@ -873,7 +900,9 @@
         "clearAll": "Clear All",
         "activeFilters": "{count} active",
         "noFilters": "No filters available",
-        "apply": "Apply Filters"
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
       },
       "enums": {
         "type": {
@@ -921,7 +950,9 @@
         "clearAll": "Clear All",
         "activeFilters": "{count} active",
         "noFilters": "No filters available",
-        "apply": "Apply Filters"
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
       },
       "form": {
         "newCustomerGroup": "New Customer Group",
@@ -1065,7 +1096,9 @@
         "clearAll": "Clear All",
         "activeFilters": "{count} active",
         "noFilters": "No filters available",
-        "apply": "Apply Filters"
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
       },
       "detail": {
         "title": "Evaluation Job Details",

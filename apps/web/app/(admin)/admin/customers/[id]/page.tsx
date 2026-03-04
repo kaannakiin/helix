@@ -181,7 +181,6 @@ export default function CustomerDetailPage() {
 
   return (
     <Stack gap="lg">
-      {/* Header */}
       <Group justify="space-between" align="flex-start">
         <Group gap="lg">
           <Avatar
@@ -231,7 +230,6 @@ export default function CustomerDetailPage() {
         </Button>
       </Group>
 
-      {/* Stats */}
       <SimpleGrid cols={{ base: 1, sm: 3 }}>
         <StatCard
           icon={<Globe size={22} />}
@@ -253,14 +251,10 @@ export default function CustomerDetailPage() {
         />
       </SimpleGrid>
 
-      {/* Details */}
       <SimpleGrid cols={{ base: 1, md: 2 }}>
-        {/* Contact Information */}
         <Paper p="lg" withBorder radius="md">
           <Stack gap="md">
-            <SectionTitle>
-              {tDetail('sections.contactInfo')}
-            </SectionTitle>
+            <SectionTitle>{tDetail('sections.contactInfo')}</SectionTitle>
             <Divider />
             <DetailRow icon={<User size={14} />} label={tTable('name')}>
               <Text size="sm" fw={500}>
@@ -285,7 +279,6 @@ export default function CustomerDetailPage() {
           </Stack>
         </Paper>
 
-        {/* Security */}
         <Paper p="lg" withBorder radius="md">
           <Stack gap="md">
             <SectionTitle>{tDetail('sections.security')}</SectionTitle>
@@ -341,7 +334,6 @@ export default function CustomerDetailPage() {
         </Paper>
       </SimpleGrid>
 
-      {/* Activity */}
       <Paper p="lg" withBorder radius="md">
         <Stack gap="md">
           <SectionTitle>{tDetail('sections.activity')}</SectionTitle>

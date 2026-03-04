@@ -4,6 +4,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Query,
@@ -61,8 +63,15 @@ export class ProductsController {
     if (!files || files.length === 0) {
       throw new BadRequestException('backend.errors.no_files_provided');
     }
-    const ownerType = body.ownerType as 'product' | 'productVariant';
-    if (ownerType !== 'product' && ownerType !== 'productVariant') {
+    const ownerType = body.ownerType as
+      | 'product'
+      | 'productVariant'
+      | 'productVariantGroupOption';
+    if (
+      ownerType !== 'product' &&
+      ownerType !== 'productVariant' &&
+      ownerType !== 'productVariantGroupOption'
+    ) {
       throw new BadRequestException('backend.errors.invalid_owner_type');
     }
     const sortOrders: number[] = body.sortOrders
@@ -76,6 +85,18 @@ export class ProductsController {
       files,
       sortOrders,
     });
+  }
+
+  @Delete(':id/images/:imageId')
+  @ApiOperation({ summary: 'Delete a product image' })
+  @ApiParam({ name: 'id', description: 'Product ID' })
+  @ApiParam({ name: 'imageId', description: 'Image ID' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteProductImage(
+    @Param('id') productId: string,
+    @Param('imageId') imageId: string
+  ) {
+    return this.productsService.deleteProductImage(productId, imageId);
   }
 
   @Get('export')

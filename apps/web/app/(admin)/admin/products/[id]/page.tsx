@@ -6,7 +6,8 @@ import {
   tagTreeFetcher,
   taxonomyTreeFetcher,
 } from '@/core/hooks/useAdminLookup';
-import { useAdminProduct } from '@/core/hooks/useAdminProducts';
+import { useAdminProduct, useSaveProduct } from '@/core/hooks/useAdminProducts';
+import { useImageUpload } from '@/core/hooks/useImageUpload';
 import { useTranslatedZodResolver } from '@/core/hooks/useTranslatedZodResolver';
 import { ApiError } from '@/core/lib/api/api-error';
 import {
@@ -21,6 +22,7 @@ import {
   Textarea,
 } from '@mantine/core';
 import { useMediaQuery } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
 import { DATA_ACCESS_KEYS } from '@org/constants/data-keys';
 import {
   ProductStatusConfigs,
@@ -31,13 +33,14 @@ import { getMimePatterns } from '@org/constants/product-constants';
 import { FileType } from '@org/prisma/browser';
 import {
   NEW_PRODUCT_DEFAULT_VALUES,
-  ProductInputType,
+  type ProductInputType,
+  type ProductOutputType,
   ProductSchema,
 } from '@org/schemas/admin/products';
 import type { VariantGroupInput } from '@org/schemas/admin/variants';
 import { FormCard } from '@org/ui/common/form-card';
 import LoadingOverlay from '@org/ui/common/loading-overlay';
-import { Dropzone } from '@org/ui/dropzone';
+import { Dropzone, type RemoteFile } from '@org/ui/dropzone';
 import { ProductSeoCard } from '@org/ui/inputs/product-seo-card';
 import { RelationDrawer } from '@org/ui/inputs/relation-drawer';
 import { RichTextEditor } from '@org/ui/inputs/rich-text-editor';
@@ -49,8 +52,9 @@ import {
   Save,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { createId } from '@paralleldrive/cuid2';
 import { useParams, useRouter } from 'next/navigation';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   Controller,
   FormProvider,
@@ -194,6 +198,60 @@ const AdminProductPage = () => {
     return map;
   }, [data, isNew]);
 
+  const productId = useMemo(() => {
+    if (!isNew && data?.id) return data.id;
+    return createId();
+  }, [data, isNew]);
+
+  const [existingFiles, setExistingFiles] = useState<RemoteFile[]>([]);
+
+  const initialExisting = useMemo<RemoteFile[]>(() => {
+    if (!data || isNew) return [];
+    return (
+      data.images?.map((img) => ({
+        id: img.id,
+        url: img.url,
+        fileType: img.fileType,
+        order: img.sortOrder,
+      })) ?? []
+    );
+  }, [data, isNew]);
+
+  useMemo(() => {
+    setExistingFiles(initialExisting);
+  }, [initialExisting]);
+
+  const { deletingIds, isUploading, deleteImage, uploadFiles } =
+    useImageUpload({
+      basePath: `/admin/products/${productId}/images`,
+      onDeleteError: () => {
+        notifications.show({
+          color: 'red',
+          title: t('loadError'),
+          message: t('loadErrorDescription'),
+        });
+      },
+      onUploadError: () => {
+        notifications.show({
+          color: 'red',
+          title: t('loadError'),
+          message: t('loadErrorDescription'),
+        });
+      },
+    });
+
+  const saveProduct = useSaveProduct();
+
+  const handleRemoveExisting = useCallback(
+    async (file: RemoteFile) => {
+      const ok = await deleteImage(file);
+      if (ok) {
+        setExistingFiles((prev) => prev.filter((f) => f.id !== file.id));
+      }
+    },
+    [deleteImage]
+  );
+
   const resolver = useTranslatedZodResolver(ProductSchema);
   const methods = useForm<ProductInputType>({
     resolver,
@@ -210,8 +268,199 @@ const AdminProductPage = () => {
 
   const productName = watch('translations.0.name');
 
-  const onSubmit: SubmitHandler<ProductInputType> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<ProductInputType> = async (formData) => {
+    try {
+      // For new products, save first to create entities in DB
+      if (isNew) {
+        const initialSave = {
+          ...formData,
+          uniqueId: productId,
+          newImages: undefined,
+          existingImages: [],
+          variants: (formData.variants ?? []).map((v) => ({
+            ...v,
+            newImages: undefined,
+            existingImages: [],
+          })),
+          variantGroups: (formData.variantGroups ?? []).map((g) => ({
+            ...g,
+            options: g.options.map((o) => ({
+              ...o,
+              images: undefined,
+            })),
+          })),
+        };
+        await saveProduct.mutateAsync(
+          initialSave as unknown as ProductOutputType
+        );
+      }
+
+      // Phase A: Upload product-level images
+      const productNewImages = formData.newImages ?? [];
+      let productUploadResults: Array<{
+        imageId: string;
+        url: string;
+        fileType: string;
+      }> = [];
+      if (productNewImages.length > 0) {
+        productUploadResults = await uploadFiles(productNewImages, {
+          ownerType: 'product',
+          ownerId: productId,
+        });
+      }
+      const productExistingImages = [
+        ...existingFiles.map((f, i) => ({
+          id: f.id,
+          url: f.url,
+          fileType: f.fileType,
+          sortOrder: i,
+        })),
+        ...productUploadResults.map((r, i) => ({
+          id: r.imageId,
+          url: r.url,
+          fileType: r.fileType,
+          sortOrder: existingFiles.length + i,
+        })),
+      ];
+
+      // Phase B: Upload variant-level images
+      const processedVariants = [];
+      for (const variant of formData.variants ?? []) {
+        const newImgs = variant.newImages ?? [];
+        let variantUploadResults: Array<{
+          imageId: string;
+          url: string;
+          fileType: string;
+        }> = [];
+        if (newImgs.length > 0) {
+          variantUploadResults = await uploadFiles(newImgs, {
+            ownerType: 'productVariant',
+            ownerId: variant.uniqueId,
+          });
+        }
+        processedVariants.push({
+          ...variant,
+          newImages: undefined,
+          existingImages: [
+            ...(variant.existingImages ?? []).map((img, i) => ({
+              id: img.id,
+              url: img.url,
+              fileType: img.fileType,
+              sortOrder: i,
+            })),
+            ...variantUploadResults.map((r, i) => ({
+              id: r.imageId,
+              url: r.url,
+              fileType: r.fileType,
+              sortOrder: (variant.existingImages?.length ?? 0) + i,
+            })),
+          ],
+        });
+      }
+
+      // Phase C: Collect variant option images info
+      const optionsWithNewImages: Array<{
+        groupUniqueId: string;
+        optUniqueId: string;
+        files: NonNullable<ProductInputType['variantGroups']>[number]['options'][number]['images'];
+        currentExistingCount: number;
+      }> = [];
+
+      const processedVariantGroups = (formData.variantGroups ?? []).map(
+        (group) => ({
+          ...group,
+          options: group.options.map((opt) => {
+            const newImgs = opt.images ?? [];
+            if (newImgs.length > 0) {
+              optionsWithNewImages.push({
+                groupUniqueId: group.uniqueId,
+                optUniqueId: opt.uniqueId,
+                files: newImgs,
+                currentExistingCount: opt.existingImages?.length ?? 0,
+              });
+            }
+            return { ...opt, images: undefined };
+          }),
+        })
+      );
+
+      // Phase D: Main save
+      const saveData = {
+        ...formData,
+        uniqueId: productId,
+        newImages: undefined,
+        existingImages: productExistingImages,
+        variants: processedVariants,
+        variantGroups: processedVariantGroups,
+      };
+      const savedProduct = await saveProduct.mutateAsync(
+        saveData as unknown as ProductOutputType
+      );
+
+      // Phase E: Upload option images if any (needs pvgOption IDs from save response)
+      if (optionsWithNewImages.length > 0) {
+        const updatedGroups = processedVariantGroups.map((g) => ({
+          ...g,
+          options: g.options.map((o) => ({ ...o })),
+        }));
+
+        for (const item of optionsWithNewImages) {
+          // Find pvgOption ID from save response
+          const savedPvg = savedProduct.variantGroups?.find(
+            (pvg) => pvg.variantGroup.id === item.groupUniqueId
+          );
+          const pvgOpt = savedPvg?.options?.find(
+            (o) => o.variantOptionId === item.optUniqueId
+          );
+          if (!pvgOpt || !item.files || item.files.length === 0) continue;
+
+          const results = await uploadFiles(item.files, {
+            ownerType: 'productVariantGroupOption',
+            ownerId: pvgOpt.id,
+          });
+
+          // Update the option's existingImages in our local copy
+          const groupIdx = updatedGroups.findIndex(
+            (g) => g.uniqueId === item.groupUniqueId
+          );
+          if (groupIdx >= 0) {
+            const optIdx = updatedGroups[groupIdx].options.findIndex(
+              (o) => o.uniqueId === item.optUniqueId
+            );
+            if (optIdx >= 0) {
+              updatedGroups[groupIdx].options[optIdx] = {
+                ...updatedGroups[groupIdx].options[optIdx],
+                existingImages: [
+                  ...(updatedGroups[groupIdx].options[optIdx].existingImages ??
+                    []),
+                  ...results.map((r, i) => ({
+                    id: r.imageId,
+                    url: r.url,
+                    fileType: r.fileType,
+                    sortOrder: item.currentExistingCount + i,
+                  })),
+                ],
+              };
+            }
+          }
+        }
+
+        // Re-save with updated option existingImages
+        await saveProduct.mutateAsync({
+          ...saveData,
+          variantGroups: updatedGroups,
+        } as unknown as ProductOutputType);
+      }
+
+      router.push('/admin/products');
+    } catch (err) {
+      const apiErr = err as ApiError;
+      notifications.show({
+        color: 'red',
+        title: t('loadError'),
+        message: apiErr?.message ?? t('loadErrorDescription'),
+      });
+    }
   };
 
   if (isLoading && !isNew) return <LoadingOverlay />;
@@ -319,6 +568,8 @@ const AdminProductPage = () => {
               <VariantCreator
                 isNew={isNew}
                 initialOriginalOptionsMap={initialOriginalOptionsMap}
+                deleteImage={deleteImage}
+                deletingIds={deletingIds}
               />
 
               <FormCard
@@ -330,15 +581,30 @@ const AdminProductPage = () => {
                 <Controller
                   control={control}
                   name="newImages"
-                  render={({ field }) => (
-                    <Dropzone
-                      value={field.value}
-                      onChange={field.onChange}
-                      accept={getMimePatterns([FileType.IMAGE, FileType.VIDEO])}
-                      maxSize={5 * 1024 * 1024}
-                      multiple
-                      maxFiles={10}
-                    />
+                  render={({ field, fieldState }) => (
+                    <Stack gap="xs">
+                      <Dropzone
+                        value={field.value}
+                        onChange={field.onChange}
+                        accept={getMimePatterns([
+                          FileType.IMAGE,
+                          FileType.VIDEO,
+                        ])}
+                        maxSize={5 * 1024 * 1024}
+                        multiple
+                        maxFiles={10}
+                        existingFiles={existingFiles}
+                        onRemoveExisting={handleRemoveExisting}
+                        onReorderExisting={setExistingFiles}
+                        deletingIds={deletingIds}
+                        loading={isUploading}
+                      />
+                      {fieldState.error?.message && (
+                        <Text size="xs" c="red">
+                          {fieldState.error.message}
+                        </Text>
+                      )}
+                    </Stack>
                   )}
                 />
               </FormCard>

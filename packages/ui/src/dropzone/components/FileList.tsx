@@ -15,16 +15,17 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { Stack } from '@mantine/core';
-import type { DropzoneFile, DropzoneTranslations } from '../types';
+import type { DropzoneTranslations, UnifiedFile } from '../types';
 import { FileListItem } from './FileListItem';
 
 interface FileListProps {
-  files: DropzoneFile[];
+  files: UnifiedFile[];
   onReorder: (sourceIndex: number, destinationIndex: number) => void;
-  onPreview: (file: DropzoneFile) => void;
-  onRemove: (id: string) => void;
+  onPreview: (file: UnifiedFile) => void;
+  onRemove: (file: UnifiedFile) => void;
   translations?: DropzoneTranslations;
   disabled?: boolean;
+  deletingIds?: Set<string>;
 }
 
 export function FileList({
@@ -34,6 +35,7 @@ export function FileList({
   onRemove,
   translations,
   disabled = false,
+  deletingIds,
 }: FileListProps) {
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -74,6 +76,7 @@ export function FileList({
               onRemove={onRemove}
               translations={translations}
               disabled={disabled}
+              isDeleting={deletingIds?.has(file.id)}
             />
           ))}
         </Stack>

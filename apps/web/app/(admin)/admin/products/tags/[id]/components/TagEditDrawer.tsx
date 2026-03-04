@@ -70,7 +70,17 @@ export const TagEditDrawer = ({
   ...drawerProps
 }: TagEditDrawerProps) => {
   const t = useTranslations('frontend.admin.tags.form.tags');
-  const saveTag = useSaveTag(tagGroupId);
+  const tForm = useTranslations('frontend.admin.tags.form');
+  const saveTag = useSaveTag(tagGroupId, {
+    onSuccess: () =>
+      notifications.show({ color: 'green', message: tForm('tagSaveSuccess') }),
+    onError: (err) =>
+      notifications.show({
+        color: 'red',
+        title: tForm('tagSaveError'),
+        message: err?.message,
+      }),
+  });
   const resolver = useTranslatedZodResolver(BaseTagSchema);
   const parentForm = useFormContext<TagGroupInput>();
 
@@ -149,11 +159,7 @@ export const TagEditDrawer = ({
         await saveTag.mutateAsync(data as unknown as BaseTagOutput);
         drawerProps.onClose();
       } catch {
-        notifications.show({
-          color: 'red',
-          title: t('editDrawer.errorTitle'),
-          message: t('editDrawer.errorMessage'),
-        });
+        // handled by useSaveTag onError callback
       }
     }
   };

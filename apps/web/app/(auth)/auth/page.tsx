@@ -10,7 +10,9 @@ const AuthPage = () => {
   const tab = searchParams.get('tab') ?? 'login';
 
   const handleSwitch = (value: 'login' | 'register') => {
-    router.replace(`/auth?tab=${value}`);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('tab', value);
+    router.replace(`/auth?${params.toString()}`);
   };
 
   return (

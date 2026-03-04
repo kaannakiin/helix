@@ -1,13 +1,29 @@
-import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Query,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { UserRole } from '@org/prisma/client';
 import type { Prisma } from '@org/prisma/client';
+import { UserRole } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
-import { I18nContext } from 'nestjs-i18n';
 import type { Response } from 'express';
+import { I18nContext } from 'nestjs-i18n';
 import { Locale, Roles } from '../../../core/decorators';
+import { FileValidationPipe } from '../../../core/pipes/file-validation.pipe';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
+import { CATEGORY_EXPORT_COLUMNS } from './categories.export-config';
 import { CategoriesService } from './categories.service';
 import {
   CategoryExportQueryDTO,
@@ -15,7 +31,6 @@ import {
   CategoryQueryDTO,
   CategorySaveDTO,
 } from './dto';
-import { CATEGORY_EXPORT_COLUMNS } from './categories.export-config';
 
 @ApiTags('Admin - Categories')
 @Controller('admin/categories')
@@ -36,7 +51,7 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Lookup categories for selection inputs' })
   async lookupCategories(
     @Query() query: CategoryLookupQueryDTO,
-    @Locale() lang: import('@org/prisma/client').Locale,
+    @Locale() lang: import('@org/prisma/client').Locale
   ) {
     return this.categoriesService.lookup({
       q: query.q,
@@ -48,10 +63,12 @@ export class CategoriesController {
   }
 
   @Get('tree')
-  @ApiOperation({ summary: 'Get categories as a tree (top-level parents with children)' })
+  @ApiOperation({
+    summary: 'Get categories as a tree (top-level parents with children)',
+  })
   async getCategoryTree(
     @Query() query: CategoryLookupQueryDTO,
-    @Locale() lang: import('@org/prisma/client').Locale,
+    @Locale() lang: import('@org/prisma/client').Locale
   ) {
     return this.categoriesService.getTree({
       q: query.q,
@@ -130,6 +147,35 @@ export class CategoriesController {
   @ApiOperation({ summary: 'Create or update a category (upsert by uniqueId)' })
   async saveCategory(@Body() body: CategorySaveDTO) {
     return this.categoriesService.saveCategory(body);
+  }
+
+  @Post(':id/images')
+  @ApiOperation({ summary: 'Upload an image for a category' })
+  @ApiParam({ name: 'id', description: 'Category ID' })
+  @UseInterceptors(FileInterceptor('file'))
+  async uploadCategoryImage(
+    @Param('id') id: string,
+    @UploadedFile(
+      new FileValidationPipe({
+        allowedTypes: ['IMAGE'],
+        maxSize: 5 * 1024 * 1024,
+      })
+    )
+    file: Express.Multer.File
+  ) {
+    return this.categoriesService.uploadCategoryImage(id, file);
+  }
+
+  @Delete(':id/images/:imageId')
+  @ApiOperation({ summary: 'Delete a category image' })
+  @ApiParam({ name: 'id', description: 'Category ID' })
+  @ApiParam({ name: 'imageId', description: 'Image ID' })
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async deleteCategoryImage(
+    @Param('id') categoryId: string,
+    @Param('imageId') imageId: string
+  ) {
+    return this.categoriesService.deleteCategoryImage(categoryId, imageId);
   }
 
   @Get(':id')

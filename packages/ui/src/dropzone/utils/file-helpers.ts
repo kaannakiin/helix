@@ -47,6 +47,16 @@ export function formatFileSize(bytes: number): string {
   return `${size.toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
 }
 
+/** Extract a human-readable filename from a URL */
+export function extractFilenameFromUrl(url: string): string {
+  try {
+    const pathname = new URL(url).pathname;
+    return pathname.split('/').pop() ?? 'unknown';
+  } catch {
+    return url.split('/').pop() ?? 'unknown';
+  }
+}
+
 /** Convert a DropzoneFile to the legacy FileWithSort type */
 export function toFileWithSort(df: DropzoneFile): FileWithSort {
   return Object.assign(df.file, { order: df.order });

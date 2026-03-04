@@ -282,7 +282,9 @@
         "clearAll": "Tümünü Temizle",
         "activeFilters": "{count} aktif",
         "noFilters": "Filtre bulunmuyor",
-        "apply": "Filtrele"
+        "apply": "Filtrele",
+        "searchPlaceholder": "Filtre ara...",
+        "appliedFilters": "Uygulanan Filtreler"
       },
       "form": {
         "newProduct": "Yeni Ürün",
@@ -459,7 +461,9 @@
         "clearAll": "Tümünü Temizle",
         "activeFilters": "{count} aktif",
         "noFilters": "Filtre bulunmuyor",
-        "apply": "Filtrele"
+        "apply": "Filtrele",
+        "searchPlaceholder": "Filtre ara...",
+        "appliedFilters": "Uygulanan Filtreler"
       },
       "form": {
         "newBrand": "Yeni Marka",
@@ -497,7 +501,9 @@
         },
         "sortOrder": {
           "label": "Sıralama"
-        }
+        },
+        "saveSuccess": "Marka başarıyla kaydedildi.",
+        "saveError": "Marka kaydedilemedi."
       }
     },
     "categories": {
@@ -534,7 +540,9 @@
         "clearAll": "Tümünü Temizle",
         "activeFilters": "{count} aktif",
         "noFilters": "Filtre bulunmuyor",
-        "apply": "Filtrele"
+        "apply": "Filtrele",
+        "searchPlaceholder": "Filtre ara...",
+        "appliedFilters": "Uygulanan Filtreler"
       },
       "form": {
         "newCategory": "Yeni Kategori",
@@ -561,7 +569,13 @@
         "parent": {
           "label": "Üst Kategori",
           "placeholder": "Üst kategori seçin..."
-        }
+        },
+        "loadError": "Yüklenemedi",
+        "loadErrorDescription": "Kategori yüklenirken bir hata oluştu. Lütfen tekrar deneyin.",
+        "saveSuccess": "Kategori başarıyla kaydedildi.",
+        "saveError": "Kategori kaydedilemedi.",
+        "imageDeleteError": "Resim silinemedi.",
+        "imageUploadError": "Resim yüklenemedi."
       }
     },
     "tags": {
@@ -596,7 +610,9 @@
         "clearAll": "Tümünü Temizle",
         "activeFilters": "{count} aktif",
         "noFilters": "Filtre bulunmuyor",
-        "apply": "Filtrele"
+        "apply": "Filtrele",
+        "searchPlaceholder": "Filtre ara...",
+        "appliedFilters": "Uygulanan Filtreler"
       },
       "form": {
         "newTagGroup": "Yeni Etiket Grubu",
@@ -662,7 +678,13 @@
           "bulkDeleteConfirm": "Seçili etiketleri ve tüm alt etiketlerini silmek istediğinizden emin misiniz?",
           "empty": "Alt etiket yok",
           "savingChildren": "Etiket verileri yükleniyor..."
-        }
+        },
+        "saveSuccess": "Etiket grubu başarıyla kaydedildi.",
+        "tagSaveSuccess": "Etiket başarıyla kaydedildi.",
+        "tagDeleteSuccess": "Etiket silindi.",
+        "tagBulkDeleteSuccess": "Etiketler silindi.",
+        "tagSaveError": "Etiket kaydedilemedi.",
+        "tagDeleteError": "Etiket silinemedi."
       }
     },
     "variants": {
@@ -697,7 +719,9 @@
         "clearAll": "Tümünü Temizle",
         "activeFilters": "{count} aktif",
         "noFilters": "Filtre bulunmuyor",
-        "apply": "Filtrele"
+        "apply": "Filtrele",
+        "searchPlaceholder": "Filtre ara...",
+        "appliedFilters": "Uygulanan Filtreler"
       },
       "form": {
         "newVariantGroup": "Yeni Varyant Grubu",
@@ -745,7 +769,8 @@
             "description": "Bu seçenek için bir görsel yükleyin (maks 1)"
           },
           "deleteConfirm": "Bu seçeneği kaldırmak istediğinizden emin misiniz?"
-        }
+        },
+        "saveSuccess": "Varyant grubu başarıyla kaydedildi."
       }
     },
     "locations": {
@@ -815,7 +840,9 @@
         "clearAll": "Tümünü Temizle",
         "activeFilters": "{count} aktif",
         "noFilters": "Filtre bulunmuyor",
-        "apply": "Filtrele"
+        "apply": "Filtrele",
+        "searchPlaceholder": "Filtre ara...",
+        "appliedFilters": "Uygulanan Filtreler"
       },
       "detail": {
         "title": "Müşteri Detayları",
@@ -873,7 +900,9 @@
         "clearAll": "Tümünü Temizle",
         "activeFilters": "{count} aktif",
         "noFilters": "Filtre bulunmuyor",
-        "apply": "Filtrele"
+        "apply": "Filtrele",
+        "searchPlaceholder": "Filtre ara...",
+        "appliedFilters": "Uygulanan Filtreler"
       },
       "enums": {
         "type": {
@@ -1065,7 +1094,9 @@
         "clearAll": "Tümünü Temizle",
         "activeFilters": "{count} aktif",
         "noFilters": "Filtre bulunmuyor",
-        "apply": "Filtrele"
+        "apply": "Filtrele",
+        "searchPlaceholder": "Filtre ara...",
+        "appliedFilters": "Uygulanan Filtreler"
       },
       "detail": {
         "title": "Değerlendirme İş Detayları",

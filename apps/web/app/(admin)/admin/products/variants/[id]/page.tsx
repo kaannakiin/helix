@@ -31,7 +31,6 @@ import {
   Button,
   ColorInput,
   ColorSwatch,
-  Divider,
   Group,
   NumberInput,
   Radio,
@@ -75,8 +74,6 @@ import {
 } from 'react-hook-form';
 
 type VariantOptionItem = VariantGroupInput['options'][number];
-
-// ─── Sortable Option Row ─────────────────────────────────────────────────────
 
 interface SortableOptionRowProps {
   opt: VariantOptionItem;
@@ -125,11 +122,15 @@ const SortableOptionRow = ({
         onClick={onToggleExpand}
         style={(theme) => ({
           borderRadius: theme.radius.sm,
-          border: `1px solid ${error ? theme.colors.red[5] : isExpanded ? theme.colors.blue[4] : theme.colors.gray[2]}`,
+          border: `1px solid ${
+            error
+              ? theme.colors.red[5]
+              : isExpanded
+              ? theme.colors.blue[4]
+              : theme.colors.gray[2]
+          }`,
           padding: `6px ${theme.spacing.sm}`,
-          backgroundColor: isExpanded
-            ? theme.colors.blue[0]
-            : theme.white,
+          backgroundColor: isExpanded ? theme.colors.blue[0] : theme.white,
           cursor: 'pointer',
         })}
       >
@@ -155,12 +156,7 @@ const SortableOptionRow = ({
             <ColorSwatch color="#cccccc" size={24} />
           ))}
 
-        <Text
-          size="sm"
-          fw={500}
-          style={{ flex: 1, minWidth: 0 }}
-          lineClamp={1}
-        >
+        <Text size="sm" fw={500} style={{ flex: 1, minWidth: 0 }} lineClamp={1}>
           {optionName}
         </Text>
 
@@ -185,8 +181,6 @@ const SortableOptionRow = ({
   );
 };
 
-// ─── Page ────────────────────────────────────────────────────────────────────
-
 const AdminVariantGroupFormPage = () => {
   const t = useTranslations('frontend.admin.variants.form');
   const params = useParams();
@@ -196,7 +190,16 @@ const AdminVariantGroupFormPage = () => {
   const isNew = id === 'new';
   const { data, isLoading, isError, error } = useAdminVariantGroup(id);
   const apiError = error as ApiError | null;
-  const saveVariantGroup = useSaveVariantGroup();
+  const saveVariantGroup = useSaveVariantGroup({
+    onSuccess: () =>
+      notifications.show({ color: 'green', message: t('saveSuccess') }),
+    onError: (err) =>
+      notifications.show({
+        color: 'red',
+        title: t('loadError'),
+        message: err?.message ?? t('loadErrorDescription'),
+      }),
+  });
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   const [expandedOptionId, setExpandedOptionId] = useState<string | null>(null);
@@ -315,7 +318,9 @@ const AdminVariantGroupFormPage = () => {
       uniqueId: newId,
       sortOrder: optionFields.length,
       colorCode: isColor
-        ? `#${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0')}`
+        ? `#${Math.floor(Math.random() * 0xffffff)
+            .toString(16)
+            .padStart(6, '0')}`
         : undefined,
       translations: [{ locale: 'TR', name: '', slug: '' }],
       images: undefined,
@@ -330,7 +335,6 @@ const AdminVariantGroupFormPage = () => {
         formData as unknown as VariantGroupOutput
       );
 
-      // Upload new images for options that have them
       for (const option of formData.options) {
         if (option.images && option.images.length > 0) {
           const file = option.images[0].file;
@@ -346,14 +350,7 @@ const AdminVariantGroupFormPage = () => {
       }
 
       router.push('/admin/products/variants');
-    } catch (err) {
-      const apiErr = err as ApiError;
-      notifications.show({
-        color: 'red',
-        title: t('loadError'),
-        message: apiErr?.message ?? t('loadErrorDescription'),
-      });
-    }
+    } catch {}
   };
 
   if (isLoading && !isNew) return <LoadingOverlay />;
@@ -411,7 +408,6 @@ const AdminVariantGroupFormPage = () => {
               gap="md"
               style={{ flex: 1, minWidth: isMobile ? '100%' : 400 }}
             >
-              {/* General Info */}
               <FormCard
                 title={t('generalInfo')}
                 icon={FileText}
@@ -515,7 +511,6 @@ const AdminVariantGroupFormPage = () => {
                 </Stack>
               </FormCard>
 
-              {/* Options */}
               <FormCard
                 title={t('options.title')}
                 description={t('options.description')}
@@ -539,8 +534,7 @@ const AdminVariantGroupFormPage = () => {
                           </Text>
                         ) : (
                           optionFields.map((fieldMeta, optIndex) => {
-                            const opt =
-                              currentOptions?.[optIndex] ?? fieldMeta;
+                            const opt = currentOptions?.[optIndex] ?? fieldMeta;
                             const isExpanded =
                               expandedOptionId === opt.uniqueId;
 
@@ -557,8 +551,7 @@ const AdminVariantGroupFormPage = () => {
                                   }
                                   onRemove={() => {
                                     removeOption(optIndex);
-                                    if (isExpanded)
-                                      setExpandedOptionId(null);
+                                    if (isExpanded) setExpandedOptionId(null);
                                   }}
                                   unnamedLabel={t('options.unnamedOption')}
                                   error={
@@ -576,39 +569,28 @@ const AdminVariantGroupFormPage = () => {
                                       border: `1px solid ${theme.colors.blue[4]}`,
                                       borderTop: 'none',
                                       borderRadius: `0 0 ${theme.radius.sm} ${theme.radius.sm}`,
-                                      backgroundColor:
-                                        theme.colors.gray[0],
+                                      backgroundColor: theme.colors.gray[0],
                                     })}
                                   >
                                     <Controller
                                       control={control}
                                       name={`options.${optIndex}.translations.0.name`}
-                                      render={({
-                                        field,
-                                        fieldState,
-                                      }) => (
+                                      render={({ field, fieldState }) => (
                                         <TextInput
                                           {...field}
                                           onChange={(e) => {
                                             field.onChange(e);
                                             setValue(
                                               `options.${optIndex}.translations.0.slug`,
-                                              slugify(
-                                                e.target.value,
-                                                locale
-                                              ),
+                                              slugify(e.target.value, locale),
                                               { shouldDirty: true }
                                             );
                                           }}
-                                          label={t(
-                                            'options.optionName.label'
-                                          )}
+                                          label={t('options.optionName.label')}
                                           placeholder={t(
                                             'options.optionName.placeholder'
                                           )}
-                                          error={
-                                            fieldState.error?.message
-                                          }
+                                          error={fieldState.error?.message}
                                           required
                                         />
                                       )}
@@ -619,10 +601,7 @@ const AdminVariantGroupFormPage = () => {
                                         <Controller
                                           control={control}
                                           name={`options.${optIndex}.colorCode`}
-                                          render={({
-                                            field,
-                                            fieldState,
-                                          }) => (
+                                          render={({ field, fieldState }) => (
                                             <ColorInput
                                               label={t(
                                                 'options.colorCode.label'
@@ -632,9 +611,7 @@ const AdminVariantGroupFormPage = () => {
                                               )}
                                               value={field.value ?? ''}
                                               onChange={field.onChange}
-                                              error={
-                                                fieldState.error?.message
-                                              }
+                                              error={fieldState.error?.message}
                                               format="hex"
                                               swatches={[
                                                 '#ff0000',
@@ -705,7 +682,6 @@ const AdminVariantGroupFormPage = () => {
               </FormCard>
             </Stack>
 
-            {/* Sidebar */}
             <Stack
               gap="md"
               style={{

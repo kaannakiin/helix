@@ -60,6 +60,7 @@ export class TagGroupsController {
       q: query.q,
       ids: query.ids?.split(',').filter(Boolean),
       tagGroupId: query.tagGroupId,
+      parentTagId: query.parentTagId,
       limit: query.limit,
       page: query.page,
       lang,
