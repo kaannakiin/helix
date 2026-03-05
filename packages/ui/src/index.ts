@@ -47,3 +47,9 @@ export {
 } from './data-table/utils/clipboardUtils';
 
 export { serializeGridQuery } from './data-table/utils/querySerializer';
+
+export {
+  HoverCardCellRenderer,
+  clearHoverCardCache,
+  type HoverCardCellRendererParams,
+} from './data-table/components/HoverCardCellRenderer';

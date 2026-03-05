@@ -5,6 +5,7 @@ import {
   useSaveCategory,
 } from '@/core/hooks/useAdminCategory';
 import { categoryTreeFetcher } from '@/core/hooks/useAdminLookup';
+import { useAdminStores } from '@/core/hooks/useAdminStores';
 import { useImageUpload } from '@/core/hooks/useImageUpload';
 import { useTranslatedZodResolver } from '@/core/hooks/useTranslatedZodResolver';
 import {
@@ -32,6 +33,7 @@ import LoadingOverlay from '@org/ui/common/loading-overlay';
 import { Dropzone, type RemoteFile } from '@org/ui/dropzone';
 import { ProductSeoCard } from '@org/ui/inputs/product-seo-card';
 import { RelationDrawer } from '@org/ui/inputs/relation-drawer';
+import { StoreMultiSelect } from '@org/ui/inputs/store-multi-select';
 import { createId } from '@paralleldrive/cuid2';
 import {
   Activity,
@@ -39,6 +41,7 @@ import {
   FileText,
   Image as ImageIcon,
   Save,
+  Store,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
@@ -57,6 +60,7 @@ const AdminCategoryFormPage = () => {
   const id = params.id as string;
   const isNew = id === 'new';
   const { data, isLoading } = useAdminCategory(id);
+  const { data: stores = [], isLoading: storesLoading } = useAdminStores();
   const saveCategory = useSaveCategory({
     onSuccess: () =>
       notifications.show({ color: 'green', message: t('saveSuccess') }),
@@ -91,6 +95,7 @@ const AdminCategoryFormPage = () => {
       slug: data.slug,
       parentId: data.parentId ?? '',
       isActive: data.isActive,
+      activeStores: data.stores?.map((cs) => cs.storeId) ?? [],
       translations: data.translations.map((tr) => ({
         locale: tr.locale,
         name: tr.name,
@@ -340,6 +345,27 @@ const AdminCategoryFormPage = () => {
                       label={t('parent.label')}
                       placeholder={t('parent.placeholder')}
                       error={fieldState.error?.message}
+                    />
+                  )}
+                />
+              </FormCard>
+
+              <FormCard
+                title={t('salesChannels.title')}
+                icon={Store}
+                iconColor="violet"
+              >
+                <Controller
+                  control={control}
+                  name="activeStores"
+                  render={({ field, fieldState }) => (
+                    <StoreMultiSelect
+                      stores={stores}
+                      value={field.value ?? []}
+                      onChange={field.onChange}
+                      placeholder={t('salesChannels.placeholder')}
+                      error={fieldState.error?.message}
+                      isLoading={storesLoading}
                     />
                   )}
                 />

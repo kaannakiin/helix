@@ -59,6 +59,12 @@
       "import": "./src/inputs/cron-input/index.ts",
       "default": "./src/inputs/cron-input/index.ts"
     },
+    "./inputs/store-multi-select": {
+      "@org/source": "./src/inputs/store-multi-select/index.ts",
+      "types": "./dist/inputs/store-multi-select/index.d.ts",
+      "import": "./src/inputs/store-multi-select/index.ts",
+      "default": "./src/inputs/store-multi-select/index.ts"
+    },
     "./inputs/*": {
       "@org/source": "./src/inputs/*.tsx",
       "types": "./dist/inputs/*.d.ts",

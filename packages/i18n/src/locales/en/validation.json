@@ -56,7 +56,9 @@
       "decision_tree_orphan_node": "Orphan node detected — not reachable from root.",
       "decision_tree_min_conditions": "At least two conditions are required in a condition group.",
       "decision_tree_simple_multiple_results": "Simple mode allows only one result node.",
-      "decision_tree_simple_no_branch_not_allowed": "No-branch is not allowed in simple mode."
+      "decision_tree_simple_no_branch_not_allowed": "No-branch is not allowed in simple mode.",
+      "active_stores_required": "At least one store must be selected.",
+      "duplicate_store": "Duplicate store selection detected."
     }
   }
 }

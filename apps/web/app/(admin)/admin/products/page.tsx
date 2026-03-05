@@ -2,7 +2,7 @@
 
 import { apiClient } from '@/core/lib/api/api-client';
 import { downloadExport } from '@/core/lib/api/download';
-import { Button, Group, Stack, Text, Title } from '@mantine/core';
+import { Badge, Button, Group, Stack, Text, Title } from '@mantine/core';
 import {
   ProductStatusConfigs,
   ProductTypeConfigs,
@@ -14,11 +14,13 @@ import type { ExportFormat } from '@org/types/export';
 import type { PaginatedResponse } from '@org/types/pagination';
 import {
   DataTable,
+  HoverCardCellRenderer,
   serializeGridQuery,
   useColumnFactory,
   type CopyColumn,
   type DataTableFilterTranslations,
   type DataTableTranslations,
+  type HoverCardCellRendererParams,
 } from '@org/ui';
 import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
 import { Plus } from 'lucide-react';
@@ -88,6 +90,7 @@ export default function ProductsPage() {
         variantCount: t('table.variantCount'),
         categoryCount: t('table.categoryCount'),
         tagCount: t('table.tagCount'),
+        storeCount: t('table.storeCount'),
         createdAt: t('table.createdAt'),
         updatedAt: t('table.updatedAt'),
       },
@@ -156,7 +159,8 @@ export default function ProductsPage() {
           headerKey: 'brandName',
           type: 'text',
           minWidth: 150,
-          valueGetter: (params) => params.data?.brand?.translations?.[0]?.name ?? '—',
+          valueGetter: (params) =>
+            params.data?.brand?.translations?.[0]?.name ?? '—',
           sortable: false,
           filter: false,
         }
@@ -175,6 +179,50 @@ export default function ProductsPage() {
         headerKey: 'tagCount',
         type: 'number',
         minWidth: 110,
+      }),
+      createColumn<AdminProductListPrismaType>('_count.stores', {
+        headerKey: 'storeCount',
+        type: 'number',
+        minWidth: 130,
+        cellRenderer: HoverCardCellRenderer,
+        cellRendererParams: {
+          fetchFn: async (row: AdminProductListPrismaType) => {
+            const res = await apiClient.get<
+              Array<{
+                id: string;
+                name: string;
+                businessModel: string;
+                status: string;
+              }>
+            >(`/admin/products/${row.id}/stores`);
+            return res.data;
+          },
+          renderContent: (stores) => (
+            <Stack gap="xs">
+              {stores.map((s) => (
+                <Group key={s.id} gap="xs">
+                  <Text size="sm">{s.name}</Text>
+                  <Badge
+                    size="xs"
+                    color={s.businessModel === 'B2B' ? 'blue' : 'green'}
+                    variant="light"
+                  >
+                    {s.businessModel}
+                  </Badge>
+                </Group>
+              ))}
+            </Stack>
+          ),
+          isHoverable: (value: unknown) => (value as number) > 0,
+        } satisfies HoverCardCellRendererParams<
+          AdminProductListPrismaType,
+          Array<{
+            id: string;
+            name: string;
+            businessModel: string;
+            status: string;
+          }>
+        >,
       }),
       createColumn<AdminProductListPrismaType>('createdAt', {
         headerKey: 'createdAt',

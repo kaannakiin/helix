@@ -1,6 +1,4 @@
-import { ACTIVE_STORE_COOKIE } from '@org/constants/auth-constants';
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
-import Cookies from 'js-cookie';
 import { ApiError } from './api-error';
 
 const apiClient = axios.create({
@@ -29,14 +27,6 @@ function processQueue(error: unknown): void {
   });
   failedQueue = [];
 }
-
-apiClient.interceptors.request.use((config) => {
-  const storeId = Cookies.get(ACTIVE_STORE_COOKIE);
-  if (storeId) {
-    config.headers['X-Store-Id'] = storeId;
-  }
-  return config;
-});
 
 apiClient.interceptors.response.use(
   (response) => response,

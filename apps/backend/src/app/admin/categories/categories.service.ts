@@ -382,8 +382,15 @@ export class CategoriesService {
     data: CategorySaveDTO,
     locale: Locale
   ): Promise<AdminCategoryDetailPrismaType> {
-    const { uniqueId, slug, parentId, isActive, translations, existingImages } =
-      data;
+    const {
+      uniqueId,
+      slug,
+      parentId,
+      isActive,
+      activeStores,
+      translations,
+      existingImages,
+    } = data;
 
     const cleanParentId = parentId && parentId !== '' ? parentId : null;
 
@@ -440,7 +447,7 @@ export class CategoriesService {
         metaDescription: tr.metaDescription ?? null,
       }));
 
-      return tx.category.upsert({
+      await tx.category.upsert({
         where: { id: uniqueId },
         create: {
           id: uniqueId,
@@ -457,6 +464,22 @@ export class CategoriesService {
           isActive,
           translations: { create: translationData },
         },
+      });
+
+      await tx.categoryStore.deleteMany({
+        where: { categoryId: uniqueId },
+      });
+      if (activeStores && activeStores.length > 0) {
+        await tx.categoryStore.createMany({
+          data: activeStores.map((storeId) => ({
+            categoryId: uniqueId,
+            storeId,
+          })),
+        });
+      }
+
+      return tx.category.findUniqueOrThrow({
+        where: { id: uniqueId },
         include: adminCategoryDetailPrismaQuery(locale),
       });
     });

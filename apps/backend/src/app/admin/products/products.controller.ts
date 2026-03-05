@@ -41,13 +41,19 @@ export class ProductsController {
 
   @Post('query')
   @ApiOperation({ summary: 'Get paginated list of products' })
-  async getProducts(@Body() query: ProductQueryDTO, @ContentLocale() locale: LocaleType) {
+  async getProducts(
+    @Body() query: ProductQueryDTO,
+    @ContentLocale() locale: LocaleType
+  ) {
     return this.productsService.getProducts(query, locale);
   }
 
   @Post('save')
   @ApiOperation({ summary: 'Create or update a product (upsert by uniqueId)' })
-  async saveProduct(@Body() body: ProductSaveDTO, @ContentLocale() locale: LocaleType) {
+  async saveProduct(
+    @Body() body: ProductSaveDTO,
+    @ContentLocale() locale: LocaleType
+  ) {
     return this.productsService.saveProduct(body, locale);
   }
 
@@ -168,10 +174,20 @@ export class ProductsController {
     result.stream.pipe(res);
   }
 
+  @Get(':id/stores')
+  @ApiOperation({ summary: 'Get stores for a product' })
+  @ApiParam({ name: 'id', description: 'Product ID' })
+  async getProductStores(@Param('id') id: string) {
+    return this.productsService.getProductStores(id);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get product by ID' })
   @ApiParam({ name: 'id', description: 'Product ID' })
-  async getProductById(@Param('id') id: string, @ContentLocale() locale: LocaleType) {
+  async getProductById(
+    @Param('id') id: string,
+    @ContentLocale() locale: LocaleType
+  ) {
     return this.productsService.getProductById(id, locale);
   }
 

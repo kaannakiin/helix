@@ -1,6 +1,5 @@
 'use client';
 
-import { ActiveStoreProvider } from '@/core/providers/active-store-provider';
 import { AppShell, Burger, Group } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { useEffect, useState } from 'react';
@@ -11,10 +10,9 @@ import { AdminSpotlight } from './admin-spotlight';
 
 interface AdminShellProps {
   children: React.ReactNode;
-  initialStoreId?: string;
 }
 
-export function AdminShell({ children, initialStoreId }: AdminShellProps) {
+export function AdminShell({ children }: AdminShellProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -74,9 +72,7 @@ export function AdminShell({ children, initialStoreId }: AdminShellProps) {
           mobileOpened={mobileOpened}
         />
         <AppShell.Main className="flex flex-col min-h-[calc(100vh - var(--app-shell-header-offset, 0px) - var(--mantine-spacing-md) * 2)] h-full">
-          <ActiveStoreProvider initialStoreId={initialStoreId}>
-            {children}
-          </ActiveStoreProvider>
+          {children}
         </AppShell.Main>
       </AppShell>
       <AdminSpotlight />

@@ -56,7 +56,9 @@
       "decision_tree_orphan_node": "Yetim düğüm tespit edildi — kökten erişilemiyor.",
       "decision_tree_min_conditions": "Bir koşul grubunda en az iki koşul gereklidir.",
       "decision_tree_simple_multiple_results": "Basit modda yalnızca bir sonuç düğümüne izin verilir.",
-      "decision_tree_simple_no_branch_not_allowed": "Basit modda hayır dalına izin verilmez."
+      "decision_tree_simple_no_branch_not_allowed": "Basit modda hayır dalına izin verilmez.",
+      "active_stores_required": "En az bir mağaza seçilmelidir.",
+      "duplicate_store": "Aynı mağaza birden fazla seçilmiş."
     }
   }
 }

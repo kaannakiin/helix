@@ -34,6 +34,7 @@ export class ProductsService {
     variants: { table: 'ProductVariant', fk: 'productId' },
     categories: { table: 'ProductCategory', fk: 'productId' },
     tags: { table: 'ProductTag', fk: 'productId' },
+    stores: { table: 'ProductStore', fk: 'productId' },
   };
 
   async getProducts(
@@ -133,6 +134,20 @@ export class ProductsService {
     return product;
   }
 
+  async getProductStores(productId: string) {
+    const rows = await this.prisma.productStore.findMany({
+      where: { productId },
+      include: { store: true },
+    });
+
+    return rows.map((r) => ({
+      id: r.store.id,
+      name: r.store.name,
+      businessModel: r.store.businessModel,
+      status: r.store.status,
+    }));
+  }
+
   async saveProduct(
     data: ProductSaveDTO,
     locale: Locale
@@ -149,6 +164,7 @@ export class ProductsService {
       variants,
       categories,
       tagIds,
+      activeStores,
     } = data;
 
     const cleanBrandId = brandId && brandId !== '' ? brandId : null;
@@ -503,6 +519,18 @@ export class ProductsService {
           data: tagIds.map((tagId) => ({
             productId: uniqueId,
             tagId,
+          })),
+        });
+      }
+
+      await tx.productStore.deleteMany({
+        where: { productId: uniqueId },
+      });
+      if (activeStores.length > 0) {
+        await tx.productStore.createMany({
+          data: activeStores.map((storeId) => ({
+            productId: uniqueId,
+            storeId,
           })),
         });
       }

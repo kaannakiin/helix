@@ -7,6 +7,7 @@ import {
   taxonomyTreeFetcher,
 } from '@/core/hooks/useAdminLookup';
 import { useAdminProduct, useSaveProduct } from '@/core/hooks/useAdminProducts';
+import { useAdminStores } from '@/core/hooks/useAdminStores';
 import { useImageUpload } from '@/core/hooks/useImageUpload';
 import { useTranslatedZodResolver } from '@/core/hooks/useTranslatedZodResolver';
 import { ApiError } from '@/core/lib/api/api-error';
@@ -33,9 +34,9 @@ import { getMimePatterns } from '@org/constants/product-constants';
 import { FileType } from '@org/prisma/browser';
 import {
   NEW_PRODUCT_DEFAULT_VALUES,
+  ProductSchema,
   type ProductInputType,
   type ProductOutputType,
-  ProductSchema,
 } from '@org/schemas/admin/products';
 import type { VariantGroupInput } from '@org/schemas/admin/variants';
 import { FormCard } from '@org/ui/common/form-card';
@@ -44,15 +45,17 @@ import { Dropzone, type RemoteFile } from '@org/ui/dropzone';
 import { ProductSeoCard } from '@org/ui/inputs/product-seo-card';
 import { RelationDrawer } from '@org/ui/inputs/relation-drawer';
 import { RichTextEditor } from '@org/ui/inputs/rich-text-editor';
+import { StoreMultiSelect } from '@org/ui/inputs/store-multi-select';
+import { createId } from '@paralleldrive/cuid2';
 import {
   Activity,
   Building,
   FileText,
   Image as ImageIcon,
   Save,
+  Store,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { createId } from '@paralleldrive/cuid2';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useMemo, useState } from 'react';
 import {
@@ -71,6 +74,11 @@ const AdminProductPage = () => {
   const id = params.id as string;
   const isNew = id === 'new';
   const { data, isLoading, isError, error } = useAdminProduct(id);
+  const {
+    data: stores = [],
+    isLoading: storesLoading,
+    isPending: storesPending,
+  } = useAdminStores();
   const apiError = error as ApiError | null;
   const isMobile = useMediaQuery('(max-width: 768px)');
 
@@ -164,6 +172,7 @@ const AdminProductPage = () => {
           sortOrder: i,
         })) ?? [],
       tagIds: data.tags?.map((t) => t.tag.id) ?? [],
+      activeStores: data.stores?.map((s) => s.store.id) ?? [],
       googleTaxonomyId: data.googleTaxonomyId ?? null,
       uniqueId: data.id,
     };
@@ -221,8 +230,8 @@ const AdminProductPage = () => {
     setExistingFiles(initialExisting);
   }, [initialExisting]);
 
-  const { deletingIds, isUploading, deleteImage, uploadFiles } =
-    useImageUpload({
+  const { deletingIds, isUploading, deleteImage, uploadFiles } = useImageUpload(
+    {
       basePath: `/admin/products/${productId}/images`,
       onDeleteError: () => {
         notifications.show({
@@ -238,7 +247,8 @@ const AdminProductPage = () => {
           message: t('loadErrorDescription'),
         });
       },
-    });
+    }
+  );
 
   const saveProduct = useSaveProduct();
 
@@ -263,14 +273,13 @@ const AdminProductPage = () => {
     control,
     handleSubmit,
     watch,
-    formState: { isSubmitting },
+    formState: { isSubmitting, errors },
   } = methods;
 
   const productName = watch('translations.0.name');
 
   const onSubmit: SubmitHandler<ProductInputType> = async (formData) => {
     try {
-      // For new products, save first to create entities in DB
       if (isNew) {
         const initialSave = {
           ...formData,
@@ -295,7 +304,6 @@ const AdminProductPage = () => {
         );
       }
 
-      // Phase A: Upload product-level images
       const productNewImages = formData.newImages ?? [];
       let productUploadResults: Array<{
         imageId: string;
@@ -323,7 +331,6 @@ const AdminProductPage = () => {
         })),
       ];
 
-      // Phase B: Upload variant-level images
       const processedVariants = [];
       for (const variant of formData.variants ?? []) {
         const newImgs = variant.newImages ?? [];
@@ -358,11 +365,12 @@ const AdminProductPage = () => {
         });
       }
 
-      // Phase C: Collect variant option images info
       const optionsWithNewImages: Array<{
         groupUniqueId: string;
         optUniqueId: string;
-        files: NonNullable<ProductInputType['variantGroups']>[number]['options'][number]['images'];
+        files: NonNullable<
+          ProductInputType['variantGroups']
+        >[number]['options'][number]['images'];
         currentExistingCount: number;
       }> = [];
 
@@ -384,7 +392,6 @@ const AdminProductPage = () => {
         })
       );
 
-      // Phase D: Main save
       const saveData = {
         ...formData,
         uniqueId: productId,
@@ -397,7 +404,6 @@ const AdminProductPage = () => {
         saveData as unknown as ProductOutputType
       );
 
-      // Phase E: Upload option images if any (needs pvgOption IDs from save response)
       if (optionsWithNewImages.length > 0) {
         const updatedGroups = processedVariantGroups.map((g) => ({
           ...g,
@@ -405,7 +411,6 @@ const AdminProductPage = () => {
         }));
 
         for (const item of optionsWithNewImages) {
-          // Find pvgOption ID from save response
           const savedPvg = savedProduct.variantGroups?.find(
             (pvg) => pvg.variantGroup.id === item.groupUniqueId
           );
@@ -419,7 +424,6 @@ const AdminProductPage = () => {
             ownerId: pvgOpt.id,
           });
 
-          // Update the option's existingImages in our local copy
           const groupIdx = updatedGroups.findIndex(
             (g) => g.uniqueId === item.groupUniqueId
           );
@@ -445,7 +449,6 @@ const AdminProductPage = () => {
           }
         }
 
-        // Re-save with updated option existingImages
         await saveProduct.mutateAsync({
           ...saveData,
           variantGroups: updatedGroups,
@@ -755,6 +758,27 @@ const AdminProductPage = () => {
                     )}
                   />
                 </Stack>
+              </FormCard>
+
+              <FormCard
+                title={t('salesChannels.title')}
+                icon={Store}
+                iconColor="violet"
+              >
+                <Controller
+                  control={control}
+                  name="activeStores"
+                  render={({ field, fieldState }) => (
+                    <StoreMultiSelect
+                      stores={stores}
+                      value={field.value ?? []}
+                      onChange={field.onChange}
+                      placeholder={t('salesChannels.placeholder')}
+                      error={fieldState.error?.message}
+                      isLoading={storesPending}
+                    />
+                  )}
+                />
               </FormCard>
             </Stack>
           </Group>

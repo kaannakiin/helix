@@ -1,4 +1,9 @@
-import { BusinessModel, CurrencyCode, Locale, StoreStatus } from '@org/prisma/browser';
+import {
+  BusinessModel,
+  CurrencyCode,
+  Locale,
+  StoreStatus,
+} from '@org/prisma/browser';
 import { z } from 'zod';
 import { V } from '../../common/validation-keys.js';
 
@@ -27,5 +32,6 @@ export const UpdateStoreSchema = CreateStoreSchema.partial();
 
 export type CreateStoreInput = z.input<typeof CreateStoreSchema>;
 export type CreateStoreOutput = z.output<typeof CreateStoreSchema>;
+
 export type UpdateStoreInput = z.input<typeof UpdateStoreSchema>;
 export type UpdateStoreOutput = z.output<typeof UpdateStoreSchema>;

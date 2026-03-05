@@ -60,14 +60,12 @@ export const V = {
     'validation.errors.common.tracking_strategy_required',
 
   // ── Pricing ──
-  PRICE_LIST_NAME_REQUIRED:
-    'validation.errors.common.price_list_name_required',
+  PRICE_LIST_NAME_REQUIRED: 'validation.errors.common.price_list_name_required',
   PRICE_LIST_CURRENCY_REQUIRED:
     'validation.errors.common.price_list_currency_required',
   PRICE_REQUIRED: 'validation.errors.common.price_required',
   PRICE_NONNEGATIVE: 'validation.errors.common.price_nonnegative',
-  DUPLICATE_VARIANT_PRICE:
-    'validation.errors.common.duplicate_variant_price',
+  DUPLICATE_VARIANT_PRICE: 'validation.errors.common.duplicate_variant_price',
 
   // ── Customer Groups ──
   CUSTOMER_GROUP_NAME_REQUIRED:
@@ -78,14 +76,12 @@ export const V = {
     'validation.errors.common.customer_group_rule_tree_required',
   CUSTOMER_GROUP_MEMBERS_MIN:
     'validation.errors.common.customer_group_members_min',
-  CRON_EXPRESSION_INVALID:
-    'validation.errors.common.cron_expression_invalid',
+  CRON_EXPRESSION_INVALID: 'validation.errors.common.cron_expression_invalid',
 
   // ── Decision Tree ──
   DECISION_TREE_ROOT_REQUIRED:
     'validation.errors.common.decision_tree_root_required',
-  DECISION_TREE_NODES_MIN:
-    'validation.errors.common.decision_tree_nodes_min',
+  DECISION_TREE_NODES_MIN: 'validation.errors.common.decision_tree_nodes_min',
   DECISION_TREE_ROOT_NOT_FOUND:
     'validation.errors.common.decision_tree_root_not_found',
   DECISION_TREE_INVALID_BRANCH_REF:
@@ -102,4 +98,8 @@ export const V = {
   // ── Condition Set ──
   CONDITION_SET_MIN_CONDITIONS:
     'validation.errors.common.condition_set_min_conditions',
+
+  // Store
+  ACTIVE_STORES_REQUIRED: 'validation.errors.common.active_stores_required',
+  DUPLICATE_STORE: 'validation.errors.common.duplicate_store',
 } as const;

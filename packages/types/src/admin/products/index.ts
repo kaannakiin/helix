@@ -9,6 +9,7 @@ export const ADMIN_PRODUCTS_FIELD_CONFIG = {
   '_count.variants': { filterType: 'number' },
   '_count.categories': { filterType: 'number' },
   '_count.tags': { filterType: 'number' },
+  '_count.stores': { filterType: 'number' },
 } as const satisfies Record<string, FieldFilterConfig>;
 
 export type AdminProductsFilterableField =
@@ -23,6 +24,7 @@ export const ADMIN_PRODUCTS_SORT_FIELDS = [
   '_count.variants',
   '_count.categories',
   '_count.tags',
+  '_count.stores',
 ] as const;
 
 export type AdminProductsSortField =
@@ -33,8 +35,10 @@ export const adminProductListPrismaQuery = (locale: Locale) =>
     translations: { where: { locale } },
     images: { where: { isPrimary: true }, take: 1 },
     brand: { include: { translations: { where: { locale } } } },
-    _count: { select: { variants: true, categories: true, tags: true } },
-  }) satisfies Prisma.ProductInclude;
+    _count: {
+      select: { variants: true, categories: true, tags: true, stores: true },
+    },
+  } satisfies Prisma.ProductInclude);
 
 export type AdminProductListPrismaType = Prisma.ProductGetPayload<{
   include: ReturnType<typeof adminProductListPrismaQuery>;
@@ -71,19 +75,26 @@ export const adminProductDetailPrismaQuery = (locale: Locale) =>
     variants: {
       include: {
         optionValues: {
-          include: { variantOption: { include: { translations: { where: { locale } } } } },
+          include: {
+            variantOption: { include: { translations: { where: { locale } } } },
+          },
         },
         images: true,
       },
       orderBy: { sortOrder: 'asc' as const },
     },
     categories: {
-      include: { category: { include: { translations: { where: { locale } } } } },
+      include: {
+        category: { include: { translations: { where: { locale } } } },
+      },
     },
     tags: {
       include: { tag: { include: { translations: { where: { locale } } } } },
     },
-  }) satisfies Prisma.ProductInclude;
+    stores: {
+      include: { store: true },
+    },
+  } satisfies Prisma.ProductInclude);
 
 export type AdminProductDetailPrismaType = Prisma.ProductGetPayload<{
   include: ReturnType<typeof adminProductDetailPrismaQuery>;

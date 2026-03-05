@@ -4,8 +4,8 @@ import {
   useSaveStoreSettings,
   useStoreSettings,
 } from '@/core/hooks/useAdminSettings';
+import { useAdminStores } from '@/core/hooks/useAdminStores';
 import { useTranslatedZodResolver } from '@/core/hooks/useTranslatedZodResolver';
-import { useActiveStoreStore } from '@/core/stores/active-store.store';
 import {
   Button,
   Group,
@@ -23,7 +23,7 @@ import {
 } from '@org/schemas/admin/settings';
 import { FormCard } from '@org/ui/common/form-card';
 import { useTranslations } from 'next-intl';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 const LOCALE_OPTIONS = Object.values(Locale).map((l) => ({
@@ -33,10 +33,18 @@ const LOCALE_OPTIONS = Object.values(Locale).map((l) => ({
 
 export default function SettingsPage() {
   const t = useTranslations('frontend.admin.settings');
-  const activeStore = useActiveStoreStore((s) => s.activeStore);
-  const { data } = useStoreSettings(activeStore?.storeId);
+  const { data: stores } = useAdminStores();
+  const [selectedStoreId, setSelectedStoreId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (stores?.length && !selectedStoreId) {
+      setSelectedStoreId(stores[0].id);
+    }
+  }, [stores, selectedStoreId]);
+
+  const { data } = useStoreSettings(selectedStoreId ?? undefined);
   const saveSettings = useSaveStoreSettings({
-    storeId: activeStore?.storeId,
+    storeId: selectedStoreId ?? undefined,
     onSuccess: () =>
       notifications.show({ color: 'green', message: t('form.success') }),
     onError: () =>
@@ -79,6 +87,15 @@ export default function SettingsPage() {
           {t('subtitle')}
         </Text>
       </div>
+
+      {stores && stores.length > 1 && (
+        <Select
+          label={t('form.selectStore')}
+          data={stores.map((s) => ({ value: s.id, label: s.name }))}
+          value={selectedStoreId}
+          onChange={setSelectedStoreId}
+        />
+      )}
 
       <FormCard title={t('title')}>
         <form onSubmit={onSubmit}>

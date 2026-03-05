@@ -17,6 +17,7 @@ import {
   metaTitleSchema,
   slugSchema,
   sortOrderSchema,
+  storesSchema,
 } from '../../common/common-schemas.js';
 import { V } from '../../common/validation-keys.js';
 import {
@@ -278,6 +279,24 @@ function checkDuplicates({ issues, value }: SharedCheckPayload) {
 
 const productSchemaShape = z.object({
   uniqueId: z.cuid2(),
+  activeStores: storesSchema
+    .default([])
+    .refine((val) => val.length > 0, {
+      error: V.ACTIVE_STORES_REQUIRED,
+      path: ['activeStores'],
+    })
+    .refine((val) => {
+      const isUnique = val.length === new Set(val).size;
+      if (!isUnique) {
+        return {
+          code: 'custom',
+          input: val,
+          error: V.DUPLICATE_STORE,
+          path: ['activeStores'],
+        };
+      }
+      return true;
+    }),
   type: z
     .enum(ProductType, { error: V.PRODUCT_TYPE_REQUIRED })
     .default('PHYSICAL'),
@@ -340,6 +359,7 @@ export const ProductSchema = productSchemaShape
 
 const backendProductSchemaShape = z.object({
   uniqueId: z.cuid2(),
+  activeStores: storesSchema.default([]),
   type: z
     .enum(ProductType, { error: V.PRODUCT_TYPE_REQUIRED })
     .default('PHYSICAL'),
@@ -379,6 +399,7 @@ export type ProductOutputType = z.output<typeof ProductSchema>;
 
 export const NEW_PRODUCT_DEFAULT_VALUES: ProductInputType = {
   uniqueId: createId(),
+  activeStores: [],
   type: 'PHYSICAL',
   status: 'DRAFT',
   hasVariants: false,

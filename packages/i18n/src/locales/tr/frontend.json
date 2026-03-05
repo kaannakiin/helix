@@ -258,6 +258,7 @@
         "variantCount": "Varyantlar",
         "categoryCount": "Kategoriler",
         "tagCount": "Etiketler",
+        "storeCount": "Mağazalar",
         "createdAt": "Oluşturulma",
         "updatedAt": "Güncellenme"
       },
@@ -426,6 +427,12 @@
             "cancel": "İptal",
             "apply": "Uygula"
           }
+        },
+        "salesChannels": {
+          "title": "Satış Kanalları",
+          "placeholder": "Mağaza seçin...",
+          "b2b": "B2B",
+          "b2c": "B2C"
         }
       }
     },
@@ -575,7 +582,13 @@
         "saveSuccess": "Kategori başarıyla kaydedildi.",
         "saveError": "Kategori kaydedilemedi.",
         "imageDeleteError": "Resim silinemedi.",
-        "imageUploadError": "Resim yüklenemedi."
+        "imageUploadError": "Resim yüklenemedi.",
+        "salesChannels": {
+          "title": "Satış Kanalları",
+          "placeholder": "Mağaza seçin...",
+          "b2b": "B2B",
+          "b2c": "B2C"
+        }
       }
     },
     "tags": {
@@ -1152,17 +1165,11 @@
         "pendingLabel": "Bekliyor"
       }
     },
-    "storeSelect": {
-      "title": "Mağaza Seçimi",
-      "loading": "Mağazalar yükleniyor...",
-      "b2b_section": "B2B",
-      "b2c_section": "B2C",
-      "confirm_button": "Mağazaya Git"
-    },
     "settings": {
       "title": "Mağaza Ayarları",
       "subtitle": "Mağaza yapılandırmanızı yönetin",
       "form": {
+        "selectStore": "Mağaza Seçin",
         "storeName": {
           "label": "Mağaza Adı",
           "placeholder": "Mağazam"

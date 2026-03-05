@@ -9,6 +9,7 @@ import {
   metaDescriptionSchema,
   metaTitleSchema,
   slugSchema,
+  storesSchema,
 } from '../../common/common-schemas.js';
 import { V } from '../../common/validation-keys.js';
 
@@ -28,6 +29,7 @@ export const BaseCategorySchema = z.object({
   slug: slugSchema,
   parentId: cuidSchema.optional().or(z.literal('')),
   isActive: z.boolean().default(true),
+  activeStores: storesSchema.default([]),
   translations: z
     .array(CategoryTranslationSchema)
     .min(1, { error: V.TRANSLATIONS_MIN }),
@@ -91,6 +93,7 @@ export const NEW_CATEGORY_DEFAULT_VALUES: CategoryInput = {
   slug: '',
   parentId: '',
   isActive: true,
+  activeStores: [],
   translations: [
     {
       locale: 'TR',

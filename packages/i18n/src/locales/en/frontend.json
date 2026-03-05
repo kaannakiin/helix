@@ -258,6 +258,7 @@
         "variantCount": "Variants",
         "categoryCount": "Categories",
         "tagCount": "Tags",
+        "storeCount": "Stores",
         "createdAt": "Created At",
         "updatedAt": "Updated At"
       },
@@ -426,6 +427,12 @@
             "cancel": "Cancel",
             "apply": "Apply"
           }
+        },
+        "salesChannels": {
+          "title": "Sales Channels",
+          "placeholder": "Select stores...",
+          "b2b": "B2B",
+          "b2c": "B2C"
         }
       }
     },
@@ -575,7 +582,13 @@
         "saveSuccess": "Category saved successfully.",
         "saveError": "Failed to save category.",
         "imageDeleteError": "Failed to delete image.",
-        "imageUploadError": "Failed to upload image."
+        "imageUploadError": "Failed to upload image.",
+        "salesChannels": {
+          "title": "Sales Channels",
+          "placeholder": "Select stores...",
+          "b2b": "B2B",
+          "b2c": "B2C"
+        }
       }
     },
     "tags": {
@@ -1154,17 +1167,11 @@
         "pendingLabel": "Pending"
       }
     },
-    "storeSelect": {
-      "title": "Select Store",
-      "loading": "Loading stores...",
-      "b2b_section": "B2B",
-      "b2c_section": "B2C",
-      "confirm_button": "Go to Store"
-    },
     "settings": {
       "title": "Store Settings",
       "subtitle": "Manage your store configuration",
       "form": {
+        "selectStore": "Select Store",
         "storeName": {
           "label": "Store Name",
           "placeholder": "My Store"

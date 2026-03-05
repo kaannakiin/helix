@@ -71,3 +71,5 @@ export function findDuplicates<T>(
 
   return dupes;
 }
+
+export const storesSchema = z.array(z.union([z.cuid2(), z.string()]));
