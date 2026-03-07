@@ -37,9 +37,6 @@ FROM prisma AS builder
 COPY . .
 RUN npx nx build @org/backend
 
-# Also generate pruned package.json + lock for production deps
-RUN npx nx run @org/backend:prune
-
 # ── Stage 4: Production runtime ───────────────────────────
 FROM node:22-alpine AS runner
 WORKDIR /app
@@ -48,21 +45,8 @@ ENV NODE_ENV=production
 # Copy the webpack bundle (self-contained JS + i18n assets)
 COPY --from=builder /app/apps/backend/dist ./dist
 
-# Copy pruned package.json + lock for installing only runtime native deps
-COPY --from=builder /app/apps/backend/dist/package.json ./dist/
-COPY --from=builder /app/apps/backend/dist/package-lock.json ./dist/
-
-# Copy workspace modules (Prisma client lives here)
-COPY --from=builder /app/apps/backend/dist/workspace_modules ./dist/workspace_modules
-
-# Install only production dependencies (native modules: @node-rs/argon2, pg, prisma engine)
-RUN cd dist && npm ci --omit=dev
-
-# Copy Prisma CLI + engines from the builder so runtime migrations do not
-# depend on downloading packages on container start.
-COPY --from=builder /app/node_modules/prisma /app/node_modules/prisma
-COPY --from=builder /app/node_modules/@prisma /app/node_modules/@prisma
-COPY --from=builder /app/node_modules/.bin/prisma /app/node_modules/.bin/prisma
+# Copy node_modules from builder (includes native modules + workspace deps)
+COPY --from=builder /app/node_modules ./node_modules
 
 # Copy Prisma schema + migrations for `prisma migrate deploy`
 COPY --from=builder /app/packages/prisma/prisma ./packages/prisma/prisma
