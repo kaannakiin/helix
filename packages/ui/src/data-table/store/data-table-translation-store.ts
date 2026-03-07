@@ -1,3 +1,4 @@
+import type React from 'react';
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import type { ContextMenuTranslations } from '../types/contextMenu.types';
@@ -54,6 +55,11 @@ export interface DataTableFilterDrawerTranslations {
   appliedFilters: string;
 }
 
+export interface DataTableNoRowsTranslations {
+  label?: string;
+  icon?: React.ReactNode;
+}
+
 export interface DataTableTranslations {
   filters: DataTableFilterTranslations;
   columns?: Record<string, string>;
@@ -62,6 +68,7 @@ export interface DataTableTranslations {
   footer?: DataTableFooterTranslations;
   filterDrawer?: DataTableFilterDrawerTranslations;
   expandableRow?: ExpandableRowTranslations;
+  noRows?: DataTableNoRowsTranslations;
 }
 
 export const DEFAULT_TRANSLATIONS: DataTableTranslations = {
@@ -112,7 +119,9 @@ interface DataTableTranslationState {
   mergeTranslations: (partial: Partial<DataTableTranslations>) => void;
 }
 
-export const useDataTableTranslationStore = create<DataTableTranslationState>()(
+export const useDataTableTranslationStore: import('zustand').UseBoundStore<
+  import('zustand').StoreApi<DataTableTranslationState>
+> = create<DataTableTranslationState>()(
   immer((set) => ({
     translations: DEFAULT_TRANSLATIONS,
     setTranslations: (translations) =>

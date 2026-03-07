@@ -19,6 +19,11 @@ export const V = {
   NAME_REQUIRED: 'validation.errors.common.name_required',
   TRANSLATIONS_MIN: 'validation.errors.common.translations_min',
   SLUG_PATTERN: 'validation.errors.common.slug_pattern',
+  DOMAIN_INVALID: 'validation.errors.common.domain_invalid',
+  HOSTNAME_INVALID: 'validation.errors.common.hostname_invalid',
+  IPV4_INVALID: 'validation.errors.common.ipv4_invalid',
+  IPV6_INVALID: 'validation.errors.common.ipv6_invalid',
+  INGRESS_TARGET_REQUIRED: 'validation.errors.common.ingress_target_required',
 
   // ── Duplicates ──
   DUPLICATE_LOCALE: 'validation.errors.common.duplicate_locale',
@@ -102,4 +107,5 @@ export const V = {
   // Store
   ACTIVE_STORES_REQUIRED: 'validation.errors.common.active_stores_required',
   DUPLICATE_STORE: 'validation.errors.common.duplicate_store',
+  TIMEZONE_INVALID: 'validation.errors.common.timezone_invalid',
 } as const;

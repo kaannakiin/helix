@@ -66,6 +66,7 @@
       }
     }
   ],
+  "useDaemonProcess": false,
   "targetDefaults": {
     "test": {
       "dependsOn": ["^build"]

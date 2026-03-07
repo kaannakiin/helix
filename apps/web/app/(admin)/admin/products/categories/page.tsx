@@ -15,6 +15,7 @@ import {
   type DataTableTranslations,
 } from '@org/ui';
 import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
+import { FolderTree } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
@@ -111,6 +112,10 @@ export default function CategoriesPage() {
         title: tColumnVisibility('title'),
         showAll: tColumnVisibility('showAll'),
         hiddenCount: tColumnVisibility.raw('hiddenCount'),
+      },
+      noRows: {
+        label: t('noRows.label'),
+        icon: <FolderTree size={40} />,
       },
     }),
     [t, tColumnVisibility, filters]

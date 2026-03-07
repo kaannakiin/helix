@@ -1,15 +1,19 @@
 import type {
   AccountStatus,
+  BusinessModel,
   CustomerGroupType,
   EvaluationJobStatus,
   EvaluationTrigger,
   ProductStatus,
   ProductType,
   RuleTargetEntity,
+  StorefrontStatus,
+  StoreStatus,
   TrackingStrategy,
   UserRole,
   VariantGroupDisplayMode,
   VariantGroupType,
+  WarehouseStatus,
 } from '@org/prisma/client';
 
 export interface EnumConfig {
@@ -96,6 +100,32 @@ export const TrackingStrategyConfigs: Record<TrackingStrategy, EnumConfig> = {
     color: 'teal',
     labelKey: 'trackingStrategy.BATCH_AND_SERIAL',
   },
+};
+
+export const StoreStatusConfigs: Record<StoreStatus, EnumConfig> = {
+  ACTIVE: { color: 'green', labelKey: 'storeStatus.ACTIVE' },
+  INACTIVE: { color: 'gray', labelKey: 'storeStatus.INACTIVE' },
+  SUSPENDED: { color: 'red', labelKey: 'storeStatus.SUSPENDED' },
+};
+
+export const BusinessModelConfigs: Record<BusinessModel, EnumConfig> = {
+  B2C: { color: 'blue', labelKey: 'businessModel.B2C' },
+  B2B: { color: 'violet', labelKey: 'businessModel.B2B' },
+};
+
+export const StorefrontStatusConfigs: Record<StorefrontStatus, EnumConfig> = {
+  PENDING_HOST: {
+    color: 'yellow',
+    labelKey: 'storefrontStatus.PENDING_HOST',
+  },
+  ACTIVE: { color: 'green', labelKey: 'storefrontStatus.ACTIVE' },
+  SUSPENDED: { color: 'red', labelKey: 'storefrontStatus.SUSPENDED' },
+};
+
+export const WarehouseStatusConfigs: Record<WarehouseStatus, EnumConfig> = {
+  ACTIVE: { color: 'green', labelKey: 'warehouseStatus.ACTIVE' },
+  INACTIVE: { color: 'gray', labelKey: 'warehouseStatus.INACTIVE' },
+  MAINTENANCE: { color: 'orange', labelKey: 'warehouseStatus.MAINTENANCE' },
 };
 
 export function buildColorMap<K extends string>(

@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { Logger, RequestMethod } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
@@ -8,13 +8,21 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { cleanupOpenApiDoc } from 'nestjs-zod';
 import { AppModule } from './app/app.module';
+import { CorsOriginService } from './core/services/cors-origin.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const config = app.get(ConfigService);
   const isProduction = config.get<string>('NODE_ENV') === 'production';
 
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', {
+    exclude: [
+      {
+        path: '.well-known/helix-routing',
+        method: RequestMethod.GET,
+      },
+    ],
+  });
 
   app.use(
     helmet({
@@ -24,8 +32,7 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  app.enableCors({
-    origin: isProduction ? config.getOrThrow<string>('CORS_ORIGIN') : true,
+  const corsOptions = {
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: [
@@ -34,7 +41,29 @@ async function bootstrap() {
       'Accept-Language',
       'x-lang',
     ],
-  });
+  };
+
+  if (isProduction) {
+    const corsOriginService = app.get(CorsOriginService);
+    app.enableCors({
+      ...corsOptions,
+      origin: async (
+        origin: string | undefined,
+        callback: (err: Error | null, allow?: boolean) => void,
+      ) => {
+        if (!origin) return callback(null, true);
+        try {
+          const url = new URL(origin);
+          const allowed = await corsOriginService.isAllowedOrigin(url.hostname);
+          callback(null, allowed);
+        } catch {
+          callback(null, false);
+        }
+      },
+    });
+  } else {
+    app.enableCors({ ...corsOptions, origin: true });
+  }
 
   app.set('trust proxy', 1);
 

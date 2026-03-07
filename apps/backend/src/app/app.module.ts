@@ -9,8 +9,10 @@ import { GeolocationModule } from './geolocation/geolocation.module';
 import { HttpExceptionI18nFilter } from './i18n/http-exception-i18n.filter';
 import { I18nModule } from './i18n/i18n.module';
 import { ZodValidationI18nFilter } from './i18n/zod-validation-i18n.filter';
+import { CorsOriginService } from '../core/services/cors-origin.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { RedisModule } from './redis/redis.module';
+import { StorefrontAuthModule } from './storefront-auth/storefront-auth.module';
 
 @Module({
   imports: [
@@ -20,6 +22,7 @@ import { RedisModule } from './redis/redis.module';
     RedisModule,
     AuthModule,
     AdminModule,
+    StorefrontAuthModule,
     EvaluationModule,
     GeolocationModule,
   ],
@@ -41,6 +44,7 @@ import { RedisModule } from './redis/redis.module';
       provide: APP_FILTER,
       useClass: ZodValidationI18nFilter,
     },
+    CorsOriginService,
   ],
 })
 export class AppModule {}

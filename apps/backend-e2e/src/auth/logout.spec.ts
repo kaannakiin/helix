@@ -2,7 +2,7 @@ import {
   createAuthClient,
   registerAndGetCredentials,
   loginUser,
-} from '../support/auth.helper';
+} from '../support/auth.helper.js';
 
 describe('Auth Logout', () => {
   describe('POST /api/auth/logout', () => {

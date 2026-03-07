@@ -1,9 +1,10 @@
 import {
+  DEFAULT_PASSWORD,
   createAuthClient,
   registerUser,
   uniqueEmail,
-  DEFAULT_PASSWORD,
-} from '../support/auth.helper';
+  uniquePhone,
+} from '../support/auth.helper.js';
 
 describe('POST /api/auth/register', () => {
   it('should register a user with email', async () => {
@@ -24,22 +25,25 @@ describe('POST /api/auth/register', () => {
     // Should have set cookies
     const setCookie = res.headers['set-cookie'];
     expect(setCookie).toBeDefined();
-    const cookieStr = Array.isArray(setCookie) ? setCookie.join('; ') : setCookie;
-    expect(cookieStr).toContain('access_token');
+    const cookieStr = Array.isArray(setCookie)
+      ? setCookie.join('; ')
+      : setCookie;
+    expect(cookieStr).toContain('token=');
     expect(cookieStr).toContain('refresh_token');
   });
 
   it('should register a user with phone', async () => {
     const client = createAuthClient();
+    const phone = uniquePhone();
 
     const res = await registerUser(client, {
       email: null,
-      phone: '+905551234567',
+      phone,
     });
 
     expect(res.status).toBe(201);
     expect(res.data.message).toBe('Authentication successful');
-    expect(res.data.user.phone).toBe('+905551234567');
+    expect(res.data.user.phone).toBe(phone);
   });
 
   it('should return 409 for duplicate email', async () => {
@@ -57,7 +61,7 @@ describe('POST /api/auth/register', () => {
 
   it('should return 409 for duplicate phone', async () => {
     const client = createAuthClient();
-    const phone = '+905559999001';
+    const phone = uniquePhone();
 
     // First registration
     const first = await registerUser(client, { email: null, phone });

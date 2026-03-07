@@ -59,9 +59,26 @@ export const DATA_ACCESS_KEYS = {
       entityHistory: (entityType: string, entityId: string) =>
         ['admin', 'evaluationJobs', 'entityHistory', entityType, entityId] as const,
     },
+    warehouses: {
+      list: ['admin', 'warehouses', 'list'],
+      detail: (id: string) => ['admin', 'warehouses', 'detail', id] as const,
+      lookup: ['admin', 'warehouses', 'lookup'],
+    },
     stores: {
       list: ['admin', 'stores', 'list'] as const,
       detail: (id: string) => ['admin', 'stores', 'detail', id] as const,
+    },
+    platformInstallation: {
+      detail: ['admin', 'platform-installation', 'detail'] as const,
+    },
+    domainSpaces: {
+      list: ['admin', 'domain-spaces', 'list'] as const,
+    },
+    storeHostBindings: {
+      list: (storeId?: string) =>
+        storeId
+          ? (['admin', 'store-host-bindings', 'list', storeId] as const)
+          : (['admin', 'store-host-bindings', 'list'] as const),
     },
   },
   locations: {

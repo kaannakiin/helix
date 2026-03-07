@@ -2,7 +2,7 @@ import {
   createAuthClient,
   registerAndGetCredentials,
   loginUser,
-} from '../support/auth.helper';
+} from '../support/auth.helper.js';
 
 describe('POST /api/auth/refresh', () => {
   it('should refresh tokens with valid refresh cookie', async () => {

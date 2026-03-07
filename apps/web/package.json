@@ -43,5 +43,15 @@
     "@types/js-cookie": "^3.0.6",
     "@types/set-cookie-parser": "^2.4.10",
     "set-cookie-parser": "^3.0.1"
+  },
+  "nx": {
+    "targets": {
+      "typecheck": {
+        "cache": true,
+        "inputs": ["default", "^default"],
+        "dependsOn": ["^build"],
+        "command": "tsc --noEmit"
+      }
+    }
   }
 }

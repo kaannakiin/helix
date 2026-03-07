@@ -34,7 +34,6 @@ import {
   BrandSaveDTO,
 } from './dto';
 
-
 @ApiTags('Admin - Brands')
 @Controller('admin/brands')
 @Roles(UserRole.ADMIN, UserRole.MODERATOR)
@@ -47,7 +46,10 @@ export class BrandsController {
 
   @Post('query')
   @ApiOperation({ summary: 'Get paginated list of brands' })
-  async getBrands(@Body() query: BrandQueryDTO, @ContentLocale() locale: Locale) {
+  async getBrands(
+    @Body() query: BrandQueryDTO,
+    @ContentLocale() locale: Locale
+  ) {
     return this.brandsService.getBrands(query, locale);
   }
 
@@ -76,7 +78,8 @@ export class BrandsController {
   @ApiOperation({ summary: 'Export brands as Excel or CSV' })
   async exportBrands(
     @Query() query: BrandExportQueryDTO,
-    @Res() res: Response
+    @Res() res: Response,
+    @ContentLocale() locale: Locale
   ) {
     const { where, orderBy } = buildPrismaQuery({
       page: 1,
@@ -106,6 +109,7 @@ export class BrandsController {
               | Prisma.BrandOrderByWithRelationInput
               | Prisma.BrandOrderByWithRelationInput[],
             batchSize,
+            locale,
           }),
       },
       {

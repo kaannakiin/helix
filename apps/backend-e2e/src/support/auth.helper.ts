@@ -9,17 +9,22 @@ export const DEFAULT_PASSWORD = 'TestPass123';
  * Each call returns a fresh instance with its own cookie store,
  * ensuring test isolation.
  */
-export function createAuthClient(): AxiosInstance {
+export function createAuthClient(hostname?: string): AxiosInstance {
   const jar = new CookieJar();
-  const client = wrapper(
+  const client = (wrapper as any)(
     axios.create({
       baseURL: axios.defaults.baseURL,
       jar,
+      headers: hostname ? { Host: hostname } : undefined,
       withCredentials: true,
       validateStatus: () => true, // Don't throw on non-2xx
-    })
-  );
+    } as any)
+  ) as AxiosInstance;
   return client;
+}
+
+export function createStorefrontClient(hostname: string): AxiosInstance {
+  return createAuthClient(hostname);
 }
 
 /**
@@ -83,6 +88,38 @@ export async function loginUser(
   return client.post('/api/auth/login', { email, password });
 }
 
+export async function registerCustomer(
+  client: AxiosInstance,
+  overrides: {
+    name?: string;
+    surname?: string;
+    email?: string | null;
+    phone?: string | null;
+    password?: string;
+  } = {}
+) {
+  const email = overrides.email !== undefined ? overrides.email : uniqueEmail();
+  const password = overrides.password ?? DEFAULT_PASSWORD;
+
+  const body = {
+    name: overrides.name ?? 'Test',
+    surname: overrides.surname ?? 'Customer',
+    email,
+    phone: overrides.phone !== undefined ? overrides.phone : null,
+    password,
+  };
+
+  return client.post('/api/storefront/auth/register', body);
+}
+
+export async function loginCustomer(
+  client: AxiosInstance,
+  email: string,
+  password: string = DEFAULT_PASSWORD
+) {
+  return client.post('/api/storefront/auth/login', { email, password });
+}
+
 /**
  * Helper: register + return { email, password, response } for convenience.
  */
@@ -98,7 +135,11 @@ export async function registerAndGetCredentials(
   const email = overrides.email ?? uniqueEmail();
   const password = overrides.password ?? DEFAULT_PASSWORD;
 
-  const response = await registerUser(client, { ...overrides, email, password });
+  const response = await registerUser(client, {
+    ...overrides,
+    email,
+    password,
+  });
 
   return { email, password, response };
 }

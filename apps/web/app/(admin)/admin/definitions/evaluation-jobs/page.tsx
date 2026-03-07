@@ -23,7 +23,7 @@ import {
   type DataTableTranslations,
 } from '@org/ui';
 import type { GridApi, IDatasource, IGetRowsParams } from 'ag-grid-community';
-import { XCircle } from 'lucide-react';
+import { ClipboardList, XCircle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
@@ -130,6 +130,10 @@ export default function AdminEvaluationJobsPage() {
         title: tColumnVisibility('title'),
         showAll: tColumnVisibility('showAll'),
         hiddenCount: tColumnVisibility.raw('hiddenCount'),
+      },
+      noRows: {
+        label: t('noRows.label'),
+        icon: <ClipboardList size={40} />,
       },
     }),
     [t, tColumnVisibility, filters]

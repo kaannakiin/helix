@@ -1,4 +1,4 @@
-import { waitForPortOpen } from '@nx/node/utils';
+import { waitForPortOpen } from '@nx/node/utils.js';
 
 /* eslint-disable */
 var __TEARDOWN_MESSAGE__: string;

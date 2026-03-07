@@ -9,9 +9,12 @@
     "customers": "Customers",
     "customer_groups": "Customer Groups",
     "analytics": "Analytics",
+    "stores": "Stores",
     "settings": "Settings",
+    "platform": "Platform Settings",
     "marketing": "Marketing",
     "inventory": "Inventory",
+    "warehouses": "Warehouses",
     "discounts": "Discounts",
     "reports": "Reports",
     "brands": "Brands",
@@ -115,6 +118,25 @@
       "PRODUCT": "Product",
       "ORDER": "Order",
       "INVENTORY": "Inventory"
+    },
+    "storeStatus": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "SUSPENDED": "Suspended"
+    },
+    "businessModel": {
+      "B2C": "B2C",
+      "B2B": "B2B"
+    },
+    "storefrontStatus": {
+      "PENDING_HOST": "Pending Host",
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended"
+    },
+    "warehouseStatus": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "MAINTENANCE": "Under Maintenance"
     }
   },
   "relationInput": {
@@ -285,7 +307,8 @@
         "noFilters": "No filters available",
         "apply": "Apply Filters",
         "searchPlaceholder": "Search filters...",
-        "appliedFilters": "Applied Filters"
+        "appliedFilters": "Applied Filters",
+        "storePlaceholder": "Select stores..."
       },
       "form": {
         "newProduct": "New Product",
@@ -434,6 +457,9 @@
           "b2b": "B2B",
           "b2c": "B2C"
         }
+      },
+      "noRows": {
+        "label": "No products found"
       }
     },
     "brands": {
@@ -511,6 +537,9 @@
         },
         "saveSuccess": "Brand saved successfully.",
         "saveError": "Failed to save brand."
+      },
+      "noRows": {
+        "label": "No brands found"
       }
     },
     "categories": {
@@ -589,6 +618,9 @@
           "b2b": "B2B",
           "b2c": "B2C"
         }
+      },
+      "noRows": {
+        "label": "No categories found"
       }
     },
     "tags": {
@@ -698,6 +730,9 @@
         "tagBulkDeleteSuccess": "Tags deleted successfully.",
         "tagSaveError": "Failed to save tag.",
         "tagDeleteError": "Failed to delete tag."
+      },
+      "noRows": {
+        "label": "No tags found"
       }
     },
     "variants": {
@@ -784,6 +819,9 @@
           "deleteConfirm": "Are you sure you want to remove this option?"
         },
         "saveSuccess": "Variant group saved successfully."
+      },
+      "noRows": {
+        "label": "No variant groups found"
       }
     },
     "locations": {
@@ -875,6 +913,9 @@
         "yes": "Yes",
         "no": "No",
         "notProvided": "Not provided"
+      },
+      "noRows": {
+        "label": "No customers found"
       }
     },
     "priceLists": {
@@ -928,6 +969,9 @@
           "DRAFT": "Draft",
           "ARCHIVED": "Archived"
         }
+      },
+      "noRows": {
+        "label": "No price lists found"
       }
     },
     "customerGroups": {
@@ -1080,6 +1124,9 @@
           "between": "Between",
           "in": "One of"
         }
+      },
+      "noRows": {
+        "label": "No customer groups found"
       }
     },
     "evaluationJobs": {
@@ -1165,11 +1212,357 @@
         "abortJob": "Abort Job",
         "streaming": "Streaming",
         "pendingLabel": "Pending"
+      },
+      "noRows": {
+        "label": "No evaluation jobs found"
+      }
+    },
+    "stores": {
+      "title": "Stores",
+      "subtitle": "Manage your stores and storefronts",
+      "new": "New Store",
+      "tabs": {
+        "general": "General",
+        "domains": "Domains"
+      },
+      "domains": {
+        "title": "Connected Domains",
+        "subtitle": "Manage the domains and addresses connected to this store.",
+        "empty": "No domains connected yet. Connect a domain to make your storefront live.",
+        "connect": "Connect Domain",
+        "pendingBanner": "Your storefront needs a domain to go live. Connect a domain to get started.",
+        "status": {
+          "live": "Live",
+          "settingUp": "Setting up...",
+          "verificationNeeded": "Verification needed",
+          "needsAttention": "Needs attention",
+          "disabled": "Disabled",
+          "verified": "Verified"
+        },
+        "type": {
+          "main": "Main address",
+          "additional": "Additional address"
+        },
+        "wizard": {
+          "title": "Connect a Domain",
+          "subtitle": "Follow the steps below to connect a domain to your store.",
+          "backToStore": "Back to store",
+          "next": "Next",
+          "back": "Back",
+          "steps": {
+            "enterDomain": "Enter Domain",
+            "verifyOwnership": "Verify Ownership",
+            "setupRouting": "Setup Connection",
+            "complete": "Complete"
+          },
+          "step1": {
+            "title": "What address should your store use?",
+            "description": "Enter the domain or subdomain where customers will visit your store.",
+            "hostnameLabel": "Domain address",
+            "hostnamePlaceholder": "shop.mybrand.com",
+            "singleStore": "Just this address",
+            "singleStoreDescription": "Each subdomain will be verified individually.",
+            "multiStore": "Use this domain for multiple stores",
+            "multiStoreDescription": "New subdomains will be activated automatically after initial setup."
+          },
+          "step2": {
+            "title": "Verify you own {domain}",
+            "description": "Add the following DNS record at your domain provider to prove ownership.",
+            "addRecord": "Add this DNS record",
+            "verify": "Verify Ownership",
+            "verifyFailed": "Ownership could not be verified yet.",
+            "retryHint": "DNS changes can take up to 48 hours to propagate. You can try again later."
+          },
+          "step3": {
+            "title": "Point {hostname} to your store",
+            "description": "Add the following DNS records at your domain provider to connect your domain.",
+            "apexInstructions": "Add these DNS records",
+            "wildcardInstructions": "Add these DNS records for wildcard routing",
+            "exactHostInstructions": "Add this DNS record",
+            "verify": "Verify Connection",
+            "verifyFailed": "Connection could not be verified yet.",
+            "retryHint": "DNS changes can take up to 48 hours to propagate. You can try again later."
+          },
+          "step4": {
+            "title": "Domain connected!",
+            "description": "{hostname} is now connected to {storeName}.",
+            "visitStore": "Visit Store",
+            "backToStore": "Back to Store"
+          },
+          "dnsRecord": {
+            "type": "Type",
+            "name": "Name",
+            "value": "Value",
+            "copy": "Copy",
+            "copied": "Copied!"
+          }
+        }
+      },
+      "empty": {
+        "title": "No stores yet",
+        "description": "Create your first store to start selling. Stores represent your sales channels — each with its own locale, currency, and storefront.",
+        "cta": "Create Your First Store"
+      },
+      "card": {
+        "businessModel": "Business Model",
+        "status": "Status",
+        "storefrontStatus": "Storefront",
+        "hostBindings": "Host Bindings",
+        "locale": "Locale",
+        "currency": "Currency",
+        "createdAt": "Created",
+        "edit": "Edit",
+        "delete": "Delete",
+        "deleteConfirm": "Are you sure you want to delete this store? This action cannot be undone.",
+        "deleteSuccess": "Store deleted successfully.",
+        "deleteError": "Failed to delete store."
+      },
+      "form": {
+        "newStore": "New Store",
+        "discard": "Discard",
+        "save": "Save",
+        "backToStores": "Back to Stores",
+        "loadError": "Failed to Load",
+        "loadErrorDescription": "An error occurred while loading the store. Please try again.",
+        "notFound": "Store Not Found",
+        "notFoundDescription": "The store you are looking for does not exist.",
+        "generalInfo": "General Information",
+        "generalInfoDescription": "Basic store identity and URL slug",
+        "name": {
+          "label": "Store Name",
+          "placeholder": "My Store"
+        },
+        "slug": {
+          "label": "Slug",
+          "placeholder": "my-store",
+          "hint": "URL-friendly identifier. Auto-generated from name on create."
+        },
+        "businessModel": {
+          "label": "Business Model",
+          "placeholder": "Select business model..."
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Brief description of this store..."
+        },
+        "regionCard": {
+          "title": "Region & Locale",
+          "description": "Language, currency, and timezone settings"
+        },
+        "defaultLocale": {
+          "label": "Default Language",
+          "placeholder": "Select language..."
+        },
+        "currency": {
+          "label": "Currency",
+          "placeholder": "Select currency..."
+        },
+        "timezone": {
+          "label": "Timezone",
+          "placeholder": "Select timezone...",
+          "notFound": "No timezone found"
+        },
+        "statusCard": {
+          "title": "Status",
+          "description": "Store and storefront status"
+        },
+        "status": {
+          "label": "Store Status"
+        },
+        "storefrontStatus": {
+          "label": "Storefront Status"
+        },
+        "hostBindingsCard": {
+          "title": "Host Bindings",
+          "description": "Domains and hostnames bound to this store",
+          "empty": "No host bindings configured. Manage host bindings in Settings.",
+          "manageInSettings": "Manage in Settings",
+          "hostname": "Hostname",
+          "type": "Type",
+          "bindingStatus": "Status"
+        },
+        "saveSuccess": "Store saved successfully.",
+        "saveError": "Failed to save store.",
+        "createSuccess": "Store created successfully."
+      }
+    },
+    "warehouses": {
+      "title": "Warehouses",
+      "subtitle": "View and manage all warehouses",
+      "table": {
+        "code": "Code",
+        "name": "Name",
+        "status": "Status",
+        "location": "Location",
+        "country": "Country",
+        "state": "State",
+        "city": "City",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
+      },
+      "noRows": {
+        "label": "No warehouses found"
       }
     },
     "settings": {
-      "title": "Store Settings",
-      "subtitle": "Manage your store configuration",
+      "title": "Storefront & Domain Settings",
+      "subtitle": "Configure installation ingress, onboard domains, and bind storefront hosts to stores.",
+      "notifications": {
+        "genericError": "The request could not be completed.",
+        "installationSaved": "Installation settings saved.",
+        "domainSpaceCreated": "Domain space created.",
+        "domainSpaceVerified": "Domain space verified successfully.",
+        "domainSpaceVerifyFailed": "Domain space verification failed.",
+        "hostBindingCreated": "Host binding created.",
+        "hostBindingVerified": "Host binding verified successfully.",
+        "hostBindingVerifyFailed": "Host binding verification failed."
+      },
+      "installation": {
+        "title": "Platform Installation",
+        "description": "Define the admin host and public ingress targets that all DNS instructions will use.",
+        "submit": "Save Installation",
+        "ask": {
+          "title": "TLS Ask Endpoint",
+          "description": "Use this token in your static Caddy ask configuration. The host parameter is provided by Caddy at request time.",
+          "empty": "Save the installation first to generate or persist a TLS ask token."
+        },
+        "fields": {
+          "name": {
+            "label": "Installation Name",
+            "placeholder": "Helix Production"
+          },
+          "portalHostname": {
+            "label": "Portal Hostname",
+            "placeholder": "portal.helix.com"
+          },
+          "tlsAskSecret": {
+            "label": "TLS Ask Secret",
+            "placeholder": "Leave empty to keep the current secret or generate a new one",
+            "description": "Caddy uses this secret when calling the ask endpoint before issuing a certificate."
+          },
+          "canonicalTargetHost": {
+            "label": "Canonical Target Host",
+            "placeholder": "edge.customer.net",
+            "description": "Preferred CNAME target for subdomains and wildcard onboarding."
+          },
+          "ipv4Addresses": {
+            "label": "IPv4 Addresses",
+            "placeholder": "203.0.113.10",
+            "description": "One IP per line. Used to generate apex A records."
+          },
+          "ipv6Addresses": {
+            "label": "IPv6 Addresses",
+            "placeholder": "2001:db8::10",
+            "description": "One IP per line. Used to generate apex AAAA records."
+          }
+        }
+      },
+      "domainSpaces": {
+        "title": "Domain Spaces",
+        "description": "Claim a base domain such as helixstore.com, generate DNS instructions, and verify onboarding status.",
+        "submit": "Create Domain Space",
+        "verify": "Verify DNS",
+        "empty": "No domain space has been created yet.",
+        "fields": {
+          "baseDomain": {
+            "label": "Base Domain",
+            "placeholder": "helixstore.com"
+          },
+          "onboardingMode": {
+            "label": "Onboarding Mode"
+          }
+        },
+        "modeLabels": {
+          "EXACT_HOSTS": "Exact Hosts",
+          "WILDCARD_DELEGATION": "Wildcard Delegation",
+          "HYBRID": "Hybrid"
+        },
+        "statusLabels": {
+          "PENDING_VERIFICATION": "Pending Verification",
+          "ACTIVE": "Active",
+          "FAILED": "Failed",
+          "ARCHIVED": "Archived"
+        },
+        "meta": {
+          "apexVerifiedAt": "Apex Verification",
+          "wildcardVerifiedAt": "Wildcard Verification",
+          "hostCount": "Host Bindings",
+          "notVerified": "Not verified yet"
+        },
+        "instructions": {
+          "apex": "Apex DNS Records",
+          "wildcard": "Wildcard DNS Records",
+          "wildcardTest": "Wildcard verification is checked against {hostname}."
+        }
+      },
+      "storeSettings": {
+        "title": "Store Settings",
+        "description": "Update the selected store while keeping storefront activation tied to host bindings.",
+        "selectedStore": "Selected store: {name}",
+        "storefrontStatus": "Storefront status: {status}",
+        "noStore": "Create a store before binding storefront hosts."
+      },
+      "hostBindings": {
+        "title": "Store Host Bindings",
+        "description": "Bind exact hostnames to the selected store. DNS instructions always point back to the installation ingress.",
+        "submit": "Create Host Binding",
+        "verify": "Verify Host",
+        "empty": "No host binding exists for this store yet.",
+        "selectedStore": "Bindings will be created for {name}.",
+        "noStore": "Select or create a store to manage host bindings.",
+        "instructions": "DNS Instructions",
+        "fields": {
+          "domainSpaceId": {
+            "label": "Domain Space",
+            "placeholder": "Select a domain space"
+          },
+          "hostname": {
+            "label": "Hostname",
+            "placeholder": "b2b.helixstore.com"
+          },
+          "type": {
+            "label": "Binding Type"
+          }
+        },
+        "typeLabels": {
+          "PRIMARY": "Primary",
+          "ALIAS": "Alias"
+        },
+        "statusLabels": {
+          "PENDING_DNS": "Pending DNS",
+          "ACTIVE": "Active",
+          "FAILED": "Failed",
+          "DISABLED": "Disabled"
+        },
+        "meta": {
+          "domainSpace": "Domain Mode",
+          "activatedAt": "Activated At",
+          "notActivated": "Not active yet"
+        }
+      },
       "form": {
         "selectStore": "Select Store",
         "storeName": {
@@ -1186,7 +1579,8 @@
         },
         "timezone": {
           "label": "Timezone",
-          "placeholder": "e.g. Europe/Istanbul"
+          "placeholder": "Select timezone...",
+          "notFound": "No timezone found"
         },
         "submit": "Save Settings",
         "success": "Settings saved successfully.",
@@ -1238,6 +1632,31 @@
           "nl": "Dutch"
         }
       }
+    }
+  },
+  "storefront": {
+    "nav": {
+      "home": "Home",
+      "products": "Products",
+      "account": "Account",
+      "sign_in": "Sign In",
+      "sign_out": "Sign Out"
+    },
+    "home": {
+      "welcome": "Welcome to {storeName}"
+    },
+    "auth": {
+      "sign_in_title": "Sign in to {storeName}",
+      "register_title": "Create an account at {storeName}",
+      "sign_in_button": "Sign In",
+      "register_button": "Create Account",
+      "no_account": "Don't have an account?",
+      "have_account": "Already have an account?"
+    },
+    "account": {
+      "title": "My Account",
+      "welcome": "Welcome, {name}",
+      "sign_out": "Sign Out"
     }
   }
 }

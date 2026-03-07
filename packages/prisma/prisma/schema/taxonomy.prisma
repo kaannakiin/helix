@@ -1,28 +1,28 @@
 model GoogleTaxonomy {
-    id       Int  @id
-    parentId Int?
+  id       Int  @id
+  parentId Int?
 
-    parent   GoogleTaxonomy?  @relation("TaxonomyTree", fields: [parentId], references: [id], onDelete: SetNull)
-    children GoogleTaxonomy[] @relation("TaxonomyTree")
+  parent   GoogleTaxonomy?  @relation("TaxonomyTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children GoogleTaxonomy[] @relation("TaxonomyTree")
 
-    translations GoogleTaxonomyTranslation[]
-    products     Product[]
+  translations GoogleTaxonomyTranslation[]
+  products     Product[]
 
-    @@index([parentId])
+  @@index([parentId])
 }
 
 model GoogleTaxonomyTranslation {
-    id String @id @default(cuid())
+  id String @id @default(cuid())
 
-    googleTaxonomyId Int
-    googleTaxonomy   GoogleTaxonomy @relation(fields: [googleTaxonomyId], references: [id], onDelete: Cascade)
+  googleTaxonomyId Int
+  googleTaxonomy   GoogleTaxonomy @relation(fields: [googleTaxonomyId], references: [id], onDelete: Cascade)
 
-    locale Locale
+  locale Locale
 
-    name String
-    path String
+  name String
+  path String
 
-    @@unique([googleTaxonomyId, locale])
-    @@index([googleTaxonomyId])
-    @@index([locale])
+  @@unique([googleTaxonomyId, locale])
+  @@index([googleTaxonomyId])
+  @@index([locale])
 }

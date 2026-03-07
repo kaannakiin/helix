@@ -10,6 +10,7 @@ export const ADMIN_PRODUCTS_FIELD_CONFIG = {
   '_count.categories': { filterType: 'number' },
   '_count.tags': { filterType: 'number' },
   '_count.stores': { filterType: 'number' },
+  storeIds: { filterType: 'enum' },
 } as const satisfies Record<string, FieldFilterConfig>;
 
 export type AdminProductsFilterableField =

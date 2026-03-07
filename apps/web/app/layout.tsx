@@ -1,7 +1,9 @@
 import { theme } from '@/core/lib/theme';
 import { AuthProvider } from '@/core/providers/auth-provider';
+import { CustomerAuthProvider } from '@/core/providers/customer-auth-provider';
 import { LocaleProvider } from '@/core/providers/locale-provider';
 import { QueryProvider } from '@/core/providers/query-provider';
+import { StoreProvider } from '@/core/providers/store-provider';
 import {
   ColorSchemeScript,
   mantineHtmlProps,
@@ -15,6 +17,7 @@ import { Notifications } from '@mantine/notifications';
 import '@mantine/notifications/styles.css';
 import '@mantine/spotlight/styles.css';
 import { Locale } from '@org/prisma/browser';
+import type { CustomerTokenPayload, StoreContext } from '@org/types/storefront';
 import type { TokenPayload } from '@org/types/token';
 import { NextIntlClientProvider } from 'next-intl';
 import { getLocale } from 'next-intl/server';
@@ -42,6 +45,30 @@ function getUserFromHeaders(h: Headers): TokenPayload | null {
   return user as unknown as TokenPayload;
 }
 
+function getCustomerFromHeaders(h: Headers): CustomerTokenPayload | null {
+  const sub = h.get('x-customer-sub');
+  if (!sub) return null;
+
+  const customer: Record<string, unknown> = {};
+  h.forEach((value, key) => {
+    if (key.startsWith('x-customer-')) {
+      const field = key.slice('x-customer-'.length);
+      customer[field] = decodeURIComponent(value);
+    }
+  });
+  return customer as unknown as CustomerTokenPayload;
+}
+
+function getStoreFromHeaders(h: Headers): StoreContext | null {
+  const id = h.get('x-store-id');
+  if (!id) return null;
+  return {
+    id,
+    slug: h.get('x-store-slug') ?? '',
+    name: decodeURIComponent(h.get('x-store-name') ?? ''),
+  };
+}
+
 export default async function RootLayout({
   children,
 }: {
@@ -49,6 +76,8 @@ export default async function RootLayout({
 }) {
   const headersList = await headers();
   const user = getUserFromHeaders(headersList);
+  const customer = getCustomerFromHeaders(headersList);
+  const store = getStoreFromHeaders(headersList);
   const locale = await getLocale();
 
   return (
@@ -59,18 +88,22 @@ export default async function RootLayout({
       <body className="min-h-screen min-w-full">
         <QueryProvider>
           <AuthProvider user={user}>
-            <NextIntlClientProvider>
-              <MantineProvider defaultColorScheme="auto" theme={theme}>
-                <Notifications />
-                <ModalsProvider>
-                  <LocaleProvider
-                    locale={(locale?.toUpperCase() as Locale) || 'TR'}
-                  >
-                    {children}
-                  </LocaleProvider>
-                </ModalsProvider>
-              </MantineProvider>
-            </NextIntlClientProvider>
+            <StoreProvider store={store}>
+              <CustomerAuthProvider customer={customer}>
+                <NextIntlClientProvider>
+                  <MantineProvider defaultColorScheme="auto" theme={theme}>
+                    <Notifications />
+                    <ModalsProvider>
+                      <LocaleProvider
+                        locale={(locale?.toUpperCase() as Locale) || 'TR'}
+                      >
+                        {children}
+                      </LocaleProvider>
+                    </ModalsProvider>
+                  </MantineProvider>
+                </NextIntlClientProvider>
+              </CustomerAuthProvider>
+            </StoreProvider>
           </AuthProvider>
         </QueryProvider>
       </body>

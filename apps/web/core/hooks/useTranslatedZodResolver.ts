@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslations } from 'next-intl';
 import type { FieldErrors, FieldValues, Resolver } from 'react-hook-form';
-import type { z } from 'zod';
 
 const VALIDATION_PREFIX = 'validation.';
+type SchemaLike = { _input: FieldValues; _output: FieldValues };
 
 function translateErrors(
   errors: FieldErrors,
@@ -36,11 +36,13 @@ function translateErrors(
   return out as FieldErrors;
 }
 
-export function useTranslatedZodResolver<T extends FieldValues>(
-  schema: z.ZodType<unknown, T>
-): Resolver<T> {
+export function useTranslatedZodResolver<TSchema extends SchemaLike>(
+  schema: TSchema
+): Resolver<TSchema['_input'], unknown, TSchema['_output']> {
   const t = useTranslations('validation');
-  const base = zodResolver(schema);
+  const base = zodResolver(
+    schema as unknown as Parameters<typeof zodResolver>[0]
+  ) as Resolver<TSchema['_input'], unknown, TSchema['_output']>;
 
   return (async (values, context, options) => {
     const result = await base(values, context, options);
@@ -53,5 +55,5 @@ export function useTranslatedZodResolver<T extends FieldValues>(
     }
 
     return result;
-  }) as Resolver<T>;
+  }) as Resolver<TSchema['_input'], unknown, TSchema['_output']>;
 }

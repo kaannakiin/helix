@@ -7,6 +7,7 @@ import type {
 import type Redis from 'ioredis';
 import { PrismaService } from '../../prisma/prisma.service.js';
 import { REDIS_CLIENT } from '../../redis/redis.constants.js';
+import { HostRoutingService } from './host-routing.service.js';
 
 const STORE_CACHE_PREFIX = 'store:settings:';
 const STORE_CACHE_TTL = 300;
@@ -17,7 +18,8 @@ export class StoresService {
 
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(REDIS_CLIENT) private readonly redis: Redis
+    @Inject(REDIS_CLIENT) private readonly redis: Redis,
+    private readonly hostRoutingService: HostRoutingService
   ) {}
 
   async list(): Promise<Store[]> {
@@ -67,17 +69,19 @@ export class StoresService {
       data,
     });
 
-    await this.invalidateCache(storeId);
+    await this.invalidateStoreCache(storeId);
+    await this.hostRoutingService.invalidateHostCachesByStoreId(storeId);
     return updated;
   }
 
   async delete(storeId: string): Promise<void> {
     await this.findById(storeId);
     await this.prisma.store.delete({ where: { id: storeId } });
-    await this.invalidateCache(storeId);
+    await this.invalidateStoreCache(storeId);
+    await this.hostRoutingService.invalidateHostCachesByStoreId(storeId);
   }
 
-  private async invalidateCache(storeId: string): Promise<void> {
+  async invalidateStoreCache(storeId: string): Promise<void> {
     try {
       await this.redis.del(`${STORE_CACHE_PREFIX}${storeId}`);
     } catch (err) {

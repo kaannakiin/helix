@@ -1,7 +1,10 @@
+import { Locale } from '@org/prisma/browser';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-export const supportedLocales = ['en', 'tr'] as const;
+export const supportedLocales = Object.values(Locale).map((val) =>
+  val.toLowerCase()
+);
 export type SupportedLocale = (typeof supportedLocales)[number];
 export const defaultLocale: SupportedLocale = 'tr';
 

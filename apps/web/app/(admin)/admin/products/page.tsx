@@ -13,6 +13,7 @@ import type { AdminProductListPrismaType } from '@org/types/admin/products';
 import type { ExportFormat } from '@org/types/export';
 import type { PaginatedResponse } from '@org/types/pagination';
 import {
+  AsyncMultiSelectFilter,
   DataTable,
   HoverCardCellRenderer,
   serializeGridQuery,
@@ -23,7 +24,7 @@ import {
   type HoverCardCellRendererParams,
 } from '@org/ui';
 import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
-import { Plus } from 'lucide-react';
+import { Package, Plus } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
@@ -124,6 +125,10 @@ export default function ProductsPage() {
         showAll: tColumnVisibility('showAll'),
         hiddenCount: tColumnVisibility.raw('hiddenCount'),
       },
+      noRows: {
+        label: t('noRows.label'),
+        icon: <Package size={40} />,
+      },
     }),
     [t, tColumnVisibility, filters]
   );
@@ -184,6 +189,7 @@ export default function ProductsPage() {
         headerKey: 'storeCount',
         type: 'number',
         minWidth: 130,
+        filter: false,
         cellRenderer: HoverCardCellRenderer,
         cellRendererParams: {
           fetchFn: async (row: AdminProductListPrismaType) => {
@@ -224,6 +230,29 @@ export default function ProductsPage() {
           }>
         >,
       }),
+      createColumn<AdminProductListPrismaType>(
+        'storeIds' as keyof AdminProductListPrismaType & string,
+        {
+          headerKey: 'storeCount',
+          type: 'text',
+          hide: true,
+          filter: {
+            component: AsyncMultiSelectFilter,
+            params: {
+              fetchOptions: () =>
+                apiClient
+                  .get<Array<{ id: string; name: string }>>(
+                    '/admin/stores'
+                  )
+                  .then((r) =>
+                    r.data.map((s) => ({ value: s.id, label: s.name }))
+                  ),
+              placeholder: t('filterDrawer.storePlaceholder'),
+            },
+            doesFilterPass: () => true,
+          },
+        }
+      ),
       createColumn<AdminProductListPrismaType>('createdAt', {
         headerKey: 'createdAt',
         type: 'date',

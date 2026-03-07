@@ -2,7 +2,7 @@ import {
   createAuthClient,
   registerAndGetCredentials,
   loginUser,
-} from '../support/auth.helper';
+} from '../support/auth.helper.js';
 
 describe('GET /api/auth/login-history', () => {
   it('should return login history after login', async () => {

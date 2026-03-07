@@ -182,6 +182,7 @@ export class AuthService {
   ) {
     const payload: TokenPayload = {
       sub: context.user.sub,
+      sessionId: context.sessionId,
       name: context.user.name,
       surname: context.user.surname,
       email: context.user.email,
@@ -216,7 +217,10 @@ export class AuthService {
     res: Response
   ) {
     if (sessionId) {
-      await this.sessionService.revokeSession(sessionId, 'USER_LOGOUT');
+      await Promise.all([
+        this.sessionService.revokeSession(sessionId, 'USER_LOGOUT'),
+        this.tokenService.revokeSessionTokens(sessionId),
+      ]);
     }
 
     await this.prisma.accountEvent.create({
@@ -535,7 +539,7 @@ export class AuthService {
       metadata,
     });
 
-    const payload = this.tokenService.buildPayload(validatedUser);
+    const payload = this.tokenService.buildPayload(validatedUser, session.id);
 
     const accessToken = this.tokenService.generateAccessToken(payload);
     const family = randomUUID();
@@ -559,7 +563,16 @@ export class AuthService {
 
     return {
       message: 'Authentication successful',
-      user: payload,
+      user: {
+        sub: payload.sub,
+        name: payload.name,
+        surname: payload.surname,
+        email: payload.email,
+        phone: payload.phone,
+        emailVerified: payload.emailVerified,
+        phoneVerified: payload.phoneVerified,
+        role: payload.role,
+      },
       sessionId: session.id,
       deviceId: device.id,
     };
