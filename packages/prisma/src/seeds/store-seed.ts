@@ -3,56 +3,50 @@ import { prisma } from '../prisma.js';
 async function storeSeed() {
   console.log('Starting store seed...');
 
+  // ── Platform Installation ──
+  const pi = await prisma.platformInstallation.upsert({
+    where: { portalHostname: 'admin.helix.local' },
+    update: {},
+    create: {
+      name: 'Helix Platform',
+      portalHostname: 'admin.helix.local',
+      tlsAskSecret: 'dev-tls-secret-placeholder-32chars',
+      status: 'ACTIVE',
+      defaultLocale: 'TR',
+      currency: 'TRY',
+      timezone: 'Europe/Istanbul',
+    },
+  });
+
+  console.log(`Platform installation seeded: ${pi?.id}`);
+
+  // ── Stores ──
   const stores = [
     {
-      id: 'store-b2b-merkez',
-      name: 'Helix Toptan Merkez',
-      slug: 'helix-toptan-merkez',
+      name: 'Helix Toptan',
+      slug: 'helix-toptan',
       businessModel: 'B2B' as const,
       status: 'ACTIVE' as const,
       defaultLocale: 'TR' as const,
       currency: 'TRY' as const,
       timezone: 'Europe/Istanbul',
-      description: 'İstanbul Merkez toptan dağıtım ve bayi operasyonları.',
+      description: 'B2B toptan satış kanalı.',
     },
     {
-      id: 'store-b2b-ege',
-      name: 'Helix Ege Bayi',
-      slug: 'helix-ege-bayi',
-      businessModel: 'B2B' as const,
-      status: 'ACTIVE' as const,
-      defaultLocale: 'TR' as const,
-      currency: 'TRY' as const,
-      timezone: 'Europe/Istanbul',
-      description: 'İzmir merkezli Ege ve Akdeniz bölgesi ihracat operasyonları.',
-    },
-    {
-      id: 'store-b2c-istanbul',
-      name: 'Helix İstanbul Mağaza',
-      slug: 'helix-istanbul',
+      name: 'Helix Mağaza',
+      slug: 'helix-magaza',
       businessModel: 'B2C' as const,
       status: 'ACTIVE' as const,
       defaultLocale: 'TR' as const,
       currency: 'TRY' as const,
       timezone: 'Europe/Istanbul',
-      description: 'İstanbul amiral mağazası, perakende satış noktası.',
-    },
-    {
-      id: 'store-b2c-ecommerce',
-      name: 'Helix E-Ticaret',
-      slug: 'helix-ecommerce',
-      businessModel: 'B2C' as const,
-      status: 'ACTIVE' as const,
-      defaultLocale: 'TR' as const,
-      currency: 'TRY' as const,
-      timezone: 'Europe/Istanbul',
-      description: 'Online perakende kanalı, tüm Türkiye teslimat.',
+      description: 'B2C perakende satış kanalı.',
     },
   ];
 
   for (const store of stores) {
     await prisma.store.upsert({
-      where: { id: store.id },
+      where: { slug: store.slug },
       update: {
         name: store.name,
         status: store.status,
@@ -62,7 +56,7 @@ async function storeSeed() {
     });
   }
 
-  console.log(`Stores seeded: ${stores.map((s) => s.slug).join(', ')}`);
+  console.log(`Stores seeded: ${stores.map((s) => `${s.slug}`).join(', ')}`);
   console.log('Store seed completed!');
 }
 

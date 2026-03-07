@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge, Button, Group, Tooltip } from '@mantine/core';
+import { DEFAULT_PAGE_SIZE } from '@org/constants';
 import type {
   CellContextMenuEvent,
   ColDef,
@@ -12,23 +13,23 @@ import type {
   ModelUpdatedEvent,
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
-import { DEFAULT_PAGE_SIZE } from '@org/constants';
 import { Filter, RefreshCw } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { cn } from '../../utils/cn';
+import { HELIX_COLUMN_TYPES } from '../columnTypeRegistry';
 import {
   DataTableTranslationProvider,
   type DataTableTranslations,
 } from '../context/DataTableTranslationContext';
-import { HELIX_COLUMN_TYPES } from '../columnTypeRegistry';
 import DataTableProvider from '../data-table-provider';
-import { dataTableTheme } from '../theme';
 import { useContextMenu } from '../hooks/useContextMenu';
+import { dataTableTheme } from '../theme';
 import type { ContextMenuConfig } from '../types/contextMenu.types';
 import { ContextMenu } from './ContextMenu';
 import { DataTableFooter } from './DataTableFooter';
 import { FilterDrawer } from './FilterDrawer';
 import { createLoadingCellRenderer } from './LoadingCellRenderer';
+import { NoRowsOverlay } from './NoRowsOverlay';
 
 export interface DataTableProps<TData> {
   tableId?: string;
@@ -178,6 +179,18 @@ export function DataTable<TData>({
       infiniteInitialRowCount: pageSize,
       maxBlocksInCache: 10,
       reactiveCustomComponents: true,
+      overlayComponentSelector: (params) => {
+        if (params.overlayType === 'noRows' || params.overlayType === 'noMatchingRows') {
+          return {
+            component: NoRowsOverlay,
+            params: {
+              icon: translations?.noRows?.icon,
+              label: translations?.noRows?.label,
+            },
+          };
+        }
+        return undefined;
+      },
       enableFilterHandlers: true,
       localeText: translations?.agGrid,
       cellSelection: false,

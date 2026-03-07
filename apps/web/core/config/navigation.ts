@@ -16,6 +16,7 @@ import {
   Percent,
   Settings,
   ShoppingCart,
+  Store,
   Tag,
   Users,
   Warehouse,
@@ -52,6 +53,14 @@ export const adminNavItems: NavItem[] = [
     visibility: 'both',
     group: 'commerce',
     description: 'Mağaza siparişlerini görüntüle ve yönet',
+  },
+  {
+    key: 'stores',
+    icon: Store,
+    href: ADMIN_NAV_ROUTES.STORES,
+    visibility: 'both',
+    group: 'commerce',
+    description: 'Mağazaları listele ve yönet',
   },
   {
     key: 'products',
@@ -117,6 +126,15 @@ export const adminNavItems: NavItem[] = [
     visibility: 'both',
     group: 'commerce',
     description: 'Depo ve envanter yönetimi',
+    children: [
+      {
+        key: 'warehouses',
+        icon: Warehouse,
+        href: ADMIN_NAV_ROUTES.WAREHOUSES,
+        visibility: 'both',
+        description: 'Depoları listele ve yönet',
+      },
+    ],
   },
 
   {
@@ -191,7 +209,17 @@ export const adminNavItems: NavItem[] = [
     href: ADMIN_NAV_ROUTES.SETTINGS,
     visibility: 'both',
     group: 'system',
-    description: 'Sistem ve mağaza ayarları',
+    description: 'Sistem ayarları',
+    isSection: true,
+    children: [
+      {
+        key: 'platform',
+        icon: Globe,
+        href: ADMIN_NAV_ROUTES.PLATFORM,
+        visibility: 'both',
+        description: 'Portal, dil ve sunucu ayarları',
+      },
+    ],
   },
 ];
 

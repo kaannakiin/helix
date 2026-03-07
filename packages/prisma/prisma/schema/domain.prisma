@@ -1,0 +1,102 @@
+// ─── Platform Installation / Domains ─────────────────────────────────────────
+
+model PlatformInstallation {
+  id             String             @id @default(cuid())
+  name           String
+  portalHostname String             @unique
+  tlsAskSecret   String
+  status         InstallationStatus @default(ACTIVE)
+
+  defaultLocale Locale       @default(TR)
+  currency      CurrencyCode @default(TRY)
+  timezone      String       @default("Europe/Istanbul")
+
+  ingress      InstallationIngress?
+  domainSpaces DomainSpace[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("platform_installations")
+}
+
+model InstallationIngress {
+  id String @id @default(cuid())
+
+  installationId String               @unique
+  installation   PlatformInstallation @relation(fields: [installationId], references: [id], onDelete: Cascade)
+
+  canonicalTargetHost String?
+  ipv4Addresses       String[] @default([])
+  ipv6Addresses       String[] @default([])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("installation_ingresses")
+}
+
+model DomainSpace {
+  id String @id @default(cuid())
+
+  installationId String
+  installation   PlatformInstallation @relation(fields: [installationId], references: [id], onDelete: Cascade)
+
+  baseDomain               String                @unique
+  onboardingMode           DomainOnboardingMode  @default(HYBRID)
+  status                   DomainSpaceStatus     @default(PENDING_OWNERSHIP)
+  ownershipMethod          DomainOwnershipMethod @default(TXT_TOKEN)
+  ownershipStatus          VerificationStatus    @default(PENDING)
+  ownershipRecordName      String?
+  ownershipRecordValue     String?
+  ownershipVerifiedAt      DateTime?
+  ownershipLastError       String?
+  apexRoutingMethod        DomainRoutingMethod   @default(HTTP_WELL_KNOWN)
+  apexRoutingStatus        VerificationStatus    @default(PENDING)
+  apexChallengeToken       String?
+  apexVerifiedAt           DateTime?
+  apexRoutingLastError     String?
+  wildcardRoutingMethod    DomainRoutingMethod   @default(HTTP_WELL_KNOWN)
+  wildcardRoutingStatus    VerificationStatus    @default(PENDING)
+  wildcardProbeHost        String?               @unique
+  wildcardChallengeToken   String?
+  wildcardVerifiedAt       DateTime?
+  wildcardRoutingLastError String?
+
+  hostBindings StoreHostBinding[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([installationId])
+  @@index([status])
+  @@map("domain_spaces")
+}
+
+model StoreHostBinding {
+  id String @id @default(cuid())
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  domainSpaceId String
+  domainSpace   DomainSpace @relation(fields: [domainSpaceId], references: [id], onDelete: Cascade)
+
+  hostname          String              @unique
+  type              HostBindingType     @default(PRIMARY)
+  status            HostBindingStatus   @default(PENDING_ROUTING)
+  routingMethod     DomainRoutingMethod @default(HTTP_WELL_KNOWN)
+  routingStatus     VerificationStatus  @default(PENDING)
+  challengeToken    String?
+  activatedAt       DateTime?
+  routingVerifiedAt DateTime?
+  routingLastError  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([storeId])
+  @@index([domainSpaceId])
+  @@index([status])
+  @@map("store_host_bindings")
+}

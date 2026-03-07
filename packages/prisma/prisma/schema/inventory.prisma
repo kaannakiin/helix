@@ -23,7 +23,7 @@ model StockLevel {
 
   // Optional batch reference
   batchId String?
-  batch   Batch? @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  batch   Batch?  @relation(fields: [batchId], references: [id], onDelete: SetNull)
 
   // Quantities (in base UoM)
   quantity     Float @default(0) // Current on-hand quantity
@@ -73,7 +73,7 @@ model StockMovementGroup {
 
   // Audit
   performedById String?
-  performedBy   User? @relation(fields: [performedById], references: [id], onDelete: SetNull)
+  performedBy   User?   @relation(fields: [performedById], references: [id], onDelete: SetNull)
 
   note     String?
   postedAt DateTime? // When the document was posted
@@ -130,7 +130,7 @@ model StockMovement {
 
   // Optional batch/serial tracking
   batchId String?
-  batch   Batch? @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  batch   Batch?  @relation(fields: [batchId], references: [id], onDelete: SetNull)
 
   serialNumberId String?
   serialNumber   SerialNumber? @relation(fields: [serialNumberId], references: [id], onDelete: SetNull)
@@ -198,7 +198,7 @@ model SerialNumber {
 
   // Optional batch link
   batchId String?
-  batch   Batch? @relation(fields: [batchId], references: [id], onDelete: SetNull)
+  batch   Batch?  @relation(fields: [batchId], references: [id], onDelete: SetNull)
 
   // Current location (denormalized for quick lookup)
   currentWarehouseId String?

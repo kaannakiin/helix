@@ -1,0 +1,57 @@
+# ============================================================
+# Helix Caddyfile
+# ============================================================
+#
+# Bu dosya bir kere yazilir ve bir daha degismez.
+# Yeni domain eklendiginde Caddy otomatik olarak backend'e
+# sorar ve Let's Encrypt sertifikasi alir.
+#
+# Gerekli env degiskenleri:
+#   PORTAL_HOSTNAME   - Admin panel hostname (ornek: admin.helix.com)
+#   TLS_ASK_SECRET    - Platform Installation'daki tlsAskSecret
+#   BACKEND_HOST      - Backend adresi (varsayilan: localhost:3001)
+#   FRONTEND_HOST     - Frontend adresi (varsayilan: localhost:3000)
+#
+# ============================================================
+
+# -- Global options --
+{
+	# On-demand TLS: Caddy her yeni hostname icin backend'e sorar.
+	# Sadece backend "200 OK" donerse sertifika alinir.
+	on_demand_tls {
+		ask http://{$BACKEND_HOST:localhost:3001}/api/storefront/domains/ask?token={$TLS_ASK_SECRET}
+	}
+}
+
+# -- 1. Admin Portal --
+# Portal hostname sabit. Sadece Next.js frontend'e proxy yapar.
+# Storefront olarak kullanilmaz (backend reject eder).
+{$PORTAL_HOSTNAME:admin.helix.com} {
+	reverse_proxy {$FRONTEND_HOST:localhost:3000}
+}
+
+# -- 2. Storefront catch-all --
+# Portal disindaki tum hostname'ler buraya duser.
+# On-demand TLS ile otomatik sertifika alinir.
+# Hem backend API hem de /.well-known challenge'lari backend'e gider.
+# Geri kalan her sey Next.js storefront'a gider.
+:443 {
+	tls {
+		on_demand
+	}
+
+	# Backend API endpointleri
+	handle /api/* {
+		reverse_proxy {$BACKEND_HOST:localhost:3001}
+	}
+
+	# Domain verification challenge (backend serve eder)
+	handle /.well-known/helix-routing {
+		reverse_proxy {$BACKEND_HOST:localhost:3001}
+	}
+
+	# Storefront (Next.js)
+	handle {
+		reverse_proxy {$FRONTEND_HOST:localhost:3000}
+	}
+}

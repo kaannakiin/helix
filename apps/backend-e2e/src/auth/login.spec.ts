@@ -3,7 +3,7 @@ import {
   registerAndGetCredentials,
   loginUser,
   DEFAULT_PASSWORD,
-} from '../support/auth.helper';
+} from '../support/auth.helper.js';
 
 describe('POST /api/auth/login', () => {
   it('should login with correct email and password', async () => {
@@ -25,7 +25,7 @@ describe('POST /api/auth/login', () => {
     const setCookie = res.headers['set-cookie'];
     expect(setCookie).toBeDefined();
     const cookieStr = Array.isArray(setCookie) ? setCookie.join('; ') : setCookie;
-    expect(cookieStr).toContain('access_token');
+    expect(cookieStr).toContain('token=');
     expect(cookieStr).toContain('refresh_token');
   });
 

@@ -1,0 +1,13 @@
+node_modules
+.nx
+.git
+.next
+dist
+.env
+.env.*
+!docker/.env.example
+packages/prisma/generated
+*.md
+!DEPLOYMENT.md
+.vscode
+.idea

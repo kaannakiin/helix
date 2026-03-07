@@ -20,6 +20,11 @@
       "name_required": "Name is required.",
       "translations_min": "At least one translation is required.",
       "slug_pattern": "Slug must contain only lowercase letters, numbers, and hyphens.",
+      "domain_invalid": "Enter a valid base domain.",
+      "hostname_invalid": "Enter a valid hostname.",
+      "ipv4_invalid": "Enter a valid IPv4 address.",
+      "ipv6_invalid": "Enter a valid IPv6 address.",
+      "ingress_target_required": "Provide at least one canonical host or IP address.",
       "duplicate_locale": "Duplicate language detected.",
       "duplicate_slug": "Duplicate slug detected.",
       "duplicate_name_in_locale": "Duplicate name in the same language.",
@@ -58,7 +63,8 @@
       "decision_tree_simple_multiple_results": "Simple mode allows only one result node.",
       "decision_tree_simple_no_branch_not_allowed": "No-branch is not allowed in simple mode.",
       "active_stores_required": "At least one store must be selected.",
-      "duplicate_store": "Duplicate store selection detected."
+      "duplicate_store": "Duplicate store selection detected.",
+      "timezone_invalid": "Invalid timezone."
     }
   }
 }

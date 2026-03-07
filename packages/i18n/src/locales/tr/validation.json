@@ -20,6 +20,11 @@
       "name_required": "İsim zorunludur.",
       "translations_min": "En az bir çeviri gereklidir.",
       "slug_pattern": "Slug yalnızca küçük harf, rakam ve tire içerebilir.",
+      "domain_invalid": "Geçerli bir ana domain girin.",
+      "hostname_invalid": "Geçerli bir host adı girin.",
+      "ipv4_invalid": "Geçerli bir IPv4 adresi girin.",
+      "ipv6_invalid": "Geçerli bir IPv6 adresi girin.",
+      "ingress_target_required": "En az bir canonical host veya IP adresi girin.",
       "duplicate_locale": "Aynı dil birden fazla eklenmiş.",
       "duplicate_slug": "Aynı slug birden fazla kullanılmış.",
       "duplicate_name_in_locale": "Aynı dilde aynı isim birden fazla kullanılmış.",
@@ -58,7 +63,8 @@
       "decision_tree_simple_multiple_results": "Basit modda yalnızca bir sonuç düğümüne izin verilir.",
       "decision_tree_simple_no_branch_not_allowed": "Basit modda hayır dalına izin verilmez.",
       "active_stores_required": "En az bir mağaza seçilmelidir.",
-      "duplicate_store": "Aynı mağaza birden fazla seçilmiş."
+      "duplicate_store": "Aynı mağaza birden fazla seçilmiş.",
+      "timezone_invalid": "Geçersiz saat dilimi."
     }
   }
 }

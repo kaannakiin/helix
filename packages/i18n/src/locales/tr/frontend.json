@@ -9,9 +9,12 @@
     "customers": "Müşteriler",
     "customer_groups": "Müşteri Grupları",
     "analytics": "Analitik",
+    "stores": "Mağazalar",
     "settings": "Ayarlar",
+    "platform": "Platform Ayarları",
     "marketing": "Pazarlama",
     "inventory": "Envanter",
+    "warehouses": "Depolar",
     "discounts": "İndirimler",
     "reports": "Raporlar",
     "brands": "Markalar",
@@ -115,6 +118,25 @@
       "PRODUCT": "Ürün",
       "ORDER": "Sipariş",
       "INVENTORY": "Envanter"
+    },
+    "storeStatus": {
+      "ACTIVE": "Aktif",
+      "INACTIVE": "Pasif",
+      "SUSPENDED": "Askıya Alınmış"
+    },
+    "businessModel": {
+      "B2C": "B2C",
+      "B2B": "B2B"
+    },
+    "storefrontStatus": {
+      "PENDING_HOST": "Host Bekliyor",
+      "ACTIVE": "Aktif",
+      "SUSPENDED": "Askıya Alınmış"
+    },
+    "warehouseStatus": {
+      "ACTIVE": "Aktif",
+      "INACTIVE": "Pasif",
+      "MAINTENANCE": "Bakımda"
     }
   },
   "relationInput": {
@@ -285,7 +307,8 @@
         "noFilters": "Filtre bulunmuyor",
         "apply": "Filtrele",
         "searchPlaceholder": "Filtre ara...",
-        "appliedFilters": "Uygulanan Filtreler"
+        "appliedFilters": "Uygulanan Filtreler",
+        "storePlaceholder": "Mağaza seç..."
       },
       "form": {
         "newProduct": "Yeni Ürün",
@@ -434,6 +457,9 @@
           "b2b": "B2B",
           "b2c": "B2C"
         }
+      },
+      "noRows": {
+        "label": "Ürün bulunamadı"
       }
     },
     "brands": {
@@ -511,6 +537,9 @@
         },
         "saveSuccess": "Marka başarıyla kaydedildi.",
         "saveError": "Marka kaydedilemedi."
+      },
+      "noRows": {
+        "label": "Marka bulunamadı"
       }
     },
     "categories": {
@@ -589,6 +618,9 @@
           "b2b": "B2B",
           "b2c": "B2C"
         }
+      },
+      "noRows": {
+        "label": "Kategori bulunamadı"
       }
     },
     "tags": {
@@ -698,6 +730,9 @@
         "tagBulkDeleteSuccess": "Etiketler silindi.",
         "tagSaveError": "Etiket kaydedilemedi.",
         "tagDeleteError": "Etiket silinemedi."
+      },
+      "noRows": {
+        "label": "Etiket bulunamadı"
       }
     },
     "variants": {
@@ -784,6 +819,9 @@
           "deleteConfirm": "Bu seçeneği kaldırmak istediğinizden emin misiniz?"
         },
         "saveSuccess": "Varyant grubu başarıyla kaydedildi."
+      },
+      "noRows": {
+        "label": "Varyant grubu bulunamadı"
       }
     },
     "locations": {
@@ -875,6 +913,9 @@
         "yes": "Evet",
         "no": "Hayır",
         "notProvided": "Belirtilmemiş"
+      },
+      "noRows": {
+        "label": "Müşteri bulunamadı"
       }
     },
     "priceLists": {
@@ -928,6 +969,9 @@
           "DRAFT": "Taslak",
           "ARCHIVED": "Arşivlenmiş"
         }
+      },
+      "noRows": {
+        "label": "Fiyat listesi bulunamadı"
       }
     },
     "customerGroups": {
@@ -1078,6 +1122,9 @@
           "between": "Arasında",
           "in": "Birinden"
         }
+      },
+      "noRows": {
+        "label": "Müşteri grubu bulunamadı"
       }
     },
     "evaluationJobs": {
@@ -1163,11 +1210,357 @@
         "abortJob": "İşi Durdur",
         "streaming": "Canlı",
         "pendingLabel": "Bekliyor"
+      },
+      "noRows": {
+        "label": "Değerlendirme işi bulunamadı"
+      }
+    },
+    "stores": {
+      "title": "Mağazalar",
+      "subtitle": "Mağazalarınızı ve vitrinlerinizi yönetin",
+      "new": "Yeni Mağaza",
+      "tabs": {
+        "general": "Genel",
+        "domains": "Domainler"
+      },
+      "domains": {
+        "title": "Bağlı Domainler",
+        "subtitle": "Bu mağazaya bağlı domain ve adresleri yönetin.",
+        "empty": "Henüz bir domain bağlanmadı. Vitrininizi yayına almak için bir domain bağlayın.",
+        "connect": "Domain Bağla",
+        "pendingBanner": "Vitrininizin yayına alınması için bir domain bağlanması gerekiyor. Başlamak için bir domain bağlayın.",
+        "status": {
+          "live": "Yayında",
+          "settingUp": "Kuruluyor...",
+          "verificationNeeded": "Doğrulama gerekli",
+          "needsAttention": "Müdahale gerekli",
+          "disabled": "Devre dışı",
+          "verified": "Doğrulandı"
+        },
+        "type": {
+          "main": "Ana adres",
+          "additional": "Ek adres"
+        },
+        "wizard": {
+          "title": "Domain Bağla",
+          "subtitle": "Mağazanıza domain bağlamak için aşağıdaki adımları takip edin.",
+          "backToStore": "Mağazaya dön",
+          "next": "İleri",
+          "back": "Geri",
+          "steps": {
+            "enterDomain": "Domain Girin",
+            "verifyOwnership": "Sahipliği Doğrulayın",
+            "setupRouting": "Bağlantıyı Kurun",
+            "complete": "Tamamlandı"
+          },
+          "step1": {
+            "title": "Mağazanız hangi adreste açılsın?",
+            "description": "Müşterilerinizin mağazanızı ziyaret edeceği domain veya alt alan adını girin.",
+            "hostnameLabel": "Domain adresi",
+            "hostnamePlaceholder": "shop.markam.com",
+            "singleStore": "Sadece bu adres",
+            "singleStoreDescription": "Her alt alan adı ayrı ayrı doğrulanacaktır.",
+            "multiStore": "Bu domain ile birden fazla mağaza kullanacağım",
+            "multiStoreDescription": "İlk kurulumdan sonra yeni alt alan adları otomatik olarak etkinleştirilecektir."
+          },
+          "step2": {
+            "title": "{domain} domainin size ait olduğunu doğrulayın",
+            "description": "Sahipliği kanıtlamak için aşağıdaki DNS kaydını domain sağlayıcınıza ekleyin.",
+            "addRecord": "Bu DNS kaydını ekleyin",
+            "verify": "Sahipliği Doğrula",
+            "verifyFailed": "Sahiplik henüz doğrulanamadı.",
+            "retryHint": "DNS değişikliklerinin yayılması 48 saate kadar sürebilir. Daha sonra tekrar deneyebilirsiniz."
+          },
+          "step3": {
+            "title": "{hostname} adresini mağazanıza yönlendirin",
+            "description": "Domaininizi bağlamak için aşağıdaki DNS kayıtlarını domain sağlayıcınıza ekleyin.",
+            "apexInstructions": "Bu DNS kayıtlarını ekleyin",
+            "wildcardInstructions": "Wildcard yönlendirme için bu DNS kayıtlarını ekleyin",
+            "exactHostInstructions": "Bu DNS kaydını ekleyin",
+            "verify": "Bağlantıyı Doğrula",
+            "verifyFailed": "Bağlantı henüz doğrulanamadı.",
+            "retryHint": "DNS değişikliklerinin yayılması 48 saate kadar sürebilir. Daha sonra tekrar deneyebilirsiniz."
+          },
+          "step4": {
+            "title": "Domain bağlandı!",
+            "description": "{hostname} artık {storeName} mağazasına bağlı.",
+            "visitStore": "Mağazayı Ziyaret Et",
+            "backToStore": "Mağazaya Dön"
+          },
+          "dnsRecord": {
+            "type": "Tip",
+            "name": "Ad",
+            "value": "Değer",
+            "copy": "Kopyala",
+            "copied": "Kopyalandı!"
+          }
+        }
+      },
+      "empty": {
+        "title": "Henüz mağaza yok",
+        "description": "Satışa başlamak için ilk mağazanızı oluşturun. Mağazalar, her biri kendi dili, para birimi ve vitrini olan satış kanallarınızı temsil eder.",
+        "cta": "İlk Mağazanızı Oluşturun"
+      },
+      "card": {
+        "businessModel": "İş Modeli",
+        "status": "Durum",
+        "storefrontStatus": "Vitrin",
+        "hostBindings": "Host Bağlantıları",
+        "locale": "Dil",
+        "currency": "Para Birimi",
+        "createdAt": "Oluşturulma",
+        "edit": "Düzenle",
+        "delete": "Sil",
+        "deleteConfirm": "Bu mağazayı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.",
+        "deleteSuccess": "Mağaza başarıyla silindi.",
+        "deleteError": "Mağaza silinemedi."
+      },
+      "form": {
+        "newStore": "Yeni Mağaza",
+        "discard": "Vazgeç",
+        "save": "Kaydet",
+        "backToStores": "Mağazalara Dön",
+        "loadError": "Yükleme Hatası",
+        "loadErrorDescription": "Mağaza yüklenirken bir hata oluştu. Lütfen tekrar deneyin.",
+        "notFound": "Mağaza Bulunamadı",
+        "notFoundDescription": "Aradığınız mağaza mevcut değil.",
+        "generalInfo": "Genel Bilgiler",
+        "generalInfoDescription": "Temel mağaza kimliği ve URL slug'ı",
+        "name": {
+          "label": "Mağaza Adı",
+          "placeholder": "Mağazam"
+        },
+        "slug": {
+          "label": "Slug",
+          "placeholder": "magazam",
+          "hint": "URL dostu tanımlayıcı. Oluşturmada isimden otomatik üretilir."
+        },
+        "businessModel": {
+          "label": "İş Modeli",
+          "placeholder": "İş modeli seçin..."
+        },
+        "description": {
+          "label": "Açıklama",
+          "placeholder": "Bu mağazanın kısa açıklaması..."
+        },
+        "regionCard": {
+          "title": "Bölge ve Dil",
+          "description": "Dil, para birimi ve saat dilimi ayarları"
+        },
+        "defaultLocale": {
+          "label": "Varsayılan Dil",
+          "placeholder": "Dil seçin..."
+        },
+        "currency": {
+          "label": "Para Birimi",
+          "placeholder": "Para birimi seçin..."
+        },
+        "timezone": {
+          "label": "Saat Dilimi",
+          "placeholder": "Saat dilimi seçin...",
+          "notFound": "Saat dilimi bulunamadı"
+        },
+        "statusCard": {
+          "title": "Durum",
+          "description": "Mağaza ve vitrin durumu"
+        },
+        "status": {
+          "label": "Mağaza Durumu"
+        },
+        "storefrontStatus": {
+          "label": "Vitrin Durumu"
+        },
+        "hostBindingsCard": {
+          "title": "Host Bağlantıları",
+          "description": "Bu mağazaya bağlı alan adları ve hostlar",
+          "empty": "Yapılandırılmış host bağlantısı yok. Host bağlantılarını Ayarlar'dan yönetin.",
+          "manageInSettings": "Ayarlar'da Yönet",
+          "hostname": "Hostname",
+          "type": "Tür",
+          "bindingStatus": "Durum"
+        },
+        "saveSuccess": "Mağaza başarıyla kaydedildi.",
+        "saveError": "Mağaza kaydedilemedi.",
+        "createSuccess": "Mağaza başarıyla oluşturuldu."
+      }
+    },
+    "warehouses": {
+      "title": "Depolar",
+      "subtitle": "Tüm depoları görüntüleyin ve yönetin",
+      "table": {
+        "code": "Kod",
+        "name": "Ad",
+        "status": "Durum",
+        "location": "Konum",
+        "country": "Ülke",
+        "state": "İl",
+        "city": "İlçe",
+        "createdAt": "Oluşturulma Tarihi"
+      },
+      "contextMenu": {
+        "copy": "Kopyala",
+        "copySelected": "Seçilenleri Kopyala",
+        "copyAsTable": "Tablo (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Düz Metin",
+        "exportGroup": "Dışa Aktar",
+        "exportCSV": "CSV Olarak Dışa Aktar",
+        "exportExcel": "Excel Olarak Dışa Aktar"
+      },
+      "footer": {
+        "totalRows": "Toplam: {count}",
+        "selectedRows": "Seçili: {count}",
+        "refresh": "Yenile"
+      },
+      "filterDrawer": {
+        "title": "Filtreler",
+        "clearAll": "Tümünü Temizle",
+        "activeFilters": "{count} aktif",
+        "noFilters": "Kullanılabilir filtre yok",
+        "apply": "Filtreleri Uygula",
+        "searchPlaceholder": "Filtre ara...",
+        "appliedFilters": "Uygulanan Filtreler"
+      },
+      "noRows": {
+        "label": "Depo bulunamadı"
       }
     },
     "settings": {
-      "title": "Mağaza Ayarları",
-      "subtitle": "Mağaza yapılandırmanızı yönetin",
+      "title": "Storefront ve Domain Ayarları",
+      "subtitle": "Kurulum ingress bilgisini yapılandırın, domain ailelerini bağlayın ve storefront hostlarını store'lara eşleyin.",
+      "notifications": {
+        "genericError": "İstek tamamlanamadı.",
+        "installationSaved": "Kurulum ayarları kaydedildi.",
+        "domainSpaceCreated": "Domain alanı oluşturuldu.",
+        "domainSpaceVerified": "Domain alanı başarıyla doğrulandı.",
+        "domainSpaceVerifyFailed": "Domain alanı doğrulanamadı.",
+        "hostBindingCreated": "Host binding oluşturuldu.",
+        "hostBindingVerified": "Host binding başarıyla doğrulandı.",
+        "hostBindingVerifyFailed": "Host binding doğrulanamadı."
+      },
+      "installation": {
+        "title": "Platform Kurulumu",
+        "description": "Admin hostunu ve tüm DNS talimatlarının kullanacağı public ingress hedeflerini tanımlayın.",
+        "submit": "Kurulumu Kaydet",
+        "ask": {
+          "title": "TLS Ask Endpoint",
+          "description": "Bu token'ı statik Caddy ask yapılandırmasında kullanın. Host parametresi Caddy tarafından istek anında gönderilir.",
+          "empty": "Önce kurulumu kaydedin; token üretildikten veya mevcut token tutulduktan sonra burada gösterilir."
+        },
+        "fields": {
+          "name": {
+            "label": "Kurulum Adı",
+            "placeholder": "Helix Production"
+          },
+          "portalHostname": {
+            "label": "Portal Hostu",
+            "placeholder": "portal.helix.com"
+          },
+          "tlsAskSecret": {
+            "label": "TLS Ask Secret",
+            "placeholder": "Mevcut secret'ı korumak veya yenisini üretmek için boş bırakın",
+            "description": "Caddy sertifika üretmeden önce ask endpoint'ine bu secret ile istek atar."
+          },
+          "canonicalTargetHost": {
+            "label": "Canonical Target Host",
+            "placeholder": "edge.customer.net",
+            "description": "Subdomain ve wildcard onboarding için tercih edilen CNAME hedefi."
+          },
+          "ipv4Addresses": {
+            "label": "IPv4 Adresleri",
+            "placeholder": "203.0.113.10",
+            "description": "Her satıra bir IP girin. Apex A kayıtları bunun üzerinden üretilir."
+          },
+          "ipv6Addresses": {
+            "label": "IPv6 Adresleri",
+            "placeholder": "2001:db8::10",
+            "description": "Her satıra bir IP girin. Apex AAAA kayıtları bunun üzerinden üretilir."
+          }
+        }
+      },
+      "domainSpaces": {
+        "title": "Domain Alanları",
+        "description": "helixstore.com gibi bir base domain bağlayın, DNS talimatlarını üretin ve onboarding durumunu doğrulayın.",
+        "submit": "Domain Alanı Oluştur",
+        "verify": "DNS Doğrula",
+        "empty": "Henüz bir domain alanı oluşturulmadı.",
+        "fields": {
+          "baseDomain": {
+            "label": "Base Domain",
+            "placeholder": "helixstore.com"
+          },
+          "onboardingMode": {
+            "label": "Onboarding Modu"
+          }
+        },
+        "modeLabels": {
+          "EXACT_HOSTS": "Tek Tek Host",
+          "WILDCARD_DELEGATION": "Wildcard Delegation",
+          "HYBRID": "Hybrid"
+        },
+        "statusLabels": {
+          "PENDING_VERIFICATION": "Doğrulama Bekliyor",
+          "ACTIVE": "Aktif",
+          "FAILED": "Başarısız",
+          "ARCHIVED": "Arşivlendi"
+        },
+        "meta": {
+          "apexVerifiedAt": "Apex Doğrulaması",
+          "wildcardVerifiedAt": "Wildcard Doğrulaması",
+          "hostCount": "Host Binding Sayısı",
+          "notVerified": "Henüz doğrulanmadı"
+        },
+        "instructions": {
+          "apex": "Apex DNS Kayıtları",
+          "wildcard": "Wildcard DNS Kayıtları",
+          "wildcardTest": "Wildcard doğrulaması {hostname} hostu üzerinden kontrol edilir."
+        }
+      },
+      "storeSettings": {
+        "title": "Store Ayarları",
+        "description": "Seçili store'u güncelleyin; storefront aktivasyonu ise host binding'ler üzerinden yürüsün.",
+        "selectedStore": "Seçili store: {name}",
+        "storefrontStatus": "Storefront durumu: {status}",
+        "noStore": "Storefront host bağlamadan önce bir store oluşturun."
+      },
+      "hostBindings": {
+        "title": "Store Host Binding'leri",
+        "description": "Exact hostları seçili store'a bağlayın. DNS talimatları her zaman kurulum ingress'ine işaret eder.",
+        "submit": "Host Binding Oluştur",
+        "verify": "Host Doğrula",
+        "empty": "Bu store için henüz host binding yok.",
+        "selectedStore": "Binding'ler {name} store'u için oluşturulacak.",
+        "noStore": "Host binding yönetmek için bir store seçin veya oluşturun.",
+        "instructions": "DNS Talimatları",
+        "fields": {
+          "domainSpaceId": {
+            "label": "Domain Alanı",
+            "placeholder": "Bir domain alanı seçin"
+          },
+          "hostname": {
+            "label": "Hostname",
+            "placeholder": "b2b.helixstore.com"
+          },
+          "type": {
+            "label": "Binding Türü"
+          }
+        },
+        "typeLabels": {
+          "PRIMARY": "Primary",
+          "ALIAS": "Alias"
+        },
+        "statusLabels": {
+          "PENDING_DNS": "DNS Bekliyor",
+          "ACTIVE": "Aktif",
+          "FAILED": "Başarısız",
+          "DISABLED": "Devre Dışı"
+        },
+        "meta": {
+          "domainSpace": "Domain Modu",
+          "activatedAt": "Aktivasyon Zamanı",
+          "notActivated": "Henüz aktif değil"
+        }
+      },
       "form": {
         "selectStore": "Mağaza Seçin",
         "storeName": {
@@ -1236,6 +1629,31 @@
           "nl": "Hollandaca"
         }
       }
+    }
+  },
+  "storefront": {
+    "nav": {
+      "home": "Ana Sayfa",
+      "products": "Ürünler",
+      "account": "Hesabım",
+      "sign_in": "Giriş Yap",
+      "sign_out": "Çıkış Yap"
+    },
+    "home": {
+      "welcome": "{storeName} mağazasına hoş geldiniz"
+    },
+    "auth": {
+      "sign_in_title": "{storeName} mağazasına giriş yapın",
+      "register_title": "{storeName} mağazasında hesap oluşturun",
+      "sign_in_button": "Giriş Yap",
+      "register_button": "Hesap Oluştur",
+      "no_account": "Hesabınız yok mu?",
+      "have_account": "Zaten hesabınız var mı?"
+    },
+    "account": {
+      "title": "Hesabım",
+      "welcome": "Hoş geldiniz, {name}",
+      "sign_out": "Çıkış Yap"
     }
   }
 }

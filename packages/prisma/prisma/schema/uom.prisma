@@ -12,8 +12,8 @@ model UnitOfMeasure {
   updatedAt DateTime @updatedAt
 
   translations    UnitOfMeasureTranslation[]
-  conversionsFrom UnitConversion[]      @relation("ConversionFrom")
-  conversionsTo   UnitConversion[]      @relation("ConversionTo")
+  conversionsFrom UnitConversion[]           @relation("ConversionFrom")
+  conversionsTo   UnitConversion[]           @relation("ConversionTo")
   productUnits    ProductUnitOfMeasure[]
   stockLevels     StockLevel[]
   stockMovements  StockMovement[]
@@ -79,7 +79,7 @@ model ProductUnitOfMeasure {
   unitOfMeasure   UnitOfMeasure @relation(fields: [unitOfMeasureId], references: [id])
 
   isBase           Boolean @default(false) // True = base/primary UoM for this variant
-  conversionFactor Float   @default(1)     // 1 of this UoM = conversionFactor of base UoM
+  conversionFactor Float   @default(1) // 1 of this UoM = conversionFactor of base UoM
 
   barcode String? // UoM-specific barcode (e.g., box barcode vs piece barcode)
 

@@ -255,6 +255,59 @@ enum StoreStatus {
   SUSPENDED
 }
 
+enum StorefrontStatus {
+  PENDING_HOST
+  ACTIVE
+  SUSPENDED
+}
+
+enum InstallationStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum DomainOnboardingMode {
+  EXACT_HOSTS
+  WILDCARD_DELEGATION
+  HYBRID
+}
+
+enum DomainSpaceStatus {
+  PENDING_OWNERSHIP
+  READY
+  FAILED
+  ARCHIVED
+}
+
+enum DomainOwnershipMethod {
+  TXT_TOKEN
+  DIRECT_DNS
+}
+
+enum DomainRoutingMethod {
+  HTTP_WELL_KNOWN
+  DIRECT_DNS
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  FAILED
+  SKIPPED
+}
+
+enum HostBindingType {
+  PRIMARY
+  ALIAS
+}
+
+enum HostBindingStatus {
+  PENDING_ROUTING
+  ACTIVE
+  FAILED
+  DISABLED
+}
+
 // ─── Account ──────────────────────────────────────────────────────────────────
 
 enum AccountType {

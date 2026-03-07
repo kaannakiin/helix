@@ -22,7 +22,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, JWT_STRATEGY) {
   }
 
   async validate(payload: TokenPayload): Promise<TokenPayload> {
-    if (!payload.sub) {
+    if (!payload.sub || !payload.sessionId) {
       throw new UnauthorizedException();
     }
     return payload;

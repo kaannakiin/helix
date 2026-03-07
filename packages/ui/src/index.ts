@@ -53,3 +53,8 @@ export {
   clearHoverCardCache,
   type HoverCardCellRendererParams,
 } from './data-table/components/HoverCardCellRenderer';
+
+export {
+  AsyncMultiSelectFilter,
+  type AsyncMultiSelectFilterModel,
+} from './data-table/components/AsyncMultiSelectFilter';

@@ -4,25 +4,19 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import type { StoreContext } from '@org/types/store';
-import { StoresService } from '../../app/admin/stores/stores.service.js';
+import { PlatformInstallationService } from '../../app/admin/stores/platform-installation.service.js';
 
 @Injectable()
 export class ContentLocaleInterceptor implements NestInterceptor {
-  constructor(private readonly storeSettings: StoresService) {}
+  constructor(
+    private readonly platformInstallationService: PlatformInstallationService
+  ) {}
 
   async intercept(context: ExecutionContext, next: CallHandler) {
     const req = context.switchToHttp().getRequest();
-    const storeContext = req['storeContext'] as StoreContext | undefined;
-
-    if (storeContext) {
-      const store = await this.storeSettings.findById(storeContext.storeId);
-      req.contentLocale = store.defaultLocale;
-    } else {
-      const stores = await this.storeSettings.list();
-      req.contentLocale = stores[0]?.defaultLocale ?? 'TR';
-    }
-
+    const installation =
+      await this.platformInstallationService.findCurrent();
+    req.contentLocale = installation?.defaultLocale ?? 'TR';
     return next.handle();
   }
 }

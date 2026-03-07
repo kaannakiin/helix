@@ -6,6 +6,13 @@
     "noUnusedLocals": false,
     "noImplicitAny": false
   },
-  "include": ["jest.config.ts", "src/**/*.ts"],
-  "references": []
+  "include": ["jest.config.cts", "src/**/*.ts"],
+  "references": [
+    {
+      "path": "../../packages/constants"
+    },
+    {
+      "path": "../../packages/prisma"
+    }
+  ]
 }

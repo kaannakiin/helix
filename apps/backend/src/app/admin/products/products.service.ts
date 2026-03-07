@@ -57,13 +57,24 @@ export class ProductsService {
       defaultSort: { field: 'createdAt', order: 'desc' },
     });
 
-    const where = (await resolveCountFilters(
+    const resolvedWhere = await resolveCountFilters(
       this.prisma,
       'Product',
       ProductsService.COUNT_RELATIONS,
       countFilters,
       baseWhere
-    )) as Prisma.ProductWhereInput;
+    );
+
+    if (resolvedWhere['storeIds']) {
+      const storeIdsFilter = resolvedWhere['storeIds'] as { in?: string[]; equals?: string };
+      const ids = storeIdsFilter.in ?? (storeIdsFilter.equals ? [storeIdsFilter.equals] : []);
+      delete resolvedWhere['storeIds'];
+      if (ids.length > 0) {
+        resolvedWhere['stores'] = { some: { storeId: { in: ids } } };
+      }
+    }
+
+    const where = resolvedWhere as Prisma.ProductWhereInput;
 
     const [items, total] = await Promise.all([
       this.prisma.product.findMany({

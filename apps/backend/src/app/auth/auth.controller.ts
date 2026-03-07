@@ -116,12 +116,12 @@ export class AuthController {
   @ApiResponse({ status: 200, description: 'Logged out successfully' })
   async logout(
     @CurrentUser('sub') userId: string,
+    @CurrentUser('sessionId') sessionId: string,
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
     @RealIp() ip: string
   ) {
     const metadata = this.buildMetadata(req, ip);
-    const sessionId = (req.user as RefreshTokenContext)?.sessionId;
     return this.authService.logout(userId, sessionId, metadata, res);
   }
 

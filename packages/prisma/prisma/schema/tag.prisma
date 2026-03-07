@@ -49,8 +49,8 @@ model Tag {
   slug String
 
   parentTagId String?
-  parent      Tag?   @relation("TagHierarchy", fields: [parentTagId], references: [id], onDelete: SetNull)
-  children    Tag[]  @relation("TagHierarchy")
+  parent      Tag?    @relation("TagHierarchy", fields: [parentTagId], references: [id], onDelete: SetNull)
+  children    Tag[]   @relation("TagHierarchy")
 
   depth Int @default(0)
 
@@ -80,7 +80,7 @@ model TagTranslation {
   id String @id @default(cuid())
 
   tagId String
-  tag   Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tag   Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   locale Locale
 
@@ -104,7 +104,7 @@ model ProductTag {
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   tagId String
-  tag   Tag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  tag   Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 

@@ -76,22 +76,29 @@ async function baseSeed() {
 
   // ── BASE PriceList for TRY ──
   const defaultCurrency = currencies.find((c) => c.isDefault)!;
-
-  await prisma.priceList.upsert({
-    where: { id: 'base-pricelist-try' },
-    update: {},
-    create: {
-      id: 'base-pricelist-try',
-      name: 'Varsayılan TRY',
-      type: 'BASE',
-      status: 'ACTIVE',
-      currencyCode: defaultCurrency.code,
-      isActive: true,
-      storeId: 'store-b2b-merkez',
-    },
+  const firstStore = await prisma.store.findFirst({
+    orderBy: { createdAt: 'asc' },
+    select: { id: true },
   });
 
-  console.log(`BASE PriceList seeded for ${defaultCurrency.code}`);
+  if (firstStore) {
+    await prisma.priceList.upsert({
+      where: { id: 'base-pricelist-try' },
+      update: {},
+      create: {
+        id: 'base-pricelist-try',
+        name: 'Varsayılan TRY',
+        type: 'BASE',
+        status: 'ACTIVE',
+        currencyCode: defaultCurrency.code,
+        isActive: true,
+        storeId: firstStore.id,
+      },
+    });
+    console.log(`BASE PriceList seeded for ${defaultCurrency.code}`);
+  } else {
+    console.log('No store found — skipping PriceList seed (run seed:stores first)');
+  }
 
   console.log('Base seed completed!');
 }

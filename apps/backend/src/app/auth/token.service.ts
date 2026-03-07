@@ -15,7 +15,6 @@ import type { ValidatedUser } from './interfaces';
 export interface RefreshTokenPayload extends TokenPayload {
   jti: string;
   family: string;
-  sessionId: string;
 }
 
 @Injectable()
@@ -30,9 +29,10 @@ export class TokenService {
     this.refreshSecret = this.config.getOrThrow<string>('JWT_REFRESH_SECRET');
   }
 
-  buildPayload(user: ValidatedUser): TokenPayload {
+  buildPayload(user: ValidatedUser, sessionId: string): TokenPayload {
     return {
       sub: user.id,
+      sessionId,
       name: user.name,
       surname: user.surname,
       email: user.email,
@@ -197,6 +197,13 @@ export class TokenService {
   async revokeAllUserTokens(userId: string): Promise<void> {
     await this.prisma.refreshToken.updateMany({
       where: { userId, isRevoked: false },
+      data: { isRevoked: true },
+    });
+  }
+
+  async revokeSessionTokens(sessionId: string): Promise<void> {
+    await this.prisma.refreshToken.updateMany({
+      where: { sessionId, isRevoked: false },
       data: { isRevoked: true },
     });
   }

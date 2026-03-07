@@ -32,7 +32,8 @@ interface AgBooleanFilterModel {
 
 interface AgCustomFilterModel {
   filterType: 'custom';
-  value: string;
+  value?: string;
+  values?: string[];
 }
 
 type AgFilterModelEntry =
@@ -98,11 +99,21 @@ function convertAgFilter(agFilter: AgFilterModelEntry): FilterCondition | null {
       };
 
     case 'custom':
-      return {
-        filterType: 'enum',
-        op: 'equals',
-        value: agFilter.value,
-      };
+      if (agFilter.values && agFilter.values.length > 0) {
+        return {
+          filterType: 'enum',
+          op: 'in',
+          value: agFilter.values,
+        };
+      }
+      if (agFilter.value) {
+        return {
+          filterType: 'enum',
+          op: 'equals',
+          value: agFilter.value,
+        };
+      }
+      return null;
 
     default:
       return null;

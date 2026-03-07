@@ -21,6 +21,7 @@ import {
   type DataTableTranslations,
 } from '@org/ui';
 import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
+import { Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
@@ -117,6 +118,10 @@ export default function CustomersPage() {
         apply: t('filterDrawer.apply'),
         searchPlaceholder: t('filterDrawer.searchPlaceholder'),
         appliedFilters: t('filterDrawer.appliedFilters'),
+      },
+      noRows: {
+        label: t('noRows.label'),
+        icon: <Users size={40} />,
       },
     }),
     [t]
@@ -292,7 +297,10 @@ export default function CustomersPage() {
         gridOptions={{
           cellSelection: false,
           suppressCellFocus: true,
-          suppressRowClickSelection: true,
+          rowSelection: {
+            mode: 'multiRow',
+            enableClickSelection: true,
+          },
         }}
         showFilterDrawer
         contextMenu={{

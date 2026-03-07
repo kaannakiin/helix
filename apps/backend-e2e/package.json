@@ -2,6 +2,7 @@
   "name": "@org/backend-e2e",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "nx": {
     "implicitDependencies": [
       "@org/backend"
@@ -24,6 +25,10 @@
     }
   },
   "dependencies": {
+    "@nx/node": "22.5.0",
+    "@org/prisma": "*",
+    "@prisma/adapter-pg": "^7.4.1",
+    "dotenv": "^16.0.0",
     "@types/tough-cookie": "^4.0.5",
     "axios-cookiejar-support": "^6.0.5",
     "tough-cookie": "^6.0.0"

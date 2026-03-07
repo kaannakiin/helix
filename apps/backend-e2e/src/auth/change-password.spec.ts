@@ -3,7 +3,7 @@ import {
   registerAndGetCredentials,
   loginUser,
   DEFAULT_PASSWORD,
-} from '../support/auth.helper';
+} from '../support/auth.helper.js';
 
 describe('POST /api/auth/change-password', () => {
   it('should change password and revoke all sessions', async () => {

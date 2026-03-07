@@ -13,8 +13,8 @@ model CustomerGroup {
   ruleTreeId String?
   ruleTree   RuleTree? @relation(fields: [ruleTreeId], references: [id], onDelete: Cascade)
 
-  cronExpression String? @default("0 * * * *")
-  lastEvaluatedAt           DateTime?
+  cronExpression  String?   @default("0 * * * *")
+  lastEvaluatedAt DateTime?
 
   members    CustomerGroupMember[]
   priceLists PriceListCustomerGroup[]
@@ -37,8 +37,8 @@ model CustomerGroupMember {
 
   // B2C: userId dolu, organizationId null
   // B2B: organizationId dolu, userId null veya dolu (org adına bireysel üye)
-  userId         String?
-  user           User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)

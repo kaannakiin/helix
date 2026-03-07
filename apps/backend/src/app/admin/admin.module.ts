@@ -12,6 +12,7 @@ import { TaxonomyModule } from './taxonomy/taxonomy.module';
 import { PriceListsModule } from './price-lists/price-lists.module';
 import { VariantGroupsModule } from './variant-groups/variant-groups.module';
 import { CustomerGroupsModule } from './customer-groups/customer-groups.module';
+import { WarehousesModule } from './warehouses/warehouses.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CustomerGroupsModule } from './customer-groups/customer-groups.module';
     PriceListsModule,
     CustomerGroupsModule,
     StoresModule,
+    WarehousesModule,
   ],
   controllers: [AdminController],
   providers: [AdminService],

@@ -1,11 +1,12 @@
 // ─── Store ────────────────────────────────────────────────────────────────────
 
 model Store {
-  id            String        @id @default(cuid())
-  name          String
-  slug          String        @unique
-  businessModel BusinessModel @default(B2C)
-  status        StoreStatus   @default(ACTIVE)
+  id               String           @id @default(cuid())
+  name             String
+  slug             String           @unique
+  businessModel    BusinessModel    @default(B2C)
+  status           StoreStatus      @default(ACTIVE)
+  storefrontStatus StorefrontStatus @default(PENDING_HOST)
 
   defaultLocale Locale       @default(TR)
   currency      CurrencyCode @default(TRY)
@@ -24,8 +25,11 @@ model Store {
   warehouses     Warehouse[]
   categoryStores CategoryStore[]
   ruleTrees      RuleTree[]
+  hostBindings   StoreHostBinding[]
+  customers      Customer[]
 
   @@index([businessModel])
   @@index([status])
+  @@index([storefrontStatus])
   @@map("stores")
 }

@@ -15,10 +15,10 @@ model Warehouse {
   country   Country @relation(fields: [countryId], references: [id])
 
   stateId String
-  state   State @relation(fields: [stateId], references: [id])
+  state   State  @relation(fields: [stateId], references: [id])
 
   cityId String?
-  city   City? @relation(fields: [cityId], references: [id])
+  city   City?   @relation(fields: [cityId], references: [id])
 
   // Detailed address
   address    String? // Street / building details
@@ -40,8 +40,8 @@ model Warehouse {
   zones              WarehouseZone[]
   bins               WarehouseBin[]
   stockLevels        StockLevel[]
-  movementGroupsFrom StockMovementGroup[] @relation("MovementGroupSourceWarehouse")
-  movementGroupsTo   StockMovementGroup[] @relation("MovementGroupDestWarehouse")
+  movementGroupsFrom StockMovementGroup[]   @relation("MovementGroupSourceWarehouse")
+  movementGroupsTo   StockMovementGroup[]   @relation("MovementGroupDestWarehouse")
 
   @@index([storeId])
   @@index([code])
@@ -138,7 +138,7 @@ model WarehouseBin {
   zoneId String?
   zone   WarehouseZone? @relation(fields: [zoneId], references: [id], onDelete: SetNull)
 
-  code    String  // Bin code: "A-01-03"
+  code    String // Bin code: "A-01-03"
   binType BinType @default(STORAGE)
 
   // Physical capacity

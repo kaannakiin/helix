@@ -1,0 +1,181 @@
+// ─── Customer (Storefront) ───────────────────────────────────────────────────
+
+model Customer {
+  id String @id @default(cuid())
+
+  storeId String
+  store   Store  @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  name     String
+  surname  String
+  email    String?
+  phone    String?
+  password String?
+
+  emailVerified Boolean @default(false)
+  phoneVerified Boolean @default(false)
+
+  avatar String?
+
+  status      AccountStatus @default(ACTIVE)
+  accountType AccountType   @default(PERSONAL)
+
+  twoFactorEnabled Boolean @default(false)
+  twoFactorSecret  String?
+
+  lastLoginAt DateTime?
+  loginCount  Int       @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  sessions      CustomerSession[]
+  devices       CustomerDevice[]
+  refreshTokens CustomerRefreshToken[]
+  oauthAccounts CustomerOAuthAccount[]
+
+  @@unique([storeId, email])
+  @@unique([storeId, phone])
+  @@index([storeId])
+  @@index([email])
+  @@index([phone])
+  @@index([status])
+  @@index([createdAt])
+  @@map("customers")
+}
+
+// ─── Customer Session ────────────────────────────────────────────────────────
+
+model CustomerSession {
+  id String @id @default(cuid())
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  sessionToken String @unique
+
+  ipAddress String?
+  userAgent String?
+
+  browserName    String?
+  browserVersion String?
+  osName         String?
+  osVersion      String?
+  deviceType     DeviceType @default(UNKNOWN)
+
+  city    String?
+  country String?
+  lat     Float?
+  lng     Float?
+
+  isActive Boolean @default(true)
+
+  revokedAt    DateTime?
+  revokeReason SessionRevokeReason?
+
+  deviceId String?
+  device   CustomerDevice? @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+
+  createdAt      DateTime @default(now())
+  lastActivityAt DateTime @default(now())
+  expiresAt      DateTime
+
+  refreshTokens CustomerRefreshToken[]
+
+  @@index([customerId])
+  @@index([sessionToken])
+  @@index([customerId, isActive])
+  @@index([expiresAt])
+  @@index([deviceId])
+  @@index([createdAt])
+  @@map("customer_sessions")
+}
+
+// ─── Customer Device ─────────────────────────────────────────────────────────
+
+model CustomerDevice {
+  id String @id @default(cuid())
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  deviceName String?
+
+  deviceType     DeviceType @default(UNKNOWN)
+  browserName    String?
+  browserVersion String?
+  osName         String?
+  osVersion      String?
+
+  fingerprint String?
+
+  isTrusted Boolean @default(false)
+
+  firstSeenAt DateTime @default(now())
+  lastSeenAt  DateTime @default(now())
+
+  sessions CustomerSession[]
+
+  @@unique([customerId, fingerprint])
+  @@index([customerId])
+  @@index([customerId, isTrusted])
+  @@index([lastSeenAt])
+  @@map("customer_devices")
+}
+
+// ─── Customer Refresh Token ──────────────────────────────────────────────────
+
+model CustomerRefreshToken {
+  id String @id @default(cuid())
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  sessionId String
+  session   CustomerSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  tokenHash String
+
+  family String
+
+  isRevoked Boolean @default(false)
+
+  replacedByTokenId String?               @unique
+  replacedByToken   CustomerRefreshToken? @relation("CustomerTokenChain", fields: [replacedByTokenId], references: [id], onDelete: SetNull)
+  replacesToken     CustomerRefreshToken? @relation("CustomerTokenChain")
+
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([customerId])
+  @@index([sessionId])
+  @@index([family])
+  @@index([customerId, family, isRevoked, createdAt])
+  @@index([expiresAt])
+  @@map("customer_refresh_tokens")
+}
+
+// ─── Customer OAuth Account ──────────────────────────────────────────────────
+
+model CustomerOAuthAccount {
+  id String @id @default(cuid())
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  provider          OAuthProvider
+  providerAccountId String
+
+  accessToken  String?
+  refreshToken String?
+  tokenExpiry  DateTime?
+  scope        String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([provider, providerAccountId])
+  @@index([customerId])
+  @@index([provider])
+  @@map("customer_oauth_accounts")
+}

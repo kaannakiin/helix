@@ -17,7 +17,7 @@ import {
 import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { Plus } from 'lucide-react';
+import { Layers, Plus } from 'lucide-react';
 import { useCallback, useMemo, useRef } from 'react';
 
 export default function VariantGroupsPage() {
@@ -108,6 +108,10 @@ export default function VariantGroupsPage() {
         title: tColumnVisibility('title'),
         showAll: tColumnVisibility('showAll'),
         hiddenCount: tColumnVisibility.raw('hiddenCount'),
+      },
+      noRows: {
+        label: t('noRows.label'),
+        icon: <Layers size={40} />,
       },
     }),
     [t, tColumnVisibility, filters]

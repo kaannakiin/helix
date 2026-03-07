@@ -15,6 +15,7 @@ import {
   type DataTableTranslations,
 } from '@org/ui';
 import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
+import { Tag } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
@@ -109,6 +110,10 @@ export default function BrandsPage() {
         title: tColumnVisibility('title'),
         showAll: tColumnVisibility('showAll'),
         hiddenCount: tColumnVisibility.raw('hiddenCount'),
+      },
+      noRows: {
+        label: t('noRows.label'),
+        icon: <Tag size={40} />,
       },
     }),
     [t, tColumnVisibility, filters]

@@ -4,7 +4,7 @@
   "license": "MIT",
   "scripts": {
     "start": "nx run-many -t serve dev --parallel",
-    "build": "nx run-many -t build --parallel"
+    "build": "nx run-many -t build --parallel --skip-nx-cache"
   },
   "private": true,
   "workspaces": [

@@ -1,31 +1,31 @@
 // ─── Evaluation Job ──────────────────────────────────────────────────────────
 
 model EvaluationJob {
-  id               String              @id @default(cuid())
-  status           EvaluationJobStatus @default(PENDING)
-  targetEntity     RuleTargetEntity
+  id           String              @id @default(cuid())
+  status       EvaluationJobStatus @default(PENDING)
+  targetEntity RuleTargetEntity
 
-  entityId         String
-  entityType       String
+  entityId   String
+  entityType String
 
   ruleTreeSnapshot Json?
 
-  startedAt        DateTime?
-  completedAt      DateTime?
-  durationMs       Int?
+  startedAt   DateTime?
+  completedAt DateTime?
+  durationMs  Int?
 
   recordsEvaluated Int?
   recordsMatched   Int?
 
-  errorLog         String?
-  attemptCount     Int                 @default(0)
-  bullJobId        String?
+  errorLog     String?
+  attemptCount Int     @default(0)
+  bullJobId    String?
 
-  triggeredBy      String?
-  triggerType      EvaluationTrigger   @default(SCHEDULED)
+  triggeredBy String?
+  triggerType EvaluationTrigger @default(SCHEDULED)
 
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([status])
   @@index([entityId, entityType])
