@@ -25,6 +25,7 @@ RUN npm ci
 
 # ── Stage 2: Generate Prisma Client ───────────────────────
 FROM deps AS prisma
+COPY tsconfig.base.json ./
 COPY packages/prisma/prisma ./packages/prisma/prisma
 COPY packages/prisma/prisma.config.ts packages/prisma/
 COPY packages/prisma/tsconfig*.json packages/prisma/

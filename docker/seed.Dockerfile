@@ -20,6 +20,7 @@ COPY apps/web/package.json apps/web/
 
 RUN npm ci
 
+COPY tsconfig.base.json ./
 COPY packages/prisma ./packages/prisma
 
 # Generate Prisma client
