@@ -27,7 +27,8 @@ export async function serverFetch<T = unknown>(
   });
 
   if (response.status === 401) {
-    redirect('/auth?tab=login');
+    const realm = headersList.get('x-realm') ?? 'admin';
+    redirect(realm === 'storefront' ? '/login' : '/auth?tab=login');
   }
 
   if (!response.ok) {

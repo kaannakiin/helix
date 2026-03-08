@@ -43,6 +43,7 @@ import {
   InstagramAuthGuard,
   JwtRefreshGuard,
   LocalAuthGuard,
+  PortalHostnameGuard,
 } from './guards';
 import type {
   OAuthProfile,
@@ -54,6 +55,7 @@ import { SessionService } from './session.service';
 
 @ApiTags('Auth')
 @ApiCookieAuth(ACCESS_TOKEN_COOKIE_NAME)
+@UseGuards(PortalHostnameGuard)
 @Controller('auth')
 export class AuthController {
   constructor(

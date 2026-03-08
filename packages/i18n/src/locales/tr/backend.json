@@ -55,6 +55,7 @@
     "tls_secret_invalid": "TLS ask token geçersiz.",
     "tls_host_not_authorized": "Bu host TLS için yetkili değil.",
     "host_resolution_not_found": "Bu host aktif bir storefront ile eşleşmiyor.",
+    "admin_auth_portal_only": "Admin kimlik doğrulaması yalnızca portal alan adında kullanılabilir.",
     "taxonomy_not_found": "Taksonomi bulunamadı.",
     "country_not_found": "Ülke bulunamadı.",
     "state_or_country_required": "İl veya ülke gereklidir.",

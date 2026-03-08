@@ -63,7 +63,11 @@ apiClient.interceptors.response.use(
       if (typeof window !== 'undefined') {
         const { useAuthStore } = await import('@/core/stores/auth.store');
         useAuthStore.getState().clearUser();
-        window.location.href = '/auth?tab=login';
+        const { getClientRealm } = await import(
+          '@/core/lib/get-client-realm'
+        );
+        window.location.href =
+          getClientRealm() === 'storefront' ? '/login' : '/auth?tab=login';
       }
 
       return Promise.reject(refreshError);

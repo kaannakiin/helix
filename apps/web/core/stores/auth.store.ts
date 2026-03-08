@@ -44,7 +44,11 @@ export const useAuthStore = create<AuthState>()(
           state.user = null;
           state.isAuthenticated = false;
         });
-        window.location.href = '/auth?tab=login';
+        const { getClientRealm } = await import(
+          '@/core/lib/get-client-realm'
+        );
+        window.location.href =
+          getClientRealm() === 'storefront' ? '/login' : '/auth?tab=login';
       }
     },
   }))

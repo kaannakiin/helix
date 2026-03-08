@@ -421,6 +421,10 @@ async function handleStorefrontRequest(
     return new NextResponse('Not Found', { status: 404 });
   }
 
+  if (isAuthRoute(pathname) || pathname === '/forgot-password') {
+    return NextResponse.redirect(new URL('/login', request.url));
+  }
+
   if (pathname.startsWith('/api/storefront/')) {
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set('x-store-id', realm.storeId);

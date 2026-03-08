@@ -55,6 +55,7 @@
     "tls_secret_invalid": "TLS ask token is invalid.",
     "tls_host_not_authorized": "Hostname is not authorized for TLS.",
     "host_resolution_not_found": "Hostname is not mapped to an active storefront.",
+    "admin_auth_portal_only": "Admin authentication is only available on the portal domain.",
     "taxonomy_not_found": "Taxonomy not found.",
     "country_not_found": "Country not found.",
     "state_or_country_required": "State or country is required.",

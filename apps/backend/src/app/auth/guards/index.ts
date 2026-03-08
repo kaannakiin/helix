@@ -5,3 +5,4 @@ export { GoogleAuthGuard } from './google-auth.guard';
 export { FacebookAuthGuard } from './facebook-auth.guard';
 export { InstagramAuthGuard } from './instagram-auth.guard';
 export { RolesGuard } from './roles.guard';
+export { PortalHostnameGuard } from './portal-hostname.guard';

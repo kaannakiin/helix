@@ -78,12 +78,14 @@ export default async function RootLayout({
   const user = getUserFromHeaders(headersList);
   const customer = getCustomerFromHeaders(headersList);
   const store = getStoreFromHeaders(headersList);
+  const realm = headersList.get('x-realm') ?? 'admin';
   const locale = await getLocale();
 
   return (
     <html {...mantineHtmlProps} lang={locale}>
       <head>
         <ColorSchemeScript />
+        <meta name="x-realm" content={realm} />
       </head>
       <body className="min-h-screen min-w-full">
         <QueryProvider>
