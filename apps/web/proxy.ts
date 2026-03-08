@@ -523,6 +523,21 @@ export default async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // DEBUG: proxy çalışıyor mu kontrol endpoint'i
+  if (pathname === '/__helix-debug') {
+    const host = request.headers.get('host') ?? '';
+    const portalHostname = await getPortalHostname();
+    const realm = await resolveRealm(request);
+    return NextResponse.json({
+      proxyActive: true,
+      host,
+      portalHostname,
+      realm,
+      backendUrl: BACKEND_URL,
+      nodeEnv: process.env.NODE_ENV,
+    });
+  }
+
   if (process.env.NODE_ENV !== 'production') {
     const storeParam = request.nextUrl.searchParams.get(DEV_STORE_PARAM);
     if (storeParam === 'admin') {
