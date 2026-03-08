@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -40,5 +41,12 @@ export class StoreHostBindingsController {
   @ApiOperation({ summary: 'Verify routing for a store host binding' })
   async verifyRouting(@Param('bindingId') bindingId: string) {
     return this.storeHostBindingsService.verifyRouting(bindingId);
+  }
+
+  @Delete(':bindingId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a store host binding' })
+  async delete(@Param('bindingId') bindingId: string) {
+    await this.storeHostBindingsService.delete(bindingId);
   }
 }

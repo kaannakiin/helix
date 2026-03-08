@@ -238,6 +238,14 @@ export class StoreHostBindingsService {
     return toStoreHostBindingView(updated);
   }
 
+  async delete(bindingId: string): Promise<void> {
+    const binding = await this.getByIdOrThrow(bindingId);
+    const { hostname, storeId } = binding;
+    await this.prisma.storeHostBinding.delete({ where: { id: bindingId } });
+    await this.hostRoutingService.invalidateHostCache(hostname);
+    await this.storefrontStatusService.syncStore(storeId);
+  }
+
   async getByIdOrThrow(bindingId: string): Promise<StoreHostBindingRecord> {
     const binding = await this.prisma.storeHostBinding.findUnique({
       ...storeHostBindingInclude,

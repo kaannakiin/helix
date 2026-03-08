@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -51,5 +52,12 @@ export class DomainSpacesController {
   @ApiOperation({ summary: 'Verify wildcard routing for a domain space' })
   async verifyWildcardRouting(@Param('domainSpaceId') domainSpaceId: string) {
     return this.domainSpacesService.verifyWildcardRouting(domainSpaceId);
+  }
+
+  @Delete(':domainSpaceId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a domain space and its bindings' })
+  async delete(@Param('domainSpaceId') domainSpaceId: string) {
+    await this.domainSpacesService.delete(domainSpaceId);
   }
 }

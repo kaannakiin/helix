@@ -322,6 +322,19 @@ export class DomainSpacesService {
     return toDomainSpaceView(updated);
   }
 
+  async delete(domainSpaceId: string): Promise<void> {
+    const domainSpace = await this.getByIdOrThrow(domainSpaceId);
+    const affectedHostnames = domainSpace.hostBindings.map((b) => b.hostname);
+    const affectedStoreIds = new Set(
+      domainSpace.hostBindings.map((b) => b.storeId)
+    );
+    await this.prisma.domainSpace.delete({ where: { id: domainSpaceId } });
+    for (const hostname of affectedHostnames) {
+      await this.hostRoutingService.invalidateHostCache(hostname);
+    }
+    await this.storefrontStatusService.syncMany(affectedStoreIds);
+  }
+
   async getByIdOrThrow(domainSpaceId: string): Promise<DomainSpaceRecord> {
     const domainSpace = await this.prisma.domainSpace.findUnique({
       ...domainSpaceInclude,

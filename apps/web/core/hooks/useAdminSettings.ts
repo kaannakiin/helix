@@ -233,6 +233,61 @@ export const useCreateStoreHostBinding = (options?: {
   });
 };
 
+export const useDeleteStoreHostBinding = (options?: {
+  storeId?: string;
+  onSuccess?: () => void;
+  onError?: (err: Error) => void;
+}) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (bindingId: string) => {
+      await apiClient.delete(`/admin/store-host-bindings/${bindingId}`);
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: DATA_ACCESS_KEYS.admin.storeHostBindings.list(
+          options?.storeId
+        ),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: DATA_ACCESS_KEYS.admin.domainSpaces.list,
+      });
+      void queryClient.invalidateQueries({
+        queryKey: DATA_ACCESS_KEYS.admin.stores.list,
+      });
+      options?.onSuccess?.();
+    },
+    onError: (err) => options?.onError?.(err as Error),
+  });
+};
+
+export const useDeleteDomainSpace = (options?: {
+  onSuccess?: () => void;
+  onError?: (err: Error) => void;
+}) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (domainSpaceId: string) => {
+      await apiClient.delete(`/admin/domain-spaces/${domainSpaceId}`);
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: DATA_ACCESS_KEYS.admin.domainSpaces.list,
+      });
+      void queryClient.invalidateQueries({
+        queryKey: DATA_ACCESS_KEYS.admin.storeHostBindings.list(),
+      });
+      void queryClient.invalidateQueries({
+        queryKey: DATA_ACCESS_KEYS.admin.stores.list,
+      });
+      options?.onSuccess?.();
+    },
+    onError: (err) => options?.onError?.(err as Error),
+  });
+};
+
 export const useVerifyStoreHostBindingRouting = (options?: {
   storeId?: string;
   onSuccess?: (result: StoreHostBindingRecord) => void;

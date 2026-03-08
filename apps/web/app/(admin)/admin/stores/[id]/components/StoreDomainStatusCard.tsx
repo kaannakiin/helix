@@ -1,11 +1,14 @@
 'use client';
 
 import {
+  useDeleteDomainSpace,
+  useDeleteStoreHostBinding,
   useDomainSpaces,
   usePlatformInstallation,
   useStoreHostBindings,
 } from '@/core/hooks/useAdminSettings';
 import {
+  ActionIcon,
   Alert,
   Badge,
   Button,
@@ -14,6 +17,8 @@ import {
   Stack,
   Text,
 } from '@mantine/core';
+import { modals } from '@mantine/modals';
+import { notifications } from '@mantine/notifications';
 import {
   AlertTriangle,
   Clock,
@@ -21,6 +26,7 @@ import {
   Globe,
   Plus,
   Settings,
+  Trash2,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -53,6 +59,33 @@ export function StoreDomainStatusCard({
   const { data: allDomainSpaces } = useDomainSpaces();
   const { data: installation } = usePlatformInstallation();
   const hasIngress = !!installation?.ingress;
+
+  const deleteBinding = useDeleteStoreHostBinding({
+    storeId,
+    onSuccess: () =>
+      notifications.show({
+        color: 'green',
+        message: t('deleteBindingSuccess'),
+      }),
+    onError: () =>
+      notifications.show({
+        color: 'red',
+        message: t('deleteBindingError'),
+      }),
+  });
+
+  const deleteDomainSpace = useDeleteDomainSpace({
+    onSuccess: () =>
+      notifications.show({
+        color: 'green',
+        message: t('deleteDomainSpaceSuccess'),
+      }),
+    onError: () =>
+      notifications.show({
+        color: 'red',
+        message: t('deleteDomainSpaceError'),
+      }),
+  });
 
   const pendingDomainSpaces = useMemo(() => {
     if (!allDomainSpaces) return [];
@@ -130,18 +163,43 @@ export function StoreDomainStatusCard({
                     {t('pendingSetupDescription')}
                   </Text>
                 </div>
-                <Button
-                  variant="light"
-                  color="yellow"
-                  size="xs"
-                  onClick={() =>
-                    router.push(
-                      `/admin/stores/${storeId}/domains/connect?domain=${ds.baseDomain}`,
-                    )
-                  }
-                >
-                  {t('resumeSetup')}
-                </Button>
+                <Group gap="xs">
+                  <Button
+                    variant="light"
+                    color="yellow"
+                    size="xs"
+                    onClick={() =>
+                      router.push(
+                        `/admin/stores/${storeId}/domains/connect?domain=${ds.baseDomain}`,
+                      )
+                    }
+                  >
+                    {t('resumeSetup')}
+                  </Button>
+                  <ActionIcon
+                    variant="light"
+                    color="red"
+                    size="sm"
+                    onClick={() =>
+                      modals.openConfirmModal({
+                        title: t('deleteDomainSpace'),
+                        children: (
+                          <Text size="sm">
+                            {t('deleteDomainSpaceConfirm')}
+                          </Text>
+                        ),
+                        labels: {
+                          confirm: t('deleteDomainSpace'),
+                          cancel: t('cancel'),
+                        },
+                        confirmProps: { color: 'red' },
+                        onConfirm: () => deleteDomainSpace.mutate(ds.id),
+                      })
+                    }
+                  >
+                    <Trash2 size={14} />
+                  </ActionIcon>
+                </Group>
               </Group>
             </Paper>
           ))}
@@ -220,9 +278,35 @@ export function StoreDomainStatusCard({
                       </Text>
                     </div>
 
-                    <Badge color={statusInfo.color} variant="light" size="sm">
-                      {t(`status.${statusInfo.key}`)}
-                    </Badge>
+                    <Group gap="xs">
+                      <Badge color={statusInfo.color} variant="light" size="sm">
+                        {t(`status.${statusInfo.key}`)}
+                      </Badge>
+                      <ActionIcon
+                        variant="light"
+                        color="red"
+                        size="sm"
+                        onClick={() =>
+                          modals.openConfirmModal({
+                            title: t('deleteBinding'),
+                            children: (
+                              <Text size="sm">
+                                {t('deleteBindingConfirm')}
+                              </Text>
+                            ),
+                            labels: {
+                              confirm: t('deleteBinding'),
+                              cancel: t('cancel'),
+                            },
+                            confirmProps: { color: 'red' },
+                            onConfirm: () =>
+                              deleteBinding.mutate(binding.id),
+                          })
+                        }
+                      >
+                        <Trash2 size={14} />
+                      </ActionIcon>
+                    </Group>
                   </Group>
                 </Paper>
               );
