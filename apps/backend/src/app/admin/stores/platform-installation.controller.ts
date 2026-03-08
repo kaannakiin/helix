@@ -23,11 +23,14 @@ export class PlatformInstallationController {
 
   @Public()
   @Get('config')
-  @ApiOperation({ summary: 'Get public platform configuration (locale)' })
+  @ApiOperation({ summary: 'Get public platform configuration (locale, hostname)' })
   async getPublicConfig() {
     const installation =
       await this.platformInstallationService.findCurrent();
-    return { defaultLocale: installation?.defaultLocale ?? 'TR' };
+    return {
+      defaultLocale: installation?.defaultLocale ?? 'TR',
+      portalHostname: installation?.portalHostname ?? null,
+    };
   }
 
   @Get()
