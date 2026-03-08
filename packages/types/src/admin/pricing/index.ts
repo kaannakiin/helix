@@ -1,8 +1,6 @@
 import type { Prisma } from '@org/prisma/browser';
 import type { FieldFilterConfig } from '../../data-query/index.js';
 
-// ─── Field Config (filterable fields for DataTable) ───
-
 export const ADMIN_PRICE_LISTS_FIELD_CONFIG = {
   name: { filterType: 'text' },
   type: { filterType: 'enum', values: ['BASE', 'SALE', 'CUSTOM'] },
@@ -17,8 +15,6 @@ export const ADMIN_PRICE_LISTS_FIELD_CONFIG = {
 
 export type AdminPriceListsFilterableField =
   keyof typeof ADMIN_PRICE_LISTS_FIELD_CONFIG;
-
-// ─── Sort Fields ───
 
 export const ADMIN_PRICE_LISTS_SORT_FIELDS = [
   'name',
@@ -35,8 +31,6 @@ export const ADMIN_PRICE_LISTS_SORT_FIELDS = [
 export type AdminPriceListsSortField =
   (typeof ADMIN_PRICE_LISTS_SORT_FIELDS)[number];
 
-// ─── Prisma Include for List Query ───
-
 export const AdminPriceListListPrismaQuery = {
   _count: { select: { prices: true } },
 } as const satisfies Prisma.PriceListInclude;
@@ -44,8 +38,6 @@ export const AdminPriceListListPrismaQuery = {
 export type AdminPriceListListPrismaType = Prisma.PriceListGetPayload<{
   include: typeof AdminPriceListListPrismaQuery;
 }>;
-
-// ─── Prisma Include for Detail Query ───
 
 export const AdminPriceListDetailPrismaQuery = {
   prices: true,

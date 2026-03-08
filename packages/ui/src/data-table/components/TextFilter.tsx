@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
 import { ActionIcon, Stack, TextInput } from '@mantine/core';
 import { useDebouncedCallback } from '@mantine/hooks';
 import { Search, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useDataTableTranslations } from '../context/DataTableTranslationContext';
 
 interface TextFilterModel {
@@ -21,7 +21,6 @@ export function TextFilter({ model, onModelChange }: TextFilterProps) {
 
   const [localValue, setLocalValue] = useState(model?.filter || '');
 
-  // Sync external model changes to local state (e.g., Clear Filters button)
   useEffect(() => {
     const modelValue = model?.filter || '';
     if (modelValue !== localValue) {

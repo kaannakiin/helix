@@ -12,18 +12,13 @@ interface EnumFilterProps {
   options: Array<{ value: string; label: string }>;
 }
 
-export function EnumFilter({
-  model,
-  onModelChange,
-  options,
-}: EnumFilterProps) {
+export function EnumFilter({ model, onModelChange, options }: EnumFilterProps) {
   const t = useDataTableTranslations();
 
   const value = model?.value ?? '';
 
   const handleChange = (newValue: string | string[]) => {
     const val = Array.isArray(newValue) ? newValue[0] : newValue;
-    // Re-clicking the active chip deselects it
     if (!val || val === value) {
       onModelChange(null);
     } else {

@@ -1,12 +1,12 @@
 'use client';
 
+import { Stack, Text } from '@mantine/core';
 import {
   Dropzone as MantineDropzone,
-  type DropzoneProps as MantineDropzoneProps,
-  type FileWithPath,
   type FileRejection,
+  type FileWithPath,
+  type DropzoneProps as MantineDropzoneProps,
 } from '@mantine/dropzone';
-import { Stack, Text } from '@mantine/core';
 import { Upload, X } from 'lucide-react';
 import { cn } from '../../utils/cn';
 import type { DropzoneTranslations } from '../types';
@@ -37,9 +37,6 @@ export function DropzoneArea({
     ...translations,
   };
 
-  // maxFiles is intentionally excluded from Mantine — Mantine only checks the
-  // count within a single drop event and has no awareness of already-added files.
-  // The limit is enforced in useDropzoneFiles instead.
   const { maxFiles: _maxFiles, ...mantineProps } = rest;
 
   return (
@@ -59,11 +56,7 @@ export function DropzoneArea({
         </MantineDropzone.Accept>
 
         <MantineDropzone.Reject>
-          <X
-            size={40}
-            strokeWidth={1.5}
-            className="text-red-500"
-          />
+          <X size={40} strokeWidth={1.5} className="text-red-500" />
         </MantineDropzone.Reject>
 
         <MantineDropzone.Idle>

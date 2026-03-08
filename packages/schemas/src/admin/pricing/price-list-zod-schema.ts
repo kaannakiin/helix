@@ -9,23 +9,31 @@ import { z } from 'zod';
 import { cuidSchema, findDuplicates } from '../../common/common-schemas.js';
 import { V } from '../../common/validation-keys.js';
 
-// ─── Price List Price (variant-level) ────────────────────────────────────────
-
 export const priceListPriceSchema = z.object({
   id: z.cuid2(),
   productVariantId: cuidSchema,
   originType: z.enum(PriceOriginType).default('FIXED'),
-  price: z.number().nonnegative({ error: V.PRICE_NONNEGATIVE }).nullable().default(null),
-  compareAtPrice: z.number().nonnegative({ error: V.PRICE_NONNEGATIVE }).nullable().default(null),
-  costPrice: z.number().nonnegative({ error: V.PRICE_NONNEGATIVE }).nullable().default(null),
+  price: z
+    .number()
+    .nonnegative({ error: V.PRICE_NONNEGATIVE })
+    .nullable()
+    .default(null),
+  compareAtPrice: z
+    .number()
+    .nonnegative({ error: V.PRICE_NONNEGATIVE })
+    .nullable()
+    .default(null),
+  costPrice: z
+    .number()
+    .nonnegative({ error: V.PRICE_NONNEGATIVE })
+    .nullable()
+    .default(null),
   adjustmentType: z.enum(AdjustmentType).nullable().default(null),
   adjustmentValue: z.number().nullable().default(null),
 });
 
 export type PriceListPriceInput = z.input<typeof priceListPriceSchema>;
 export type PriceListPriceOutput = z.output<typeof priceListPriceSchema>;
-
-// ─── Base Price List Schema ──────────────────────────────────────────────────
 
 export const BasePriceListSchema = z.object({
   uniqueId: z.cuid2(),
@@ -54,7 +62,6 @@ const checkPriceList = ({
   issues: z.core.$ZodRawIssue[];
   value: z.output<typeof BasePriceListSchema>;
 }) => {
-  // Duplicate variant price check
   const dupes = findDuplicates(value.prices, (p) => p.productVariantId);
   for (const dupe of dupes) {
     issues.push({
@@ -65,7 +72,6 @@ const checkPriceList = ({
     });
   }
 
-  // FIXED prices must have a price value
   for (let i = 0; i < value.prices.length; i++) {
     const p = value.prices[i];
     if (p.originType === 'FIXED' && p.price === null) {
@@ -78,7 +84,6 @@ const checkPriceList = ({
     }
   }
 
-  // validFrom must be before validTo
   if (value.validFrom && value.validTo && value.validFrom >= value.validTo) {
     issues.push({
       code: 'custom',

@@ -16,8 +16,6 @@ import { getLayoutedElements } from './layout';
 
 export const START_NODE_ID = '__start__';
 
-// ─── Tree → Flow ────────────────────────────────────────────────────────────
-
 function treeNodeToFlowNode(treeNode: DecisionTreeNode): Node {
   const base = { id: treeNode.id, position: { x: 0, y: 0 } };
 
@@ -72,7 +70,6 @@ function createBranchEdges(
   const edges: Edge[] = [];
 
   if (mode === 'simple') {
-    // Simple mode: yesBranch maps to 'next' handle
     if (node.yesBranch) {
       edges.push({
         id: `e-${node.id}-next-${node.yesBranch}`,
@@ -84,7 +81,6 @@ function createBranchEdges(
       });
     }
   } else {
-    // Advanced mode: yes/no handles
     if (node.yesBranch) {
       edges.push({
         id: `e-${node.id}-yes-${node.yesBranch}`,
@@ -124,7 +120,6 @@ export function treeToFlow(
   const nodes: Node[] = [startNode, ...tree.nodes.map(treeNodeToFlowNode)];
   const edges: Edge[] = [];
 
-  // Edge from start node to root
   edges.push({
     id: `e-${START_NODE_ID}-next-${tree.rootNodeId}`,
     source: START_NODE_ID,
@@ -143,22 +138,18 @@ export function treeToFlow(
   return getLayoutedElements(nodes, edges);
 }
 
-// ─── Flow → Tree ────────────────────────────────────────────────────────────
-
 export function flowToTree(nodes: Node[], edges: Edge[]): DecisionTree {
-  // Filter out start node
   const dataNodes = nodes.filter((n) => n.id !== START_NODE_ID);
 
   if (dataNodes.length === 0) {
     return { rootNodeId: '', nodes: [] };
   }
 
-  // Build edge maps: 'next' handle is treated as yesBranch
   const yesEdges = new Map<string, string>();
   const noEdges = new Map<string, string>();
 
   for (const edge of edges) {
-    if (edge.source === START_NODE_ID) continue; // skip start→root edge
+    if (edge.source === START_NODE_ID) continue;
     if (edge.sourceHandle === 'yes' || edge.sourceHandle === 'next') {
       yesEdges.set(edge.source, edge.target);
     } else if (edge.sourceHandle === 'no') {
@@ -166,16 +157,12 @@ export function flowToTree(nodes: Node[], edges: Edge[]): DecisionTree {
     }
   }
 
-  // Root node: the node that the start node connects to
   const startEdge = edges.find((e) => e.source === START_NODE_ID);
   let rootNodeId = startEdge?.target ?? '';
 
-  // Fallback: find node with no incoming edges from data nodes
   if (!rootNodeId) {
     const targetIds = new Set(
-      edges
-        .filter((e) => e.source !== START_NODE_ID)
-        .map((e) => e.target)
+      edges.filter((e) => e.source !== START_NODE_ID).map((e) => e.target)
     );
     const rootNode = dataNodes.find((n) => !targetIds.has(n.id));
     rootNodeId = rootNode?.id ?? dataNodes[0].id;

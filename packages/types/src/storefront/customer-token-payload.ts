@@ -14,8 +14,6 @@ export interface CustomerRefreshTokenPayload extends CustomerTokenPayload {
   family: string;
 }
 
-// ─── Storefront Context ───────────────────────────────────────────────────────
-
 export interface StoreContext {
   id: string;
   slug: string;

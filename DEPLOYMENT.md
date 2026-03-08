@@ -10,7 +10,9 @@
 
 ```
 Internet → Caddy (:80/:443)
-              ├── admin.domain.com → Frontend (:3000)
+              ├── admin.domain.com
+              │     ├── /api/*  → Backend (:3001)
+              │     └── /*     → Frontend (:3000)
               └── *.storefront.com
                     ├── /api/*                    → Backend (:3001)
                     ├── /.well-known/helix-routing → Backend
@@ -23,6 +25,8 @@ Backend (:3001)
 
 Portainer CE (:9443) — optional management dashboard
 ```
+
+All domains (admin + storefront) route `/api/*` directly to the backend via Caddy. The frontend never proxies API requests — cookies are set with `Domain=<request hostname>` so they work across any domain.
 
 All services run in a single `docker-compose.yml`. Portainer CE is optional — install it if you want a web dashboard for container management.
 
@@ -153,6 +157,28 @@ Navigate to `https://admin.yourdomain.com` and login with your seeded credential
 | INSTAGRAM_CLIENT_SECRET  | Instagram OAuth secret    |
 | INSTAGRAM_CALLBACK_URL   | Instagram OAuth callback  |
 
+## API Routing & Cookie Architecture
+
+Caddy routes `/api/*` requests directly to the backend on every domain — the frontend (Next.js) is never involved in API traffic in production.
+
+```
+Browser → POST admin.helix.com/api/auth/login
+       → Caddy → backend:3001
+       → Set-Cookie: Domain=admin.helix.com; HttpOnly; Secure; SameSite=Lax
+       → Same-origin ✓
+
+Browser → POST brandstore.com/api/storefront/auth/login
+       → Caddy → backend:3001
+       → Set-Cookie: Domain=brandstore.com; HttpOnly; Secure; SameSite=Lax
+       → Same-origin ✓
+```
+
+**Key points:**
+- Cookie `Domain` is set dynamically from `req.hostname` — each domain gets scoped cookies
+- `BACKEND_INTERNAL_URL` is only used for server-side operations (SSR middleware token refresh)
+- Frontend Axios clients use `NEXT_PUBLIC_API_URL` (defaults to `/api`, a relative path)
+- In development, Next.js rewrites `/api/*` to the backend (no Caddy needed)
+
 ## Adding Storefront Domains
 
 1. Admin panel > Settings > Domain Management
@@ -228,5 +254,5 @@ Or use Portainer's GitOps webhook for automatic redeployment on push.
 | Storefront returns 404       | Check StoreHostBinding status — must be ACTIVE                |
 | Seed fails                   | Ensure postgres is healthy: `docker compose ps`               |
 | Caddy certificate errors     | Check port 80/443 are open, DNS is propagated                 |
-| Frontend can't reach backend | BACKEND_INTERNAL_URL should be `http://backend:3001`          |
+| Frontend can't reach backend | BACKEND_INTERNAL_URL should be `http://backend:3001` (SSR only) |
 | OAuth redirect fails         | Check *_CALLBACK_URL matches your actual domain               |

@@ -38,7 +38,6 @@ export function LocaleFilter({ model, onModelChange }: LocaleFilterProps) {
 
   const handleChange = (newValue: string | string[]) => {
     const val = Array.isArray(newValue) ? newValue[0] : newValue;
-    // Re-clicking the active chip deselects it
     if (!val || val === value) {
       onModelChange(null);
     } else {

@@ -9,7 +9,12 @@ import type {
 export const RuleLogicalOperator = ['AND', 'OR'] as const;
 export type RuleLogicalOperator = (typeof RuleLogicalOperator)[number];
 
-export const RuleTargetEntity = ['USER', 'PRODUCT', 'ORDER', 'INVENTORY'] as const;
+export const RuleTargetEntity = [
+  'USER',
+  'PRODUCT',
+  'ORDER',
+  'INVENTORY',
+] as const;
 export type RuleTargetEntity = (typeof RuleTargetEntity)[number];
 
 export const CustomerGroupType = ['RULE_BASED', 'MANUAL'] as const;
@@ -59,16 +64,16 @@ export type RuleCondition =
   | BooleanRuleCondition
   | EnumRuleCondition;
 
-// ─── Condition Set (flat evaluation) ─────────────────────────────────────────
-
 export interface ConditionSet {
   operator: RuleLogicalOperator;
   conditions: RuleCondition[];
 }
 
-// ─── Decision Tree ────────────────────────────────────────────────────────────
-
-export const DecisionTreeNodeType = ['condition', 'conditionGroup', 'result'] as const;
+export const DecisionTreeNodeType = [
+  'condition',
+  'conditionGroup',
+  'result',
+] as const;
 export type DecisionTreeNodeType = (typeof DecisionTreeNodeType)[number];
 
 export const DecisionTreeAction = ['include', 'exclude'] as const;
