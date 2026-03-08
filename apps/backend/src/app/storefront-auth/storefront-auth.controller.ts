@@ -48,7 +48,7 @@ export class StorefrontAuthController {
     const storeId = await this.resolveStoreId(req);
     const metadata = this.extractMetadata(req);
 
-    return this.storefrontAuth.register(storeId, body, metadata, res);
+    return this.storefrontAuth.register(storeId, body, metadata, res, req.hostname);
   }
 
   @Public()
@@ -76,7 +76,7 @@ export class StorefrontAuthController {
       );
     }
 
-    return this.storefrontAuth.login(customer, metadata, res);
+    return this.storefrontAuth.login(customer, metadata, res, req.hostname);
   }
 
   @Public()
@@ -97,6 +97,7 @@ export class StorefrontAuthController {
         tokenId: context.tokenId,
       },
       res,
+      req.hostname,
     );
   }
 
@@ -109,7 +110,7 @@ export class StorefrontAuthController {
   ) {
     const user = req.user as CustomerTokenPayload;
 
-    return this.storefrontAuth.logout(user.sub, user.sessionId, res);
+    return this.storefrontAuth.logout(user.sub, user.sessionId, res, req.hostname);
   }
 
   @Get('me')

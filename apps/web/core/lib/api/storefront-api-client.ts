@@ -1,8 +1,9 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import { API_BASE_URL } from './api-base-url';
 import { ApiError } from './api-error';
 
 const storefrontApiClient = axios.create({
-  baseURL: '/api/storefront',
+  baseURL: `${API_BASE_URL}/storefront`,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -49,7 +50,7 @@ storefrontApiClient.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      await axios.post('/api/storefront/auth/refresh', null, {
+      await axios.post(`${API_BASE_URL}/storefront/auth/refresh`, null, {
         withCredentials: true,
       });
 

@@ -75,7 +75,7 @@ export class AuthController {
     @RealIp() ip: string
   ) {
     const metadata = this.buildMetadata(req, ip);
-    return this.authService.register(dto, metadata, res);
+    return this.authService.register(dto, metadata, res, req.hostname);
   }
 
   @Public()
@@ -92,7 +92,7 @@ export class AuthController {
     @RealIp() ip: string
   ) {
     const metadata = this.buildMetadata(req, ip);
-    return this.authService.login(req.user as ValidatedUser, metadata, res);
+    return this.authService.login(req.user as ValidatedUser, metadata, res, req.hostname);
   }
 
   @Public()
@@ -107,7 +107,7 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response
   ) {
     const context = req.user as RefreshTokenContext;
-    return this.authService.refreshTokens(context, res);
+    return this.authService.refreshTokens(context, res, req.hostname);
   }
 
   @Post('logout')
@@ -122,7 +122,7 @@ export class AuthController {
     @RealIp() ip: string
   ) {
     const metadata = this.buildMetadata(req, ip);
-    return this.authService.logout(userId, sessionId, metadata, res);
+    return this.authService.logout(userId, sessionId, metadata, res, req.hostname);
   }
 
   @Post('logout-all')
@@ -136,7 +136,7 @@ export class AuthController {
     @RealIp() ip: string
   ) {
     const metadata = this.buildMetadata(req, ip);
-    return this.authService.logoutAll(userId, metadata, res);
+    return this.authService.logoutAll(userId, metadata, res, req.hostname);
   }
 
   @Get('me')
@@ -177,7 +177,8 @@ export class AuthController {
       dto.currentPassword,
       dto.newPassword,
       metadata,
-      res
+      res,
+      req.hostname,
     );
   }
 
@@ -251,7 +252,7 @@ export class AuthController {
     const metadata = this.buildMetadata(req, ip);
     const frontendUrl = this.config.getOrThrow<string>('FRONTEND_URL');
     try {
-      await this.authService.handleOAuthLogin(oauthProfile, metadata, res);
+      await this.authService.handleOAuthLogin(oauthProfile, metadata, res, req.hostname);
       res.redirect(frontendUrl);
     } catch {
       res.redirect(`${frontendUrl}/auth/error`);
@@ -277,7 +278,7 @@ export class AuthController {
     const metadata = this.buildMetadata(req, ip);
     const frontendUrl = this.config.getOrThrow<string>('FRONTEND_URL');
     try {
-      await this.authService.handleOAuthLogin(oauthProfile, metadata, res);
+      await this.authService.handleOAuthLogin(oauthProfile, metadata, res, req.hostname);
       res.redirect(frontendUrl);
     } catch {
       res.redirect(`${frontendUrl}/auth/error`);
@@ -303,7 +304,7 @@ export class AuthController {
     const metadata = this.buildMetadata(req, ip);
     const frontendUrl = this.config.getOrThrow<string>('FRONTEND_URL');
     try {
-      await this.authService.handleOAuthLogin(oauthProfile, metadata, res);
+      await this.authService.handleOAuthLogin(oauthProfile, metadata, res, req.hostname);
       res.redirect(frontendUrl);
     } catch {
       res.redirect(`${frontendUrl}/auth/error`);

@@ -23,9 +23,7 @@ RUN npm ci
 FROM deps AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
-# Next.js rewrites() evaluates at build time — set the Docker-internal URL
-# so /api/* requests proxy to the backend service, not localhost
-ENV BACKEND_INTERNAL_URL=http://backend:3001
+ENV NEXT_PUBLIC_API_URL=/api
 
 COPY . .
 

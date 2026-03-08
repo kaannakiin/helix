@@ -1,8 +1,9 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import { API_BASE_URL } from './api-base-url';
 import { ApiError } from './api-error';
 
 const apiClient = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE_URL,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -49,7 +50,7 @@ apiClient.interceptors.response.use(
     isRefreshing = true;
 
     try {
-      await axios.post('/api/auth/refresh', null, {
+      await axios.post(`${API_BASE_URL}/auth/refresh`, null, {
         withCredentials: true,
       });
 

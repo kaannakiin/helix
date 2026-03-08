@@ -43,7 +43,8 @@ export class AuthService {
       password: string;
     },
     metadata: RequestMetadata,
-    res: Response
+    res: Response,
+    hostname?: string,
   ) {
     if (data.email) {
       const existing = await this.prisma.user.findUnique({
@@ -87,7 +88,8 @@ export class AuthService {
         role: user.role,
       },
       metadata,
-      res
+      res,
+      hostname,
     );
   }
 
@@ -131,13 +133,14 @@ export class AuthService {
   async login(
     validatedUser: ValidatedUser,
     metadata: RequestMetadata,
-    res: Response
+    res: Response,
+    hostname?: string,
   ) {
     const loginMethod: 'EMAIL' | 'PHONE' = validatedUser.email
       ? 'EMAIL'
       : 'PHONE';
 
-    const result = await this.issueTokens(validatedUser, metadata, res);
+    const result = await this.issueTokens(validatedUser, metadata, res, hostname);
 
     await this.prisma.$transaction([
       this.prisma.loginHistory.create({
@@ -178,7 +181,8 @@ export class AuthService {
       family: string;
       tokenId: string;
     },
-    res: Response
+    res: Response,
+    hostname?: string,
   ) {
     const payload: TokenPayload = {
       sub: context.user.sub,
@@ -204,8 +208,8 @@ export class AuthService {
 
     await this.sessionService.updateSessionActivity(context.sessionId);
 
-    setAccessTokenCookie(res, accessToken);
-    setRefreshTokenCookie(res, rawToken);
+    setAccessTokenCookie(res, accessToken, hostname);
+    setRefreshTokenCookie(res, rawToken, hostname);
 
     return { message: 'Tokens refreshed successfully' };
   }
@@ -214,7 +218,8 @@ export class AuthService {
     userId: string,
     sessionId: string | undefined,
     metadata: RequestMetadata,
-    res: Response
+    res: Response,
+    hostname?: string,
   ) {
     if (sessionId) {
       await Promise.all([
@@ -232,12 +237,17 @@ export class AuthService {
       },
     });
 
-    clearAuthCookies(res);
+    clearAuthCookies(res, hostname);
 
     return { message: 'Logged out successfully' };
   }
 
-  async logoutAll(userId: string, metadata: RequestMetadata, res: Response) {
+  async logoutAll(
+    userId: string,
+    metadata: RequestMetadata,
+    res: Response,
+    hostname?: string,
+  ) {
     await Promise.all([
       this.sessionService.revokeAllSessions(userId, 'USER_REVOKED'),
       this.tokenService.revokeAllUserTokens(userId),
@@ -253,7 +263,7 @@ export class AuthService {
       },
     });
 
-    clearAuthCookies(res);
+    clearAuthCookies(res, hostname);
 
     return { message: 'All sessions revoked' };
   }
@@ -263,7 +273,8 @@ export class AuthService {
     currentPassword: string,
     newPassword: string,
     metadata: RequestMetadata,
-    res: Response
+    res: Response,
+    hostname?: string,
   ) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -307,7 +318,7 @@ export class AuthService {
       this.tokenService.revokeAllUserTokens(userId),
     ]);
 
-    clearAuthCookies(res);
+    clearAuthCookies(res, hostname);
 
     return { message: 'Password changed. Please log in again.' };
   }
@@ -377,7 +388,8 @@ export class AuthService {
   async handleOAuthLogin(
     oauthProfile: OAuthProfile,
     metadata: RequestMetadata,
-    res: Response
+    res: Response,
+    hostname?: string,
   ) {
     const loginMethodMap: Record<OAuthProvider, LoginMethod> = {
       GOOGLE: 'OAUTH_GOOGLE',
@@ -486,7 +498,7 @@ export class AuthService {
       role: user.role,
     };
 
-    const result = await this.issueTokens(validatedUser, metadata, res);
+    const result = await this.issueTokens(validatedUser, metadata, res, hostname);
 
     const loginMethod = loginMethodMap[oauthProfile.provider];
 
@@ -526,7 +538,8 @@ export class AuthService {
   private async issueTokens(
     validatedUser: ValidatedUser,
     metadata: RequestMetadata,
-    res: Response
+    res: Response,
+    hostname?: string,
   ) {
     const device = await this.deviceService.findOrCreateDevice({
       userId: validatedUser.id,
@@ -558,8 +571,8 @@ export class AuthService {
       family,
     });
 
-    setAccessTokenCookie(res, accessToken);
-    setRefreshTokenCookie(res, rawRefreshToken);
+    setAccessTokenCookie(res, accessToken, hostname);
+    setRefreshTokenCookie(res, rawRefreshToken, hostname);
 
     return {
       message: 'Authentication successful',

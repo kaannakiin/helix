@@ -41,6 +41,7 @@ export class StorefrontAuthService {
     },
     metadata: CustomerRequestMetadata,
     res: Response,
+    hostname?: string,
   ) {
     if (data.email) {
       const existing = await this.prisma.customer.findUnique({
@@ -84,6 +85,7 @@ export class StorefrontAuthService {
       },
       metadata,
       res,
+      hostname,
     );
   }
 
@@ -130,8 +132,9 @@ export class StorefrontAuthService {
     validatedCustomer: ValidatedCustomer,
     metadata: CustomerRequestMetadata,
     res: Response,
+    hostname?: string,
   ) {
-    const result = await this.issueTokens(validatedCustomer, metadata, res);
+    const result = await this.issueTokens(validatedCustomer, metadata, res, hostname);
 
     await this.prisma.customer.update({
       where: { id: validatedCustomer.id },
@@ -152,6 +155,7 @@ export class StorefrontAuthService {
       tokenId: string;
     },
     res: Response,
+    hostname?: string,
   ) {
     const payload: CustomerTokenPayload = {
       sub: context.user.sub,
@@ -176,8 +180,8 @@ export class StorefrontAuthService {
 
     await this.sessionService.updateSessionActivity(context.sessionId);
 
-    setCustomerAccessTokenCookie(res, accessToken);
-    setCustomerRefreshTokenCookie(res, rawToken);
+    setCustomerAccessTokenCookie(res, accessToken, hostname);
+    setCustomerRefreshTokenCookie(res, rawToken, hostname);
 
     return { message: 'Tokens refreshed successfully' };
   }
@@ -186,6 +190,7 @@ export class StorefrontAuthService {
     customerId: string,
     sessionId: string | undefined,
     res: Response,
+    hostname?: string,
   ) {
     if (sessionId) {
       await Promise.all([
@@ -194,7 +199,7 @@ export class StorefrontAuthService {
       ]);
     }
 
-    clearCustomerAuthCookies(res);
+    clearCustomerAuthCookies(res, hostname);
 
     return { message: 'Logged out successfully' };
   }
@@ -210,6 +215,7 @@ export class StorefrontAuthService {
     validatedCustomer: ValidatedCustomer,
     metadata: CustomerRequestMetadata,
     res: Response,
+    hostname?: string,
   ) {
     const device = await this.deviceService.findOrCreateDevice({
       customerId: validatedCustomer.id,
@@ -244,8 +250,8 @@ export class StorefrontAuthService {
       family,
     });
 
-    setCustomerAccessTokenCookie(res, accessToken);
-    setCustomerRefreshTokenCookie(res, rawRefreshToken);
+    setCustomerAccessTokenCookie(res, accessToken, hostname);
+    setCustomerRefreshTokenCookie(res, rawRefreshToken, hostname);
 
     return {
       message: 'Authentication successful',

@@ -31,16 +31,21 @@ const nextConfig = {
     ];
     return config;
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${
-          process.env.BACKEND_INTERNAL_URL || 'http://localhost:3001'
-        }/api/:path*`,
-      },
-    ];
-  },
+  // Production: Caddy routes /api/* to backend. Dev: Next.js proxies /api/* to backend.
+  ...(process.env.NODE_ENV !== 'production'
+    ? {
+        async rewrites() {
+          return [
+            {
+              source: '/api/:path*',
+              destination: `${
+                process.env.BACKEND_INTERNAL_URL || 'http://localhost:3001'
+              }/api/:path*`,
+            },
+          ];
+        },
+      }
+    : {}),
 };
 
 const plugins = [withNx, withNextIntl];

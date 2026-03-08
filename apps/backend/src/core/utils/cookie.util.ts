@@ -12,36 +12,52 @@ import {
 } from '@org/constants/auth-constants';
 import type { CookieOptions, Response } from 'express';
 
-function baseCookieOptions(): CookieOptions {
+function baseCookieOptions(hostname?: string): CookieOptions {
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
     path: '/',
+    ...(hostname ? { domain: hostname } : {}),
   };
 }
 
 // ─── Admin (Portal) Cookies ──────────────────────────────────────────────────
 
-export function setAccessTokenCookie(res: Response, token: string): void {
+export function setAccessTokenCookie(
+  res: Response,
+  token: string,
+  hostname?: string,
+): void {
   res.cookie(ACCESS_TOKEN_COOKIE_NAME, token, {
-    ...baseCookieOptions(),
+    ...baseCookieOptions(hostname),
     path: ACCESS_COOKIE_PATH,
     maxAge: ACCESS_TOKEN_EXPIRY_MS,
   });
 }
 
-export function setRefreshTokenCookie(res: Response, token: string): void {
+export function setRefreshTokenCookie(
+  res: Response,
+  token: string,
+  hostname?: string,
+): void {
   res.cookie(REFRESH_TOKEN_COOKIE_NAME, token, {
-    ...baseCookieOptions(),
+    ...baseCookieOptions(hostname),
     path: REFRESH_COOKIE_PATH,
     maxAge: REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000,
   });
 }
 
-export function clearAuthCookies(res: Response): void {
-  res.clearCookie(ACCESS_TOKEN_COOKIE_NAME, { path: ACCESS_COOKIE_PATH });
-  res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, { path: REFRESH_COOKIE_PATH });
+export function clearAuthCookies(res: Response, hostname?: string): void {
+  const opts = hostname ? { domain: hostname } : {};
+  res.clearCookie(ACCESS_TOKEN_COOKIE_NAME, {
+    path: ACCESS_COOKIE_PATH,
+    ...opts,
+  });
+  res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, {
+    path: REFRESH_COOKIE_PATH,
+    ...opts,
+  });
 }
 
 // ─── Customer (Storefront) Cookies ───────────────────────────────────────────
@@ -49,9 +65,10 @@ export function clearAuthCookies(res: Response): void {
 export function setCustomerAccessTokenCookie(
   res: Response,
   token: string,
+  hostname?: string,
 ): void {
   res.cookie(CUSTOMER_ACCESS_COOKIE_NAME, token, {
-    ...baseCookieOptions(),
+    ...baseCookieOptions(hostname),
     maxAge: CUSTOMER_ACCESS_TOKEN_EXPIRY_MS,
   });
 }
@@ -59,14 +76,19 @@ export function setCustomerAccessTokenCookie(
 export function setCustomerRefreshTokenCookie(
   res: Response,
   token: string,
+  hostname?: string,
 ): void {
   res.cookie(CUSTOMER_REFRESH_COOKIE_NAME, token, {
-    ...baseCookieOptions(),
+    ...baseCookieOptions(hostname),
     maxAge: CUSTOMER_REFRESH_TOKEN_EXPIRY_DAYS * 24 * 60 * 60 * 1000,
   });
 }
 
-export function clearCustomerAuthCookies(res: Response): void {
-  res.clearCookie(CUSTOMER_ACCESS_COOKIE_NAME, { path: '/' });
-  res.clearCookie(CUSTOMER_REFRESH_COOKIE_NAME, { path: '/' });
+export function clearCustomerAuthCookies(
+  res: Response,
+  hostname?: string,
+): void {
+  const opts = hostname ? { domain: hostname } : {};
+  res.clearCookie(CUSTOMER_ACCESS_COOKIE_NAME, { path: '/', ...opts });
+  res.clearCookie(CUSTOMER_REFRESH_COOKIE_NAME, { path: '/', ...opts });
 }

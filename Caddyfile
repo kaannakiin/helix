@@ -27,7 +27,12 @@
 # Portal hostname sabit. Sadece Next.js frontend'e proxy yapar.
 # Storefront olarak kullanilmaz (backend reject eder).
 {$PORTAL_HOSTNAME:admin.helix.com} {
-	reverse_proxy {$FRONTEND_HOST:localhost:3000}
+	handle /api/* {
+		reverse_proxy {$BACKEND_HOST:localhost:3001}
+	}
+	handle {
+		reverse_proxy {$FRONTEND_HOST:localhost:3000}
+	}
 }
 
 # -- 2. Storefront catch-all --
