@@ -48,11 +48,9 @@ COPY --from=builder /app/apps/backend/dist ./dist
 # Copy node_modules from builder (includes native modules + workspace deps)
 COPY --from=builder /app/node_modules ./node_modules
 
-# Copy Prisma schema + migrations for `prisma migrate deploy`
-COPY --from=builder /app/packages/prisma/prisma ./packages/prisma/prisma
-COPY --from=builder /app/packages/prisma/prisma.config.ts ./packages/prisma/prisma.config.ts
-COPY --from=builder /app/packages/prisma/package.json ./packages/prisma/package.json
-COPY --from=prisma /app/packages/prisma/generated ./packages/prisma/generated
+# Copy workspace packages (needed for @org/* symlink resolution at runtime)
+COPY --from=builder /app/packages ./packages
+COPY --from=builder /app/package.json ./package.json
 
 # Copy entrypoint script
 COPY docker/backend-entrypoint.sh /app/entrypoint.sh
