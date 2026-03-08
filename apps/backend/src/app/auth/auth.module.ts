@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, type Provider } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
@@ -17,6 +17,14 @@ import { GoogleStrategy } from './strategies/google.strategy';
 import { FacebookStrategy } from './strategies/facebook.strategy';
 import { InstagramStrategy } from './strategies/instagram.strategy';
 import { TokenService } from './token.service';
+
+function optionalOAuthProviders(): Provider[] {
+  const providers: Provider[] = [];
+  if (process.env['GOOGLE_CLIENT_ID']) providers.push(GoogleStrategy);
+  if (process.env['FACEBOOK_CLIENT_ID']) providers.push(FacebookStrategy);
+  if (process.env['INSTAGRAM_CLIENT_ID']) providers.push(InstagramStrategy);
+  return providers;
+}
 
 @Module({
   imports: [
@@ -39,9 +47,7 @@ import { TokenService } from './token.service';
     LocalStrategy,
     JwtStrategy,
     JwtRefreshStrategy,
-    GoogleStrategy,
-    FacebookStrategy,
-    InstagramStrategy,
+    ...optionalOAuthProviders(),
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
