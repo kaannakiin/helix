@@ -1231,6 +1231,11 @@
         "empty": "No domains connected yet. Connect a domain to make your storefront live.",
         "connect": "Connect Domain",
         "pendingBanner": "Your storefront needs a domain to go live. Connect a domain to get started.",
+        "pendingSetups": "Pending Domain Setups",
+        "pendingSetupDescription": "Domain setup was started but not completed.",
+        "resumeSetup": "Resume Setup",
+        "ingressRequired": "Domain connection requires ingress configuration. Please set up your platform ingress settings first.",
+        "goToSettings": "Go to Platform Settings",
         "status": {
           "live": "Live",
           "settingUp": "Setting up...",
@@ -1263,7 +1268,9 @@
             "singleStore": "Just this address",
             "singleStoreDescription": "Each subdomain will be verified individually.",
             "multiStore": "Use this domain for multiple stores",
-            "multiStoreDescription": "New subdomains will be activated automatically after initial setup."
+            "multiStoreDescription": "New subdomains will be activated automatically after initial setup.",
+            "wwwSuggestion": "You're connecting {entered}. You may also want to connect {suggested} so visitors can reach your store from both addresses.",
+            "wwwSuggestionHint": "You can set this up after completing the current connection."
           },
           "step2": {
             "title": "Verify you own {domain}",
@@ -1287,7 +1294,10 @@
             "title": "Domain connected!",
             "description": "{hostname} is now connected to {storeName}.",
             "visitStore": "Visit Store",
-            "backToStore": "Back to Store"
+            "backToStore": "Back to Store",
+            "wwwSuggestionTitle": "Also connect the other address?",
+            "wwwSuggestion": "Visitors might also try {hostname}. Connect it to make sure they can reach your store.",
+            "connectComplement": "Connect {hostname}"
           },
           "dnsRecord": {
             "type": "Type",

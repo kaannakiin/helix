@@ -1229,6 +1229,11 @@
         "empty": "Henüz bir domain bağlanmadı. Vitrininizi yayına almak için bir domain bağlayın.",
         "connect": "Domain Bağla",
         "pendingBanner": "Vitrininizin yayına alınması için bir domain bağlanması gerekiyor. Başlamak için bir domain bağlayın.",
+        "pendingSetups": "Bekleyen Domain Kurulumları",
+        "pendingSetupDescription": "Domain kurulumu başlatıldı ancak tamamlanmadı.",
+        "resumeSetup": "Kuruluma Devam Et",
+        "ingressRequired": "Domain bağlantısı için ingress yapılandırması gereklidir. Lütfen önce platform ingress ayarlarınızı yapılandırın.",
+        "goToSettings": "Platform Ayarlarına Git",
         "status": {
           "live": "Yayında",
           "settingUp": "Kuruluyor...",
@@ -1261,7 +1266,9 @@
             "singleStore": "Sadece bu adres",
             "singleStoreDescription": "Her alt alan adı ayrı ayrı doğrulanacaktır.",
             "multiStore": "Bu domain ile birden fazla mağaza kullanacağım",
-            "multiStoreDescription": "İlk kurulumdan sonra yeni alt alan adları otomatik olarak etkinleştirilecektir."
+            "multiStoreDescription": "İlk kurulumdan sonra yeni alt alan adları otomatik olarak etkinleştirilecektir.",
+            "wwwSuggestion": "{entered} adresini bağlıyorsunuz. Ziyaretçilerinizin her iki adresten de ulaşabilmesi için {suggested} adresini de bağlamak isteyebilirsiniz.",
+            "wwwSuggestionHint": "Bunu mevcut bağlantıyı tamamladıktan sonra ayarlayabilirsiniz."
           },
           "step2": {
             "title": "{domain} domainin size ait olduğunu doğrulayın",
@@ -1285,7 +1292,10 @@
             "title": "Domain bağlandı!",
             "description": "{hostname} artık {storeName} mağazasına bağlı.",
             "visitStore": "Mağazayı Ziyaret Et",
-            "backToStore": "Mağazaya Dön"
+            "backToStore": "Mağazaya Dön",
+            "wwwSuggestionTitle": "Diğer adresi de bağlayın?",
+            "wwwSuggestion": "Ziyaretçiler {hostname} adresini de deneyebilir. Mağazanıza ulaşabilmeleri için bu adresi de bağlayın.",
+            "connectComplement": "{hostname} adresini bağla"
           },
           "dnsRecord": {
             "type": "Tip",

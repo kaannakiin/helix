@@ -1,3 +1,4 @@
+import type { DomainSpaceView } from '@org/schemas/admin/settings';
 import { create } from 'zustand';
 
 interface DomainSpaceRef {
@@ -11,10 +12,17 @@ interface DomainSpaceRef {
   };
 }
 
+interface DnsRecord {
+  type: string;
+  name: string;
+  value: string;
+}
+
 interface BindingRef {
   id: string;
   hostname: string;
   status: string;
+  dns?: DnsRecord[];
 }
 
 interface DomainWizardState {
@@ -54,3 +62,26 @@ export const useWizardState = create<DomainWizardState>((set) => ({
   setBinding: (binding) => set({ binding }),
   reset: () => set(initialState),
 }));
+
+/**
+ * Derives the correct wizard step from server state.
+ * Step 0: Enter Domain (no DomainSpace)
+ * Step 1: Verify Ownership (ownership not yet VERIFIED)
+ * Step 2: Setup Routing (ownership VERIFIED, routing/binding not complete)
+ * Step 3: Complete (ACTIVE binding exists for this hostname)
+ */
+export function deriveWizardStep(
+  domainSpace: DomainSpaceView | null,
+  hostname: string,
+): number {
+  if (!domainSpace) return 0;
+
+  if (domainSpace.ownership.status !== 'VERIFIED') return 1;
+
+  const hasActiveBinding = domainSpace.hostBindings.some(
+    (b) => b.hostname === hostname && b.status === 'ACTIVE',
+  );
+  if (hasActiveBinding) return 3;
+
+  return 2;
+}

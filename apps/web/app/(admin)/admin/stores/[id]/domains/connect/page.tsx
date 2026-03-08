@@ -4,6 +4,7 @@ import {
   useCreateDomainSpace,
   useCreateStoreHostBinding,
   useDomainSpaces,
+  usePlatformInstallation,
   useVerifyDomainSpaceApexRouting,
   useVerifyDomainSpaceOwnership,
   useVerifyDomainSpaceWildcardRouting,
@@ -35,36 +36,89 @@ import {
   Check,
   ExternalLink,
   Globe,
-  Loader2,
   Search,
   Shield,
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { DnsRecordCard } from './components/DnsRecordCard';
 import {
   extractBaseDomain,
+  getComplementaryHostname,
   isApexHostname,
   normalizeHostname,
 } from './hostname-utils';
-import { useWizardState } from './wizard-state';
+import { deriveWizardStep, useWizardState } from './wizard-state';
 
 export default function DomainConnectWizard() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const storeId = params.id as string;
+  const resumeDomain = searchParams.get('domain');
   const t = useTranslations('frontend.admin.stores.domains.wizard');
 
   const { data: store } = useAdminStore(storeId);
   const { data: domainSpaces } = useDomainSpaces();
+  const { data: installation } = usePlatformInstallation();
+  const hasIngress = !!installation?.ingress;
+  const tDomains = useTranslations('frontend.admin.stores.domains');
 
   const wizard = useWizardState();
   const [activeStep, setActiveStep] = useState(0);
-  const [hostnameInput, setHostnameInput] = useState('');
+  const [hostnameInput, setHostnameInput] = useState(resumeDomain ?? '');
   const [multiStoreChoice, setMultiStoreChoice] = useState('single');
   const [verifyError, setVerifyError] = useState<string | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
+  // Auto-resume from server state when domainSpaces load
+  useEffect(() => {
+    if (initialized || !domainSpaces) return;
+
+    if (resumeDomain) {
+      const hostname = normalizeHostname(resumeDomain);
+      const baseDomain = extractBaseDomain(hostname);
+      const isApex = isApexHostname(hostname, baseDomain);
+
+      const existing = domainSpaces.find(
+        (ds) => normalizeHostname(ds.baseDomain) === baseDomain,
+      );
+
+      if (existing) {
+        wizard.setHostname(hostname, baseDomain, isApex);
+        wizard.setDomainSpace({
+          id: existing.id,
+          baseDomain: existing.baseDomain,
+          status: existing.status,
+          ownership: { status: existing.ownership.status },
+          routing: {
+            apex: { status: existing.routing.apex.status },
+            wildcard: { status: existing.routing.wildcard.status },
+          },
+        });
+
+        const existingBinding = existing.hostBindings.find(
+          (b) => b.hostname === hostname && b.storeId === storeId,
+        );
+        if (existingBinding) {
+          wizard.setBinding({
+            id: existingBinding.id,
+            hostname: existingBinding.hostname,
+            status: existingBinding.status,
+          });
+        }
+
+        const step = deriveWizardStep(existing, hostname);
+        setActiveStep(step);
+        setHostnameInput(hostname);
+      }
+    }
+
+    setInitialized(true);
+  }, [domainSpaces, resumeDomain, initialized]);
+
+  // Clean up wizard state on unmount
   useEffect(() => {
     return () => wizard.reset();
   }, []);
@@ -103,9 +157,7 @@ export default function DomainConnectWizard() {
         setVerifyError(null);
         setActiveStep(2);
       } else {
-        setVerifyError(
-          result.ownership.lastError || t('step2.verifyFailed')
-        );
+        setVerifyError(result.ownership.lastError || t('step2.verifyFailed'));
       }
     },
     onError: (err) => setVerifyError(err.message),
@@ -166,6 +218,11 @@ export default function DomainConnectWizard() {
         id: result.id,
         hostname: result.hostname,
         status: result.status,
+        dns: result.routing.dns?.map((d) => ({
+          type: d.type,
+          name: d.name,
+          value: d.value,
+        })),
       });
       if (result.status === 'ACTIVE') {
         setActiveStep(3);
@@ -183,14 +240,17 @@ export default function DomainConnectWizard() {
         id: result.id,
         hostname: result.hostname,
         status: result.status,
+        dns: result.routing.dns?.map((d) => ({
+          type: d.type,
+          name: d.name,
+          value: d.value,
+        })),
       });
       if (result.status === 'ACTIVE') {
         setVerifyError(null);
         setActiveStep(3);
       } else {
-        setVerifyError(
-          result.routing.lastError || t('step3.verifyFailed')
-        );
+        setVerifyError(result.routing.lastError || t('step3.verifyFailed'));
       }
     },
     onError: (err) => setVerifyError(err.message),
@@ -208,22 +268,37 @@ export default function DomainConnectWizard() {
     } else {
       setActiveStep(3);
     }
-  }, [wizard.binding, wizard.domainSpace, wizard.hostname, wizard.bindingType, storeId, createBinding]);
+  }, [
+    wizard.binding,
+    wizard.domainSpace,
+    wizard.hostname,
+    wizard.bindingType,
+    storeId,
+    createBinding,
+  ]);
 
   const existingDomainSpace = useMemo(() => {
     if (!wizard.baseDomain || !domainSpaces) return null;
-    return domainSpaces.find(
-      (ds) =>
-        normalizeHostname(ds.baseDomain) ===
-        normalizeHostname(wizard.baseDomain)
-    ) ?? null;
+    return (
+      domainSpaces.find(
+        (ds) =>
+          normalizeHostname(ds.baseDomain) ===
+          normalizeHostname(wizard.baseDomain)
+      ) ?? null
+    );
   }, [wizard.baseDomain, domainSpaces]);
+
+  const complementaryHostname = useMemo(() => {
+    if (!hostnameInput.trim()) return null;
+    const hostname = normalizeHostname(hostnameInput);
+    const baseDomain = extractBaseDomain(hostname);
+    return getComplementaryHostname(hostname, baseDomain);
+  }, [hostnameInput]);
 
   const activeDomainSpace = wizard.domainSpace
     ? domainSpaces?.find((ds) => ds.id === wizard.domainSpace!.id) ?? null
     : existingDomainSpace;
 
-  // --- Step 1: Enter Domain ---
   const handleStep1Next = () => {
     const hostname = normalizeHostname(hostnameInput);
     if (!hostname) return;
@@ -268,14 +343,12 @@ export default function DomainConnectWizard() {
     }
   };
 
-  // --- Step 2: Verify Ownership ---
   const handleStep2Verify = () => {
     if (!activeDomainSpace) return;
     setVerifyError(null);
     verifyOwnership.mutate(activeDomainSpace.id);
   };
 
-  // --- Step 3: Setup Routing ---
   const handleStep3Verify = () => {
     if (!activeDomainSpace) return;
     setVerifyError(null);
@@ -285,7 +358,6 @@ export default function DomainConnectWizard() {
     } else if (wizard.isMultiStore) {
       verifyWildcardRouting.mutate(activeDomainSpace.id);
     } else {
-      // EXACT_HOSTS mode: create binding first, then verify it
       if (!wizard.binding) {
         createBinding.mutate({
           storeId,
@@ -343,6 +415,25 @@ export default function DomainConnectWizard() {
                 </Text>
               </div>
 
+              {!hasIngress && (
+                <Alert
+                  icon={<AlertTriangle size={16} />}
+                  color="orange"
+                  variant="light"
+                >
+                  <Text size="sm">{tDomains('ingressRequired')}</Text>
+                  <Button
+                    variant="light"
+                    color="orange"
+                    size="xs"
+                    mt="sm"
+                    onClick={() => router.push('/admin/settings/platform')}
+                  >
+                    {tDomains('goToSettings')}
+                  </Button>
+                </Alert>
+              )}
+
               <TextInput
                 label={t('step1.hostnameLabel')}
                 placeholder={t('step1.hostnamePlaceholder')}
@@ -350,6 +441,20 @@ export default function DomainConnectWizard() {
                 onChange={(e) => setHostnameInput(e.currentTarget.value)}
                 size="md"
               />
+
+              {complementaryHostname && (
+                <Alert icon={<Globe size={16} />} color="blue" variant="light">
+                  <Text size="sm">
+                    {t('step1.wwwSuggestion', {
+                      entered: normalizeHostname(hostnameInput),
+                      suggested: complementaryHostname,
+                    })}
+                  </Text>
+                  <Text size="xs" c="dimmed" mt={4}>
+                    {t('step1.wwwSuggestionHint')}
+                  </Text>
+                </Alert>
+              )}
 
               <Radio.Group
                 value={multiStoreChoice}
@@ -373,7 +478,7 @@ export default function DomainConnectWizard() {
                 <Button
                   onClick={handleStep1Next}
                   loading={createDomainSpace.isPending}
-                  disabled={!hostnameInput.trim()}
+                  disabled={!hostnameInput.trim() || !hasIngress}
                 >
                   {t('next')}
                 </Button>
@@ -425,10 +530,7 @@ export default function DomainConnectWizard() {
               )}
 
               <Group justify="space-between">
-                <Button
-                  variant="default"
-                  onClick={() => setActiveStep(0)}
-                >
+                <Button variant="default" onClick={() => setActiveStep(0)}>
                   {t('back')}
                 </Button>
                 <Button
@@ -463,7 +565,6 @@ export default function DomainConnectWizard() {
                   domainSpace={activeDomainSpace}
                   isApex={wizard.isApex}
                   isMultiStore={wizard.isMultiStore}
-                  hostname={wizard.hostname}
                   binding={wizard.binding}
                 />
               )}
@@ -482,16 +583,10 @@ export default function DomainConnectWizard() {
               )}
 
               <Group justify="space-between">
-                <Button
-                  variant="default"
-                  onClick={() => setActiveStep(1)}
-                >
+                <Button variant="default" onClick={() => setActiveStep(1)}>
                   {t('back')}
                 </Button>
-                <Button
-                  onClick={handleStep3Verify}
-                  loading={isVerifying}
-                >
+                <Button onClick={handleStep3Verify} loading={isVerifying}>
                   {t('step3.verify')}
                 </Button>
               </Group>
@@ -518,6 +613,50 @@ export default function DomainConnectWizard() {
                   })}
                 </Text>
               </div>
+
+              {(() => {
+                const comp = getComplementaryHostname(
+                  wizard.hostname,
+                  wizard.baseDomain,
+                );
+                if (!comp) return null;
+                const alreadyBound = activeDomainSpace?.hostBindings.some(
+                  (b) => b.hostname === comp && b.status === 'ACTIVE',
+                );
+                if (alreadyBound) return null;
+
+                return (
+                  <Alert
+                    icon={<Globe size={16} />}
+                    color="blue"
+                    variant="light"
+                    style={{ width: '100%' }}
+                  >
+                    <Text size="sm" fw={500}>
+                      {t('step4.wwwSuggestionTitle')}
+                    </Text>
+                    <Text size="sm" mt={4}>
+                      {t('step4.wwwSuggestion', { hostname: comp })}
+                    </Text>
+                    <Button
+                      variant="light"
+                      size="xs"
+                      mt="sm"
+                      onClick={() => {
+                        wizard.reset();
+                        setHostnameInput(comp);
+                        setActiveStep(0);
+                        setInitialized(false);
+                        router.replace(
+                          `/admin/stores/${storeId}/domains/connect?domain=${comp}`,
+                        );
+                      }}
+                    >
+                      {t('step4.connectComplement', { hostname: comp })}
+                    </Button>
+                  </Alert>
+                );
+              })()}
 
               <Group>
                 <Button
@@ -550,14 +689,17 @@ function RoutingDnsInstructions({
   domainSpace,
   isApex,
   isMultiStore,
-  hostname,
   binding,
 }: {
   domainSpace: DomainSpaceView;
   isApex: boolean;
   isMultiStore: boolean;
-  hostname: string;
-  binding: { id: string; hostname: string; status: string } | null;
+  binding: {
+    id: string;
+    hostname: string;
+    status: string;
+    dns?: { type: string; name: string; value: string }[];
+  } | null;
 }) {
   const t = useTranslations('frontend.admin.stores.domains.wizard');
 
@@ -591,37 +733,16 @@ function RoutingDnsInstructions({
     );
   }
 
-  // For exact host, show binding-level DNS if available
-  if (binding) {
-    // We'd need the full StoreHostBindingView here to get routing.dns
-    // For now show a generic CNAME instruction
+  // Exact host binding: use DNS records from backend
+  if (binding?.dns && binding.dns.length > 0) {
     return (
       <DnsRecordCard
         title={t('step3.exactHostInstructions')}
-        records={[
-          {
-            type: 'CNAME',
-            name: hostname.split('.')[0],
-            value: domainSpace.routing.apex.dns?.[0]?.value ?? hostname,
-          },
-        ]}
-      />
-    );
-  }
-
-  // Before binding is created, show expected DNS
-  const apexDns = domainSpace.routing.apex.dns ?? [];
-  if (apexDns.length > 0) {
-    return (
-      <DnsRecordCard
-        title={t('step3.exactHostInstructions')}
-        records={[
-          {
-            type: 'CNAME',
-            name: hostname.split('.')[0],
-            value: apexDns[0]?.value ?? hostname,
-          },
-        ]}
+        records={binding.dns.map((d) => ({
+          type: d.type,
+          name: d.name,
+          value: d.value,
+        }))}
       />
     );
   }
