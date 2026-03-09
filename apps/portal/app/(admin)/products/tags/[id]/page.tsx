@@ -4,9 +4,8 @@ import {
   useAdminTagGroup,
   useSaveTagGroup,
 } from '@/core/hooks/useAdminTagGroup';
-import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import { Button, Group, Stack, Text, TextInput, Textarea } from '@mantine/core';
-import { slugify } from '@org/utils';
+import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import {
   NEW_TAG_GROUP_DEFAULT_VALUES,
   TagGroupSchema,
@@ -15,6 +14,7 @@ import {
 } from '@org/schemas/admin/tags';
 import { FormCard } from '@org/ui/common/form-card';
 import LoadingOverlay from '@org/ui/common/loading-overlay';
+import { slugify } from '@org/utils/slugify';
 import { createId } from '@paralleldrive/cuid2';
 import { FileText, Save, SendToBack } from 'lucide-react';
 import { useTranslations } from 'next-intl';
