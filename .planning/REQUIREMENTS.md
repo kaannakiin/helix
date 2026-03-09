@@ -125,13 +125,48 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (Populated by roadmapper) | | |
+| INFR-01 | Phase 1 | Pending |
+| BCAT-01 | Phase 1 | Pending |
+| BCAT-02 | Phase 1 | Pending |
+| BCAT-03 | Phase 1 | Pending |
+| BCAT-04 | Phase 1 | Pending |
+| BCAT-05 | Phase 1 | Pending |
+| BCAT-06 | Phase 1 | Pending |
+| CUST-01 | Phase 1 | Pending |
+| CUST-02 | Phase 1 | Pending |
+| CUST-03 | Phase 1 | Pending |
+| INFR-02 | Phase 2 | Pending |
+| INFR-03 | Phase 2 | Pending |
+| CART-01 | Phase 2 | Pending |
+| CART-02 | Phase 2 | Pending |
+| CART-03 | Phase 2 | Pending |
+| CART-04 | Phase 2 | Pending |
+| AORD-01 | Phase 3 | Pending |
+| AORD-02 | Phase 3 | Pending |
+| AORD-03 | Phase 3 | Pending |
+| AORD-04 | Phase 3 | Pending |
+| ACFG-01 | Phase 3 | Pending |
+| ACFG-02 | Phase 3 | Pending |
+| ACFG-03 | Phase 3 | Pending |
+| ACFG-04 | Phase 3 | Pending |
+| ACFG-05 | Phase 3 | Pending |
+| BORG-01 | Phase 4 | Pending |
+| BORG-02 | Phase 4 | Pending |
+| BORG-03 | Phase 4 | Pending |
+| BPRC-01 | Phase 4 | Pending |
+| BPRC-02 | Phase 4 | Pending |
+| BPRC-03 | Phase 4 | Pending |
+| BWRK-01 | Phase 5 | Pending |
+| BWRK-02 | Phase 5 | Pending |
+| BWRK-03 | Phase 5 | Pending |
+| BWRK-04 | Phase 5 | Pending |
+| BWRK-05 | Phase 5 | Pending |
 
 **Coverage:**
-- v1 requirements: 30 total
-- Mapped to phases: 0
-- Unmapped: 30
+- v1 requirements: 36 total
+- Mapped to phases: 36
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-09*
-*Last updated: 2026-03-09 after initial definition*
+*Last updated: 2026-03-09 after roadmap creation*

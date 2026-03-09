@@ -14,6 +14,7 @@ COPY packages/schemas/package.json packages/schemas/
 COPY packages/types/package.json packages/types/
 COPY packages/ui/package.json packages/ui/
 COPY packages/utils/package.json packages/utils/
+COPY packages/hooks/package.json packages/hooks/
 COPY apps/backend/package.json apps/backend/
 COPY apps/portal/package.json apps/portal/
 
