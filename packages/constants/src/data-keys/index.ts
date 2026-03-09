@@ -1,7 +1,6 @@
 export const DATA_ACCESS_KEYS = {
   auth: {
     login: ['auth', 'login'],
-    register: ['auth', 'register'],
     logout: ['auth', 'logout'],
   },
   admin: {
@@ -46,6 +45,11 @@ export const DATA_ACCESS_KEYS = {
     priceLists: {
       list: ['admin', 'priceLists', 'list'],
       detail: (id: string) => ['admin', 'priceLists', 'detail', id] as const,
+    },
+    organizations: {
+      list: ['admin', 'organizations', 'list'],
+      detail: (id: string) =>
+        ['admin', 'organizations', 'detail', id] as const,
     },
     customerGroups: {
       list: ['admin', 'customerGroups', 'list'],

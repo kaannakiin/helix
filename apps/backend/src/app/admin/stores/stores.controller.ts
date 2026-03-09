@@ -10,14 +10,11 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UserRole } from '@org/prisma/client';
-import { Roles } from '../../../core/decorators/index.js';
 import { StoreCreateDTO, StoreSaveDTO } from './dto/index.js';
 import { StoresService } from './stores.service.js';
 
 @ApiTags('Admin - Stores')
 @Controller('admin/stores')
-@Roles(UserRole.ADMIN, UserRole.MODERATOR)
 export class StoresController {
   constructor(private readonly storesService: StoresService) {}
 

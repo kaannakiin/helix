@@ -7,9 +7,12 @@
 # and on-demand TLS on ports 80/443.
 #
 # Usage:
-#   docker compose up -d          # Start everything
-#   docker compose run --rm seed  # Run initial seed (once)
-#   docker compose logs -f        # Follow logs
+#   docker compose up -d                             # Start core (portal, router, backend)
+#   docker compose --profile b2c up -d               # Start with B2C storefront
+#   docker compose --profile full up -d              # Start everything (B2C + B2B)
+#   docker compose --profile b2c --profile b2b up -d # Start both storefronts
+#   docker compose run --rm seed                     # Run initial seed (once)
+#   docker compose logs -f                           # Follow logs
 #
 # ============================================================
 
@@ -105,12 +108,15 @@ services:
       INSTAGRAM_CLIENT_ID: ${INSTAGRAM_CLIENT_ID:-}
       INSTAGRAM_CLIENT_SECRET: ${INSTAGRAM_CLIENT_SECRET:-}
       INSTAGRAM_CALLBACK_URL: ${INSTAGRAM_CALLBACK_URL:-}
+      # Storefront Router (cache invalidation)
+      ROUTER_URL: http://storefront-router:3100
+      ROUTER_INTERNAL_SECRET: ${ROUTER_INTERNAL_SECRET}
 
-  # ── Frontend (Next.js) ─────────────────────────────────
-  frontend:
+  # ── Portal (Admin — Next.js) ───────────────────────────
+  portal:
     build:
       context: .
-      dockerfile: docker/frontend.Dockerfile
+      dockerfile: docker/portal.Dockerfile
     restart: unless-stopped
     depends_on:
       - backend
@@ -120,6 +126,35 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       CUSTOMER_JWT_SECRET: ${CUSTOMER_JWT_SECRET}
 
+  # ── Storefront Router (Fastify Reverse Proxy) ──────────
+  storefront-router:
+    build:
+      context: .
+      dockerfile: docker/storefront-router.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      NODE_ENV: production
+      PORT: "3100"
+      BACKEND_URL: http://backend:3001
+      ROUTER_INTERNAL_SECRET: ${ROUTER_INTERNAL_SECRET}
+      B2C_UPSTREAM: http://b2c-storefront:3200
+      B2B_UPSTREAM: http://b2b-storefront:3300
+
+  # ── B2C Storefront (Next.js) ──────────────────────────
+  b2c-storefront:
+    build:
+      context: .
+      dockerfile: docker/b2c-storefront.Dockerfile
+    restart: unless-stopped
+    profiles: ["b2c", "full"]
+    depends_on:
+      - backend
+    environment:
+      NODE_ENV: production
+      BACKEND_INTERNAL_URL: http://backend:3001
+
   # ── Caddy (Reverse Proxy + On-Demand TLS) ──────────────
   caddy:
     build:
@@ -128,12 +163,14 @@ services:
     restart: unless-stopped
     depends_on:
       - backend
-      - frontend
+      - portal
+      - storefront-router
     environment:
       PORTAL_HOSTNAME: ${PORTAL_HOSTNAME}
       TLS_ASK_SECRET: ${TLS_ASK_SECRET}
       BACKEND_HOST: backend:3001
-      FRONTEND_HOST: frontend:3000
+      ADMIN_HOST: portal:3000
+      ROUTER_HOST: storefront-router:3100
     ports:
       - "80:80"
       - "443:443"

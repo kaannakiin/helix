@@ -29,6 +29,18 @@
     },
     {
       "path": "./packages/utils"
+    },
+    {
+      "path": "./apps/storefront-router"
+    },
+    {
+      "path": "./apps/b2c-storefront"
+    },
+    {
+      "path": "./apps/b2b-storefront"
+    },
+    {
+      "path": "./packages/hooks"
     }
   ]
 }

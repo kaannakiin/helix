@@ -10,14 +10,11 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UserRole } from '@org/prisma/client';
-import { Roles } from '../../../core/decorators/index.js';
 import { StoreHostBindingDTO } from './dto/index.js';
 import { StoreHostBindingsService } from './store-host-bindings.service.js';
 
 @ApiTags('Admin - Store Host Bindings')
 @Controller('admin/store-host-bindings')
-@Roles(UserRole.ADMIN, UserRole.MODERATOR)
 export class StoreHostBindingsController {
   constructor(
     private readonly storeHostBindingsService: StoreHostBindingsService

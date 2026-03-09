@@ -60,6 +60,12 @@ export interface DataTableNoRowsTranslations {
   icon?: React.ReactNode;
 }
 
+export interface ColumnVisibilityTranslations {
+  title: string;
+  showAll: string;
+  hiddenCount: string;
+}
+
 export interface DataTableTranslations {
   filters: DataTableFilterTranslations;
   columns?: Record<string, string>;
@@ -69,6 +75,7 @@ export interface DataTableTranslations {
   filterDrawer?: DataTableFilterDrawerTranslations;
   expandableRow?: ExpandableRowTranslations;
   noRows?: DataTableNoRowsTranslations;
+  columnVisibility?: ColumnVisibilityTranslations;
 }
 
 export const DEFAULT_TRANSLATIONS: DataTableTranslations = {

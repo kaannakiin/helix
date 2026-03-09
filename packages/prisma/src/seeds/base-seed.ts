@@ -15,7 +15,6 @@ async function baseSeed() {
       email: 'akinkaan49@gmail.com',
       password: hashedPassword,
       emailVerified: true,
-      role: 'ADMIN',
       status: 'ACTIVE',
     },
   });

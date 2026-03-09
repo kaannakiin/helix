@@ -1,5 +1,3 @@
-import type { UserRole } from '@org/prisma/browser';
-
 export interface TokenPayload {
   sub: string;
   sessionId: string;
@@ -9,5 +7,4 @@ export interface TokenPayload {
   phone?: string | null;
   emailVerified?: boolean;
   phoneVerified?: boolean;
-  role: UserRole;
 }

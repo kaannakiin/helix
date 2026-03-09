@@ -9,14 +9,11 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UserRole } from '@org/prisma/client';
-import { Roles } from '../../../core/decorators/index.js';
 import { DomainSpaceDTO } from './dto/index.js';
 import { DomainSpacesService } from './domain-spaces.service.js';
 
 @ApiTags('Admin - Domain Spaces')
 @Controller('admin/domain-spaces')
-@Roles(UserRole.ADMIN, UserRole.MODERATOR)
 export class DomainSpacesController {
   constructor(private readonly domainSpacesService: DomainSpacesService) {}
 

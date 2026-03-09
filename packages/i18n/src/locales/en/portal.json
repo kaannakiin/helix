@@ -1,0 +1,1755 @@
+{
+  "app_name": "Helix",
+  "loading": "Loading...",
+  "nav": {
+    "toggle_navigation": "Toggle navigation",
+    "dashboard": "Dashboard",
+    "orders": "Orders",
+    "products": "Products",
+    "customers": "Customers",
+    "customer_groups": "Customer Groups",
+    "analytics": "Analytics",
+    "stores": "Stores",
+    "settings": "Settings",
+    "platform": "Platform Settings",
+    "marketing": "Marketing",
+    "inventory": "Inventory",
+    "warehouses": "Warehouses",
+    "discounts": "Discounts",
+    "reports": "Reports",
+    "brands": "Brands",
+    "categories": "Categories",
+    "tags": "Tags",
+    "organizations": "Organizations",
+    "variants": "Variants",
+    "definitions": "Definitions",
+    "locations": "Locations",
+    "price_lists": "Price Lists",
+    "evaluation_jobs": "Evaluation Jobs",
+    "groups": {
+      "main": "Main",
+      "commerce": "Commerce",
+      "marketing": "Marketing",
+      "system": "System"
+    },
+    "search_placeholder": "Search...",
+    "search_nothing_found": "No results found",
+    "quick_actions": "Quick Actions",
+    "navigation": "Navigation",
+    "add_products": "Add Product",
+    "add_brands": "Add Brand",
+    "add_categories": "Add Category",
+    "add_tags": "Add Tag",
+    "add_variants": "Add Variant Group",
+    "add_stores": "Add Store",
+    "add_customer_groups": "Add Customer Group",
+    "logout": "Logout",
+    "profile": "Profile"
+  },
+  "auth": {
+    "sign_in_title": "Sign in to your account",
+    "register_title": "Create your account",
+    "no_account": "Don't have an account?",
+    "register_link": "Create one",
+    "have_account": "Already have an account?",
+    "sign_in_link": "Sign in",
+    "or_continue_with": "Or continue with",
+    "email_label": "Email address",
+    "phone_label": "Phone number",
+    "password_label": "Password",
+    "confirm_password_label": "Confirm password",
+    "first_name_label": "First name",
+    "last_name_label": "Last name",
+    "remember_me": "Remember me",
+    "forgot_password": "Forgot password?",
+    "sign_in_button": "Sign in",
+    "create_account_button": "Create account",
+    "email_tab": "Email",
+    "phone_tab": "Phone"
+  },
+  "enums": {
+    "userRole": {
+      "ADMIN": "Admin",
+      "MODERATOR": "Moderator",
+      "USER": "User"
+    },
+    "accountType": {
+      "PERSONAL": "Personal",
+      "BUSINESS": "Business"
+    },
+    "accountStatus": {
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended",
+      "BANNED": "Banned",
+      "DEACTIVATED": "Deactivated"
+    },
+    "productType": {
+      "PHYSICAL": "Physical",
+      "DIGITAL": "Digital"
+    },
+    "productStatus": {
+      "DRAFT": "Draft",
+      "ACTIVE": "Active",
+      "ARCHIVED": "Archived"
+    },
+    "variantGroupType": {
+      "SIZE": "Size",
+      "COLOR": "Color"
+    },
+    "variantGroupDisplayMode": {
+      "BADGE": "Badge",
+      "SELECT": "Select",
+      "IMAGE_GRID": "Image Grid"
+    },
+    "trackingStrategy": {
+      "NONE": "None",
+      "BATCH": "Batch",
+      "SERIAL": "Serial",
+      "BATCH_AND_SERIAL": "Batch & Serial"
+    },
+    "countryType": {
+      "HAS_STATES": "Has States",
+      "HAS_CITIES_ONLY": "Cities Only",
+      "COUNTRY_ONLY": "Country Only"
+    },
+    "customerGroupType": {
+      "MANUAL": "Manual",
+      "RULE_BASED": "Rule Based"
+    },
+    "evaluationJobStatus": {
+      "PENDING": "Pending",
+      "RUNNING": "Running",
+      "COMPLETED": "Completed",
+      "FAILED": "Failed",
+      "CANCELLED": "Cancelled"
+    },
+    "evaluationTrigger": {
+      "SCHEDULED": "Scheduled",
+      "MANUAL": "Manual"
+    },
+    "ruleTargetEntity": {
+      "USER": "User",
+      "PRODUCT": "Product",
+      "ORDER": "Order",
+      "INVENTORY": "Inventory"
+    },
+    "storeStatus": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "SUSPENDED": "Suspended"
+    },
+    "businessModel": {
+      "B2C": "B2C",
+      "B2B": "B2B"
+    },
+    "storefrontStatus": {
+      "PENDING_HOST": "Pending Host",
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended"
+    },
+    "warehouseStatus": {
+      "ACTIVE": "Active",
+      "INACTIVE": "Inactive",
+      "MAINTENANCE": "Under Maintenance"
+    }
+  },
+  "relationInput": {
+    "search": "Search...",
+    "empty": "No results found",
+    "selected": "Selected"
+  },
+  "relationModal": {
+    "select": "Select",
+    "search": "Search...",
+    "empty": "No results found",
+    "selected": "{count} selected",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "clear": "Clear all",
+    "loadMore": "Load more"
+  },
+  "dropzone": {
+    "dropzoneLabel": "Drag files here or click to select",
+    "dropzoneSublabel": "Attach files",
+    "rejectLabel": "File not accepted",
+    "removeFile": "Remove file",
+    "previewFile": "Preview",
+    "dragHandle": "Drag to reorder",
+    "previewTitle": "Preview",
+    "noPreview": "No preview available",
+    "rejectionTitle": "Error",
+    "fileTooLarge": "File exceeds the __maxSize__ size limit",
+    "fileInvalidType": "File type not allowed",
+    "tooManyFiles": "Maximum __maxFiles__ files allowed"
+  },
+  "decisionTree": {
+    "startNode": "Start",
+    "drawerTitle": "Decision Tree",
+    "addCondition": "Add Condition",
+    "addConditionGroup": "Add Group",
+    "addResult": "Add Result",
+    "deleteSelected": "Delete selected",
+    "fitView": "Fit view",
+    "saveAndClose": "Save & Close",
+    "cancel": "Cancel",
+    "conditionNode": "Condition",
+    "conditionGroupNode": "Group",
+    "resultNode": "Result",
+    "yesBranch": "Yes",
+    "noBranch": "No",
+    "editCondition": "Edit Condition",
+    "editConditionGroup": "Edit Condition Group",
+    "editResult": "Edit Result",
+    "selectField": "Select field...",
+    "selectOperator": "Select operator...",
+    "enterValue": "Enter value...",
+    "enterValueTo": "End value...",
+    "selectAction": "Select action",
+    "addConditionToGroup": "Add condition to group",
+    "labelPlaceholder": "Label (optional)",
+    "save": "Save",
+    "validationFailed": "Validation Failed",
+    "validationErrorMessage": "Please fix the errors before saving.",
+    "unsavedChangesTitle": "Unsaved Changes",
+    "unsavedChangesConfirm": "You have unsaved changes. Are you sure you want to close?",
+    "discard": "Discard",
+    "conditionCount": "{count} condition(s)",
+    "moreConditions": "+{count} more",
+    "operators": {
+      "contains": "Contains",
+      "equals": "Equals",
+      "startsWith": "Starts with",
+      "endsWith": "Ends with",
+      "gt": "Greater than",
+      "lt": "Less than",
+      "gte": "Greater or equal",
+      "lte": "Less or equal",
+      "between": "Between",
+      "in": "One of"
+    },
+    "actions": {
+      "include": "Include",
+      "exclude": "Exclude"
+    }
+  },
+  "seoCard": {
+    "title": "SEO",
+    "fields": {
+      "slug": {
+        "label": "Slug",
+        "placeholder": "url-friendly-slug"
+      },
+      "metaTitle": {
+        "label": "Meta Title",
+        "placeholder": "Page title for search engines..."
+      },
+      "metaDescription": {
+        "label": "Meta Description",
+        "placeholder": "Brief description for search results..."
+      }
+    },
+    "preview": {
+      "title": "Search Preview",
+      "defaultSlug": "your-slug",
+      "defaultMetaTitle": "Page Title",
+      "defaultMetaDescription": "Page description will appear here..."
+    }
+  },
+  "richTextEditor": {
+    "link": {
+      "placeholder": "https://example.com",
+      "apply": "Apply",
+      "remove": "Remove link",
+      "cancel": "Cancel"
+    },
+    "toolbar": {
+      "bold": "Bold",
+      "italic": "Italic",
+      "underline": "Underline",
+      "strikethrough": "Strikethrough",
+      "code": "Inline Code",
+      "heading1": "Heading 1",
+      "heading2": "Heading 2",
+      "heading3": "Heading 3",
+      "bulletList": "Bullet List",
+      "orderedList": "Ordered List",
+      "blockquote": "Blockquote",
+      "horizontalRule": "Horizontal Rule",
+      "link": "Insert Link",
+      "clearFormatting": "Clear Formatting",
+      "undo": "Undo",
+      "redo": "Redo"
+    }
+  },
+  "admin": {
+    "products": {
+      "title": "Products",
+      "subtitle": "Manage all products",
+      "new": "New Product",
+      "table": {
+        "name": "Name",
+        "type": "Type",
+        "status": "Status",
+        "brandName": "Brand",
+        "variantCount": "Variants",
+        "categoryCount": "Categories",
+        "tagCount": "Tags",
+        "storeCount": "Stores",
+        "createdAt": "Created At",
+        "updatedAt": "Updated At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters",
+        "storePlaceholder": "Select stores..."
+      },
+      "form": {
+        "newProduct": "New Product",
+        "discard": "Discard",
+        "save": "Save",
+        "generalInfo": "General Information",
+        "name": {
+          "label": "Product Name",
+          "placeholder": "Enter product name..."
+        },
+        "shortDescription": {
+          "label": "Short Description",
+          "placeholder": "Brief summary of the product..."
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Full product description...",
+          "description": "Supports rich text formatting"
+        },
+        "media": {
+          "title": "Media",
+          "description": "Upload product images and videos"
+        },
+        "statusCard": {
+          "title": "Status",
+          "publishing": "Publishing",
+          "hidden": "Draft products are not visible to customers"
+        },
+        "status": {
+          "label": "Status"
+        },
+        "type": {
+          "label": "Product Type"
+        },
+        "organization": "Organization",
+        "brand": {
+          "label": "Brand",
+          "placeholder": "Select brand..."
+        },
+        "categories": {
+          "label": "Categories",
+          "placeholder": "Select categories..."
+        },
+        "tags": {
+          "label": "Tags",
+          "placeholder": "Select tags..."
+        },
+        "taxonomy": {
+          "label": "Google Taxonomy",
+          "placeholder": "Select taxonomy..."
+        },
+        "notFound": "Product Not Found",
+        "notFoundDescription": "The product you are looking for does not exist or has been deleted.",
+        "loadError": "Failed to Load Product",
+        "loadErrorDescription": "An error occurred while loading the product. Please try again.",
+        "backToProducts": "Back to Products",
+        "variants": {
+          "title": "Variants",
+          "description": "Define product variants like size and color",
+          "toggle": "Has Variants",
+          "disabled": "Enable variants to add variant groups",
+          "noGroups": "No variant groups added yet",
+          "addGroup": "Add Variant Group",
+          "lockedHasVariants": "This product has variants. Manage variant groups below.",
+          "lockedNoVariants": "This product has no variants.",
+          "unnamedGroup": "Unnamed Group",
+          "unnamedOption": "Unnamed Option",
+          "cancel": "Cancel",
+          "save": "Save",
+          "noOptions": "No options added yet",
+          "modal": {
+            "title": "Add Variant Group",
+            "existing": "From Library",
+            "new": "Create New",
+            "searchDescription": "Search existing variant groups to reuse them",
+            "searchPlaceholder": "Search groups...",
+            "searchGroups": "Type to search variant groups",
+            "noGroups": "No groups found",
+            "colorGroupExists": "Only one color group allowed",
+            "slugExistsOnProduct": "This group already exists on the product",
+            "slugExistsInDatabase": "A group with this name already exists",
+            "slugCheckFailed": "Could not verify group name. Please try again.",
+            "cancel": "Cancel",
+            "add": "Add",
+            "groupType": "Group Type",
+            "groupName": "Group Name",
+            "groupNamePlaceholder": "Enter group name..."
+          },
+          "groupDrawer": {
+            "name": "Group Name",
+            "namePlaceholder": "Enter group name...",
+            "type": "Group Type",
+            "sizeDescription": "Text-based options like S, M, L, XL",
+            "colorDescription": "Color swatches with hex codes or images",
+            "options": "Options",
+            "addOption": "Add Option",
+            "removedOptions": "Removed Options",
+            "restoreOption": "Restore"
+          },
+          "primary": "Primary",
+          "openGroup": "Open Group",
+          "confirmRemoveGroup": "Remove this variant group?",
+          "confirm": "Remove",
+          "removeGroup": "Remove Group"
+        },
+        "combinations": {
+          "title": "Variant Combinations",
+          "description": "Manage SKU, barcode, stock and images for each variant combination",
+          "count": "{count} combinations",
+          "variant": "Variant",
+          "sku": "SKU",
+          "skuPlaceholder": "Enter SKU...",
+          "barcode": "Barcode",
+          "barcodePlaceholder": "Enter barcode...",
+          "isActive": "Active",
+          "trackingStrategy": "Tracking Strategy",
+          "actions": "Actions",
+          "addImage": "Add Image",
+          "selectedCount": "{count} selected",
+          "generateSku": "Generate SKU",
+          "generateBarcode": "Generate Barcode",
+          "bulkEdit": "Bulk Edit",
+          "deselectAll": "Deselect All",
+          "editDrawer": {
+            "title": "Edit Variant",
+            "variantInfo": "Variant Information",
+            "generateSku": "Generate",
+            "generateBarcode": "Generate",
+            "images": "Images",
+            "imagesDescription": "Manage images for this variant",
+            "cancel": "Cancel",
+            "save": "Save"
+          },
+          "bulkDrawer": {
+            "title": "Edit {count} Variants",
+            "description": "Changes will apply to all selected variants",
+            "images": "Images",
+            "imagesDescription": "Replace images for all selected variants",
+            "cancel": "Cancel",
+            "apply": "Apply"
+          }
+        },
+        "salesChannels": {
+          "title": "Sales Channels",
+          "placeholder": "Select stores...",
+          "b2b": "B2B",
+          "b2c": "B2C"
+        }
+      },
+      "noRows": {
+        "label": "No products found"
+      },
+      "searchPlaceholder": "Search products..."
+    },
+    "brands": {
+      "title": "Brands",
+      "subtitle": "Manage all brands",
+      "table": {
+        "name": "Name",
+        "slug": "Slug",
+        "isActive": "Active",
+        "productsCount": "Products",
+        "websiteUrl": "Website",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
+      },
+      "form": {
+        "newBrand": "New Brand",
+        "discard": "Discard",
+        "save": "Save",
+        "backToBrands": "Back to Brands",
+        "loadError": "Failed to Load",
+        "loadErrorDescription": "An error occurred while loading the brand. Please try again.",
+        "notFound": "Brand Not Found",
+        "notFoundDescription": "The brand you are looking for does not exist.",
+        "generalInfo": "General Information",
+        "name": {
+          "label": "Brand Name",
+          "placeholder": "Enter brand name..."
+        },
+        "slug": {
+          "label": "Slug",
+          "placeholder": "brand-slug"
+        },
+        "website": {
+          "label": "Website URL",
+          "placeholder": "https://example.com"
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Brief description of the brand..."
+        },
+        "media": {
+          "title": "Media",
+          "description": "Upload brand logo or images (max 3)"
+        },
+        "statusCard": {
+          "title": "Status",
+          "activeLabel": "Active"
+        },
+        "sortOrder": {
+          "label": "Sort Order"
+        },
+        "saveSuccess": "Brand saved successfully.",
+        "saveError": "Failed to save brand."
+      },
+      "noRows": {
+        "label": "No brands found"
+      },
+      "newBrand": "New Brand",
+      "searchPlaceholder": "Search brands..."
+    },
+    "categories": {
+      "title": "Categories",
+      "subtitle": "Manage all categories",
+      "table": {
+        "name": "Name",
+        "slug": "Slug",
+        "parentName": "Parent",
+        "depth": "Depth",
+        "isActive": "Active",
+        "childrenCount": "Children",
+        "productsCount": "Products",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
+      },
+      "form": {
+        "newCategory": "New Category",
+        "discard": "Discard",
+        "save": "Save",
+        "generalInfo": "General Information",
+        "name": {
+          "label": "Category Name",
+          "placeholder": "Enter category name..."
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Brief description of the category..."
+        },
+        "media": {
+          "title": "Media",
+          "description": "Upload category image"
+        },
+        "statusCard": {
+          "title": "Status",
+          "activeLabel": "Active"
+        },
+        "organization": "Organization",
+        "parent": {
+          "label": "Parent Category",
+          "placeholder": "Select parent category..."
+        },
+        "loadError": "Failed to Load",
+        "loadErrorDescription": "An error occurred while loading the category. Please try again.",
+        "saveSuccess": "Category saved successfully.",
+        "saveError": "Failed to save category.",
+        "imageDeleteError": "Failed to delete image.",
+        "imageUploadError": "Failed to upload image.",
+        "salesChannels": {
+          "title": "Sales Channels",
+          "placeholder": "Select stores...",
+          "b2b": "B2B",
+          "b2c": "B2C"
+        }
+      },
+      "noRows": {
+        "label": "No categories found"
+      },
+      "newCategory": "New Category",
+      "searchPlaceholder": "Search categories..."
+    },
+    "tags": {
+      "title": "Tag Groups",
+      "subtitle": "Manage all tag groups",
+      "new": "New Tag Group",
+      "table": {
+        "name": "Name",
+        "slug": "Slug",
+        "isActive": "Active",
+        "tagsCount": "Tags",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
+      },
+      "form": {
+        "newTagGroup": "New Tag Group",
+        "discard": "Discard",
+        "save": "Save",
+        "saveAsDraft": "Save as Draft",
+        "generalInfo": "General Information",
+        "name": {
+          "label": "Tag Group Name",
+          "placeholder": "Enter tag group name..."
+        },
+        "slug": {
+          "label": "Slug",
+          "placeholder": "tag-group-slug"
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Brief description of the tag group..."
+        },
+        "statusCard": {
+          "title": "Status",
+          "activeLabel": "Active"
+        },
+        "tags": {
+          "title": "Tags",
+          "description": "Manage tags in this group",
+          "addTag": "Add Tag",
+          "addRootTag": "Add Root Tag",
+          "addChildTag": "Add Child Tag",
+          "noTags": "No tags added yet",
+          "childrenCount": "children",
+          "unnamedTag": "(unnamed)",
+          "activeLabel": "Active",
+          "tagName": {
+            "label": "Tag Name",
+            "placeholder": "Enter tag name..."
+          },
+          "tagDescription": {
+            "label": "Description",
+            "placeholder": "Brief description..."
+          },
+          "removeTag": "Remove Tag",
+          "deleteTag": "Delete Tag",
+          "deleteConfirm": "Are you sure you want to delete this tag and all its children?",
+          "deleteConfirmTitle": "Delete Tag",
+          "slug": "Slug",
+          "sortOrder": "Sort Order",
+          "table": {
+            "name": "Name",
+            "slug": "Slug",
+            "active": "Active",
+            "sortOrder": "Sort Order",
+            "children": "Children",
+            "actions": "Actions"
+          },
+          "editDrawer": {
+            "editTitle": "Edit Tag",
+            "newTitle": "New Tag",
+            "cancel": "Cancel",
+            "save": "Save",
+            "errorTitle": "Error",
+            "errorMessage": "Failed to save tag. Please try again.",
+            "imagesAfterSave": "Images can be added after saving the tag group."
+          },
+          "bulkDelete": "Delete Selected",
+          "bulkDeleteConfirmTitle": "Delete Selected Tags",
+          "bulkDeleteConfirm": "Are you sure you want to delete the selected tags and all their children?",
+          "empty": "No child tags",
+          "savingChildren": "Loading tag data..."
+        },
+        "saveSuccess": "Tag group saved successfully.",
+        "tagSaveSuccess": "Tag saved successfully.",
+        "tagDeleteSuccess": "Tag deleted successfully.",
+        "tagBulkDeleteSuccess": "Tags deleted successfully.",
+        "tagSaveError": "Failed to save tag.",
+        "tagDeleteError": "Failed to delete tag."
+      },
+      "noRows": {
+        "label": "No tags found"
+      }
+    },
+    "variants": {
+      "title": "Variant Groups",
+      "subtitle": "Manage all variant groups",
+      "new": "New Variant Group",
+      "table": {
+        "name": "Name",
+        "optionsCount": "Options",
+        "productsCount": "Products",
+        "createdAt": "Created At",
+        "updatedAt": "Updated At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
+      },
+      "form": {
+        "newVariantGroup": "New Variant Group",
+        "discard": "Discard",
+        "save": "Save",
+        "backToVariants": "Back to Variant Groups",
+        "loadError": "Failed to Load",
+        "loadErrorDescription": "An error occurred while loading the variant group. Please try again.",
+        "notFound": "Variant Group Not Found",
+        "notFoundDescription": "The variant group you are looking for does not exist.",
+        "generalInfo": "General Information",
+        "name": {
+          "label": "Group Name",
+          "placeholder": "Enter group name..."
+        },
+        "type": {
+          "label": "Group Type",
+          "size": "Size",
+          "color": "Color",
+          "sizeDescription": "Text-based options like S, M, L, XL",
+          "colorDescription": "Color swatches with hex codes or images"
+        },
+        "statusCard": {
+          "title": "Settings",
+          "sortOrder": {
+            "label": "Sort Order"
+          }
+        },
+        "options": {
+          "title": "Options",
+          "description": "Manage options in this variant group",
+          "addOption": "Add Option",
+          "noOptions": "No options added yet. Click 'Add Option' to create one.",
+          "unnamedOption": "Unnamed Option",
+          "optionName": {
+            "label": "Option Name",
+            "placeholder": "Enter option name..."
+          },
+          "colorCode": {
+            "label": "Color Code",
+            "placeholder": "#000000"
+          },
+          "optionImage": {
+            "title": "Option Image",
+            "description": "Upload an image for this option (max 1)"
+          },
+          "deleteConfirm": "Are you sure you want to remove this option?"
+        },
+        "saveSuccess": "Variant group saved successfully."
+      },
+      "noRows": {
+        "label": "No variant groups found"
+      },
+      "searchPlaceholder": "Search variant groups..."
+    },
+    "locations": {
+      "title": "Locations",
+      "subtitle": "Country, state, city, district, and town management",
+      "table": {
+        "flag": "Flag",
+        "country": "Country",
+        "code": "Code",
+        "iso3": "ISO3",
+        "phone": "Phone",
+        "type": "Type",
+        "state": "State",
+        "stateCode": "Code",
+        "city": "City",
+        "district": "District",
+        "town": "Town"
+      },
+      "empty": {
+        "states": "No states",
+        "cities": "No cities",
+        "districts": "No districts",
+        "towns": "No towns"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      }
+    },
+    "customers": {
+      "title": "Customers",
+      "subtitle": "Manage all user accounts",
+      "searchPlaceholder": "Search by name, surname or email...",
+      "notFound": "Customer not found.",
+      "table": {
+        "name": "Name",
+        "surname": "Surname",
+        "email": "Email",
+        "phone": "Phone",
+        "accountType": "Account Type",
+        "status": "Status",
+        "emailVerified": "Email Verified",
+        "phoneVerified": "Phone Verified",
+        "twoFactorEnabled": "2FA",
+        "lastLoginAt": "Last Login",
+        "loginCount": "Login Count",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
+      },
+      "detail": {
+        "title": "Customer Details",
+        "backToList": "Back to Customers",
+        "sections": {
+          "overview": "Overview",
+          "contactInfo": "Contact Information",
+          "security": "Security",
+          "activity": "Activity"
+        },
+        "sessions": "Sessions",
+        "devices": "Devices",
+        "memberSince": "Member since",
+        "lastSeen": "Last seen",
+        "neverLoggedIn": "Never logged in",
+        "yes": "Yes",
+        "no": "No",
+        "notProvided": "Not provided"
+      },
+      "noRows": {
+        "label": "No customers found"
+      }
+    },
+    "organizations": {
+      "title": "Organizations",
+      "subtitle": "Manage B2B organizations and their members",
+      "notFound": "Organization not found.",
+      "table": {
+        "name": "Name",
+        "taxId": "Tax ID",
+        "email": "Email",
+        "phone": "Phone",
+        "address": "Address",
+        "isActive": "Active",
+        "membersCount": "Members",
+        "childOrgsCount": "Sub-Orgs",
+        "parentOrg": "Parent Org",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
+      },
+      "detail": {
+        "title": "Organization Details",
+        "backToList": "Back to Organizations"
+      },
+      "noRows": {
+        "label": "No organizations found"
+      },
+      "searchPlaceholder": "Search organizations..."
+    },
+    "priceLists": {
+      "title": "Price Lists",
+      "subtitle": "Manage pricing lists and rules",
+      "table": {
+        "name": "Name",
+        "type": "Type",
+        "status": "Status",
+        "currencyCode": "Currency",
+        "isActive": "Active",
+        "priority": "Priority",
+        "validFrom": "Valid From",
+        "validTo": "Valid To",
+        "pricesCount": "Prices",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
+      },
+      "enums": {
+        "type": {
+          "BASE": "Base",
+          "SALE": "Sale",
+          "CUSTOM": "Custom"
+        },
+        "status": {
+          "ACTIVE": "Active",
+          "DRAFT": "Draft",
+          "ARCHIVED": "Archived"
+        }
+      },
+      "noRows": {
+        "label": "No price lists found"
+      }
+    },
+    "customerGroups": {
+      "title": "Customer Groups",
+      "subtitle": "Manage customer segments and groups",
+      "new": "New Group",
+      "table": {
+        "name": "Name",
+        "type": "Type",
+        "isActive": "Active",
+        "membersCount": "Members",
+        "lastEvaluatedAt": "Last Run",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
+      },
+      "form": {
+        "newCustomerGroup": "New Customer Group",
+        "discard": "Discard",
+        "save": "Save",
+        "backToList": "Back to Customer Groups",
+        "loadError": "Failed to Load",
+        "loadErrorDescription": "An error occurred while loading the customer group.",
+        "notFound": "Customer Group Not Found",
+        "notFoundDescription": "The customer group you are looking for does not exist.",
+        "generalInfo": "General Information",
+        "name": {
+          "label": "Group Name",
+          "placeholder": "Enter group name..."
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Brief description..."
+        },
+        "color": {
+          "label": "Color"
+        },
+        "type": {
+          "label": "Group Type"
+        },
+        "statusCard": {
+          "title": "Settings",
+          "activeLabel": "Active"
+        },
+        "cronExpression": {
+          "label": "Evaluation Schedule",
+          "description": "Cron expression for automatic re-evaluation"
+        },
+        "ruleTree": {
+          "title": "Rule Conditions",
+          "description": "Define conditions to auto-assign customers"
+        },
+        "members": {
+          "title": "Members",
+          "description": "Manually assign customers to this group",
+          "label": "Members",
+          "placeholder": "Add members...",
+          "modalTitle": "Select Members",
+          "addButton": "Add Members",
+          "removeTooltip": "Remove from group",
+          "searchPlaceholder": "Search by name...",
+          "nameHeader": "Name",
+          "emailHeader": "Email",
+          "confirm": "Confirm",
+          "cancel": "Cancel"
+        },
+        "confirmSwitch": {
+          "title": "Switch Group Type?",
+          "toRuleBased": "Switching to Rule Based will remove all {count} selected members. This cannot be undone.",
+          "toManual": "Switching to Manual will clear the decision tree configuration. This cannot be undone.",
+          "confirm": "Switch & Clear",
+          "cancel": "Cancel"
+        },
+        "tree": {
+          "addCondition": "Add Condition",
+          "addConditionGroup": "Add Group",
+          "addResult": "Add Result",
+          "deleteSelected": "Delete selected",
+          "fitView": "Fit view",
+          "saveAndClose": "Save & Close",
+          "cancel": "Cancel",
+          "conditionNode": "Condition",
+          "conditionGroupNode": "Group",
+          "resultNode": "Result",
+          "yesBranch": "Yes",
+          "noBranch": "No",
+          "editCondition": "Edit Condition",
+          "editConditionGroup": "Edit Condition Group",
+          "editResult": "Edit Result",
+          "selectField": "Select field...",
+          "selectOperator": "Select operator...",
+          "enterValue": "Enter value...",
+          "enterValueTo": "End value...",
+          "selectAction": "Select action",
+          "addConditionToGroup": "Add condition to group",
+          "labelPlaceholder": "Label (optional)",
+          "save": "Save",
+          "validationFailed": "Validation Failed",
+          "validationErrorMessage": "Please fix the decision tree errors before saving.",
+          "editTree": "Edit Decision Tree",
+          "actionInclude": "Include",
+          "actionExclude": "Exclude"
+        },
+        "fields": {
+          "name": "Name",
+          "surname": "Surname",
+          "email": "Email",
+          "phone": "Phone",
+          "accountType": "Account Type",
+          "status": "Status",
+          "emailVerified": "Email Verified",
+          "phoneVerified": "Phone Verified",
+          "twoFactorEnabled": "2FA Enabled",
+          "createdAt": "Created At",
+          "lastLoginAt": "Last Login",
+          "loginCount": "Login Count"
+        },
+        "operators": {
+          "contains": "Contains",
+          "equals": "Equals",
+          "startsWith": "Starts with",
+          "endsWith": "Ends with",
+          "gt": "Greater than",
+          "lt": "Less than",
+          "gte": "Greater or equal",
+          "lte": "Less or equal",
+          "between": "Between",
+          "in": "One of"
+        }
+      },
+      "noRows": {
+        "label": "No customer groups found"
+      }
+    },
+    "evaluationJobs": {
+      "title": "Evaluation Jobs",
+      "subtitle": "Monitor and manage evaluation processes",
+      "table": {
+        "status": "Status",
+        "entityType": "Entity Type",
+        "targetEntity": "Target",
+        "triggerType": "Trigger",
+        "triggeredBy": "Triggered By",
+        "recordsEvaluated": "Evaluated",
+        "recordsMatched": "Matched",
+        "durationMs": "Duration",
+        "completedAt": "Completed At",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "cancel": "Cancel Job",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
+      },
+      "detail": {
+        "title": "Evaluation Job Details",
+        "backToList": "Back to Evaluation Jobs",
+        "loadError": "Failed to Load",
+        "loadErrorDescription": "An error occurred while loading the evaluation job.",
+        "notFound": "Evaluation Job Not Found",
+        "notFoundDescription": "The evaluation job you are looking for does not exist.",
+        "jobInfo": "Job Information",
+        "status": "Status",
+        "entityType": "Entity Type",
+        "entityId": "Entity ID",
+        "targetEntity": "Target Entity",
+        "triggerType": "Trigger Type",
+        "triggeredBy": "Triggered By",
+        "attemptCount": "Attempts",
+        "timing": "Timing",
+        "createdAt": "Created At",
+        "startedAt": "Started At",
+        "completedAt": "Completed At",
+        "duration": "Duration",
+        "results": "Results",
+        "recordsEvaluated": "Records Evaluated",
+        "recordsMatched": "Records Matched",
+        "matchRate": "Match Rate",
+        "errorLog": "Error Log",
+        "executionLog": "Execution Log",
+        "ruleTreeSnapshot": "Rule Tree Snapshot",
+        "actions": "Actions",
+        "rerun": "Re-run Evaluation",
+        "cancel": "Cancel Job",
+        "history": "Evaluation History",
+        "noHistory": "No previous evaluations",
+        "durationFormat": "{seconds}s",
+        "cancelSuccess": "Job cancelled successfully",
+        "cancelError": "Failed to cancel job",
+        "rerunSuccess": "Evaluation triggered successfully",
+        "rerunError": "Failed to trigger evaluation",
+        "currentDuration": "Current Duration",
+        "resultsPreview": "Results Preview",
+        "abortJob": "Abort Job",
+        "streaming": "Streaming",
+        "pendingLabel": "Pending"
+      },
+      "noRows": {
+        "label": "No evaluation jobs found"
+      }
+    },
+    "stores": {
+      "title": "Stores",
+      "subtitle": "Manage your stores and storefronts",
+      "new": "New Store",
+      "tabs": {
+        "general": "General",
+        "domains": "Domains"
+      },
+      "domains": {
+        "title": "Connected Domains",
+        "subtitle": "Manage the domains and addresses connected to this store.",
+        "empty": "No domains connected yet. Connect a domain to make your storefront live.",
+        "connect": "Connect Domain",
+        "pendingBanner": "Your storefront needs a domain to go live. Connect a domain to get started.",
+        "pendingSetups": "Pending Domain Setups",
+        "pendingSetupDescription": "Domain setup was started but not completed.",
+        "resumeSetup": "Resume Setup",
+        "ingressRequired": "Domain connection requires ingress configuration. Please set up your platform ingress settings first.",
+        "goToSettings": "Go to Platform Settings",
+        "deleteBinding": "Disconnect Host",
+        "deleteBindingConfirm": "Are you sure you want to disconnect this hostname? The storefront will no longer be reachable at this address.",
+        "deleteBindingSuccess": "Host binding disconnected successfully.",
+        "deleteBindingError": "Failed to disconnect host binding.",
+        "deleteDomainSpace": "Remove Domain",
+        "deleteDomainSpaceConfirm": "Are you sure you want to remove this domain? All host bindings under this domain will also be removed.",
+        "deleteDomainSpaceSuccess": "Domain removed successfully.",
+        "deleteDomainSpaceError": "Failed to remove domain.",
+        "cancel": "Cancel",
+        "status": {
+          "live": "Live",
+          "settingUp": "Setting up...",
+          "verificationNeeded": "Verification needed",
+          "needsAttention": "Needs attention",
+          "disabled": "Disabled",
+          "verified": "Verified"
+        },
+        "type": {
+          "main": "Main address",
+          "additional": "Additional address"
+        },
+        "wizard": {
+          "title": "Connect a Domain",
+          "subtitle": "Follow the steps below to connect a domain to your store.",
+          "backToStore": "Back to store",
+          "next": "Next",
+          "back": "Back",
+          "steps": {
+            "enterDomain": "Enter Domain",
+            "verifyOwnership": "Verify Ownership",
+            "setupRouting": "Setup Connection",
+            "complete": "Complete"
+          },
+          "step1": {
+            "title": "What address should your store use?",
+            "description": "Enter the domain or subdomain where customers will visit your store.",
+            "hostnameLabel": "Domain address",
+            "hostnamePlaceholder": "shop.mybrand.com",
+            "singleStore": "Just this address",
+            "singleStoreDescription": "Each subdomain will be verified individually.",
+            "multiStore": "Use this domain for multiple stores",
+            "multiStoreDescription": "New subdomains will be activated automatically after initial setup.",
+            "wwwSuggestion": "You're connecting {entered}. You may also want to connect {suggested} so visitors can reach your store from both addresses.",
+            "wwwSuggestionHint": "You can set this up after completing the current connection."
+          },
+          "step2": {
+            "title": "Verify you own {domain}",
+            "description": "Add the following DNS record at your domain provider to prove ownership.",
+            "addRecord": "Add this DNS record",
+            "verify": "Verify Ownership",
+            "verifyFailed": "Ownership could not be verified yet.",
+            "retryHint": "DNS changes can take up to 48 hours to propagate. You can try again later."
+          },
+          "step3": {
+            "title": "Point {hostname} to your store",
+            "description": "Add the following DNS records at your domain provider to connect your domain.",
+            "apexInstructions": "Add these DNS records",
+            "wildcardInstructions": "Add these DNS records for wildcard routing",
+            "exactHostInstructions": "Add this DNS record",
+            "verify": "Verify Connection",
+            "verifyFailed": "Connection could not be verified yet.",
+            "retryHint": "DNS changes can take up to 48 hours to propagate. You can try again later."
+          },
+          "step4": {
+            "title": "Domain connected!",
+            "description": "{hostname} is now connected to {storeName}.",
+            "visitStore": "Visit Store",
+            "backToStore": "Back to Store",
+            "wwwSuggestionTitle": "Also connect the other address?",
+            "wwwSuggestion": "Visitors might also try {hostname}. Connect it to make sure they can reach your store.",
+            "connectComplement": "Connect {hostname}"
+          },
+          "dnsRecord": {
+            "type": "Type",
+            "name": "Name",
+            "value": "Value",
+            "copy": "Copy",
+            "copied": "Copied!"
+          }
+        }
+      },
+      "empty": {
+        "title": "No stores yet",
+        "description": "Create your first store to start selling. Stores represent your sales channels — each with its own locale, currency, and storefront.",
+        "cta": "Create Your First Store"
+      },
+      "card": {
+        "businessModel": "Business Model",
+        "status": "Status",
+        "storefrontStatus": "Storefront",
+        "hostBindings": "Host Bindings",
+        "locale": "Locale",
+        "currency": "Currency",
+        "createdAt": "Created",
+        "edit": "Edit",
+        "delete": "Delete",
+        "deleteConfirm": "Are you sure you want to delete this store? This action cannot be undone.",
+        "deleteSuccess": "Store deleted successfully.",
+        "deleteError": "Failed to delete store."
+      },
+      "form": {
+        "newStore": "New Store",
+        "discard": "Discard",
+        "save": "Save",
+        "backToStores": "Back to Stores",
+        "loadError": "Failed to Load",
+        "loadErrorDescription": "An error occurred while loading the store. Please try again.",
+        "notFound": "Store Not Found",
+        "notFoundDescription": "The store you are looking for does not exist.",
+        "generalInfo": "General Information",
+        "generalInfoDescription": "Basic store identity and URL slug",
+        "name": {
+          "label": "Store Name",
+          "placeholder": "My Store"
+        },
+        "slug": {
+          "label": "Slug",
+          "placeholder": "my-store",
+          "hint": "URL-friendly identifier. Auto-generated from name on create."
+        },
+        "businessModel": {
+          "label": "Business Model",
+          "placeholder": "Select business model..."
+        },
+        "description": {
+          "label": "Description",
+          "placeholder": "Brief description of this store..."
+        },
+        "regionCard": {
+          "title": "Region & Locale",
+          "description": "Language, currency, and timezone settings"
+        },
+        "defaultLocale": {
+          "label": "Default Language",
+          "placeholder": "Select language..."
+        },
+        "currency": {
+          "label": "Currency",
+          "placeholder": "Select currency..."
+        },
+        "timezone": {
+          "label": "Timezone",
+          "placeholder": "Select timezone...",
+          "notFound": "No timezone found"
+        },
+        "statusCard": {
+          "title": "Status",
+          "description": "Store and storefront status"
+        },
+        "status": {
+          "label": "Store Status"
+        },
+        "storefrontStatus": {
+          "label": "Storefront Status"
+        },
+        "hostBindingsCard": {
+          "title": "Host Bindings",
+          "description": "Domains and hostnames bound to this store",
+          "empty": "No host bindings configured. Manage host bindings in Settings.",
+          "manageInSettings": "Manage in Settings",
+          "hostname": "Hostname",
+          "type": "Type",
+          "bindingStatus": "Status"
+        },
+        "saveSuccess": "Store saved successfully.",
+        "saveError": "Failed to save store.",
+        "createSuccess": "Store created successfully."
+      }
+    },
+    "warehouses": {
+      "title": "Warehouses",
+      "subtitle": "View and manage all warehouses",
+      "table": {
+        "code": "Code",
+        "name": "Name",
+        "status": "Status",
+        "location": "Location",
+        "country": "Country",
+        "state": "State",
+        "city": "City",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
+      },
+      "noRows": {
+        "label": "No warehouses found"
+      }
+    },
+    "settings": {
+      "title": "Storefront & Domain Settings",
+      "subtitle": "Configure installation ingress, onboard domains, and bind storefront hosts to stores.",
+      "notifications": {
+        "genericError": "The request could not be completed.",
+        "installationSaved": "Installation settings saved.",
+        "domainSpaceCreated": "Domain space created.",
+        "domainSpaceVerified": "Domain space verified successfully.",
+        "domainSpaceVerifyFailed": "Domain space verification failed.",
+        "hostBindingCreated": "Host binding created.",
+        "hostBindingVerified": "Host binding verified successfully.",
+        "hostBindingVerifyFailed": "Host binding verification failed."
+      },
+      "installation": {
+        "title": "Platform Installation",
+        "description": "Define the admin host and public ingress targets that all DNS instructions will use.",
+        "submit": "Save Installation",
+        "ask": {
+          "title": "TLS Ask Endpoint",
+          "description": "Use this token in your static Caddy ask configuration. The host parameter is provided by Caddy at request time.",
+          "empty": "Save the installation first to generate or persist a TLS ask token."
+        },
+        "fields": {
+          "name": {
+            "label": "Installation Name",
+            "placeholder": "Helix Production"
+          },
+          "portalHostname": {
+            "label": "Portal Hostname",
+            "placeholder": "portal.helix.com"
+          },
+          "tlsAskSecret": {
+            "label": "TLS Ask Secret",
+            "placeholder": "Leave empty to keep the current secret or generate a new one",
+            "description": "Caddy uses this secret when calling the ask endpoint before issuing a certificate."
+          },
+          "canonicalTargetHost": {
+            "label": "Canonical Target Host",
+            "placeholder": "edge.customer.net",
+            "description": "Preferred CNAME target for subdomains and wildcard onboarding."
+          },
+          "ipv4Addresses": {
+            "label": "IPv4 Addresses",
+            "placeholder": "203.0.113.10",
+            "description": "One IP per line. Used to generate apex A records."
+          },
+          "ipv6Addresses": {
+            "label": "IPv6 Addresses",
+            "placeholder": "2001:db8::10",
+            "description": "One IP per line. Used to generate apex AAAA records."
+          }
+        }
+      },
+      "domainSpaces": {
+        "title": "Domain Spaces",
+        "description": "Claim a base domain such as helixstore.com, generate DNS instructions, and verify onboarding status.",
+        "submit": "Create Domain Space",
+        "verify": "Verify DNS",
+        "empty": "No domain space has been created yet.",
+        "fields": {
+          "baseDomain": {
+            "label": "Base Domain",
+            "placeholder": "helixstore.com"
+          },
+          "onboardingMode": {
+            "label": "Onboarding Mode"
+          }
+        },
+        "modeLabels": {
+          "EXACT_HOSTS": "Exact Hosts",
+          "WILDCARD_DELEGATION": "Wildcard Delegation",
+          "HYBRID": "Hybrid"
+        },
+        "statusLabels": {
+          "PENDING_VERIFICATION": "Pending Verification",
+          "ACTIVE": "Active",
+          "FAILED": "Failed",
+          "ARCHIVED": "Archived"
+        },
+        "meta": {
+          "apexVerifiedAt": "Apex Verification",
+          "wildcardVerifiedAt": "Wildcard Verification",
+          "hostCount": "Host Bindings",
+          "notVerified": "Not verified yet"
+        },
+        "instructions": {
+          "apex": "Apex DNS Records",
+          "wildcard": "Wildcard DNS Records",
+          "wildcardTest": "Wildcard verification is checked against {hostname}."
+        }
+      },
+      "storeSettings": {
+        "title": "Store Settings",
+        "description": "Update the selected store while keeping storefront activation tied to host bindings.",
+        "selectedStore": "Selected store: {name}",
+        "storefrontStatus": "Storefront status: {status}",
+        "noStore": "Create a store before binding storefront hosts."
+      },
+      "hostBindings": {
+        "title": "Store Host Bindings",
+        "description": "Bind exact hostnames to the selected store. DNS instructions always point back to the installation ingress.",
+        "submit": "Create Host Binding",
+        "verify": "Verify Host",
+        "empty": "No host binding exists for this store yet.",
+        "selectedStore": "Bindings will be created for {name}.",
+        "noStore": "Select or create a store to manage host bindings.",
+        "instructions": "DNS Instructions",
+        "fields": {
+          "domainSpaceId": {
+            "label": "Domain Space",
+            "placeholder": "Select a domain space"
+          },
+          "hostname": {
+            "label": "Hostname",
+            "placeholder": "b2b.helixstore.com"
+          },
+          "type": {
+            "label": "Binding Type"
+          }
+        },
+        "typeLabels": {
+          "PRIMARY": "Primary",
+          "ALIAS": "Alias"
+        },
+        "statusLabels": {
+          "PENDING_DNS": "Pending DNS",
+          "ACTIVE": "Active",
+          "FAILED": "Failed",
+          "DISABLED": "Disabled"
+        },
+        "meta": {
+          "domainSpace": "Domain Mode",
+          "activatedAt": "Activated At",
+          "notActivated": "Not active yet"
+        }
+      },
+      "form": {
+        "selectStore": "Select Store",
+        "storeName": {
+          "label": "Store Name",
+          "placeholder": "My Store"
+        },
+        "defaultLocale": {
+          "label": "Default Content Language",
+          "placeholder": "Select language..."
+        },
+        "currency": {
+          "label": "Currency",
+          "placeholder": "e.g. USD"
+        },
+        "timezone": {
+          "label": "Timezone",
+          "placeholder": "Select timezone...",
+          "notFound": "No timezone found"
+        },
+        "submit": "Save Settings",
+        "success": "Settings saved successfully.",
+        "error": "Failed to save settings."
+      }
+    }
+  },
+  "dataTable": {
+    "columnVisibility": {
+      "title": "Columns",
+      "showAll": "Show All",
+      "hiddenCount": "{count} hidden"
+    },
+    "filters": {
+      "reset": "Reset",
+      "text": {
+        "placeholder": "Filter..."
+      },
+      "date": {
+        "placeholder": "Select date...",
+        "placeholderTo": "Select end date...",
+        "equals": "Equals",
+        "greaterThan": "After",
+        "lessThan": "Before",
+        "inRange": "Between"
+      },
+      "boolean": {
+        "placeholder": "Select...",
+        "yes": "Yes",
+        "no": "No"
+      },
+      "number": {
+        "placeholder": "Value...",
+        "placeholderTo": "To...",
+        "equals": "Equals",
+        "greaterThan": "Greater than",
+        "lessThan": "Less than",
+        "inRange": "Between"
+      },
+      "locale": {
+        "placeholder": "Select locale...",
+        "labels": {
+          "en": "English",
+          "tr": "Turkish",
+          "de": "German",
+          "fr": "French",
+          "es": "Spanish",
+          "it": "Italian",
+          "nl": "Dutch"
+        }
+      }
+    }
+  },
+  "storefront": {
+    "nav": {
+      "home": "Home",
+      "products": "Products",
+      "account": "Account",
+      "sign_in": "Sign In",
+      "sign_out": "Sign Out"
+    },
+    "home": {
+      "welcome": "Welcome to {storeName}"
+    },
+    "auth": {
+      "sign_in_title": "Sign in to {storeName}",
+      "register_title": "Create an account at {storeName}",
+      "sign_in_button": "Sign In",
+      "register_button": "Create Account",
+      "no_account": "Don't have an account?",
+      "have_account": "Already have an account?"
+    },
+    "account": {
+      "title": "My Account",
+      "welcome": "Welcome, {name}",
+      "sign_out": "Sign Out"
+    }
+  }
+}

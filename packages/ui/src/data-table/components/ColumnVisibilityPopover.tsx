@@ -13,12 +13,9 @@ import {
 import { Columns3 } from 'lucide-react';
 import { useState } from 'react';
 import type { HideableColumn } from '../hooks/useColumnVisibility';
+import type { ColumnVisibilityTranslations } from '../store/data-table-translation-store';
 
-export interface ColumnVisibilityTranslations {
-  title: string;
-  showAll: string;
-  hiddenCount: string;
-}
+export type { ColumnVisibilityTranslations };
 
 const DEFAULT_TRANSLATIONS: ColumnVisibilityTranslations = {
   title: 'Columns',

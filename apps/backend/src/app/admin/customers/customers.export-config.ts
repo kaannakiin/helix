@@ -6,11 +6,11 @@ export const CUSTOMER_EXPORT_COLUMNS: ExportColumnDef[] = [
   { field: 'email', headerKey: 'frontend.admin.customers.table.email', type: 'text', width: 30 },
   { field: 'phone', headerKey: 'frontend.admin.customers.table.phone', type: 'text', width: 20 },
   {
-    field: 'role',
-    headerKey: 'frontend.admin.customers.table.role',
+    field: 'accountType',
+    headerKey: 'frontend.admin.customers.table.accountType',
     type: 'badge',
     width: 15,
-    labelMap: { ADMIN: 'Admin', MODERATOR: 'Moderator', USER: 'User' },
+    labelMap: { PERSONAL: 'Personal', BUSINESS: 'Business' },
   },
   {
     field: 'status',

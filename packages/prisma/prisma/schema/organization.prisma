@@ -36,10 +36,11 @@ model OrganizationMember {
   id             String       @id @default(cuid())
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  userId         String
-  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  customerId     String
+  customer       Customer     @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
-  role OrgMemberRole @default(MEMBER)
+  role  OrgMemberRole @default(MEMBER)
+  title String?
 
   parentMemberId String?
   parentMember   OrganizationMember?  @relation("MemberTree", fields: [parentMemberId], references: [id], onDelete: SetNull)
@@ -48,10 +49,32 @@ model OrganizationMember {
   joinedAt DateTime @default(now())
   isActive Boolean  @default(true)
 
-  @@unique([organizationId, userId])
+  ancestorClosures   OrgMemberClosure[] @relation("ClosureDescendant")
+  descendantClosures OrgMemberClosure[] @relation("ClosureAncestor")
+
+  @@unique([organizationId, customerId])
   @@index([organizationId])
-  @@index([userId])
+  @@index([customerId])
   @@index([parentMemberId])
   @@index([role])
   @@map("organization_members")
+}
+
+// ─── Organization Member Closure (Tree) ─────────────────────────────────────
+
+model OrgMemberClosure {
+  id String @id @default(cuid())
+
+  ancestorId String
+  ancestor   OrganizationMember @relation("ClosureAncestor", fields: [ancestorId], references: [id], onDelete: Cascade)
+
+  descendantId String
+  descendant   OrganizationMember @relation("ClosureDescendant", fields: [descendantId], references: [id], onDelete: Cascade)
+
+  depth Int // 0 = kendisi, 1 = direkt child, 2 = torun...
+
+  @@unique([ancestorId, descendantId])
+  @@index([ancestorId, depth])
+  @@index([descendantId])
+  @@map("org_member_closures")
 }

@@ -8,6 +8,7 @@
       "account_banned": "Account is banned.",
       "account_deactivated": "Account is deactivated.",
       "user_not_found": "User not found.",
+      "customer_not_found": "Customer not found.",
       "current_password_incorrect": "Current password is incorrect.",
       "invalid_credentials": "Invalid credentials.",
       "refresh_token_missing": "Refresh token missing.",
@@ -66,7 +67,8 @@
     "invalid_owner_id": "Invalid owner ID.",
     "files_too_many": "Too many files uploaded.",
     "file_too_large": "File exceeds the maximum size of {max}.",
-    "file_type_not_allowed": "File type not allowed. Allowed types: {allowed}."
+    "file_type_not_allowed": "File type not allowed. Allowed types: {allowed}.",
+    "organization_not_found": "Organization not found."
   },
   "export": {
     "boolean_yes": "Yes",

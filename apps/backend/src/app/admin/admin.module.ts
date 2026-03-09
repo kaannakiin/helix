@@ -13,10 +13,15 @@ import { PriceListsModule } from './price-lists/price-lists.module';
 import { VariantGroupsModule } from './variant-groups/variant-groups.module';
 import { CustomerGroupsModule } from './customer-groups/customer-groups.module';
 import { WarehousesModule } from './warehouses/warehouses.module';
+import { OrganizationsModule } from './organizations/organizations.module';
+import { AuthModule } from './auth/auth.module';
+import { EvaluationModule } from './evaluation/evaluation.module';
 
 @Module({
   imports: [
     PrismaModule,
+    AuthModule,
+    EvaluationModule,
     CustomersModule,
     ProductsModule,
     BrandsModule,
@@ -28,6 +33,7 @@ import { WarehousesModule } from './warehouses/warehouses.module';
     CustomerGroupsModule,
     StoresModule,
     WarehousesModule,
+    OrganizationsModule,
   ],
   controllers: [AdminController],
   providers: [AdminService],

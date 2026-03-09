@@ -32,7 +32,9 @@ model Customer {
   sessions      CustomerSession[]
   devices       CustomerDevice[]
   refreshTokens CustomerRefreshToken[]
-  oauthAccounts CustomerOAuthAccount[]
+  oauthAccounts            CustomerOAuthAccount[]
+  customerGroupMemberships CustomerGroupMember[]
+  organizationMemberships  OrganizationMember[]
 
   @@unique([storeId, email])
   @@unique([storeId, phone])

@@ -99,11 +99,19 @@ export function createDataQuerySchema<
 
   const sortItemSchema = plainSortItemSchema;
 
+  const searchSchema = z
+    .object({
+      value: z.string().min(1),
+      fields: z.array(z.string()).min(1),
+    })
+    .optional();
+
   return z.object({
     page: z.coerce.number().int().min(1).default(1),
     limit: z.coerce.number().int().min(1).max(maxLimit).default(maxLimit),
     filters: filtersSchema.optional(),
     sort: z.array(sortItemSchema).optional(),
+    search: searchSchema,
   });
 }
 

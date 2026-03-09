@@ -40,7 +40,7 @@ export class VariantGroupsService {
     query: VariantGroupQueryDTO,
     locale: Locale
   ): Promise<PaginatedResponse<AdminVariantGroupListPrismaType>> {
-    const { page, limit, filters, sort } = query;
+    const { page, limit, filters, sort, search } = query;
 
     const {
       where: baseWhere,
@@ -53,6 +53,7 @@ export class VariantGroupsService {
       limit,
       filters: filters as Record<string, FilterCondition> | undefined,
       sort,
+      search,
       defaultSort: { field: 'createdAt', order: 'desc' },
     });
 

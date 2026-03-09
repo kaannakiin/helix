@@ -18,7 +18,7 @@ import {
   type CountRelationMap,
 } from '../../../core/utils/prisma-query-builder';
 import { PrismaService } from '../../prisma/prisma.service';
-import { EvaluationService } from '../../evaluation/evaluation.service';
+import { EvaluationService } from '../evaluation/evaluation.service';
 import type { CustomerGroupQueryDTO, CustomerGroupSaveDTO } from './dto';
 
 @Injectable()

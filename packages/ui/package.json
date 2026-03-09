@@ -35,6 +35,12 @@
       "import": "./src/inputs/relation-input/index.ts",
       "default": "./src/inputs/relation-input/index.ts"
     },
+    "./inputs/search-input": {
+      "@org/source": "./src/inputs/search-input/index.ts",
+      "types": "./dist/inputs/search-input/index.d.ts",
+      "import": "./src/inputs/search-input/index.ts",
+      "default": "./src/inputs/search-input/index.ts"
+    },
     "./inputs/member-selector": {
       "@org/source": "./src/inputs/member-selector/index.ts",
       "types": "./dist/inputs/member-selector/index.d.ts",

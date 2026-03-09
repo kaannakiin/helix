@@ -9,11 +9,10 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Locale, Prisma } from '@org/prisma/client';
-import { UserRole } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import type { Response } from 'express';
 import { I18nContext } from 'nestjs-i18n';
-import { ContentLocale, Roles } from '../../../core/decorators/index.js';
+import { ContentLocale } from '../../../core/decorators/index.js';
 import { LocaleDecorator } from '../../../core/decorators/locale.decorator';
 import { ContentLocaleInterceptor } from '../../../core/interceptors/content-locale.interceptor.js';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
@@ -28,7 +27,6 @@ import {
 
 @ApiTags('Admin - Warehouses')
 @Controller('admin/warehouses')
-@Roles(UserRole.ADMIN, UserRole.MODERATOR)
 @UseInterceptors(ContentLocaleInterceptor)
 export class WarehousesController {
   constructor(

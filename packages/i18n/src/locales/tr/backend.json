@@ -8,6 +8,7 @@
       "account_banned": "Hesap yasaklanmış.",
       "account_deactivated": "Hesap devre dışı bırakılmış.",
       "user_not_found": "Kullanıcı bulunamadı.",
+      "customer_not_found": "Müşteri bulunamadı.",
       "current_password_incorrect": "Mevcut şifre yanlış.",
       "invalid_credentials": "Geçersiz kimlik bilgileri.",
       "refresh_token_missing": "Yenileme tokeni eksik.",
@@ -66,7 +67,8 @@
     "invalid_owner_id": "Geçersiz sahip ID.",
     "files_too_many": "Çok fazla dosya yüklendi.",
     "file_too_large": "Dosya boyutu maksimum {max} limitini aşıyor.",
-    "file_type_not_allowed": "Dosya türüne izin verilmiyor. İzin verilen türler: {allowed}."
+    "file_type_not_allowed": "Dosya türüne izin verilmiyor. İzin verilen türler: {allowed}.",
+    "organization_not_found": "Organizasyon bulunamadı."
   },
   "export": {
     "boolean_yes": "Evet",

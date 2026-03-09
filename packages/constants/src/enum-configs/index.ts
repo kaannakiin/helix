@@ -1,5 +1,6 @@
 import type {
   AccountStatus,
+  AccountType,
   BusinessModel,
   CustomerGroupType,
   EvaluationJobStatus,
@@ -10,7 +11,6 @@ import type {
   StorefrontStatus,
   StoreStatus,
   TrackingStrategy,
-  UserRole,
   VariantGroupDisplayMode,
   VariantGroupType,
   WarehouseStatus,
@@ -23,10 +23,9 @@ export interface EnumConfig {
 
 export type EnumOptionItem = { value: string; label: string };
 
-export const UserRoleConfigs: Record<UserRole, EnumConfig> = {
-  ADMIN: { color: 'red', labelKey: 'userRole.ADMIN' },
-  MODERATOR: { color: 'orange', labelKey: 'userRole.MODERATOR' },
-  USER: { color: 'blue', labelKey: 'userRole.USER' },
+export const AccountTypeConfigs: Record<AccountType, EnumConfig> = {
+  PERSONAL: { color: 'blue', labelKey: 'accountType.PERSONAL' },
+  BUSINESS: { color: 'teal', labelKey: 'accountType.BUSINESS' },
 };
 
 export const AccountStatusConfigs: Record<AccountStatus, EnumConfig> = {

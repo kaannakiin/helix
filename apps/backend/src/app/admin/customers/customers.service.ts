@@ -9,36 +9,37 @@ import {
 import type { PaginatedResponse } from '@org/types/pagination';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { PrismaService } from '../../prisma/prisma.service';
-import type { UserQueryDTO } from './dto';
+import type { CustomerQueryDTO } from './dto';
 
 @Injectable()
 export class CustomersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getUsers(
-    query: UserQueryDTO
+  async getCustomers(
+    query: CustomerQueryDTO
   ): Promise<PaginatedResponse<AdminCustomersPrismaType>> {
-    const { page, limit, filters, sort } = query;
+    const { page, limit, filters, sort, search } = query;
 
     const { where, orderBy, skip, take } = buildPrismaQuery({
       page,
       limit,
       filters,
       sort,
+      search,
       defaultSort: { field: 'createdAt', order: 'desc' },
     });
 
     const [items, total] = await Promise.all([
-      this.prisma.user.findMany({
-        where: where as Prisma.UserWhereInput,
+      this.prisma.customer.findMany({
+        where: where as Prisma.CustomerWhereInput,
         orderBy: orderBy as
-          | Prisma.UserOrderByWithRelationInput
-          | Prisma.UserOrderByWithRelationInput[],
+          | Prisma.CustomerOrderByWithRelationInput
+          | Prisma.CustomerOrderByWithRelationInput[],
         skip,
         take,
         include: AdminCustomersPrismaQuery,
       }),
-      this.prisma.user.count({ where: where as Prisma.UserWhereInput }),
+      this.prisma.customer.count({ where: where as Prisma.CustomerWhereInput }),
     ]);
 
     return {
@@ -52,17 +53,17 @@ export class CustomersService {
     };
   }
 
-  async *iterateUsers(opts: {
-    where: Prisma.UserWhereInput;
+  async *iterateCustomers(opts: {
+    where: Prisma.CustomerWhereInput;
     orderBy:
-      | Prisma.UserOrderByWithRelationInput
-      | Prisma.UserOrderByWithRelationInput[];
+      | Prisma.CustomerOrderByWithRelationInput
+      | Prisma.CustomerOrderByWithRelationInput[];
     batchSize: number;
   }): AsyncGenerator<AdminCustomersPrismaType[]> {
     let cursor: string | undefined;
 
     while (true) {
-      const batch = await this.prisma.user.findMany({
+      const batch = await this.prisma.customer.findMany({
         where: opts.where,
         orderBy: opts.orderBy,
         take: opts.batchSize,
@@ -79,16 +80,16 @@ export class CustomersService {
     }
   }
 
-  async getUserById(id: string): Promise<AdminCustomerDetailPrismaType> {
-    const user = await this.prisma.user.findUnique({
+  async getCustomerById(id: string): Promise<AdminCustomerDetailPrismaType> {
+    const customer = await this.prisma.customer.findUnique({
       where: { id },
       include: AdminCustomerDetailPrismaQuery,
     });
 
-    if (!user) {
-      throw new NotFoundException('backend.errors.auth.user_not_found');
+    if (!customer) {
+      throw new NotFoundException('backend.errors.auth.customer_not_found');
     }
 
-    return user;
+    return customer;
   }
 }

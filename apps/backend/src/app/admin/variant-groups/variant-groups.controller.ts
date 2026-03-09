@@ -13,11 +13,10 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiConsumes, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Locale as LocaleType, Prisma } from '@org/prisma/client';
-import { UserRole } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import { I18nContext } from 'nestjs-i18n';
 import type { Response } from 'express';
-import { ContentLocale, Locale, Roles } from '../../../core/decorators';
+import { ContentLocale, Locale } from '../../../core/decorators';
 import { ContentLocaleInterceptor } from '../../../core/interceptors/content-locale.interceptor.js';
 import { FileValidationPipe } from '../../../core/pipes/file-validation.pipe';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
@@ -34,7 +33,6 @@ import { VARIANT_GROUP_EXPORT_COLUMNS } from './variant-groups.export-config';
 
 @ApiTags('Admin - Variant Groups')
 @Controller('admin/variant-groups')
-@Roles(UserRole.ADMIN, UserRole.MODERATOR)
 @UseInterceptors(ContentLocaleInterceptor)
 export class VariantGroupsController {
   constructor(

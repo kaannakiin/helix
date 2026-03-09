@@ -1,11 +1,5 @@
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
-enum UserRole {
-  USER
-  ADMIN
-  MODERATOR
-}
-
 enum AccountStatus {
   ACTIVE
   SUSPENDED

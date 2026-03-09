@@ -38,7 +38,7 @@ export class BrandsService {
     query: BrandQueryDTO,
     locale: Locale
   ): Promise<PaginatedResponse<AdminBrandListPrismaType>> {
-    const { page, limit, filters, sort } = query;
+    const { page, limit, filters, sort, search } = query;
 
     const { where: baseWhere, orderBy, skip, take, countFilters } =
       buildPrismaQuery({
@@ -46,6 +46,7 @@ export class BrandsService {
         limit,
         filters: filters as Record<string, FilterCondition> | undefined,
         sort,
+        search,
         defaultSort: { field: 'createdAt', order: 'desc' },
       });
 

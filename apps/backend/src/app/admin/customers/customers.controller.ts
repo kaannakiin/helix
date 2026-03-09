@@ -1,20 +1,17 @@
 import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { UserRole } from '@org/prisma/client';
 import type { Prisma } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import { I18nContext } from 'nestjs-i18n';
 import type { Response } from 'express';
-import { Roles } from '../../../core/decorators';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
 import { CustomersService } from './customers.service';
-import { CustomerExportQueryDTO, UserQueryDTO } from './dto';
+import { CustomerExportQueryDTO, CustomerQueryDTO } from './dto';
 import { CUSTOMER_EXPORT_COLUMNS } from './customers.export-config';
 
 @ApiTags('Admin - Customers')
 @Controller('admin/customers')
-@Roles(UserRole.ADMIN, UserRole.MODERATOR)
 export class CustomersController {
   constructor(
     private readonly customersService: CustomersService,
@@ -22,14 +19,14 @@ export class CustomersController {
   ) {}
 
   @Post('query')
-  @ApiOperation({ summary: 'Get paginated list of users' })
-  async getUsers(@Body() query: UserQueryDTO) {
-    return this.customersService.getUsers(query);
+  @ApiOperation({ summary: 'Get paginated list of customers' })
+  async getCustomers(@Body() query: CustomerQueryDTO) {
+    return this.customersService.getCustomers(query);
   }
 
   @Get('export')
   @ApiOperation({ summary: 'Export customers as Excel or CSV' })
-  async exportUsers(
+  async exportCustomers(
     @Query() query: CustomerExportQueryDTO,
     @Res() res: Response
   ) {
@@ -55,11 +52,11 @@ export class CustomersController {
         resourceKey: 'customers',
         columns,
         createDataIterator: (batchSize) =>
-          this.customersService.iterateUsers({
-            where: where as Prisma.UserWhereInput,
+          this.customersService.iterateCustomers({
+            where: where as Prisma.CustomerWhereInput,
             orderBy: orderBy as
-              | Prisma.UserOrderByWithRelationInput
-              | Prisma.UserOrderByWithRelationInput[],
+              | Prisma.CustomerOrderByWithRelationInput
+              | Prisma.CustomerOrderByWithRelationInput[],
             batchSize,
           }),
       },
@@ -91,9 +88,9 @@ export class CustomersController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get user by ID' })
-  @ApiParam({ name: 'id', description: 'User ID' })
-  async getUserById(@Param('id') id: string) {
-    return this.customersService.getUserById(id);
+  @ApiOperation({ summary: 'Get customer by ID' })
+  @ApiParam({ name: 'id', description: 'Customer ID' })
+  async getCustomerById(@Param('id') id: string) {
+    return this.customersService.getCustomerById(id);
   }
 }

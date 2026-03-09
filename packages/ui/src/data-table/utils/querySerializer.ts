@@ -2,6 +2,7 @@ import type {
   DataQueryParams,
   FilterCondition,
   PlainSortCondition,
+  SearchParam,
 } from '@org/types/data-query';
 import type { SortModelItem } from 'ag-grid-community';
 
@@ -125,8 +126,9 @@ export function serializeGridQuery(params: {
   endRow: number;
   filterModel?: AgFilterModel | null;
   sortModel?: SortModelItem[] | null;
+  search?: SearchParam;
 }): DataQueryParams {
-  const { startRow, endRow, filterModel, sortModel } = params;
+  const { startRow, endRow, filterModel, sortModel, search } = params;
   const limit = endRow - startRow;
   const page = Math.floor(startRow / limit) + 1;
 
@@ -151,6 +153,10 @@ export function serializeGridQuery(params: {
       order: s.sort as 'asc' | 'desc',
     }));
     query.sort = sort;
+  }
+
+  if (search?.value && search.fields.length > 0) {
+    query.search = search;
   }
 
   return query;

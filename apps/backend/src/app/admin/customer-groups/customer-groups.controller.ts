@@ -9,14 +9,12 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { UserRole } from '@org/prisma/client';
-import { CurrentUser, Roles } from '../../../core/decorators';
+import { CurrentUser } from '../../../core/decorators';
 import { CustomerGroupsService } from './customer-groups.service';
 import { CustomerGroupQueryDTO, CustomerGroupSaveDTO } from './dto';
 
 @ApiTags('Admin - Customer Groups')
 @Controller('admin/customer-groups')
-@Roles(UserRole.ADMIN, UserRole.MODERATOR)
 export class CustomerGroupsController {
   constructor(private readonly customerGroupsService: CustomerGroupsService) {}
 

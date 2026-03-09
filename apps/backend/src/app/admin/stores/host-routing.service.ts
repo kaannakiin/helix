@@ -25,6 +25,7 @@ const HOST_CACHE_PREFIX = 'storefront:host:';
 const HOST_CACHE_TTL = 300;
 const STORE_HOSTS_PREFIX = 'storefront:store:';
 const STORE_HOSTS_SUFFIX = ':hosts';
+const ROUTER_INTERNAL_SECRET_HEADER = 'x-router-internal-secret';
 
 const storefrontResolutionInclude = {
   include: {
@@ -214,6 +215,7 @@ export class HostRoutingService {
     } catch (err) {
       this.logger.warn('Failed to invalidate host cache', err);
     }
+    this.notifyRouterInvalidation(hostname);
   }
 
   async invalidateHostCachesByStoreId(storeId: string): Promise<void> {
@@ -228,6 +230,10 @@ export class HostRoutingService {
       }
       pipe.del(setKey);
       await pipe.exec();
+
+      for (const h of hostnames) {
+        this.notifyRouterInvalidation(h);
+      }
     } catch (err) {
       this.logger.warn('Failed to invalidate host caches by store', err);
     }
@@ -252,6 +258,10 @@ export class HostRoutingService {
         );
       }
       await pipe.exec();
+
+      for (const b of bindings) {
+        this.notifyRouterInvalidation(b.hostname);
+      }
     } catch (err) {
       this.logger.warn(
         'Failed to invalidate host caches by domain space',
@@ -329,6 +339,40 @@ export class HostRoutingService {
     });
 
     return Boolean(binding);
+  }
+
+  /** Fire-and-forget notification to storefront-router to clear its in-memory cache. */
+  private notifyRouterInvalidation(hostname?: string): void {
+    const routerUrl = process.env.ROUTER_URL;
+    const routerInternalSecret = process.env.ROUTER_INTERNAL_SECRET;
+
+    if (!routerUrl || !routerInternalSecret) {
+      const missingConfig = [
+        !routerUrl ? 'ROUTER_URL' : null,
+        !routerInternalSecret ? 'ROUTER_INTERNAL_SECRET' : null,
+      ]
+        .filter(Boolean)
+        .join(', ');
+
+      this.logger.warn(
+        `Router cache invalidation skipped: missing ${missingConfig}`
+      );
+      return;
+    }
+
+    const url = `${routerUrl}/cache/invalidate`;
+    const body = hostname ? JSON.stringify({ hostname }) : '{}';
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        [ROUTER_INTERNAL_SECRET_HEADER]: routerInternalSecret,
+      },
+      body,
+      signal: AbortSignal.timeout(3000),
+    }).catch((err) => {
+      this.logger.warn('Failed to notify storefront-router cache invalidation', err);
+    });
   }
 
   private matchesSecret(expected: string, received?: string): boolean {

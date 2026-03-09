@@ -1,0 +1,63 @@
+{
+  "name": "@org/portal",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
+    "@hookform/resolvers": "^5.2.2",
+    "@mantine/core": "^8.3.15",
+    "@mantine/dates": "^8.3.15",
+    "@mantine/dropzone": "^8.3.15",
+    "@mantine/hooks": "^8.3.15",
+    "@mantine/modals": "^8.3.15",
+    "@mantine/notifications": "^8.3.15",
+    "@mantine/spotlight": "^8.3.15",
+    "@org/constants": "*",
+    "@org/i18n": "*",
+    "@org/schemas": "*",
+    "@org/types": "*",
+    "@org/ui": "*",
+    "@paralleldrive/cuid2": "^3.3.0",
+    "@tanstack/react-query": "^5.90.21",
+    "@tanstack/react-query-devtools": "^5.91.3",
+    "@xyflow/react": "^12.10.1",
+    "ag-grid-community": "^35.1.0",
+    "ag-grid-react": "^35.1.0",
+    "axios": "^1.13.5",
+    "dayjs": "^1.11.19",
+    "immer": "^11.1.4",
+    "jose": "^6.1.3",
+    "js-cookie": "^3.0.5",
+    "lucide-react": "^0.475.0",
+    "next": "~16.0.1",
+    "next-intl": "^4.8.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.71.1",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@dagrejs/dagre": "^2.0.4",
+    "@types/js-cookie": "^3.0.6",
+    "@types/set-cookie-parser": "^2.4.10",
+    "set-cookie-parser": "^3.0.1"
+  },
+  "nx": {
+    "targets": {
+      "typecheck": {
+        "cache": true,
+        "inputs": [
+          "default",
+          "^default"
+        ],
+        "dependsOn": [
+          "^build"
+        ],
+        "command": "tsc --noEmit"
+      }
+    },
+    "name": "@org/portal"
+  }
+}

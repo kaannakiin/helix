@@ -1,4 +1,4 @@
 export {
-  UserQuerySchema,
-  type UserQuerySchemaType,
+  CustomerQuerySchema,
+  type CustomerQuerySchemaType,
 } from './customer-query-zod-schema.js';

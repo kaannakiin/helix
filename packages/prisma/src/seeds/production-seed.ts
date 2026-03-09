@@ -30,7 +30,7 @@ async function productionSeed() {
 
   // ── 1. PlatformInstallation ──
 
-  console.log('[1/6] PlatformInstallation...');
+  console.log('[1/5] PlatformInstallation...');
   const installation = await prisma.platformInstallation.upsert({
     where: { portalHostname },
     update: { tlsAskSecret },
@@ -48,7 +48,7 @@ async function productionSeed() {
 
   // ── 2. Admin User ──
 
-  console.log('[2/6] Admin user...');
+  console.log('[2/5] Admin user...');
   const hashedPassword = await argon2Hash(adminPassword);
   const admin = await prisma.user.upsert({
     where: { email: adminEmail },
@@ -59,7 +59,6 @@ async function productionSeed() {
       email: adminEmail,
       password: hashedPassword,
       emailVerified: true,
-      role: 'ADMIN',
       status: 'ACTIVE',
     },
   });
@@ -67,7 +66,7 @@ async function productionSeed() {
 
   // ── 3. Stores ──
 
-  console.log('[3/6] Stores...');
+  console.log('[3/5] Stores...');
   const storeConfigs = [
     {
       name: 'Helix Toptan',
@@ -100,28 +99,9 @@ async function productionSeed() {
     console.log(`  -> ${store.slug} (${store.id})`);
   }
 
-  // ── 4. StoreMember (link admin to all stores) ──
+  // ── 4. Currencies ──
 
-  console.log('[4/6] StoreMember links...');
-  for (const storeId of storeIds) {
-    await prisma.storeMember.upsert({
-      where: {
-        storeId_userId: { storeId, userId: admin.id },
-      },
-      update: {},
-      create: {
-        storeId,
-        userId: admin.id,
-        accountType: 'PERSONAL',
-        isActive: true,
-      },
-    });
-  }
-  console.log(`  -> Admin linked to ${storeIds.length} stores`);
-
-  // ── 5. Currencies ──
-
-  console.log('[5/6] Currencies...');
+  console.log('[4/5] Currencies...');
   const currencies = [
     {
       code: 'TRY' as const,
@@ -172,7 +152,7 @@ async function productionSeed() {
 
   // ── 6. Base PriceList ──
 
-  console.log('[6/6] Base PriceList...');
+  console.log('[5/5] Base PriceList...');
   if (storeIds.length > 0) {
     const existing = await prisma.priceList.findFirst({
       where: { storeId: storeIds[0], type: 'BASE' },
