@@ -1,11 +1,9 @@
 import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Prisma } from '@org/prisma/client';
-import { UserRole } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import type { Response } from 'express';
 import { I18nContext } from 'nestjs-i18n';
-import { Roles } from '../../../core/decorators';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
 import { PRICE_LIST_EXPORT_COLUMNS } from './price-lists.export-config';
@@ -14,7 +12,6 @@ import { PriceListExportQueryDTO, PriceListQueryDTO } from './dto';
 
 @ApiTags('Admin - Price Lists')
 @Controller('admin/price-lists')
-@Roles(UserRole.ADMIN, UserRole.MODERATOR)
 export class PriceListsController {
   constructor(
     private readonly priceListsService: PriceListsService,

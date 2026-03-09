@@ -15,11 +15,10 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Locale as LocaleType, Prisma } from '@org/prisma/client';
-import { UserRole } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import type { Response } from 'express';
 import { I18nContext } from 'nestjs-i18n';
-import { ContentLocale, Locale, Roles } from '../../../core/decorators';
+import { ContentLocale, Locale } from '../../../core/decorators';
 import { ContentLocaleInterceptor } from '../../../core/interceptors/content-locale.interceptor.js';
 import { FileValidationPipe } from '../../../core/pipes/file-validation.pipe';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
@@ -35,7 +34,6 @@ import {
 
 @ApiTags('Admin - Categories')
 @Controller('admin/categories')
-@Roles(UserRole.ADMIN, UserRole.MODERATOR)
 @UseInterceptors(ContentLocaleInterceptor)
 export class CategoriesController {
   constructor(

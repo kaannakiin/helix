@@ -1,13 +1,11 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UserRole } from '@org/prisma/client';
-import { Locale, Roles } from '../../../core/decorators';
+import { Locale } from '../../../core/decorators';
 import { TaxonomyService } from './taxonomy.service';
 import { TaxonomyLookupQueryDTO, TaxonomyTreeQueryDTO } from './dto';
 
 @ApiTags('Admin - Taxonomy')
 @Controller('admin/taxonomy')
-@Roles(UserRole.ADMIN, UserRole.MODERATOR)
 export class TaxonomyController {
   constructor(private readonly taxonomyService: TaxonomyService) {}
 

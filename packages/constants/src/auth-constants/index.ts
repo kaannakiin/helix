@@ -38,7 +38,6 @@ export const CUSTOMER_JWT_REFRESH_STRATEGY = 'customer-jwt-refresh';
 
 export const LOCALE_COOKIE_NAME = 'LOCALE';
 export const IS_PUBLIC_KEY = 'isPublic';
-export const ROLES_KEY = 'roles';
 export const AUTH_SURFACE_KEY = 'authSurface';
 export const STOREFRONT_AUTH_SURFACE = 'storefront';
 export const LOCALE_HEADER_NAME = 'x-lang';

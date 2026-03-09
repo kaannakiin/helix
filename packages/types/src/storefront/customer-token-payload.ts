@@ -13,9 +13,3 @@ export interface CustomerRefreshTokenPayload extends CustomerTokenPayload {
   jti: string;
   family: string;
 }
-
-export interface StoreContext {
-  id: string;
-  slug: string;
-  name: string;
-}

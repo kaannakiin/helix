@@ -14,7 +14,6 @@ model User {
 
   avatar String?
 
-  role        UserRole      @default(USER)
   status      AccountStatus @default(ACTIVE)
   accountType AccountType   @default(PERSONAL)
 
@@ -38,6 +37,5 @@ model User {
   @@index([email])
   @@index([phone])
   @@index([status])
-  @@index([role])
   @@index([createdAt])
 }

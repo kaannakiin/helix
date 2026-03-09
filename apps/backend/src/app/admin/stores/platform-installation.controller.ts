@@ -7,15 +7,12 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UserRole } from '@org/prisma/client';
 import { Public } from '../../../core/decorators/public.decorator.js';
-import { Roles } from '../../../core/decorators/index.js';
 import { PlatformInstallationDTO } from './dto/index.js';
 import { PlatformInstallationService } from './platform-installation.service.js';
 
 @ApiTags('Admin - Platform Installation')
 @Controller('admin/platform-installation')
-@Roles(UserRole.ADMIN, UserRole.MODERATOR)
 export class PlatformInstallationController {
   constructor(
     private readonly platformInstallationService: PlatformInstallationService

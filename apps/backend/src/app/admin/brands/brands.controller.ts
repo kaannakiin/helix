@@ -15,11 +15,10 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Locale, Prisma } from '@org/prisma/client';
-import { UserRole } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import type { Response } from 'express';
 import { I18nContext } from 'nestjs-i18n';
-import { ContentLocale, Roles } from '../../../core/decorators/index.js';
+import { ContentLocale } from '../../../core/decorators/index.js';
 import { LocaleDecorator } from '../../../core/decorators/locale.decorator';
 import { ContentLocaleInterceptor } from '../../../core/interceptors/content-locale.interceptor.js';
 import { FileValidationPipe } from '../../../core/pipes/file-validation.pipe';
@@ -36,7 +35,6 @@ import {
 
 @ApiTags('Admin - Brands')
 @Controller('admin/brands')
-@Roles(UserRole.ADMIN, UserRole.MODERATOR)
 @UseInterceptors(ContentLocaleInterceptor)
 export class BrandsController {
   constructor(

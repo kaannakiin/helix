@@ -1,11 +1,9 @@
 import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { UserRole } from '@org/prisma/client';
 import type { Prisma } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import { I18nContext } from 'nestjs-i18n';
 import type { Response } from 'express';
-import { Roles } from '../../../core/decorators';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
 import { CustomersService } from './customers.service';
@@ -14,7 +12,6 @@ import { CUSTOMER_EXPORT_COLUMNS } from './customers.export-config';
 
 @ApiTags('Admin - Customers')
 @Controller('admin/customers')
-@Roles(UserRole.ADMIN, UserRole.MODERATOR)
 export class CustomersController {
   constructor(
     private readonly customersService: CustomersService,

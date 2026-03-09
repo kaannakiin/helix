@@ -49,7 +49,7 @@ async function bootstrap() {
       ...corsOptions,
       origin: async (
         origin: string | undefined,
-        callback: (err: Error | null, allow?: boolean) => void,
+        callback: (err: Error | null, allow?: boolean) => void
       ) => {
         if (!origin) return callback(null, true);
         try {
@@ -86,7 +86,7 @@ async function bootstrap() {
     });
   }
 
-  const port = config.get<number>('PORT', 3001);
+  const port = config.get<number>('PORT', 3003);
   await app.listen(port);
 
   Logger.log(`Application is running on: http://localhost:${port}/api`);

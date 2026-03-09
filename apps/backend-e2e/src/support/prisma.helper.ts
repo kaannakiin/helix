@@ -12,7 +12,6 @@ import {
   PrismaClient,
   StoreStatus,
   StorefrontStatus,
-  UserRole,
   VerificationStatus,
 } from '@org/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -80,11 +79,9 @@ export async function resetDomainFixtures() {
   });
 }
 
-export async function elevateUserToAdmin(email: string) {
-  await prisma.user.update({
-    where: { email },
-    data: { role: UserRole.ADMIN },
-  });
+// TODO: Re-implement with ABAC when available
+export async function elevateUserToAdmin(_email: string) {
+  // No-op: UserRole enum removed, ABAC not yet implemented
 }
 
 export async function createStoreOnly(suffix: string) {

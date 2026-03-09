@@ -1,0 +1,79 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "jsx": "preserve",
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "noEmit": true,
+    "emitDeclarationOnly": false,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "customConditions": ["@org/source"],
+    "resolveJsonModule": true,
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    },
+    "outDir": "dist",
+    "rootDir": "."
+  },
+  "include": [
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "app/**/*.js",
+    "app/**/*.jsx",
+    "core/**/*.ts",
+    "core/**/*.tsx",
+    "proxy.ts",
+    "../../apps/web/.next/types/**/*.ts",
+    "../../dist/apps/web/.next/types/**/*.ts",
+    "next-env.d.ts"
+  ],
+  "exclude": [
+    "out-tsc",
+    "dist",
+    "node_modules",
+    "jest.config.ts",
+    "jest.config.cts",
+    "app/**/*.spec.ts",
+    "app/**/*.test.ts",
+    ".next"
+  ],
+  "references": [
+    {
+      "path": "../../packages/i18n"
+    },
+    {
+      "path": "../../packages/utils"
+    },
+    {
+      "path": "../../packages/prisma"
+    },
+    {
+      "path": "../../packages/ui"
+    },
+    {
+      "path": "../../packages/types"
+    },
+    {
+      "path": "../../packages/schemas"
+    },
+    {
+      "path": "../../packages/constants"
+    },
+    {
+      "path": "../../packages/hooks"
+    }
+  ]
+}

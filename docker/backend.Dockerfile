@@ -19,7 +19,7 @@ COPY packages/types/package.json packages/types/
 COPY packages/ui/package.json packages/ui/
 COPY packages/utils/package.json packages/utils/
 COPY apps/backend/package.json apps/backend/
-COPY apps/web/package.json apps/web/
+COPY apps/portal/package.json apps/portal/
 
 RUN npm ci
 

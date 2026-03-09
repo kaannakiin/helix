@@ -59,7 +59,6 @@ async function productionSeed() {
       email: adminEmail,
       password: hashedPassword,
       emailVerified: true,
-      role: 'ADMIN',
       status: 'ACTIVE',
     },
   });

@@ -1,11 +1,10 @@
 import { Body, Controller, Delete, Get, Param, Post, Query, Res, UseInterceptors } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Locale as LocaleType, Prisma } from '@org/prisma/client';
-import { UserRole } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import { I18nContext } from 'nestjs-i18n';
 import type { Response } from 'express';
-import { ContentLocale, Locale, Roles } from '../../../core/decorators';
+import { ContentLocale, Locale } from '../../../core/decorators';
 import { ContentLocaleInterceptor } from '../../../core/interceptors/content-locale.interceptor.js';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
@@ -23,7 +22,6 @@ import { TAG_GROUP_EXPORT_COLUMNS } from './tag-groups.export-config';
 
 @ApiTags('Admin - Tag Groups')
 @Controller('admin/tag-groups')
-@Roles(UserRole.ADMIN, UserRole.MODERATOR)
 @UseInterceptors(ContentLocaleInterceptor)
 export class TagGroupsController {
   constructor(

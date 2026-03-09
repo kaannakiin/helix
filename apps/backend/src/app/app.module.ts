@@ -3,8 +3,6 @@ import { ConfigModule } from '@nestjs/config';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ZodSerializerInterceptor, ZodValidationPipe } from 'nestjs-zod';
 import { AdminModule } from './admin/admin.module';
-import { AuthModule } from './auth/auth.module';
-import { EvaluationModule } from './evaluation/evaluation.module';
 import { GeolocationModule } from './geolocation/geolocation.module';
 import { HttpExceptionI18nFilter } from './i18n/http-exception-i18n.filter';
 import { I18nModule } from './i18n/i18n.module';
@@ -12,7 +10,7 @@ import { ZodValidationI18nFilter } from './i18n/zod-validation-i18n.filter';
 import { CorsOriginService } from '../core/services/cors-origin.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { RedisModule } from './redis/redis.module';
-import { StorefrontAuthModule } from './storefront-auth/storefront-auth.module';
+import { StorefrontModule } from './storefront/storefront.module';
 
 @Module({
   imports: [
@@ -20,10 +18,8 @@ import { StorefrontAuthModule } from './storefront-auth/storefront-auth.module';
     I18nModule,
     PrismaModule,
     RedisModule,
-    AuthModule,
     AdminModule,
-    StorefrontAuthModule,
-    EvaluationModule,
+    StorefrontModule,
     GeolocationModule,
   ],
   controllers: [],

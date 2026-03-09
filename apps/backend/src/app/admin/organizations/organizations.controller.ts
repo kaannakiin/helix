@@ -1,11 +1,9 @@
 import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
-import { UserRole } from '@org/prisma/client';
 import type { Prisma } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import { I18nContext } from 'nestjs-i18n';
 import type { Response } from 'express';
-import { Roles } from '../../../core/decorators';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
 import { OrganizationsService } from './organizations.service';
@@ -14,7 +12,6 @@ import { ORGANIZATION_EXPORT_COLUMNS } from './organizations.export-config';
 
 @ApiTags('Admin - Organizations')
 @Controller('admin/organizations')
-@Roles(UserRole.ADMIN, UserRole.MODERATOR)
 export class OrganizationsController {
   constructor(
     private readonly organizationsService: OrganizationsService,

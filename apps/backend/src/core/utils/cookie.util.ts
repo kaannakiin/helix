@@ -13,10 +13,12 @@ import {
 import type { CookieOptions, Response } from 'express';
 
 function baseCookieOptions(hostname?: string): CookieOptions {
+  const isProduction = process.env.NODE_ENV === 'production';
+  const isCrossOrigin = process.env.COOKIE_CROSS_ORIGIN === 'true';
   return {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    secure: isProduction,
+    sameSite: isProduction && isCrossOrigin ? 'none' : 'lax',
     path: '/',
     ...(hostname ? { domain: hostname } : {}),
   };

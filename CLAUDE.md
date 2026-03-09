@@ -16,12 +16,12 @@ npm install
 
 # Build
 npx nx build @org/backend
-npx nx build @org/web
+npx nx build @org/portal
 npx nx run-many -t build              # build all
 
 # Serve (development)
 npx nx serve @org/backend             # NestJS on :3001
-npx nx dev @org/web                   # Next.js on :3000
+npx nx dev @org/portal                # Next.js on :3000
 
 # Test
 npx nx test @org/backend              # backend unit tests

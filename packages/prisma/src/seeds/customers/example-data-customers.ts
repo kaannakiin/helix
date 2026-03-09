@@ -1,5 +1,5 @@
 import { faker } from '@faker-js/faker';
-import { AccountStatus, SessionRevokeReason, UserRole } from '../../browser.js';
+import { AccountStatus, SessionRevokeReason } from '../../browser.js';
 import { prisma } from '../../prisma.js';
 const TOTAL_USERS = faker.number.int({ min: 200, max: 300 });
 
@@ -12,11 +12,6 @@ async function seedCustomers() {
     const email = faker.internet.email({ firstName, lastName });
     const isVerified = faker.datatype.boolean({ probability: 0.8 });
     const hasPhone = faker.datatype.boolean({ probability: 0.6 });
-
-    let role: UserRole = 'USER';
-    const roleRand = Math.random();
-    if (roleRand > 0.99) role = 'ADMIN';
-    else if (roleRand > 0.95) role = 'MODERATOR';
 
     let status: AccountStatus = 'ACTIVE';
     const statusRand = Math.random();
@@ -32,7 +27,6 @@ async function seedCustomers() {
       emailVerified: isVerified,
       phoneVerified: hasPhone ? faker.datatype.boolean() : false,
       avatar: faker.image.avatar(),
-      role: role,
       status: status,
       password: faker.internet.password({ length: 12 }),
       loginCount: faker.number.int({ min: 0, max: 100 }),

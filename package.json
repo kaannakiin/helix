@@ -9,13 +9,18 @@
   "private": true,
   "workspaces": [
     "packages/*",
-    "apps/*"
+    "apps/*",
+    "applications/*"
   ],
   "packageManager": "npm@11.8.0",
   "devDependencies": {
+    "@babel/core": "^7.14.5",
+    "@babel/preset-react": "^7.14.5",
     "@eslint/js": "^9.8.0",
     "@nestjs/schematics": "^11.0.0",
     "@nestjs/testing": "^11.0.0",
+    "@nx/devkit": "22.5.0",
+    "@nx/esbuild": "22.5.0",
     "@nx/eslint": "22.5.0",
     "@nx/eslint-plugin": "22.5.0",
     "@nx/jest": "22.5.0",
@@ -23,8 +28,11 @@
     "@nx/nest": "22.5.0",
     "@nx/next": "22.5.0",
     "@nx/node": "22.5.0",
+    "@nx/playwright": "22.5.0",
+    "@nx/react": "^22.5.0",
     "@nx/web": "22.5.0",
     "@nx/webpack": "22.5.0",
+    "@playwright/test": "^1.36.0",
     "@swc-node/register": "1.11.1",
     "@swc/cli": "~0.8.0",
     "@swc/core": "1.15.8",
@@ -35,6 +43,7 @@
     "@types/node": "20.19.9",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "esbuild": "^0.19.2",
     "eslint": "^9.8.0",
     "eslint-config-prettier": "^10.0.0",
     "jest": "^30.0.2",
@@ -55,5 +64,9 @@
   },
   "optionalDependencies": {
     "@next/swc-darwin-arm64": "^16.0.11"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   }
 }
