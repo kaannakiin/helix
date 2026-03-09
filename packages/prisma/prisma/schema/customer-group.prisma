@@ -35,19 +35,19 @@ model CustomerGroupMember {
   customerGroupId String
   customerGroup   CustomerGroup @relation(fields: [customerGroupId], references: [id], onDelete: Cascade)
 
-  // B2C: userId dolu, organizationId null
-  // B2B: organizationId dolu, userId null veya dolu (org adına bireysel üye)
-  userId String?
-  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // B2C: customerId dolu, organizationId null
+  // B2B: organizationId dolu, customerId null veya dolu (org adına bireysel üye)
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   organizationId String?
   organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
   addedAt DateTime @default(now())
 
-  @@unique([customerGroupId, userId])
+  @@unique([customerGroupId, customerId])
   @@unique([customerGroupId, organizationId])
   @@index([customerGroupId])
-  @@index([userId])
+  @@index([customerId])
   @@index([organizationId])
 }

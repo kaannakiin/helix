@@ -17,7 +17,7 @@ const PORTAL_HOSTNAME_TTL = 300;
 export class PortalHostnameGuard implements CanActivate {
   constructor(
     private readonly prisma: PrismaService,
-    @Inject(REDIS_CLIENT) private readonly redis: Redis,
+    @Inject(REDIS_CLIENT) private readonly redis: Redis
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -46,7 +46,7 @@ export class PortalHostnameGuard implements CanActivate {
         PORTAL_HOSTNAME_KEY,
         installation.portalHostname,
         'EX',
-        PORTAL_HOSTNAME_TTL,
+        PORTAL_HOSTNAME_TTL
       );
     } catch {
       /* cache write fail is non-fatal */

@@ -20,6 +20,7 @@
     "brands": "Brands",
     "categories": "Categories",
     "tags": "Tags",
+    "organizations": "Organizations",
     "variants": "Variants",
     "definitions": "Definitions",
     "locations": "Locations",
@@ -33,6 +34,15 @@
     },
     "search_placeholder": "Search...",
     "search_nothing_found": "No results found",
+    "quick_actions": "Quick Actions",
+    "navigation": "Navigation",
+    "add_products": "Add Product",
+    "add_brands": "Add Brand",
+    "add_categories": "Add Category",
+    "add_tags": "Add Tag",
+    "add_variants": "Add Variant Group",
+    "add_stores": "Add Store",
+    "add_customer_groups": "Add Customer Group",
     "logout": "Logout",
     "profile": "Profile"
   },
@@ -62,6 +72,10 @@
       "ADMIN": "Admin",
       "MODERATOR": "Moderator",
       "USER": "User"
+    },
+    "accountType": {
+      "PERSONAL": "Personal",
+      "BUSINESS": "Business"
     },
     "accountStatus": {
       "ACTIVE": "Active",
@@ -460,7 +474,8 @@
       },
       "noRows": {
         "label": "No products found"
-      }
+      },
+      "searchPlaceholder": "Search products..."
     },
     "brands": {
       "title": "Brands",
@@ -540,7 +555,9 @@
       },
       "noRows": {
         "label": "No brands found"
-      }
+      },
+      "newBrand": "New Brand",
+      "searchPlaceholder": "Search brands..."
     },
     "categories": {
       "title": "Categories",
@@ -621,7 +638,9 @@
       },
       "noRows": {
         "label": "No categories found"
-      }
+      },
+      "newCategory": "New Category",
+      "searchPlaceholder": "Search categories..."
     },
     "tags": {
       "title": "Tag Groups",
@@ -668,6 +687,10 @@
         "name": {
           "label": "Tag Group Name",
           "placeholder": "Enter tag group name..."
+        },
+        "slug": {
+          "label": "Slug",
+          "placeholder": "tag-group-slug"
         },
         "description": {
           "label": "Description",
@@ -822,7 +845,8 @@
       },
       "noRows": {
         "label": "No variant groups found"
-      }
+      },
+      "searchPlaceholder": "Search variant groups..."
     },
     "locations": {
       "title": "Locations",
@@ -855,13 +879,14 @@
     "customers": {
       "title": "Customers",
       "subtitle": "Manage all user accounts",
+      "searchPlaceholder": "Search by name, surname or email...",
       "notFound": "Customer not found.",
       "table": {
         "name": "Name",
         "surname": "Surname",
         "email": "Email",
         "phone": "Phone",
-        "role": "Role",
+        "accountType": "Account Type",
         "status": "Status",
         "emailVerified": "Email Verified",
         "phoneVerified": "Phone Verified",
@@ -906,7 +931,6 @@
         },
         "sessions": "Sessions",
         "devices": "Devices",
-        "loginHistory": "Login History",
         "memberSince": "Member since",
         "lastSeen": "Last seen",
         "neverLoggedIn": "Never logged in",
@@ -917,6 +941,56 @@
       "noRows": {
         "label": "No customers found"
       }
+    },
+    "organizations": {
+      "title": "Organizations",
+      "subtitle": "Manage B2B organizations and their members",
+      "notFound": "Organization not found.",
+      "table": {
+        "name": "Name",
+        "taxId": "Tax ID",
+        "email": "Email",
+        "phone": "Phone",
+        "address": "Address",
+        "isActive": "Active",
+        "membersCount": "Members",
+        "childOrgsCount": "Sub-Orgs",
+        "parentOrg": "Parent Org",
+        "createdAt": "Created At"
+      },
+      "contextMenu": {
+        "view": "View Details",
+        "copy": "Copy",
+        "copySelected": "Copy Selected",
+        "copyAsTable": "Table (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Plain Text",
+        "exportGroup": "Export",
+        "exportCSV": "Export as CSV",
+        "exportExcel": "Export as Excel"
+      },
+      "footer": {
+        "totalRows": "Total: {count}",
+        "selectedRows": "Selected: {count}",
+        "refresh": "Refresh"
+      },
+      "filterDrawer": {
+        "title": "Filters",
+        "clearAll": "Clear All",
+        "activeFilters": "{count} active",
+        "noFilters": "No filters available",
+        "apply": "Apply Filters",
+        "searchPlaceholder": "Search filters...",
+        "appliedFilters": "Applied Filters"
+      },
+      "detail": {
+        "title": "Organization Details",
+        "backToList": "Back to Organizations"
+      },
+      "noRows": {
+        "label": "No organizations found"
+      },
+      "searchPlaceholder": "Search organizations..."
     },
     "priceLists": {
       "title": "Price Lists",
@@ -1103,7 +1177,7 @@
           "surname": "Surname",
           "email": "Email",
           "phone": "Phone",
-          "role": "Role",
+          "accountType": "Account Type",
           "status": "Status",
           "emailVerified": "Email Verified",
           "phoneVerified": "Phone Verified",

@@ -2,10 +2,10 @@
 
 import { apiClient } from '@/core/lib/api/api-client';
 import { downloadExport } from '@/core/lib/api/download';
-import { Stack, Text, Title } from '@mantine/core';
+import { Group, Stack, Text, Title } from '@mantine/core';
 import {
   AccountStatusConfigs,
-  UserRoleConfigs,
+  AccountTypeConfigs,
   buildColorMap,
   buildEnumOptions,
 } from '@org/constants/enum-configs';
@@ -14,8 +14,10 @@ import type { ExportFormat } from '@org/types/export';
 import type { PaginatedResponse } from '@org/types/pagination';
 import {
   DataTable,
+  SearchInput,
   serializeGridQuery,
   useColumnFactory,
+  useTableSearch,
   type CopyColumn,
   type DataTableFilterTranslations,
   type DataTableTranslations,
@@ -33,6 +35,9 @@ export default function CustomersPage() {
   const tEnums = useTranslations('frontend.enums');
   const tExport = useTranslations('frontend.export');
   const tFilters = useTranslations('frontend.dataTable.filters');
+  const tColumnVisibility = useTranslations(
+    'frontend.dataTable.columnVisibility'
+  );
 
   const filters = useMemo<DataTableFilterTranslations>(
     () => ({
@@ -85,7 +90,7 @@ export default function CustomersPage() {
         surname: t('table.surname'),
         email: t('table.email'),
         phone: t('table.phone'),
-        role: t('table.role'),
+        accountType: t('table.accountType'),
         status: t('table.status'),
         emailVerified: t('table.emailVerified'),
         phoneVerified: t('table.phoneVerified'),
@@ -123,8 +128,13 @@ export default function CustomersPage() {
         label: t('noRows.label'),
         icon: <Users size={40} />,
       },
+      columnVisibility: {
+        title: tColumnVisibility('title'),
+        showAll: tColumnVisibility('showAll'),
+        hiddenCount: tColumnVisibility.raw('hiddenCount'),
+      },
     }),
-    [t]
+    [t, tColumnVisibility]
   );
 
   const { createColumn } = useColumnFactory(translations);
@@ -151,12 +161,12 @@ export default function CustomersPage() {
         type: 'text',
         minWidth: 150,
       }),
-      createColumn<AdminCustomersPrismaType>('role', {
-        headerKey: 'role',
+      createColumn<AdminCustomersPrismaType>('accountType', {
+        headerKey: 'accountType',
         type: 'badge',
         minWidth: 120,
-        colorMap: buildColorMap(UserRoleConfigs),
-        enumOptions: buildEnumOptions(UserRoleConfigs, tEnums),
+        colorMap: buildColorMap(AccountTypeConfigs),
+        enumOptions: buildEnumOptions(AccountTypeConfigs, tEnums),
       }),
       createColumn<AdminCustomersPrismaType>('status', {
         headerKey: 'status',
@@ -219,6 +229,12 @@ export default function CustomersPage() {
 
   const lastQueryRef = useRef<{ filters?: string; sort?: string }>({});
 
+  const { search, setSearch, searchParam } =
+    useTableSearch<AdminCustomersPrismaType>({
+      fields: ['name', 'surname', 'email'],
+      searchParam: 'q',
+    });
+
   const datasource = useMemo<IDatasource>(
     () => ({
       getRows: async (params: IGetRowsParams) => {
@@ -228,6 +244,7 @@ export default function CustomersPage() {
             endRow: params.endRow,
             filterModel: params.filterModel,
             sortModel: params.sortModel,
+            search: searchParam,
           });
 
           lastQueryRef.current = {
@@ -245,7 +262,7 @@ export default function CustomersPage() {
         }
       },
     }),
-    [columns]
+    [searchParam]
   );
 
   const handleExport = useCallback(
@@ -282,14 +299,24 @@ export default function CustomersPage() {
 
   return (
     <Stack gap="md" className="flex-1">
-      <div>
-        <Title order={2}>{t('title')}</Title>
-        <Text c="dimmed" mt="xs">
-          {t('subtitle')}
-        </Text>
-      </div>
-
+      <Group justify="space-between" align="flex-start">
+        <Group>
+          <Title order={2}>{t('title')}</Title>
+          <Text c="dimmed" mt="xs">
+            {t('subtitle')}
+          </Text>
+        </Group>
+        <Group align="center">
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder={t('searchPlaceholder')}
+            style={{ width: 280 }}
+          />
+        </Group>
+      </Group>
       <DataTable<AdminCustomersPrismaType>
+        tableId="customers"
         columns={columns}
         datasource={datasource}
         translations={translations}

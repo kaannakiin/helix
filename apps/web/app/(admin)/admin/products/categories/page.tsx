@@ -2,14 +2,16 @@
 
 import { apiClient } from '@/core/lib/api/api-client';
 import { downloadExport } from '@/core/lib/api/download';
-import { Stack, Text, Title } from '@mantine/core';
+import { Button, Group, Stack, Text, Title } from '@mantine/core';
 import type { AdminCategoryListPrismaType } from '@org/types/admin/categories';
 import type { ExportFormat } from '@org/types/export';
 import type { PaginatedResponse } from '@org/types/pagination';
 import {
   DataTable,
+  SearchInput,
   serializeGridQuery,
   useColumnFactory,
+  useTableSearch,
   type CopyColumn,
   type DataTableFilterTranslations,
   type DataTableTranslations,
@@ -206,6 +208,11 @@ export default function CategoriesPage() {
 
   const lastQueryRef = useRef<{ filters?: string; sort?: string }>({});
 
+  const { search, setSearch, searchParam } = useTableSearch({
+    fields: ['name'],
+    searchParam: 'q',
+  });
+
   const datasource = useMemo<IDatasource>(
     () => ({
       getRows: async (params: IGetRowsParams) => {
@@ -215,6 +222,7 @@ export default function CategoriesPage() {
             endRow: params.endRow,
             filterModel: params.filterModel,
             sortModel: params.sortModel,
+            search: searchParam,
           });
 
           lastQueryRef.current = {
@@ -232,7 +240,7 @@ export default function CategoriesPage() {
         }
       },
     }),
-    [columns]
+    [searchParam]
   );
 
   const handleExport = useCallback(
@@ -270,12 +278,25 @@ export default function CategoriesPage() {
 
   return (
     <Stack gap="md" className="flex-1">
-      <div>
-        <Title order={2}>{t('title')}</Title>
-        <Text c="dimmed" mt="xs">
-          {t('subtitle')}
-        </Text>
-      </div>
+      <Group justify="space-between" align="flex-end">
+        <div>
+          <Title order={2}>{t('title')}</Title>
+          <Text c="dimmed" mt="xs">
+            {t('subtitle')}
+          </Text>
+        </div>
+        <Group>
+          <SearchInput
+            placeholder={t('searchPlaceholder')}
+            value={search}
+            onChange={setSearch}
+            style={{ width: 280 }}
+          />
+          <Button onClick={() => router.push('/admin/products/categories/new')}>
+            {t('newCategory')}
+          </Button>
+        </Group>
+      </Group>
 
       <DataTable<AdminCategoryListPrismaType>
         tableId="categories"

@@ -4,6 +4,7 @@ import {
   Activity,
   BarChart3,
   BookOpen,
+  Building2,
   DollarSign,
   FileText,
   FolderTree,
@@ -34,6 +35,7 @@ export interface NavItem {
   children?: NavItem[];
 
   isSection?: boolean;
+  quickActionHref?: string;
 }
 
 export const adminNavItems: NavItem[] = [
@@ -61,6 +63,7 @@ export const adminNavItems: NavItem[] = [
     visibility: 'both',
     group: 'commerce',
     description: 'Mağazaları listele ve yönet',
+    quickActionHref: `${ADMIN_NAV_ROUTES.STORES}/new`,
   },
   {
     key: 'products',
@@ -70,6 +73,7 @@ export const adminNavItems: NavItem[] = [
     group: 'commerce',
     description: 'Ürün kataloğunu ve stokları yönet',
     isSection: false,
+    quickActionHref: `${ADMIN_NAV_ROUTES.PRODUCTS}/new`,
     children: [
       {
         key: 'brands',
@@ -77,6 +81,7 @@ export const adminNavItems: NavItem[] = [
         href: ADMIN_NAV_ROUTES.BRANDS,
         visibility: 'both',
         description: 'Markaları listele ve yönet',
+        quickActionHref: `${ADMIN_NAV_ROUTES.BRANDS}/new`,
       },
       {
         key: 'categories',
@@ -84,6 +89,7 @@ export const adminNavItems: NavItem[] = [
         href: ADMIN_NAV_ROUTES.CATEGORIES,
         visibility: 'both',
         description: 'Ürün kategorilerini yönet',
+        quickActionHref: `${ADMIN_NAV_ROUTES.CATEGORIES}/new`,
       },
       {
         key: 'tags',
@@ -91,6 +97,7 @@ export const adminNavItems: NavItem[] = [
         href: ADMIN_NAV_ROUTES.TAGS,
         visibility: 'both',
         description: 'Etiket gruplarını yönet',
+        quickActionHref: `${ADMIN_NAV_ROUTES.TAGS}/new`,
       },
       {
         key: 'variants',
@@ -98,6 +105,7 @@ export const adminNavItems: NavItem[] = [
         href: ADMIN_NAV_ROUTES.VARIANTS,
         visibility: 'both',
         description: 'Ürün varyantlarını yönet',
+        quickActionHref: `${ADMIN_NAV_ROUTES.VARIANTS}/new`,
       },
     ],
   },
@@ -116,8 +124,17 @@ export const adminNavItems: NavItem[] = [
         href: ADMIN_NAV_ROUTES.CUSTOMER_GROUPS,
         visibility: 'both',
         description: 'Müşteri gruplarını yönet',
+        quickActionHref: `${ADMIN_NAV_ROUTES.CUSTOMER_GROUPS}/new`,
       },
     ],
+  },
+  {
+    key: 'organizations',
+    icon: Building2,
+    href: ADMIN_NAV_ROUTES.ORGANIZATIONS,
+    visibility: 'both',
+    group: 'commerce',
+    description: 'Kurumsal hesapları ve detayları',
   },
   {
     key: 'inventory',
@@ -237,6 +254,10 @@ export function getSpotlightItems(): NavItem[] {
   return getAllItems().filter(
     (item) => item.visibility === 'spotlight' || item.visibility === 'both'
   );
+}
+
+export function getQuickActionItems(): NavItem[] {
+  return getAllItems().filter((item) => !!item.quickActionHref);
 }
 
 export function getGroupedNavbarItems(): Map<string, NavItem[]> {

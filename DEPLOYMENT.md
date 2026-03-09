@@ -95,7 +95,7 @@ docker compose run --rm seed
 This creates:
 - PlatformInstallation (your portal hostname + TLS secret)
 - Admin user (from ADMIN_EMAIL / ADMIN_PASSWORD)
-- B2B + B2C stores with StoreMember links
+- B2B + B2C stores
 - Currencies (TRY, USD, EUR, GBP)
 - Base price list
 

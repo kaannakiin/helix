@@ -1,2 +1,2 @@
-export { UserQueryDTO } from './user-query.dto';
+export { CustomerQueryDTO } from './customer-query.dto';
 export { CustomerExportQueryDTO } from './customer-export-query.dto';

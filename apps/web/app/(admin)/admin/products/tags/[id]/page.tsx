@@ -6,6 +6,7 @@ import {
 } from '@/core/hooks/useAdminTagGroup';
 import { useTranslatedZodResolver } from '@/core/hooks/useTranslatedZodResolver';
 import { Button, Group, Stack, Text, TextInput, Textarea } from '@mantine/core';
+import { slugify } from '@org/utils';
 import {
   NEW_TAG_GROUP_DEFAULT_VALUES,
   TagGroupSchema,
@@ -18,7 +19,7 @@ import { createId } from '@paralleldrive/cuid2';
 import { FileText, Save, SendToBack } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, FormProvider, useForm } from 'react-hook-form';
 import { TagTreeTable } from './components/TagTreeTable';
 
@@ -62,10 +63,22 @@ const AdminTagGroupFormPage = () => {
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { isSubmitting },
   } = methods;
 
   const tagGroupName = watch('translations.0.name');
+  const [userEditedSlug, setUserEditedSlug] = useState(() => !!(data?.slug));
+
+  useEffect(() => {
+    setUserEditedSlug(!!(data?.slug));
+  }, [data?.slug]);
+
+  useEffect(() => {
+    if (userEditedSlug) return;
+    if (!tagGroupName) return;
+    setValue('slug', slugify(tagGroupName, 'tr'), { shouldValidate: true });
+  }, [tagGroupName, userEditedSlug, setValue]);
 
   const onSubmit = async (formData: TagGroupInput) => {
     const payload = {
@@ -141,6 +154,22 @@ const AdminTagGroupFormPage = () => {
                     placeholder={t('name.placeholder')}
                     error={fieldState.error?.message}
                     required
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="slug"
+                render={({ field, fieldState }) => (
+                  <TextInput
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      setUserEditedSlug(true);
+                    }}
+                    label={t('slug.label')}
+                    placeholder={t('slug.placeholder')}
+                    error={fieldState.error?.message}
                   />
                 )}
               />

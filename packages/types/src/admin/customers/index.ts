@@ -6,7 +6,7 @@ export const ADMIN_CUSTOMERS_FIELD_CONFIG = {
   surname: { filterType: 'text' },
   email: { filterType: 'text' },
   phone: { filterType: 'text' },
-  role: { filterType: 'enum', values: ['USER', 'ADMIN', 'MODERATOR'] },
+  accountType: { filterType: 'enum', values: ['PERSONAL', 'BUSINESS'] },
   status: {
     filterType: 'enum',
     values: ['ACTIVE', 'SUSPENDED', 'BANNED', 'DEACTIVATED'],
@@ -27,7 +27,7 @@ export const ADMIN_CUSTOMERS_SORT_FIELDS = [
   'surname',
   'email',
   'phone',
-  'role',
+  'accountType',
   'status',
   'emailVerified',
   'phoneVerified',
@@ -40,18 +40,18 @@ export type AdminCustomersSortField =
   (typeof ADMIN_CUSTOMERS_SORT_FIELDS)[number];
 
 export const AdminCustomersPrismaQuery =
-  {} as const satisfies Prisma.UserInclude;
+  {} as const satisfies Prisma.CustomerInclude;
 
-export type AdminCustomersPrismaType = Prisma.UserGetPayload<{
+export type AdminCustomersPrismaType = Prisma.CustomerGetPayload<{
   include: typeof AdminCustomersPrismaQuery;
 }>;
 
 export const AdminCustomerDetailPrismaQuery = {
   _count: {
-    select: { sessions: true, devices: true, loginHistory: true },
+    select: { sessions: true, devices: true },
   },
-} as const satisfies Prisma.UserInclude;
+} as const satisfies Prisma.CustomerInclude;
 
-export type AdminCustomerDetailPrismaType = Prisma.UserGetPayload<{
+export type AdminCustomerDetailPrismaType = Prisma.CustomerGetPayload<{
   include: typeof AdminCustomerDetailPrismaQuery;
 }>;

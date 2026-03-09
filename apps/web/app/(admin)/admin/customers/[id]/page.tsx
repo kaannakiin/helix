@@ -1,6 +1,6 @@
 'use client';
 
-import { useUserDetail } from '@/core/hooks/useAdminUsers';
+import { useCustomerDetail } from '@/core/hooks/useAdminCustomers';
 import {
   Avatar,
   Badge,
@@ -18,7 +18,6 @@ import {
 import {
   ArrowLeft,
   Calendar,
-  Clock,
   Fingerprint,
   Globe,
   LogIn,
@@ -34,10 +33,9 @@ import {
 import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
 
-const ROLE_COLORS: Record<string, string> = {
-  ADMIN: 'red',
-  MODERATOR: 'orange',
-  USER: 'blue',
+const ACCOUNT_TYPE_COLORS: Record<string, string> = {
+  PERSONAL: 'blue',
+  BUSINESS: 'teal',
 };
 
 const STATUS_COLORS: Record<string, string> = {
@@ -135,7 +133,7 @@ export default function CustomerDetailPage() {
   const tDetail = useTranslations('frontend.admin.customers.detail');
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const { data: user, isLoading, error } = useUserDetail(params.id);
+  const { data: customer, isLoading, error } = useCustomerDetail(params.id);
 
   if (isLoading) {
     return (
@@ -147,8 +145,8 @@ export default function CustomerDetailPage() {
             <Skeleton height={16} width={180} mt={8} />
           </div>
         </Group>
-        <SimpleGrid cols={{ base: 1, sm: 3 }}>
-          {Array.from({ length: 3 }).map((_, i) => (
+        <SimpleGrid cols={{ base: 1, sm: 2 }}>
+          {Array.from({ length: 2 }).map((_, i) => (
             <Skeleton key={i} height={80} radius="md" />
           ))}
         </SimpleGrid>
@@ -157,7 +155,7 @@ export default function CustomerDetailPage() {
     );
   }
 
-  if (error || !user) {
+  if (error || !customer) {
     return (
       <Stack gap="lg" align="center" justify="center" py={80}>
         <ThemeIcon size={64} radius="xl" variant="light" color="gray">
@@ -177,7 +175,7 @@ export default function CustomerDetailPage() {
     );
   }
 
-  const fullName = `${user.name ?? ''} ${user.surname ?? ''}`.trim();
+  const fullName = `${customer.name ?? ''} ${customer.surname ?? ''}`.trim();
 
   return (
     <Stack gap="lg">
@@ -186,36 +184,36 @@ export default function CustomerDetailPage() {
           <Avatar
             size={64}
             radius="xl"
-            color={ROLE_COLORS[user.role] ?? 'blue'}
+            color={ACCOUNT_TYPE_COLORS[customer.accountType] ?? 'blue'}
           >
-            {getInitials(user.name, user.surname)}
+            {getInitials(customer.name, customer.surname)}
           </Avatar>
           <div>
             <Group gap="sm" align="center">
               <Title order={2}>{fullName || '—'}</Title>
-              <Badge color={ROLE_COLORS[user.role]} variant="filled" size="sm">
-                {user.role}
+              <Badge color={ACCOUNT_TYPE_COLORS[customer.accountType]} variant="filled" size="sm">
+                {customer.accountType}
               </Badge>
               <Badge
-                color={STATUS_COLORS[user.status]}
+                color={STATUS_COLORS[customer.status]}
                 variant="light"
                 size="sm"
               >
-                {user.status}
+                {customer.status}
               </Badge>
             </Group>
             <Group gap="xs" mt={4}>
               <Text size="sm" c="dimmed">
                 {tDetail('memberSince')}{' '}
-                {new Date(user.createdAt).toLocaleDateString()}
+                {new Date(customer.createdAt).toLocaleDateString()}
               </Text>
               <Text size="sm" c="dimmed">
                 {'·'}
               </Text>
               <Text size="sm" c="dimmed">
                 {tDetail('lastSeen')}{' '}
-                {user.lastLoginAt
-                  ? new Date(user.lastLoginAt).toLocaleDateString()
+                {customer.lastLoginAt
+                  ? new Date(customer.lastLoginAt).toLocaleDateString()
                   : tDetail('neverLoggedIn')}
               </Text>
             </Group>
@@ -230,24 +228,18 @@ export default function CustomerDetailPage() {
         </Button>
       </Group>
 
-      <SimpleGrid cols={{ base: 1, sm: 3 }}>
+      <SimpleGrid cols={{ base: 1, sm: 2 }}>
         <StatCard
           icon={<Globe size={22} />}
           label={tDetail('sessions')}
-          count={user._count.sessions}
+          count={customer._count.sessions}
           color="blue"
         />
         <StatCard
           icon={<Monitor size={22} />}
           label={tDetail('devices')}
-          count={user._count.devices}
+          count={customer._count.devices}
           color="violet"
-        />
-        <StatCard
-          icon={<Clock size={22} />}
-          label={tDetail('loginHistory')}
-          count={user._count.loginHistory}
-          color="teal"
         />
       </SimpleGrid>
 
@@ -258,22 +250,22 @@ export default function CustomerDetailPage() {
             <Divider />
             <DetailRow icon={<User size={14} />} label={tTable('name')}>
               <Text size="sm" fw={500}>
-                {user.name ?? '—'}
+                {customer.name ?? '—'}
               </Text>
             </DetailRow>
             <DetailRow icon={<User size={14} />} label={tTable('surname')}>
               <Text size="sm" fw={500}>
-                {user.surname ?? '—'}
+                {customer.surname ?? '—'}
               </Text>
             </DetailRow>
             <DetailRow icon={<Mail size={14} />} label={tTable('email')}>
               <Text size="sm" fw={500}>
-                {user.email ?? tDetail('notProvided')}
+                {customer.email ?? tDetail('notProvided')}
               </Text>
             </DetailRow>
             <DetailRow icon={<Phone size={14} />} label={tTable('phone')}>
               <Text size="sm" fw={500}>
-                {user.phone ?? tDetail('notProvided')}
+                {customer.phone ?? tDetail('notProvided')}
               </Text>
             </DetailRow>
           </Stack>
@@ -288,7 +280,7 @@ export default function CustomerDetailPage() {
               label={tTable('emailVerified')}
             >
               <BooleanBadge
-                value={user.emailVerified}
+                value={customer.emailVerified}
                 yesLabel={tDetail('yes')}
                 noLabel={tDetail('no')}
               />
@@ -298,7 +290,7 @@ export default function CustomerDetailPage() {
               label={tTable('phoneVerified')}
             >
               <BooleanBadge
-                value={user.phoneVerified}
+                value={customer.phoneVerified}
                 yesLabel={tDetail('yes')}
                 noLabel={tDetail('no')}
               />
@@ -308,14 +300,14 @@ export default function CustomerDetailPage() {
               label={tTable('twoFactorEnabled')}
             >
               <BooleanBadge
-                value={user.twoFactorEnabled}
+                value={customer.twoFactorEnabled}
                 yesLabel={tDetail('yes')}
                 noLabel={tDetail('no')}
               />
             </DetailRow>
-            <DetailRow icon={<Shield size={14} />} label={tTable('role')}>
-              <Badge color={ROLE_COLORS[user.role]} size="sm">
-                {user.role}
+            <DetailRow icon={<Shield size={14} />} label={tTable('accountType')}>
+              <Badge color={ACCOUNT_TYPE_COLORS[customer.accountType]} size="sm">
+                {customer.accountType}
               </Badge>
             </DetailRow>
             <DetailRow
@@ -323,11 +315,11 @@ export default function CustomerDetailPage() {
               label={tTable('status')}
             >
               <Badge
-                color={STATUS_COLORS[user.status]}
+                color={STATUS_COLORS[customer.status]}
                 variant="light"
                 size="sm"
               >
-                {user.status}
+                {customer.status}
               </Badge>
             </DetailRow>
           </Stack>
@@ -341,8 +333,8 @@ export default function CustomerDetailPage() {
           <SimpleGrid cols={{ base: 1, sm: 3 }}>
             <DetailRow icon={<LogIn size={14} />} label={tTable('lastLoginAt')}>
               <Text size="sm" fw={500}>
-                {user.lastLoginAt
-                  ? new Date(user.lastLoginAt).toLocaleString()
+                {customer.lastLoginAt
+                  ? new Date(customer.lastLoginAt).toLocaleString()
                   : '—'}
               </Text>
             </DetailRow>
@@ -351,7 +343,7 @@ export default function CustomerDetailPage() {
               label={tTable('loginCount')}
             >
               <Text size="sm" fw={500}>
-                {user.loginCount.toLocaleString()}
+                {customer.loginCount.toLocaleString()}
               </Text>
             </DetailRow>
             <DetailRow
@@ -359,7 +351,7 @@ export default function CustomerDetailPage() {
               label={tTable('createdAt')}
             >
               <Text size="sm" fw={500}>
-                {new Date(user.createdAt).toLocaleString()}
+                {new Date(customer.createdAt).toLocaleString()}
               </Text>
             </DetailRow>
           </SimpleGrid>

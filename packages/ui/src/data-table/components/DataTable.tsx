@@ -14,7 +14,7 @@ import type {
 } from 'ag-grid-community';
 import { AgGridReact } from 'ag-grid-react';
 import { Filter, RefreshCw } from 'lucide-react';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '../../utils/cn';
 import { HELIX_COLUMN_TYPES } from '../columnTypeRegistry';
 import {
@@ -25,11 +25,15 @@ import DataTableProvider from '../data-table-provider';
 import { useContextMenu } from '../hooks/useContextMenu';
 import { dataTableTheme } from '../theme';
 import type { ContextMenuConfig } from '../types/contextMenu.types';
+import { ColumnVisibilityPopover } from './ColumnVisibilityPopover';
 import { ContextMenu } from './ContextMenu';
 import { DataTableFooter } from './DataTableFooter';
 import { FilterDrawer } from './FilterDrawer';
 import { createLoadingCellRenderer } from './LoadingCellRenderer';
 import { NoRowsOverlay } from './NoRowsOverlay';
+import { useColumnVisibility } from '../hooks/useColumnVisibility';
+
+const EMPTY_GRID_OPTIONS = {} as const;
 
 export interface DataTableProps<TData> {
   tableId?: string;
@@ -41,22 +45,21 @@ export interface DataTableProps<TData> {
   height?: number | string;
   onRowClicked?: (data: TData) => void;
   onSelectionChanged?: (selected: TData[]) => void;
-  debug?: boolean;
   contextMenu?: ContextMenuConfig<TData>;
   showFilterDrawer?: boolean;
   pageSize?: number;
 }
 
 export function DataTable<TData>({
+  tableId,
   columns,
   datasource,
-  gridOptions = {},
+  gridOptions = EMPTY_GRID_OPTIONS,
   translations,
   className,
   height = '600px',
   onRowClicked,
   onSelectionChanged,
-  debug = false,
   contextMenu,
   showFilterDrawer = false,
   pageSize = DEFAULT_PAGE_SIZE,
@@ -85,6 +88,21 @@ export function DataTable<TData>({
       })),
     [columns]
   );
+
+  const { hiddenFields, toggleColumn, showAll, hideableColumns, isMounted } =
+    useColumnVisibility(tableId, columnsWithLoading);
+
+  useEffect(() => {
+    const api = gridApiRef.current;
+    if (!api || !isMounted) return;
+    const visible: string[] = [];
+    const hidden: string[] = [];
+    hideableColumns.forEach(({ field }) => {
+      (hiddenFields.has(field) ? hidden : visible).push(field);
+    });
+    if (visible.length) api.setColumnsVisible(visible, true);
+    if (hidden.length) api.setColumnsVisible(hidden, false);
+  }, [hiddenFields, hideableColumns, isMounted]);
 
   const handleSelectionChanged = useCallback(
     (event: { api: { getSelectedRows: () => TData[] } }) => {
@@ -223,7 +241,6 @@ export function DataTable<TData>({
     handleGridReady,
     handleFilterChanged,
     gridOptions,
-    debug,
     contextMenuEnabled,
     handleCellContextMenu,
     closeMenu,
@@ -266,6 +283,15 @@ export function DataTable<TData>({
               translations={translations?.footer}
             />
             <Group gap="xs" mr="xs" wrap="nowrap">
+              {tableId && (
+                <ColumnVisibilityPopover
+                  hideableColumns={hideableColumns}
+                  hiddenFields={hiddenFields}
+                  onToggle={toggleColumn}
+                  onShowAll={showAll}
+                  translations={translations?.columnVisibility}
+                />
+              )}
               {showFilterDrawer && (
                 <Button
                   variant="subtle"

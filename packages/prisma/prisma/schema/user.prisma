@@ -33,10 +33,7 @@ model User {
   refreshTokens            RefreshToken[]
   accountEvents            AccountEvent[]
   oauthAccounts            OAuthAccount[]
-  stockMovements           StockMovementGroup[]
-  customerGroupMemberships CustomerGroupMember[]
-  storeMembers             StoreMember[]
-  organizationMemberships  OrganizationMember[]
+  stockMovements StockMovementGroup[]
 
   @@index([email])
   @@index([phone])

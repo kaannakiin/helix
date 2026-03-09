@@ -84,11 +84,17 @@ export interface PlainSortCondition {
 
 export type SortCondition = PlainSortCondition;
 
+export interface SearchParam {
+  value: string;
+  fields: string[];
+}
+
 export interface DataQueryParams {
   page: number;
   limit: number;
   filters?: Record<string, FilterCondition>;
   sort?: SortCondition[];
+  search?: SearchParam;
 }
 
 export interface FieldFilterConfig {

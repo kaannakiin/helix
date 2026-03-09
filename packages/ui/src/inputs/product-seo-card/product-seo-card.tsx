@@ -2,8 +2,10 @@
 
 import { Box, Grid, Stack, Text, TextInput, Textarea } from '@mantine/core';
 import { Locale } from '@org/prisma/browser';
+import { slugify } from '@org/utils/slugify';
 import { Globe } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
 import {
   Controller,
   useFormContext,
@@ -19,6 +21,7 @@ export interface ProductSeoCardProps<T extends FieldValues> {
   slugName: Path<T>;
   metaTitleName: Path<T>;
   metaDescriptionName: Path<T>;
+  nameName?: Path<T>;
   defaultValue?: {
     slug?: string;
     metaTitle?: string;
@@ -31,10 +34,30 @@ const ProductSeoCard = <T extends FieldValues>({
   slugName,
   metaTitleName,
   metaDescriptionName,
+  nameName,
   defaultValue = {},
 }: ProductSeoCardProps<T>) => {
-  const { control } = useFormContext<T>();
+  const { control, setValue } = useFormContext<T>();
   const t = useTranslations('frontend.seoCard');
+  const [userEditedSlug, setUserEditedSlug] = useState(
+    () => !!defaultValue.slug
+  );
+
+  const nameValue = useWatch({
+    control,
+    name: nameName as Path<T>,
+    disabled: !nameName,
+  }) as string | undefined;
+
+  useEffect(() => {
+    if (!nameName) return;
+    if (userEditedSlug) return;
+    if (!nameValue) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setValue(slugName, slugify(nameValue, 'tr') as any, {
+      shouldValidate: true,
+    });
+  }, [nameValue, userEditedSlug, nameName, slugName, setValue]);
 
   const slug = useWatch({
     control,
@@ -66,6 +89,10 @@ const ProductSeoCard = <T extends FieldValues>({
               render={({ field, fieldState }) => (
                 <TextInput
                   {...field}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    setUserEditedSlug(true);
+                  }}
                   withAsterisk
                   label={t('fields.slug.label')}
                   placeholder={t('fields.slug.placeholder')}

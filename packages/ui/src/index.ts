@@ -58,3 +58,13 @@ export {
   AsyncMultiSelectFilter,
   type AsyncMultiSelectFilterModel,
 } from './data-table/components/AsyncMultiSelectFilter';
+
+export {
+  SearchInput,
+  type SearchInputProps,
+} from './inputs/search-input/search-input';
+
+export {
+  useTableSearch,
+  type UseTableSearchOptions,
+} from './data-table/hooks/useTableSearch';

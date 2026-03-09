@@ -10,7 +10,7 @@ const CHUNK_SIZE = 1000;
 
 @Injectable()
 export class CustomerGroupEvaluator extends BaseEvaluator {
-  readonly targetEntity = 'USER';
+  readonly targetEntity = 'CUSTOMER';
   private readonly logger = new Logger(CustomerGroupEvaluator.name);
 
   constructor(
@@ -35,29 +35,34 @@ export class CustomerGroupEvaluator extends BaseEvaluator {
     const tree = group.ruleTree.conditions as unknown as MembershipDecisionTree;
     const prismaWhere = this.treeConverter.convertToWhere(tree);
 
-    const [totalUsers, matchedUsers] = await Promise.all([
-      this.prisma.user.count(),
-      this.prisma.user.findMany({
-        where: prismaWhere as Prisma.UserWhereInput,
+    const [totalCustomers, matchedCustomers] = await Promise.all([
+      this.prisma.customer.count({ where: { storeId: group.storeId } }),
+      this.prisma.customer.findMany({
+        where: {
+          storeId: group.storeId,
+          ...(prismaWhere as Prisma.CustomerWhereInput),
+        },
         select: { id: true },
       }),
     ]);
 
-    const matchedUserIds = new Set(matchedUsers.map((u) => u.id));
+    const matchedCustomerIds = new Set(matchedCustomers.map((c) => c.id));
 
     await this.prisma.$transaction(async (tx) => {
       const currentMembers = await tx.customerGroupMember.findMany({
         where: { customerGroupId: ctx.entityId },
-        select: { id: true, userId: true },
+        select: { id: true, customerId: true },
       });
 
-      const currentMemberIds = new Set(currentMembers.map((m) => m.userId));
+      const currentMemberIds = new Set(
+        currentMembers.map((m) => m.customerId).filter(Boolean) as string[]
+      );
 
-      const toAdd = [...matchedUserIds].filter(
+      const toAdd = [...matchedCustomerIds].filter(
         (id) => !currentMemberIds.has(id)
       );
       const toRemove = currentMembers
-        .filter((m) => !matchedUserIds.has(m.userId))
+        .filter((m) => !m.customerId || !matchedCustomerIds.has(m.customerId))
         .map((m) => m.id);
 
       if (toRemove.length > 0) {
@@ -69,9 +74,9 @@ export class CustomerGroupEvaluator extends BaseEvaluator {
       for (let i = 0; i < toAdd.length; i += CHUNK_SIZE) {
         const chunk = toAdd.slice(i, i + CHUNK_SIZE);
         await tx.customerGroupMember.createMany({
-          data: chunk.map((userId) => ({
+          data: chunk.map((customerId) => ({
             customerGroupId: ctx.entityId,
-            userId,
+            customerId,
           })),
           skipDuplicates: true,
         });
@@ -90,12 +95,12 @@ export class CustomerGroupEvaluator extends BaseEvaluator {
     const durationMs = Date.now() - startTime;
 
     this.logger.log(
-      `Evaluated CustomerGroup ${ctx.entityId}: ${matchedUserIds.size}/${totalUsers} matched in ${durationMs}ms`
+      `Evaluated CustomerGroup ${ctx.entityId}: ${matchedCustomerIds.size}/${totalCustomers} matched in ${durationMs}ms`
     );
 
     return {
-      recordsEvaluated: totalUsers,
-      recordsMatched: matchedUserIds.size,
+      recordsEvaluated: totalCustomers,
+      recordsMatched: matchedCustomerIds.size,
       durationMs,
     };
   }

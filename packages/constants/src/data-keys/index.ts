@@ -47,6 +47,11 @@ export const DATA_ACCESS_KEYS = {
       list: ['admin', 'priceLists', 'list'],
       detail: (id: string) => ['admin', 'priceLists', 'detail', id] as const,
     },
+    organizations: {
+      list: ['admin', 'organizations', 'list'],
+      detail: (id: string) =>
+        ['admin', 'organizations', 'detail', id] as const,
+    },
     customerGroups: {
       list: ['admin', 'customerGroups', 'list'],
       detail: (id: string) =>

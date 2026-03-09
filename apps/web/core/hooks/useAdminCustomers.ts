@@ -3,7 +3,7 @@ import type { AdminCustomerDetailPrismaType } from '@org/types/admin/customers';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../lib/api/api-client';
 
-export const useUserDetail = (id: string) => {
+export const useCustomerDetail = (id: string) => {
   return useQuery({
     queryKey: DATA_ACCESS_KEYS.admin.customers.detail(id),
     queryFn: async () => {

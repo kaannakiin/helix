@@ -33,7 +33,8 @@ import { createId } from '@paralleldrive/cuid2';
 import { Activity, FileText, Image as ImageIcon, Save } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useMemo, useState } from 'react';
+import { slugify } from '@org/utils';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Controller,
   FormProvider,
@@ -152,10 +153,22 @@ const AdminBrandFormPage = () => {
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { isSubmitting },
   } = methods;
 
   const brandName = watch('translations.0.name');
+  const [userEditedSlug, setUserEditedSlug] = useState(() => !!(data?.slug));
+
+  useEffect(() => {
+    setUserEditedSlug(!!(data?.slug));
+  }, [data?.slug]);
+
+  useEffect(() => {
+    if (userEditedSlug) return;
+    if (!brandName) return;
+    setValue('slug', slugify(brandName, 'tr'), { shouldValidate: true });
+  }, [brandName, userEditedSlug, setValue]);
 
   const onSubmit: SubmitHandler<BrandInput> = async (formData) => {
     try {
@@ -279,6 +292,10 @@ const AdminBrandFormPage = () => {
                     render={({ field, fieldState }) => (
                       <TextInput
                         {...field}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          setUserEditedSlug(true);
+                        }}
                         label={t('slug.label')}
                         placeholder={t('slug.placeholder')}
                         error={fieldState.error?.message}

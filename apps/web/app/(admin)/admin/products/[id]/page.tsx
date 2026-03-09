@@ -615,8 +615,10 @@ const AdminProductPage = () => {
               <ProductSeoCard
                 locale="TR"
                 slugName="translations.0.slug"
+                nameName="translations.0.name"
                 metaTitleName="translations.0.metaTitle"
                 metaDescriptionName="translations.0.metaDescription"
+                defaultValue={{ slug: data?.translations?.[0]?.slug ?? '' }}
               />
             </Stack>
 

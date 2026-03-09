@@ -55,7 +55,7 @@ export class CategoriesService {
     query: CategoryQueryDTO,
     locale: Locale
   ): Promise<PaginatedResponse<AdminCategoryListPrismaType>> {
-    const { page, limit, filters, sort } = query;
+    const { page, limit, filters, sort, search } = query;
 
     const {
       where: baseWhere,
@@ -68,6 +68,7 @@ export class CategoriesService {
       limit,
       filters: filters as Record<string, FilterCondition> | undefined,
       sort,
+      search,
       defaultSort: { field: 'createdAt', order: 'desc' },
     });
 

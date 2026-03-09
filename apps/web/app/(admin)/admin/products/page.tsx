@@ -16,8 +16,10 @@ import {
   AsyncMultiSelectFilter,
   DataTable,
   HoverCardCellRenderer,
+  SearchInput,
   serializeGridQuery,
   useColumnFactory,
+  useTableSearch,
   type CopyColumn,
   type DataTableFilterTranslations,
   type DataTableTranslations,
@@ -290,6 +292,11 @@ export default function ProductsPage() {
 
   const lastQueryRef = useRef<{ filters?: string; sort?: string }>({});
 
+  const { search, setSearch, searchParam } = useTableSearch({
+    fields: ['_translations.name', '_variants.sku'],
+    searchParam: 'q',
+  });
+
   const datasource = useMemo<IDatasource>(
     () => ({
       getRows: async (params: IGetRowsParams) => {
@@ -299,6 +306,7 @@ export default function ProductsPage() {
             endRow: params.endRow,
             filterModel: params.filterModel,
             sortModel: params.sortModel,
+            search: searchParam,
           });
 
           lastQueryRef.current = {
@@ -316,7 +324,7 @@ export default function ProductsPage() {
         }
       },
     }),
-    [columns]
+    [searchParam]
   );
 
   const handleExport = useCallback(
@@ -361,12 +369,20 @@ export default function ProductsPage() {
             {t('subtitle')}
           </Text>
         </div>
-        <Button
-          leftSection={<Plus size={16} />}
-          onClick={() => router.push('/admin/products/new')}
-        >
-          {t('new')}
-        </Button>
+        <Group>
+          <SearchInput
+            placeholder={t('searchPlaceholder')}
+            value={search}
+            onChange={setSearch}
+            style={{ width: 280 }}
+          />
+          <Button
+            leftSection={<Plus size={16} />}
+            onClick={() => router.push('/admin/products/new')}
+          >
+            {t('new')}
+          </Button>
+        </Group>
       </Group>
 
       <DataTable<AdminProductListPrismaType>

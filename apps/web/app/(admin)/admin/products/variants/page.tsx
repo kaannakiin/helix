@@ -8,8 +8,10 @@ import type { ExportFormat } from '@org/types/export';
 import type { PaginatedResponse } from '@org/types/pagination';
 import {
   DataTable,
+  SearchInput,
   serializeGridQuery,
   useColumnFactory,
+  useTableSearch,
   type CopyColumn,
   type DataTableFilterTranslations,
   type DataTableTranslations,
@@ -174,6 +176,11 @@ export default function VariantGroupsPage() {
 
   const lastQueryRef = useRef<{ filters?: string; sort?: string }>({});
 
+  const { search, setSearch, searchParam } = useTableSearch({
+    fields: ['name'],
+    searchParam: 'q',
+  });
+
   const datasource = useMemo<IDatasource>(
     () => ({
       getRows: async (params: IGetRowsParams) => {
@@ -183,6 +190,7 @@ export default function VariantGroupsPage() {
             endRow: params.endRow,
             filterModel: params.filterModel,
             sortModel: params.sortModel,
+            search: searchParam,
           });
 
           lastQueryRef.current = {
@@ -200,7 +208,7 @@ export default function VariantGroupsPage() {
         }
       },
     }),
-    [columns]
+    [searchParam]
   );
 
   const handleExport = useCallback(
@@ -245,12 +253,20 @@ export default function VariantGroupsPage() {
             {t('subtitle')}
           </Text>
         </div>
-        <Button
-          leftSection={<Plus size={16} />}
-          onClick={() => router.push('/admin/products/variants/new')}
-        >
-          {t('new')}
-        </Button>
+        <Group>
+          <SearchInput
+            placeholder={t('searchPlaceholder')}
+            value={search}
+            onChange={setSearch}
+            style={{ width: 280 }}
+          />
+          <Button
+            leftSection={<Plus size={16} />}
+            onClick={() => router.push('/admin/products/variants/new')}
+          >
+            {t('new')}
+          </Button>
+        </Group>
       </Group>
 
       <DataTable<AdminVariantGroupListPrismaType>

@@ -29,12 +29,13 @@
   },
   "scripts": {
     "seed:base": "npx tsx src/seeds/base-seed.ts",
-    "seed:customers": "npx tsx src/seeds/customers/example-data-customers.ts",
-    "seed:products": "npx tsx src/seeds/products/example-data-products.ts",
-    "seed:bulk": "npx tsx src/seeds/products/example-data-bulk.ts",
+    "seed:customers": "npx tsx src/new-seeds/customer-seed.ts",
+    "seed:products": "npx tsx src/new-seeds/catalog-seed.ts",
+    "seed:bulk": "PRODUCT_SEED_COUNT=300 npx tsx src/new-seeds/catalog-seed.ts",
     "seed:taxonomy": "npx tsx src/seeds/taxonomy-seed.ts",
     "seed:geo": "npx tsx src/seeds/geolocation-seed.ts",
     "seed:stores": "npx tsx src/seeds/store-seed.ts",
+    "seed:organizations": "npx tsx src/new-seeds/organization-seed.ts",
     "seed:production": "npx tsx src/seeds/production-seed.ts"
   },
   "dependencies": {

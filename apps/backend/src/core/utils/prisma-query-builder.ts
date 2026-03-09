@@ -1,5 +1,9 @@
 import { Prisma } from '@org/prisma/client';
-import type { FilterCondition, SortCondition } from '@org/types/data-query';
+import type {
+  FilterCondition,
+  SearchParam,
+  SortCondition,
+} from '@org/types/data-query';
 
 export function textToPrisma(
   op: string,
@@ -111,8 +115,9 @@ export function buildPrismaQuery(params: {
   filters?: Record<string, FilterCondition> | Record<string, unknown>;
   sort?: SortCondition[];
   defaultSort?: { field: string; order: 'asc' | 'desc' };
+  search?: SearchParam;
 }): PrismaQueryResult {
-  const { page, limit, filters, sort, defaultSort } = params;
+  const { page, limit, filters, sort, defaultSort, search } = params;
 
   const where: Record<string, unknown> = {};
   const countFilters: CountFilter[] = [];
@@ -135,10 +140,32 @@ export function buildPrismaQuery(params: {
     }
   }
 
+  if (search?.value && search.fields.length > 0) {
+    where['OR'] = search.fields.map((field) => {
+      if (field.startsWith('_')) {
+        const dotIdx = field.indexOf('.');
+        const relationName = field.slice(1, dotIdx);
+        const relationField = field.slice(dotIdx + 1);
+        return {
+          [relationName]: {
+            some: {
+              [relationField]: { contains: search.value, mode: 'insensitive' },
+            },
+          },
+        };
+      }
+      return { [field]: { contains: search.value, mode: 'insensitive' } };
+    });
+  }
+
   let orderBy: Record<string, unknown>[] | Record<string, unknown>;
 
   if (sort && sort.length > 0) {
     orderBy = sort.map((s) => {
+      if (s.field.startsWith('_count.')) {
+        const relation = s.field.split('.')[1];
+        return { [relation]: { _count: s.order } };
+      }
       if (s.field.includes('.')) {
         const [parent, child] = s.field.split('.');
         return { [parent]: { [child]: s.order } };

@@ -5,9 +5,9 @@ import {
 import { z } from 'zod';
 import { createDataQuerySchema } from '../../data-query/index.js';
 
-export const UserQuerySchema = createDataQuerySchema({
+export const CustomerQuerySchema = createDataQuerySchema({
   fields: ADMIN_CUSTOMERS_FIELD_CONFIG,
   sortFields: ADMIN_CUSTOMERS_SORT_FIELDS,
 });
 
-export type UserQuerySchemaType = z.infer<typeof UserQuerySchema>;
+export type CustomerQuerySchemaType = z.infer<typeof CustomerQuerySchema>;

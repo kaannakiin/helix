@@ -13,9 +13,10 @@ interface TextFilterModel {
 interface TextFilterProps {
   model: TextFilterModel | null;
   onModelChange: (model: TextFilterModel | null) => void;
+  placeholder?: string;
 }
 
-export function TextFilter({ model, onModelChange }: TextFilterProps) {
+export function TextFilter({ model, onModelChange, placeholder }: TextFilterProps) {
   const t = useDataTableTranslations();
   const filterType = model?.type || 'contains';
 
@@ -53,7 +54,7 @@ export function TextFilter({ model, onModelChange }: TextFilterProps) {
   return (
     <Stack gap="xs" p="xs">
       <TextInput
-        placeholder={t.filters.text.placeholder}
+        placeholder={placeholder ?? t.filters.text.placeholder}
         value={localValue}
         onChange={(e) => handleTextChange(e.currentTarget.value)}
         size="xs"

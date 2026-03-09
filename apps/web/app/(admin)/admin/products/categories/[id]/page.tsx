@@ -294,8 +294,10 @@ const AdminCategoryFormPage = () => {
               <ProductSeoCard
                 locale="TR"
                 slugName="slug"
+                nameName="translations.0.name"
                 metaTitleName="translations.0.metaTitle"
                 metaDescriptionName="translations.0.metaDescription"
+                defaultValue={{ slug: data?.slug ?? '' }}
               />
             </Stack>
 

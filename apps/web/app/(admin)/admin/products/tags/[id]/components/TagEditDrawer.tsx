@@ -27,7 +27,8 @@ import type { AdminTagChildrenPrismaType } from '@org/types/admin/tags';
 import { Dropzone } from '@org/ui/dropzone';
 import { createId } from '@paralleldrive/cuid2';
 import { useTranslations } from 'next-intl';
-import { useEffect, useRef } from 'react';
+import { slugify } from '@org/utils';
+import { useEffect, useRef, useState } from 'react';
 import { Controller, useForm, useFormContext } from 'react-hook-form';
 import { addTagToTree, updateTagInTree } from '../utils/tag-tree-helpers';
 
@@ -102,8 +103,19 @@ export const TagEditDrawer = ({
     control,
     reset,
     handleSubmit,
+    watch,
+    setValue,
     formState: { isSubmitting },
   } = draftForm;
+
+  const tagName = watch('translations.0.name');
+  const [userEditedSlug, setUserEditedSlug] = useState(false);
+
+  useEffect(() => {
+    if (userEditedSlug) return;
+    if (!tagName) return;
+    setValue('slug', slugify(tagName, 'tr'), { shouldValidate: true });
+  }, [tagName, userEditedSlug, setValue]);
 
   const prevOpenedRef = useRef(false);
 
@@ -111,6 +123,7 @@ export const TagEditDrawer = ({
     if (drawerProps.opened && !prevOpenedRef.current) {
       if (tag) {
         reset(mapPrismaTagToFormInput(tag));
+        setUserEditedSlug(true);
       } else {
         reset({
           id: createId(),
@@ -122,6 +135,7 @@ export const TagEditDrawer = ({
           existingImages: [],
           images: [],
         });
+        setUserEditedSlug(false);
       }
     }
     prevOpenedRef.current = drawerProps.opened ?? false;
@@ -199,6 +213,10 @@ export const TagEditDrawer = ({
               <TextInput
                 {...field}
                 value={field.value ?? ''}
+                onChange={(e) => {
+                  field.onChange(e);
+                  setUserEditedSlug(true);
+                }}
                 label={t('slug')}
                 placeholder="tag-slug"
                 error={fieldState.error?.message}

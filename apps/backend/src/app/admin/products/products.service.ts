@@ -41,7 +41,7 @@ export class ProductsService {
     query: ProductQueryDTO,
     locale: Locale
   ): Promise<PaginatedResponse<AdminProductListPrismaType>> {
-    const { page, limit, filters, sort } = query;
+    const { page, limit, filters, sort, search } = query;
 
     const {
       where: baseWhere,
@@ -54,6 +54,7 @@ export class ProductsService {
       limit,
       filters: filters as Record<string, FilterCondition> | undefined,
       sort,
+      search,
       defaultSort: { field: 'createdAt', order: 'desc' },
     });
 

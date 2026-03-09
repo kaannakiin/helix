@@ -20,6 +20,7 @@
     "brands": "Markalar",
     "categories": "Kategoriler",
     "tags": "Etiketler",
+    "organizations": "Organizasyonlar",
     "variants": "Varyantlar",
     "definitions": "Tanımlamalar",
     "locations": "Lokasyonlar",
@@ -33,6 +34,15 @@
     },
     "search_placeholder": "Ara...",
     "search_nothing_found": "Sonuç bulunamadı",
+    "quick_actions": "Hızlı İşlemler",
+    "navigation": "Navigasyon",
+    "add_products": "Ürün Ekle",
+    "add_brands": "Marka Ekle",
+    "add_categories": "Kategori Ekle",
+    "add_tags": "Etiket Ekle",
+    "add_variants": "Varyant Grubu Ekle",
+    "add_stores": "Mağaza Ekle",
+    "add_customer_groups": "Müşteri Grubu Ekle",
     "logout": "Çıkış Yap",
     "profile": "Profil"
   },
@@ -62,6 +72,10 @@
       "ADMIN": "Admin",
       "MODERATOR": "Moderatör",
       "USER": "Kullanıcı"
+    },
+    "accountType": {
+      "PERSONAL": "Bireysel",
+      "BUSINESS": "Kurumsal"
     },
     "accountStatus": {
       "ACTIVE": "Aktif",
@@ -460,7 +474,8 @@
       },
       "noRows": {
         "label": "Ürün bulunamadı"
-      }
+      },
+      "searchPlaceholder": "Ürün ara..."
     },
     "brands": {
       "title": "Markalar",
@@ -540,7 +555,9 @@
       },
       "noRows": {
         "label": "Marka bulunamadı"
-      }
+      },
+      "newBrand": "Yeni Marka",
+      "searchPlaceholder": "Marka ara..."
     },
     "categories": {
       "title": "Kategoriler",
@@ -621,7 +638,9 @@
       },
       "noRows": {
         "label": "Kategori bulunamadı"
-      }
+      },
+      "newCategory": "Yeni Kategori",
+      "searchPlaceholder": "Kategori ara..."
     },
     "tags": {
       "title": "Etiket Grupları",
@@ -668,6 +687,10 @@
         "name": {
           "label": "Etiket Grubu Adı",
           "placeholder": "Etiket grubu adını girin..."
+        },
+        "slug": {
+          "label": "Slug",
+          "placeholder": "etiket-grubu-slug"
         },
         "description": {
           "label": "Açıklama",
@@ -822,7 +845,8 @@
       },
       "noRows": {
         "label": "Varyant grubu bulunamadı"
-      }
+      },
+      "searchPlaceholder": "Varyant grubu ara..."
     },
     "locations": {
       "title": "Lokasyonlar",
@@ -855,13 +879,14 @@
     "customers": {
       "title": "Müşteriler",
       "subtitle": "Tüm kullanıcı hesaplarını yönetin",
+      "searchPlaceholder": "İsim, soyisim veya e-posta ile ara...",
       "notFound": "Müşteri bulunamadı.",
       "table": {
         "name": "Ad",
         "surname": "Soyad",
         "email": "E-posta",
         "phone": "Telefon",
-        "role": "Rol",
+        "accountType": "Hesap Tipi",
         "status": "Durum",
         "emailVerified": "E-posta Doğrulandı",
         "phoneVerified": "Telefon Doğrulandı",
@@ -906,7 +931,6 @@
         },
         "sessions": "Oturumlar",
         "devices": "Cihazlar",
-        "loginHistory": "Giriş Geçmişi",
         "memberSince": "Üyelik tarihi",
         "lastSeen": "Son görülme",
         "neverLoggedIn": "Hiç giriş yapmadı",
@@ -917,6 +941,56 @@
       "noRows": {
         "label": "Müşteri bulunamadı"
       }
+    },
+    "organizations": {
+      "title": "Organizasyonlar",
+      "subtitle": "B2B organizasyonları ve üyelerini yönetin",
+      "notFound": "Organizasyon bulunamadı.",
+      "table": {
+        "name": "Ad",
+        "taxId": "Vergi No",
+        "email": "E-posta",
+        "phone": "Telefon",
+        "address": "Adres",
+        "isActive": "Aktif",
+        "membersCount": "Üyeler",
+        "childOrgsCount": "Alt Org.",
+        "parentOrg": "Üst Org.",
+        "createdAt": "Oluşturulma"
+      },
+      "contextMenu": {
+        "view": "Detayları Görüntüle",
+        "copy": "Kopyala",
+        "copySelected": "Seçilenleri Kopyala",
+        "copyAsTable": "Tablo (Excel)",
+        "copyAsJSON": "JSON",
+        "copyAsPlainText": "Düz Metin",
+        "exportGroup": "Dışa Aktar",
+        "exportCSV": "CSV Olarak Dışa Aktar",
+        "exportExcel": "Excel Olarak Dışa Aktar"
+      },
+      "footer": {
+        "totalRows": "Toplam: {count}",
+        "selectedRows": "Seçili: {count}",
+        "refresh": "Yenile"
+      },
+      "filterDrawer": {
+        "title": "Filtreler",
+        "clearAll": "Tümünü Temizle",
+        "activeFilters": "{count} aktif",
+        "noFilters": "Filtre bulunmuyor",
+        "apply": "Filtrele",
+        "searchPlaceholder": "Filtre ara...",
+        "appliedFilters": "Uygulanan Filtreler"
+      },
+      "detail": {
+        "title": "Organizasyon Detayları",
+        "backToList": "Organizasyonlara Dön"
+      },
+      "noRows": {
+        "label": "Organizasyon bulunamadı"
+      },
+      "searchPlaceholder": "Organizasyon ara..."
     },
     "priceLists": {
       "title": "Fiyat Listeleri",
@@ -1101,7 +1175,7 @@
           "surname": "Soyad",
           "email": "E-posta",
           "phone": "Telefon",
-          "role": "Rol",
+          "accountType": "Hesap Tipi",
           "status": "Durum",
           "emailVerified": "E-posta Doğrulanmış",
           "phoneVerified": "Telefon Doğrulanmış",

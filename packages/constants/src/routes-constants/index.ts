@@ -19,6 +19,7 @@ export const ADMIN_NAV_ROUTES = {
   VARIANTS: '/admin/products/variants',
   CUSTOMERS: '/admin/customers',
   CUSTOMER_GROUPS: '/admin/customers/customer-groups',
+  ORGANIZATIONS: '/admin/organizations',
   ANALYTICS: '/admin/analytics',
   SETTINGS: '/admin/settings',
   MARKETING: '/admin/marketing',
