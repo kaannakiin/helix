@@ -17,16 +17,20 @@ import type { Request, Response } from 'express';
 import { UAParser } from 'ua-parser-js';
 import { AuthSurface, Public } from '../../../core/decorators';
 import { HostRoutingService } from '../../admin/stores/host-routing.service';
+import { CustomerFacebookAuthGuard } from './guards/customer-facebook-auth.guard';
+import { CustomerGoogleAuthGuard } from './guards/customer-google-auth.guard';
+import { CustomerInstagramAuthGuard } from './guards/customer-instagram-auth.guard';
+import { CustomerJwtAuthGuard } from './guards/customer-jwt-auth.guard';
 import { CustomerJwtRefreshGuard } from './guards/customer-jwt-refresh.guard';
 import { StoreScopeGuard } from './guards/store-scope.guard';
 import type {
   AuthenticatedCustomerRefreshRequest,
   AuthenticatedCustomerRequest,
+  CustomerOAuthProfile,
   CustomerRefreshTokenContext,
   CustomerRequestMetadata,
 } from './interfaces';
 import { StorefrontAuthService } from './storefront-auth.service';
-import { CustomerJwtAuthGuard } from './guards/customer-jwt-auth.guard';
 
 @ApiTags('Storefront - Auth')
 @Controller('storefront/auth')
@@ -118,6 +122,67 @@ export class StorefrontAuthController {
   async me(@Req() req: AuthenticatedCustomerRequest) {
     const user = req.user as CustomerTokenPayload;
     return this.storefrontAuth.getProfile(user.sub);
+  }
+
+  @Public()
+  @UseGuards(CustomerGoogleAuthGuard)
+  @Get('oauth/google')
+  googleLogin(): void {}
+
+  @Public()
+  @UseGuards(CustomerGoogleAuthGuard)
+  @Get('oauth/google/callback')
+  async googleCallback(
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    const storeId = await this.resolveStoreId(req);
+    const metadata = this.extractMetadata(req);
+    const profile = req.user as CustomerOAuthProfile;
+    await this.storefrontAuth.handleCustomerOAuthLogin(storeId, profile, metadata, res, req.hostname);
+    res.redirect(this.resolveStorefrontUrl(req));
+  }
+
+  @Public()
+  @UseGuards(CustomerFacebookAuthGuard)
+  @Get('oauth/facebook')
+  facebookLogin(): void {}
+
+  @Public()
+  @UseGuards(CustomerFacebookAuthGuard)
+  @Get('oauth/facebook/callback')
+  async facebookCallback(
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    const storeId = await this.resolveStoreId(req);
+    const metadata = this.extractMetadata(req);
+    const profile = req.user as CustomerOAuthProfile;
+    await this.storefrontAuth.handleCustomerOAuthLogin(storeId, profile, metadata, res, req.hostname);
+    res.redirect(this.resolveStorefrontUrl(req));
+  }
+
+  @Public()
+  @UseGuards(CustomerInstagramAuthGuard)
+  @Get('oauth/instagram')
+  instagramLogin(): void {}
+
+  @Public()
+  @UseGuards(CustomerInstagramAuthGuard)
+  @Get('oauth/instagram/callback')
+  async instagramCallback(
+    @Req() req: Request,
+    @Res() res: Response,
+  ) {
+    const storeId = await this.resolveStoreId(req);
+    const metadata = this.extractMetadata(req);
+    const profile = req.user as CustomerOAuthProfile;
+    await this.storefrontAuth.handleCustomerOAuthLogin(storeId, profile, metadata, res, req.hostname);
+    res.redirect(this.resolveStorefrontUrl(req));
+  }
+
+  private resolveStorefrontUrl(req: Request): string {
+    return `https://${req.hostname}`;
   }
 
   private async resolveStoreId(req: Request): Promise<string> {

@@ -1,4 +1,4 @@
-import type { DeviceType } from '@org/prisma/client';
+import type { DeviceType, OAuthProvider } from '@org/prisma/client';
 import type {
   CustomerRefreshTokenPayload,
   CustomerTokenPayload,
@@ -28,6 +28,18 @@ export interface AuthenticatedCustomerRequest extends Request {
 
 export interface AuthenticatedCustomerRefreshRequest extends Request {
   user: CustomerRefreshTokenContext;
+}
+
+export interface CustomerOAuthProfile {
+  provider: OAuthProvider;
+  providerAccountId: string;
+  email: string | null;
+  name: string;
+  surname: string;
+  avatar: string | null;
+  emailVerified: boolean;
+  accessToken: string;
+  refreshToken: string | null;
 }
 
 export interface CustomerRequestMetadata {

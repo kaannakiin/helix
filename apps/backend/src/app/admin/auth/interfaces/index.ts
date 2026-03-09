@@ -1,4 +1,4 @@
-import type { DeviceType, OAuthProvider } from '@org/prisma/client';
+import type { DeviceType } from '@org/prisma/client';
 import type { TokenPayload } from '@org/types/token';
 import type { Request } from 'express';
 import type { RefreshTokenPayload } from '../token.service';
@@ -40,14 +40,3 @@ export interface RequestMetadata {
   fingerprint: string;
 }
 
-export interface OAuthProfile {
-  provider: OAuthProvider;
-  providerAccountId: string;
-  email: string | null;
-  name: string;
-  surname: string;
-  avatar: string | null;
-  emailVerified: boolean;
-  accessToken: string;
-  refreshToken: string | null;
-}

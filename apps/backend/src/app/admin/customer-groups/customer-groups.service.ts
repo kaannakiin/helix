@@ -1,7 +1,7 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
-  BadRequestException,
 } from '@nestjs/common';
 import { RuleTargetEntity, type Prisma } from '@org/prisma/client';
 import {
@@ -37,14 +37,19 @@ export class CustomerGroupsService {
   ): Promise<PaginatedResponse<AdminCustomerGroupListPrismaType>> {
     const { page, limit, filters, sort } = query;
 
-    const { where: baseWhere, orderBy, skip, take, countFilters } =
-      buildPrismaQuery({
-        page,
-        limit,
-        filters: filters as Record<string, FilterCondition> | undefined,
-        sort,
-        defaultSort: { field: 'createdAt', order: 'desc' },
-      });
+    const {
+      where: baseWhere,
+      orderBy,
+      skip,
+      take,
+      countFilters,
+    } = buildPrismaQuery({
+      page,
+      limit,
+      filters: filters as Record<string, FilterCondition> | undefined,
+      sort,
+      defaultSort: { field: 'createdAt', order: 'desc' },
+    });
 
     const where = (await resolveCountFilters(
       this.prisma,
@@ -140,8 +145,13 @@ export class CustomerGroupsService {
 
       if (type === 'RULE_BASED') {
         if (ruleTree) {
-          const ruleTreeData = {
+          const ruleTreeData: Prisma.RuleTreeCreateArgs['data'] = {
             name: ruleTree.name,
+            store: {
+              connect: {
+                id: '',
+              },
+            },
             description: ruleTree.description ?? null,
             targetEntity: RuleTargetEntity.USER,
             conditions: (ruleTree.tree ?? null) as Prisma.InputJsonValue,
@@ -175,6 +185,7 @@ export class CustomerGroupsService {
           type,
           isActive,
           ruleTreeId: resolvedRuleTreeId,
+          storeId: '',
           cronExpression: cronExpression ?? null,
         },
         update: {
@@ -211,15 +222,11 @@ export class CustomerGroupsService {
     }
 
     if (group.type !== 'RULE_BASED') {
-      throw new BadRequestException(
-        'backend.errors.evaluation_manual_group'
-      );
+      throw new BadRequestException('backend.errors.evaluation_manual_group');
     }
 
     if (!group.ruleTree) {
-      throw new BadRequestException(
-        'backend.errors.evaluation_no_rule_tree'
-      );
+      throw new BadRequestException('backend.errors.evaluation_no_rule_tree');
     }
 
     const { id: jobId } = await this.evaluationService.createAndEnqueue({

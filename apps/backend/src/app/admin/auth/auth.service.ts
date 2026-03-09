@@ -5,7 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { hash as argon2Hash, verify as argon2Verify } from '@node-rs/argon2';
-import type { LoginMethod, OAuthProvider } from '@org/prisma/client';
 import type { TokenPayload } from '@org/types/token';
 import { randomUUID } from 'crypto';
 import type { Response } from 'express';
@@ -17,7 +16,6 @@ import {
 import { PrismaService } from '../../prisma/prisma.service';
 import { DeviceService } from './device.service';
 import type {
-  OAuthProfile,
   RequestMetadata,
   ValidatedUser,
 } from './interfaces';
@@ -321,155 +319,6 @@ export class AuthService {
         totalPages: Math.ceil(total / limit),
       },
     };
-  }
-
-  async handleOAuthLogin(
-    oauthProfile: OAuthProfile,
-    metadata: RequestMetadata,
-    res: Response,
-    hostname?: string,
-  ) {
-    const loginMethodMap: Record<OAuthProvider, LoginMethod> = {
-      GOOGLE: 'OAUTH_GOOGLE',
-      FACEBOOK: 'OAUTH_FACEBOOK',
-      INSTAGRAM: 'OAUTH_INSTAGRAM',
-    };
-
-    let oauthAccount = await this.prisma.oAuthAccount.findUnique({
-      where: {
-        provider_providerAccountId: {
-          provider: oauthProfile.provider,
-          providerAccountId: oauthProfile.providerAccountId,
-        },
-      },
-      include: { user: true },
-    });
-
-    let user: Awaited<ReturnType<typeof this.prisma.user.findUniqueOrThrow>>;
-
-    if (oauthAccount) {
-      user = oauthAccount.user;
-      await this.prisma.oAuthAccount.update({
-        where: { id: oauthAccount.id },
-        data: {
-          accessToken: oauthProfile.accessToken,
-          refreshToken: oauthProfile.refreshToken,
-        },
-      });
-    } else if (oauthProfile.email) {
-      const existingUser = await this.prisma.user.findUnique({
-        where: { email: oauthProfile.email },
-      });
-
-      if (existingUser) {
-        user = existingUser;
-        await this.prisma.oAuthAccount.create({
-          data: {
-            userId: existingUser.id,
-            provider: oauthProfile.provider,
-            providerAccountId: oauthProfile.providerAccountId,
-            accessToken: oauthProfile.accessToken,
-            refreshToken: oauthProfile.refreshToken,
-          },
-        });
-      } else {
-        user = await this.prisma.$transaction(async (tx) => {
-          const newUser = await tx.user.create({
-            data: {
-              name: oauthProfile.name,
-              surname: oauthProfile.surname,
-              email: oauthProfile.email,
-              emailVerified: oauthProfile.emailVerified,
-              avatar: oauthProfile.avatar,
-            },
-          });
-          await tx.oAuthAccount.create({
-            data: {
-              userId: newUser.id,
-              provider: oauthProfile.provider,
-              providerAccountId: oauthProfile.providerAccountId,
-              accessToken: oauthProfile.accessToken,
-              refreshToken: oauthProfile.refreshToken,
-            },
-          });
-          return newUser;
-        });
-      }
-    } else {
-      user = await this.prisma.$transaction(async (tx) => {
-        const newUser = await tx.user.create({
-          data: {
-            name: oauthProfile.name,
-            surname: oauthProfile.surname,
-            email: null,
-            emailVerified: false,
-            avatar: oauthProfile.avatar,
-          },
-        });
-        await tx.oAuthAccount.create({
-          data: {
-            userId: newUser.id,
-            provider: oauthProfile.provider,
-            providerAccountId: oauthProfile.providerAccountId,
-            accessToken: oauthProfile.accessToken,
-            refreshToken: oauthProfile.refreshToken,
-          },
-        });
-        return newUser;
-      });
-    }
-
-    if (user.status !== 'ACTIVE') {
-      throw new ForbiddenException(
-        `backend.errors.auth.account_${user.status.toLowerCase()}`
-      );
-    }
-
-    const validatedUser: ValidatedUser = {
-      id: user.id,
-      name: user.name,
-      surname: user.surname,
-      email: user.email,
-      phone: user.phone,
-      emailVerified: user.emailVerified,
-      phoneVerified: user.phoneVerified,
-    };
-
-    const result = await this.issueTokens(validatedUser, metadata, res, hostname);
-
-    const loginMethod = loginMethodMap[oauthProfile.provider];
-
-    await this.prisma.$transaction([
-      this.prisma.loginHistory.create({
-        data: {
-          userId: user.id,
-          sessionId: result.sessionId,
-          deviceId: result.deviceId,
-          ipAddress: metadata.ipAddress,
-          userAgent: metadata.userAgent,
-          loginMethod,
-          status: 'SUCCESS',
-        },
-      }),
-      this.prisma.user.update({
-        where: { id: user.id },
-        data: {
-          lastLoginAt: new Date(),
-          loginCount: { increment: 1 },
-        },
-      }),
-      this.prisma.accountEvent.create({
-        data: {
-          userId: user.id,
-          eventType: 'LOGIN',
-          ipAddress: metadata.ipAddress,
-          userAgent: metadata.userAgent,
-          metadata: { provider: oauthProfile.provider },
-        },
-      }),
-    ]);
-
-    return result;
   }
 
   private async issueTokens(

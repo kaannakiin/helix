@@ -1,25 +1,31 @@
 import {
   ConflictException,
   ForbiddenException,
+  Inject,
   Injectable,
 } from '@nestjs/common';
 import { hash as argon2Hash, verify as argon2Verify } from '@node-rs/argon2';
 import type { CustomerTokenPayload } from '@org/types/storefront';
 import { randomUUID } from 'crypto';
 import type { Response } from 'express';
+import type Redis from 'ioredis';
 import {
   clearCustomerAuthCookies,
   setCustomerAccessTokenCookie,
   setCustomerRefreshTokenCookie,
 } from '../../../core/utils/cookie.util';
+import { REDIS_CLIENT } from '../../redis/redis.constants';
 import { PrismaService } from '../../prisma/prisma.service';
 import { CustomerDeviceService } from './customer-device.service';
 import { CustomerSessionService } from './customer-session.service';
 import { CustomerTokenService } from './customer-token.service';
 import type {
+  CustomerOAuthProfile,
   CustomerRequestMetadata,
   ValidatedCustomer,
 } from './interfaces';
+
+const OAUTH_STATE_TTL_SECONDS = 300;
 
 @Injectable()
 export class StorefrontAuthService {
@@ -28,6 +34,7 @@ export class StorefrontAuthService {
     private readonly tokenService: CustomerTokenService,
     private readonly sessionService: CustomerSessionService,
     private readonly deviceService: CustomerDeviceService,
+    @Inject(REDIS_CLIENT) private readonly redis: Redis,
   ) {}
 
   async register(
@@ -202,6 +209,150 @@ export class StorefrontAuthService {
     clearCustomerAuthCookies(res, hostname);
 
     return { message: 'Logged out successfully' };
+  }
+
+  // ─── OAuth State (CSRF) ──────────────────────────────────────────────────────
+
+  async generateOAuthState(): Promise<string> {
+    const state = randomUUID();
+    await this.redis.set(
+      `oauth:state:${state}`,
+      '1',
+      'EX',
+      OAUTH_STATE_TTL_SECONDS,
+    );
+    return state;
+  }
+
+  async validateAndConsumeOAuthState(state: string): Promise<boolean> {
+    const key = `oauth:state:${state}`;
+    const result = await this.redis.get(key);
+    if (!result) return false;
+    await this.redis.del(key);
+    return true;
+  }
+
+  // ─── OAuth Login ─────────────────────────────────────────────────────────────
+
+  async handleCustomerOAuthLogin(
+    storeId: string,
+    oauthProfile: CustomerOAuthProfile,
+    metadata: CustomerRequestMetadata,
+    res: Response,
+    hostname?: string,
+  ) {
+    let oauthAccount = await this.prisma.customerOAuthAccount.findUnique({
+      where: {
+        provider_providerAccountId: {
+          provider: oauthProfile.provider,
+          providerAccountId: oauthProfile.providerAccountId,
+        },
+      },
+      include: { customer: true },
+    });
+
+    let customer: { id: string; storeId: string; name: string; surname: string; email: string | null; phone: string | null; status: string };
+
+    if (oauthAccount) {
+      customer = oauthAccount.customer;
+      await this.prisma.customerOAuthAccount.update({
+        where: { id: oauthAccount.id },
+        data: {
+          accessToken: oauthProfile.accessToken,
+          refreshToken: oauthProfile.refreshToken,
+        },
+      });
+    } else if (oauthProfile.email) {
+      const existingCustomer = await this.prisma.customer.findUnique({
+        where: { storeId_email: { storeId, email: oauthProfile.email } },
+      });
+
+      if (existingCustomer) {
+        customer = existingCustomer;
+        await this.prisma.customerOAuthAccount.create({
+          data: {
+            customerId: existingCustomer.id,
+            provider: oauthProfile.provider,
+            providerAccountId: oauthProfile.providerAccountId,
+            accessToken: oauthProfile.accessToken,
+            refreshToken: oauthProfile.refreshToken,
+          },
+        });
+      } else {
+        customer = await this.prisma.$transaction(async (tx) => {
+          const newCustomer = await tx.customer.create({
+            data: {
+              storeId,
+              name: oauthProfile.name,
+              surname: oauthProfile.surname,
+              email: oauthProfile.email,
+              emailVerified: oauthProfile.emailVerified,
+              avatar: oauthProfile.avatar,
+            },
+          });
+          await tx.customerOAuthAccount.create({
+            data: {
+              customerId: newCustomer.id,
+              provider: oauthProfile.provider,
+              providerAccountId: oauthProfile.providerAccountId,
+              accessToken: oauthProfile.accessToken,
+              refreshToken: oauthProfile.refreshToken,
+            },
+          });
+          return newCustomer;
+        });
+      }
+    } else {
+      customer = await this.prisma.$transaction(async (tx) => {
+        const newCustomer = await tx.customer.create({
+          data: {
+            storeId,
+            name: oauthProfile.name,
+            surname: oauthProfile.surname,
+            email: null,
+            emailVerified: false,
+            avatar: oauthProfile.avatar,
+          },
+        });
+        await tx.customerOAuthAccount.create({
+          data: {
+            customerId: newCustomer.id,
+            provider: oauthProfile.provider,
+            providerAccountId: oauthProfile.providerAccountId,
+            accessToken: oauthProfile.accessToken,
+            refreshToken: oauthProfile.refreshToken,
+          },
+        });
+        return newCustomer;
+      });
+    }
+
+    if (customer.status !== 'ACTIVE') {
+      throw new ForbiddenException(
+        `backend.errors.auth.account_${customer.status.toLowerCase()}`,
+      );
+    }
+
+    const validatedCustomer: ValidatedCustomer = {
+      id: customer.id,
+      storeId: customer.storeId,
+      name: customer.name,
+      surname: customer.surname,
+      email: customer.email,
+      phone: customer.phone,
+    };
+
+    const result = await this.issueTokens(validatedCustomer, metadata, res, hostname);
+
+    await this.prisma.customer.update({
+      where: { id: customer.id },
+      data: {
+        lastLoginAt: new Date(),
+        loginCount: { increment: 1 },
+      },
+    });
+
+    return result;
   }
 
   async getProfile(customerId: string) {

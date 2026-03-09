@@ -37,15 +37,11 @@ import {
   UpdateProfileDTO,
 } from './dto';
 import {
-  FacebookAuthGuard,
-  GoogleAuthGuard,
-  InstagramAuthGuard,
   JwtRefreshGuard,
   LocalAuthGuard,
   PortalHostnameGuard,
 } from './guards';
 import type {
-  OAuthProfile,
   RefreshTokenContext,
   RequestMetadata,
   ValidatedUser,
@@ -217,84 +213,6 @@ export class AuthController {
     @Query() query: PaginationQueryDTO
   ) {
     return this.authService.getLoginHistory(userId, query.page, query.limit);
-  }
-
-  @Public()
-  @UseGuards(GoogleAuthGuard)
-  @Get('google')
-  @ApiOperation({ summary: 'Initiate Google OAuth login' })
-  googleLogin(): void {}
-
-  @Public()
-  @UseGuards(GoogleAuthGuard)
-  @Get('google/callback')
-  @ApiOperation({ summary: 'Google OAuth callback' })
-  async googleCallback(
-    @Req() req: Request,
-    @Res() res: Response,
-    @RealIp() ip: string
-  ) {
-    const oauthProfile = req.user as OAuthProfile;
-    const metadata = this.buildMetadata(req, ip);
-    const frontendUrl = this.config.getOrThrow<string>('FRONTEND_URL');
-    try {
-      await this.authService.handleOAuthLogin(oauthProfile, metadata, res, req.hostname);
-      res.redirect(frontendUrl);
-    } catch {
-      res.redirect(`${frontendUrl}/auth/error`);
-    }
-  }
-
-  @Public()
-  @UseGuards(FacebookAuthGuard)
-  @Get('facebook')
-  @ApiOperation({ summary: 'Initiate Facebook OAuth login' })
-  facebookLogin(): void {}
-
-  @Public()
-  @UseGuards(FacebookAuthGuard)
-  @Get('facebook/callback')
-  @ApiOperation({ summary: 'Facebook OAuth callback' })
-  async facebookCallback(
-    @Req() req: Request,
-    @Res() res: Response,
-    @RealIp() ip: string
-  ) {
-    const oauthProfile = req.user as OAuthProfile;
-    const metadata = this.buildMetadata(req, ip);
-    const frontendUrl = this.config.getOrThrow<string>('FRONTEND_URL');
-    try {
-      await this.authService.handleOAuthLogin(oauthProfile, metadata, res, req.hostname);
-      res.redirect(frontendUrl);
-    } catch {
-      res.redirect(`${frontendUrl}/auth/error`);
-    }
-  }
-
-  @Public()
-  @UseGuards(InstagramAuthGuard)
-  @Get('instagram')
-  @ApiOperation({ summary: 'Initiate Instagram OAuth login' })
-  instagramLogin(): void {}
-
-  @Public()
-  @UseGuards(InstagramAuthGuard)
-  @Get('instagram/callback')
-  @ApiOperation({ summary: 'Instagram OAuth callback' })
-  async instagramCallback(
-    @Req() req: Request,
-    @Res() res: Response,
-    @RealIp() ip: string
-  ) {
-    const oauthProfile = req.user as OAuthProfile;
-    const metadata = this.buildMetadata(req, ip);
-    const frontendUrl = this.config.getOrThrow<string>('FRONTEND_URL');
-    try {
-      await this.authService.handleOAuthLogin(oauthProfile, metadata, res, req.hostname);
-      res.redirect(frontendUrl);
-    } catch {
-      res.redirect(`${frontendUrl}/auth/error`);
-    }
   }
 
   private buildMetadata(req: Request, ip: string): RequestMetadata {
