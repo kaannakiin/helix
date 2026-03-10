@@ -164,7 +164,7 @@ export function StoreDomainStatusCard({
                     size="xs"
                     onClick={() =>
                       router.push(
-                        `/admin/stores/${storeId}/domains/connect?domain=${ds.baseDomain}`
+                        `/stores/${storeId}/domains/connect?domain=${ds.baseDomain}`
                       )
                     }
                   >

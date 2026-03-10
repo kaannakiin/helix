@@ -151,6 +151,59 @@
       "ACTIVE": "Active",
       "INACTIVE": "Inactive",
       "MAINTENANCE": "Under Maintenance"
+    },
+    "priceListType": {
+      "BASE": "Base",
+      "SALE": "Sale",
+      "CUSTOM": "Custom",
+      "CONTRACT": "Contract"
+    },
+    "priceListStatus": {
+      "DRAFT": "Draft",
+      "ACTIVE": "Active",
+      "ARCHIVED": "Archived"
+    },
+    "currencyCode": {
+      "TRY": "TRY",
+      "USD": "USD",
+      "EUR": "EUR",
+      "GBP": "GBP"
+    },
+    "sourceSystem": {
+      "INTERNAL": "Internal",
+      "SAP": "SAP",
+      "CANIAS": "Canias",
+      "WMS": "WMS",
+      "API": "API",
+      "CSV_IMPORT": "CSV Import",
+      "MANUAL_IMPORT": "Manual Import"
+    },
+    "roundingRule": {
+      "NONE": "None",
+      "ROUND_99": "Round to .99",
+      "ROUND_95": "Round to .95",
+      "ROUND_NEAREST": "Round Nearest",
+      "ROUND_UP": "Round Up",
+      "ROUND_DOWN": "Round Down"
+    },
+    "assignmentTargetType": {
+      "ALL_CUSTOMERS": "All Customers",
+      "CUSTOMER_GROUP": "Customer Group",
+      "ORGANIZATION": "Organization",
+      "CUSTOMER": "Customer"
+    },
+    "priceOriginType": {
+      "FIXED": "Fixed",
+      "RELATIVE": "Relative"
+    },
+    "adjustmentType": {
+      "PERCENTAGE": "Percentage",
+      "FIXED_AMOUNT": "Fixed Amount"
+    },
+    "taxBehavior": {
+      "INCLUSIVE": "Inclusive",
+      "EXCLUSIVE": "Exclusive",
+      "UNSPECIFIED": "Unspecified"
     }
   },
   "relationInput": {
@@ -454,7 +507,12 @@
             "images": "Images",
             "imagesDescription": "Manage images for this variant",
             "cancel": "Cancel",
-            "save": "Save"
+            "save": "Save",
+            "price": "Price",
+            "compareAtPrice": "Compare-at Price",
+            "costPrice": "Cost Price",
+            "costCurrency": "Cost Currency",
+            "costCurrencyPlaceholder": "Select currency..."
           },
           "bulkDrawer": {
             "title": "Edit {count} Variants",
@@ -462,14 +520,36 @@
             "images": "Images",
             "imagesDescription": "Replace images for all selected variants",
             "cancel": "Cancel",
-            "apply": "Apply"
-          }
+            "apply": "Apply",
+            "price": "Price",
+            "pricePlaceholder": "Set fixed price",
+            "costPrice": "Cost Price",
+            "costPricePlaceholder": "Set fixed cost",
+            "costCurrency": "Cost Currency",
+            "costCurrencyPlaceholder": "Select currency..."
+          },
+          "price": "Price",
+          "compareAtPrice": "Comp. Price",
+          "costPrice": "Cost",
+          "costCurrency": "Cost Currency"
         },
         "salesChannels": {
           "title": "Sales Channels",
           "placeholder": "Select stores...",
           "b2b": "B2B",
           "b2c": "B2C"
+        },
+        "pricing": {
+          "title": "Pricing",
+          "price": "Price",
+          "pricePlaceholder": "0.00",
+          "compareAtPrice": "Compare-at Price",
+          "compareAtPricePlaceholder": "0.00",
+          "costPrice": "Cost Price",
+          "costPricePlaceholder": "0.00",
+          "costCurrency": "Cost Currency",
+          "costCurrencyPlaceholder": "Select currency...",
+          "profitMargin": "Profit Margin"
         }
       },
       "noRows": {
@@ -999,12 +1079,18 @@
         "name": "Name",
         "type": "Type",
         "status": "Status",
-        "currencyCode": "Currency",
+        "defaultCurrencyCode": "Currency",
         "isActive": "Active",
         "priority": "Priority",
         "validFrom": "Valid From",
         "validTo": "Valid To",
         "pricesCount": "Prices",
+        "sourceSystem": "Source System",
+        "isExchangeRateDerived": "Derived",
+        "sourceCurrencyCode": "Source Currency",
+        "isSourceLocked": "Locked",
+        "store": "Store",
+        "assignmentsCount": "Assignments",
         "createdAt": "Created At"
       },
       "contextMenu": {
@@ -1042,10 +1128,234 @@
           "ACTIVE": "Active",
           "DRAFT": "Draft",
           "ARCHIVED": "Archived"
+        },
+        "sourceSystem": {
+          "INTERNAL": "Internal",
+          "ERP": "ERP",
+          "IMPORT": "Import"
         }
       },
       "noRows": {
         "label": "No price lists found"
+      },
+      "actions": {
+        "newPriceList": "New Price List"
+      },
+      "form": {
+        "newPriceList": "New Price List",
+        "discard": "Discard",
+        "save": "Save",
+        "saveSuccess": "Price list saved successfully.",
+        "saveError": "Failed to save price list.",
+        "loadError": "Failed to Load",
+        "loadErrorDescription": "An error occurred while loading the price list.",
+        "notFound": "Price List Not Found",
+        "notFoundDescription": "The price list you are looking for does not exist.",
+        "backToList": "Back to Price Lists",
+        "tabs": {
+          "general": "General",
+          "assignments": "Assignments",
+          "prices": "Prices"
+        },
+        "generalInfo": "General Information",
+        "name": { "label": "Name", "placeholder": "Enter price list name" },
+        "store": { "label": "Store", "placeholder": "Select store" },
+        "type": { "label": "Type" },
+        "status": { "label": "Status" },
+        "defaultCurrencyCode": { "label": "Default Currency" },
+        "priority": { "label": "Priority" },
+        "description": { "label": "Description", "placeholder": "Optional description" },
+        "isActive": "Active",
+        "validityCard": "Validity & Contract",
+        "validFrom": { "label": "Valid From" },
+        "validTo": { "label": "Valid To" },
+        "contractRef": { "label": "Contract Reference", "placeholder": "e.g. CNT-2024-001" },
+        "currencyBehaviorCard": {
+          "title": "Currency Behavior",
+          "description": "Configure how prices are sourced and converted in this price list."
+        },
+        "isExchangeRateDerived": {
+          "label": "Exchange Rate Derived",
+          "description": "When enabled, prices are automatically converted from the source currency using current exchange rates."
+        },
+        "sourceCurrencyCode": {
+          "label": "Source Currency",
+          "description": "The currency in which original prices are defined before conversion."
+        },
+        "roundingRule": {
+          "label": "Rounding Rule",
+          "description": "How converted prices are rounded after exchange rate calculation."
+        },
+        "sourceSystem": { "label": "Source System" },
+        "isSourceLocked": {
+          "label": "Source Locked",
+          "description": "When enabled, prices are managed by an external system and cannot be edited manually in the Prices tab."
+        },
+        "sourceLockedWarning": "This price list is locked. Prices are managed by {sourceSystem} and cannot be modified here.",
+        "sourceLockedWarningInternal": "This price list is locked. Prices cannot be edited manually.",
+        "derivedPricingInfo": "Prices in this list are automatically converted from {sourceCurrency} to {defaultCurrency}. Exchange rates are applied at write-time.",
+        "prices": {
+          "title": "Prices",
+          "description": "View prices configured for this price list.",
+          "lockedCallout": "Price editing is disabled because this list is managed by an external system.",
+          "emptyState": "No prices configured yet. Prices will appear here once they are imported or created.",
+          "lockedBadge": "Locked",
+          "colVariantId": "Variant ID",
+          "colPrice": "Price",
+          "colCompareAtPrice": "Compare At",
+          "colCostPrice": "Cost",
+          "colCurrency": "Currency",
+          "colOriginType": "Origin",
+          "colMinQty": "Min Qty",
+          "colSourcePrice": "Source Price",
+          "colExchangeRate": "FX Rate",
+          "colLocked": "Locked",
+          "rowCount": "{count} prices",
+          "showingLimited": "Showing first {shown} of {total} prices."
+        },
+        "statusCard": "Status & Metadata",
+        "baseTypeNote": "Base price list uses the store's default currency.",
+        "enums": {
+          "type": {
+            "BASE": "Base",
+            "SALE": "Sale",
+            "CUSTOM": "Custom",
+            "CONTRACT": "Contract"
+          },
+          "status": {
+            "ACTIVE": "Active",
+            "DRAFT": "Draft",
+            "ARCHIVED": "Archived"
+          },
+          "sourceSystem": {
+            "INTERNAL": "Internal",
+            "SAP": "SAP",
+            "CANIAS": "Canias",
+            "WMS": "WMS",
+            "API": "API",
+            "CSV_IMPORT": "CSV Import",
+            "MANUAL_IMPORT": "Manual Import"
+          },
+          "roundingRule": {
+            "NONE": "None",
+            "ROUND_99": "Round to .99",
+            "ROUND_95": "Round to .95",
+            "ROUND_NEAREST": "Round Nearest",
+            "ROUND_UP": "Round Up",
+            "ROUND_DOWN": "Round Down"
+          }
+        },
+        "assignments": {
+          "title": "Assignments",
+          "description": "Define which customers or groups can access this price list.",
+          "addAssignment": "Add Assignment",
+          "emptyState": "No assignments configured. This price list is not assigned to any target.",
+          "colTargetType": "Target Type",
+          "colTargetName": "Target",
+          "colPriority": "Priority",
+          "saveSuccess": "Assignment saved successfully.",
+          "saveError": "Failed to save assignment.",
+          "deleteSuccess": "Assignment deleted.",
+          "deleteError": "Failed to delete assignment.",
+          "deleteConfirmTitle": "Delete Assignment",
+          "deleteConfirmBody": "Are you sure you want to remove this assignment?",
+          "allCustomersLabel": "All Customers",
+          "modal": {
+            "title": "Add Assignment",
+            "editTitle": "Edit Assignment",
+            "targetType": { "label": "Target Type", "placeholder": "Select target type" },
+            "customerGroup": { "label": "Customer Group", "placeholder": "Select customer group" },
+            "organization": { "label": "Organization", "placeholder": "Select organization" },
+            "customer": { "label": "Customer", "placeholder": "Select customer" },
+            "priority": { "label": "Priority" },
+            "allCustomersInfo": "This price list will apply to all customers in the store.",
+            "cancel": "Cancel",
+            "add": "Add"
+          }
+        },
+        "prices": {
+          "title": "Prices",
+          "description": "Manage individual price entries for product variants.",
+          "addVariants": "Add Variants",
+          "summary": {
+            "totalRows": "Total Rows",
+            "currencies": "Currencies",
+            "lockedRows": "Locked Rows",
+            "missingPrices": "Missing Prices"
+          },
+          "table": {
+            "variantName": "Variant",
+            "sku": "SKU",
+            "currency": "Currency",
+            "originType": "Origin",
+            "price": "Price",
+            "compareAt": "Compare At",
+            "minQty": "Min Qty",
+            "maxQty": "Max Qty",
+            "uom": "UoM",
+            "validity": "Validity",
+            "locked": "Locked",
+            "updatedAt": "Updated"
+          },
+          "contextMenu": {
+            "edit": "Edit",
+            "delete": "Delete"
+          },
+          "footer": {
+            "totalRows": "Total: {count}",
+            "selectedRows": "Selected: {count}",
+            "refresh": "Refresh"
+          },
+          "noRows": {
+            "label": "No price rows found"
+          },
+          "editDrawer": {
+            "title": "Edit Price Row",
+            "createTitle": "New Price Row",
+            "variant": "Variant",
+            "sku": "SKU",
+            "currency": "Currency",
+            "originType": "Origin Type",
+            "price": "Price",
+            "compareAtPrice": "Compare At Price",
+            "costPrice": "Cost Price",
+            "adjustmentType": "Adjustment Type",
+            "adjustmentValue": "Adjustment Value",
+            "minQuantity": "Min Quantity",
+            "maxQuantity": "Max Quantity",
+            "unitOfMeasure": "Unit of Measure",
+            "taxBehavior": "Tax Behavior",
+            "validFrom": "Valid From",
+            "validTo": "Valid To",
+            "conditionType": "Condition Type",
+            "metadata": "Source Metadata",
+            "sourcePrice": "Source Price",
+            "sourceExchangeRate": "Applied Exchange Rate",
+            "lastRateComputedAt": "Last Rate Computed",
+            "isSourceLocked": "Source Locked",
+            "save": "Save",
+            "cancel": "Cancel",
+            "saveSuccess": "Price row saved.",
+            "saveError": "Failed to save price row.",
+            "lockedWarning": "This row is source-locked and cannot be edited."
+          },
+          "addDrawer": {
+            "title": "Add Variants",
+            "searchPlaceholder": "Search by SKU or product name...",
+            "addSelected": "Add Selected",
+            "noResults": "No variants found.",
+            "currency": "Default Currency",
+            "uom": "Default Unit of Measure",
+            "originType": "Origin Type",
+            "success": "Variants added successfully.",
+            "error": "Failed to add variants.",
+            "cancel": "Cancel"
+          },
+          "deleteConfirmTitle": "Delete Price Row",
+          "deleteConfirmBody": "Are you sure you want to remove this price row?",
+          "deleteSuccess": "Price row deleted.",
+          "deleteError": "Failed to delete price row."
+        }
       }
     },
     "customerGroups": {
@@ -1297,7 +1607,50 @@
       "new": "New Store",
       "tabs": {
         "general": "General",
-        "domains": "Domains"
+        "domains": "Domains",
+        "currencies": "Currencies"
+      },
+      "currencies": {
+        "title": "Currency Policy",
+        "subtitle": "Manage which currencies are available in this store.",
+        "defaultCurrency": {
+          "title": "Default Currency",
+          "description": "The store's primary currency. Checkout fallback and base price list rotation are tied to this.",
+          "label": "Default Currency",
+          "changeConfirmTitle": "Change Default Currency?",
+          "changeConfirmBody": "A new BASE price list will be created for the new currency. Do you want to continue?",
+          "changeConfirmBtn": "Change",
+          "cancel": "Cancel"
+        },
+        "policy": {
+          "title": "Currency Rows",
+          "description": "Configure visibility, checkout access, and display order per currency.",
+          "addCurrency": "Add Currency",
+          "colCurrency": "Currency",
+          "colStorefront": "Visible in storefront",
+          "colCheckout": "Allow checkout",
+          "colSortOrder": "Sort order",
+          "colRole": "Role"
+        },
+        "roles": {
+          "default": "Default",
+          "checkout": "Checkout",
+          "displayOnly": "Display only"
+        },
+        "addModal": {
+          "title": "Add Currency",
+          "currencyLabel": "Currency",
+          "currencyPlaceholder": "Select currency...",
+          "add": "Add",
+          "cancel": "Cancel",
+          "noneAvailable": "All platform currencies are already added."
+        },
+        "saveSuccess": "Currency settings saved.",
+        "saveError": "Failed to save currency settings.",
+        "deleteSuccess": "Currency removed.",
+        "deleteError": "Failed to remove currency.",
+        "addSuccess": "Currency added.",
+        "addError": "Failed to add currency."
       },
       "domains": {
         "title": "Connected Domains",

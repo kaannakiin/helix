@@ -20,6 +20,7 @@ model Organization {
 
   customerGroupMemberships CustomerGroupMember[]
   members                  OrganizationMember[]
+  priceListAssignments     PriceListAssignment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

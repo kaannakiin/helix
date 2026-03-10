@@ -14,8 +14,8 @@ import {
   setCustomerAccessTokenCookie,
   setCustomerRefreshTokenCookie,
 } from '../../../core/utils/cookie.util';
-import { REDIS_CLIENT } from '../../redis/redis.constants';
 import { PrismaService } from '../../prisma/prisma.service';
+import { REDIS_CLIENT } from '../../redis/redis.constants';
 import { CustomerDeviceService } from './customer-device.service';
 import { CustomerSessionService } from './customer-session.service';
 import { CustomerTokenService } from './customer-token.service';
@@ -34,7 +34,7 @@ export class StorefrontAuthService {
     private readonly tokenService: CustomerTokenService,
     private readonly sessionService: CustomerSessionService,
     private readonly deviceService: CustomerDeviceService,
-    @Inject(REDIS_CLIENT) private readonly redis: Redis,
+    @Inject(REDIS_CLIENT) private readonly redis: Redis
   ) {}
 
   async register(
@@ -48,7 +48,7 @@ export class StorefrontAuthService {
     },
     metadata: CustomerRequestMetadata,
     res: Response,
-    hostname?: string,
+    hostname?: string
   ) {
     if (data.email) {
       const existing = await this.prisma.customer.findUnique({
@@ -92,7 +92,7 @@ export class StorefrontAuthService {
       },
       metadata,
       res,
-      hostname,
+      hostname
     );
   }
 
@@ -100,7 +100,7 @@ export class StorefrontAuthService {
     storeId: string,
     email: string | null,
     phone: string | null,
-    password: string,
+    password: string
   ): Promise<ValidatedCustomer | null> {
     if (!email && !phone) return null;
 
@@ -116,7 +116,7 @@ export class StorefrontAuthService {
 
     if (customer.status !== 'ACTIVE') {
       throw new ForbiddenException(
-        `backend.errors.auth.account_${customer.status.toLowerCase()}`,
+        `backend.errors.auth.account_${customer.status.toLowerCase()}`
       );
     }
 
@@ -139,9 +139,14 @@ export class StorefrontAuthService {
     validatedCustomer: ValidatedCustomer,
     metadata: CustomerRequestMetadata,
     res: Response,
-    hostname?: string,
+    hostname?: string
   ) {
-    const result = await this.issueTokens(validatedCustomer, metadata, res, hostname);
+    const result = await this.issueTokens(
+      validatedCustomer,
+      metadata,
+      res,
+      hostname
+    );
 
     await this.prisma.customer.update({
       where: { id: validatedCustomer.id },
@@ -162,7 +167,7 @@ export class StorefrontAuthService {
       tokenId: string;
     },
     res: Response,
-    hostname?: string,
+    hostname?: string
   ) {
     const payload: CustomerTokenPayload = {
       sub: context.user.sub,
@@ -197,7 +202,7 @@ export class StorefrontAuthService {
     customerId: string,
     sessionId: string | undefined,
     res: Response,
-    hostname?: string,
+    hostname?: string
   ) {
     if (sessionId) {
       await Promise.all([
@@ -211,15 +216,13 @@ export class StorefrontAuthService {
     return { message: 'Logged out successfully' };
   }
 
-  // ─── OAuth State (CSRF) ──────────────────────────────────────────────────────
-
   async generateOAuthState(): Promise<string> {
     const state = randomUUID();
     await this.redis.set(
       `oauth:state:${state}`,
       '1',
       'EX',
-      OAUTH_STATE_TTL_SECONDS,
+      OAUTH_STATE_TTL_SECONDS
     );
     return state;
   }
@@ -232,14 +235,12 @@ export class StorefrontAuthService {
     return true;
   }
 
-  // ─── OAuth Login ─────────────────────────────────────────────────────────────
-
   async handleCustomerOAuthLogin(
     storeId: string,
     oauthProfile: CustomerOAuthProfile,
     metadata: CustomerRequestMetadata,
     res: Response,
-    hostname?: string,
+    hostname?: string
   ) {
     let oauthAccount = await this.prisma.customerOAuthAccount.findUnique({
       where: {
@@ -251,7 +252,15 @@ export class StorefrontAuthService {
       include: { customer: true },
     });
 
-    let customer: { id: string; storeId: string; name: string; surname: string; email: string | null; phone: string | null; status: string };
+    let customer: {
+      id: string;
+      storeId: string;
+      name: string;
+      surname: string;
+      email: string | null;
+      phone: string | null;
+      status: string;
+    };
 
     if (oauthAccount) {
       customer = oauthAccount.customer;
@@ -329,7 +338,7 @@ export class StorefrontAuthService {
 
     if (customer.status !== 'ACTIVE') {
       throw new ForbiddenException(
-        `backend.errors.auth.account_${customer.status.toLowerCase()}`,
+        `backend.errors.auth.account_${customer.status.toLowerCase()}`
       );
     }
 
@@ -342,7 +351,12 @@ export class StorefrontAuthService {
       phone: customer.phone,
     };
 
-    const result = await this.issueTokens(validatedCustomer, metadata, res, hostname);
+    const result = await this.issueTokens(
+      validatedCustomer,
+      metadata,
+      res,
+      hostname
+    );
 
     await this.prisma.customer.update({
       where: { id: customer.id },
@@ -366,7 +380,7 @@ export class StorefrontAuthService {
     validatedCustomer: ValidatedCustomer,
     metadata: CustomerRequestMetadata,
     res: Response,
-    hostname?: string,
+    hostname?: string
   ) {
     const device = await this.deviceService.findOrCreateDevice({
       customerId: validatedCustomer.id,

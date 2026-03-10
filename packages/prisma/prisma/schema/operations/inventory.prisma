@@ -67,7 +67,7 @@ model StockMovementGroup {
   destWarehouse   Warehouse? @relation("MovementGroupDestWarehouse", fields: [destWarehouseId], references: [id])
 
   // External document reference
-  referenceType   String? // "PURCHASE_ORDER", "SALES_ORDER", "RETURN"
+  referenceType   BusinessReferenceType?
   referenceId     String?
   referenceNumber String? // Human-readable ref number
 
@@ -81,7 +81,8 @@ model StockMovementGroup {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  movements StockMovement[]
+  movements    StockMovement[]
+  statusEvents StockMovementGroupStatusEvent[]
 
   @@index([documentNumber])
   @@index([movementType])
@@ -136,7 +137,7 @@ model StockMovement {
   serialNumber   SerialNumber? @relation(fields: [serialNumberId], references: [id], onDelete: SetNull)
 
   // Cost tracking (for valuation)
-  unitCost     Float?
+  unitCost     Decimal?
   currencyCode CurrencyCode?
 
   // Snapshot: stock quantity after this movement was applied
@@ -151,6 +152,29 @@ model StockMovement {
   @@index([batchId])
   @@index([serialNumberId])
   @@index([productVariantId, createdAt])
+  @@index([createdAt])
+}
+
+model StockMovementGroupStatusEvent {
+  id String @id @default(cuid())
+
+  stockMovementGroupId String
+  stockMovementGroup   StockMovementGroup @relation(fields: [stockMovementGroupId], references: [id], onDelete: Cascade)
+
+  fromStatus StockMovementStatus?
+  toStatus   StockMovementStatus
+
+  actorUserId String?
+  actorUser   User?   @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  reason   String?
+  metadata Json?
+
+  createdAt DateTime @default(now())
+
+  @@index([stockMovementGroupId])
+  @@index([actorUserId])
+  @@index([toStatus])
   @@index([createdAt])
 }
 

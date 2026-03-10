@@ -64,7 +64,25 @@
       "decision_tree_simple_no_branch_not_allowed": "No-branch is not allowed in simple mode.",
       "active_stores_required": "At least one store must be selected.",
       "duplicate_store": "Duplicate store selection detected.",
-      "timezone_invalid": "Invalid timezone."
+      "timezone_invalid": "Invalid timezone.",
+      "price_list_name_required": "Price list name is required.",
+      "price_list_currency_required": "Price list currency is required.",
+      "price_required": "Price is required.",
+      "price_nonnegative": "Price must be non-negative.",
+      "cost_currency_required": "Cost currency is required when cost price is set.",
+      "duplicate_variant_price": "Duplicate variant price detected.",
+      "compare_at_price_must_be_higher": "Compare-at price must be higher than the selling price.",
+      "source_currency_required_for_exchange_rate": "Source currency is required when exchange rate derivation is enabled.",
+      "source_currency_must_differ_from_default": "Source currency must differ from the default currency.",
+      "date_from_must_be_before_to": "End date must be after start date.",
+      "date_from_cannot_be_in_past": "Start date cannot be set in the past."
+    },
+    "pricing": {
+      "assignment_relation_required": "A target must be selected for this assignment type.",
+      "assignment_relation_must_be_null": "No target should be selected for this assignment type.",
+      "adjustment_type_required_for_relative": "Adjustment type is required for relative pricing.",
+      "adjustment_value_required_for_relative": "Adjustment value is required for relative pricing.",
+      "max_qty_must_be_gte_min": "Maximum quantity must be greater than or equal to minimum quantity."
     }
   }
 }

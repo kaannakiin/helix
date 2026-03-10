@@ -166,6 +166,30 @@ throw new BadRequestException('backend.errors.file_too_large|{"max":"10MB"}');
 
 `HttpExceptionI18nFilter` translates the key using `Accept-Language` or `x-lang` header.
 
+## Prisma Where Filters — Always Type Them
+
+**Never use `as any` on Prisma where objects.** Always annotate filters with `Prisma.{Model}WhereInput` so TypeScript catches invalid field names at compile time instead of runtime `PrismaClientValidationError`.
+
+```typescript
+import type { Prisma } from '@org/prisma/client';
+
+// Good — typos and invalid relations are caught at compile time
+const storeFilter: Prisma.ProductVariantWhereInput = {
+  product: { is: { stores: { some: { storeId } } } },
+};
+const where: Prisma.ProductVariantWhereInput = {
+  ...storeFilter,
+  AND: [...searchFilter, ...notInFilter],
+};
+
+// Bad — silent runtime error if field name is wrong
+const where = { ...storeFilter, AND: [...] } as any;
+```
+
+**Import:** Always use `import type { Prisma } from '@org/prisma/client'` (not `@prisma/client`).
+
+**After schema changes:** Run `npx nx prisma-generate prisma` to regenerate the client — stale types cause the exact same class of runtime errors.
+
 ## Query Builder
 
 `buildPrismaQuery()` in `src/core/utils/prisma-query-builder.ts` converts ag-grid filter/sort params to Prisma queries. Supports text, number, date, boolean, enum filters. For `_count.relation` filters (e.g., "products with more than 5 variants"), use `resolveCountFilters()` with a `COUNT_RELATIONS` map — these become raw SQL subqueries.

@@ -372,7 +372,9 @@ export default function ProductsPage() {
             placeholder={t('searchPlaceholder')}
             value={search}
             onChange={setSearch}
-            style={{ width: 280 }}
+            style={{
+              width: 280,
+            }}
           />
           <Button
             leftSection={<Plus size={16} />}

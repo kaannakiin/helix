@@ -27,10 +27,11 @@
   "dependencies": {
     "@nx/node": "22.5.0",
     "@org/prisma": "*",
+    "@paralleldrive/cuid2": "^3.3.0",
     "@prisma/adapter-pg": "^7.4.1",
-    "dotenv": "^16.0.0",
     "@types/tough-cookie": "^4.0.5",
     "axios-cookiejar-support": "^6.0.5",
+    "dotenv": "^16.0.0",
     "tough-cookie": "^6.0.0"
   }
 }

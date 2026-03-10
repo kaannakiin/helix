@@ -1,4 +1,5 @@
 import {
+  CurrencyCode,
   FileType,
   Locale,
   ProductStatus,
@@ -64,6 +65,12 @@ export const productVariantSchema = z.object({
   trackingStrategy: z
     .enum(TrackingStrategy, { error: V.TRACKING_STRATEGY_REQUIRED })
     .default('NONE'),
+  costPrice: z
+    .number()
+    .nonnegative({ error: V.PRICE_NONNEGATIVE })
+    .nullable()
+    .default(null),
+  costCurrencyCode: z.enum(CurrencyCode).nullable().default(null),
   sortOrder: sortOrderSchema,
   newImages: dropzoneFileSchema({
     maxFiles: 10,
@@ -85,9 +92,32 @@ export const backendProductVariantSchema = z.object({
   trackingStrategy: z
     .enum(TrackingStrategy, { error: V.TRACKING_STRATEGY_REQUIRED })
     .default('NONE'),
+  costPrice: z
+    .number()
+    .nonnegative({ error: V.PRICE_NONNEGATIVE })
+    .nullable()
+    .default(null),
+  costCurrencyCode: z.enum(CurrencyCode).nullable().default(null),
   sortOrder: sortOrderSchema,
   existingImages: z.array(existingImageSchema).default([]),
 });
+
+export const variantPricingSchema = z.object({
+  variantUniqueId: z.cuid2(),
+  price: z
+    .number()
+    .nonnegative({ error: V.PRICE_NONNEGATIVE })
+    .nullable()
+    .default(null),
+  compareAtPrice: z
+    .number()
+    .nonnegative({ error: V.PRICE_NONNEGATIVE })
+    .nullable()
+    .default(null),
+});
+
+export type VariantPricingInput = z.input<typeof variantPricingSchema>;
+export type VariantPricingOutput = z.output<typeof variantPricingSchema>;
 
 type SharedCheckPayload = z.core.ParsePayload<{
   translations: Array<{ locale: string }>;
@@ -102,8 +132,15 @@ type SharedCheckPayload = z.core.ParsePayload<{
     uniqueKey: string;
     optionValueIds: string[];
     sku?: string | undefined;
+    costPrice?: number | null;
+    costCurrencyCode?: string | null;
   }>;
   categories: Array<{ categoryId: string }>;
+  variantPricing?: Array<{
+    variantUniqueId: string;
+    price: number | null;
+    compareAtPrice: number | null;
+  }>;
 }>;
 
 function checkDuplicateLocales({ issues, value }: SharedCheckPayload) {
@@ -277,6 +314,22 @@ function checkDuplicates({ issues, value }: SharedCheckPayload) {
   }
 }
 
+function checkCostCurrencies({ issues, value }: SharedCheckPayload) {
+  for (let i = 0; i < value.variants.length; i++) {
+    const variant = value.variants[i];
+    if (variant.costPrice !== null && variant.costPrice !== undefined) {
+      if (!variant.costCurrencyCode) {
+        issues.push({
+          code: 'custom',
+          input: variant.costCurrencyCode,
+          error: V.COST_CURRENCY_REQUIRED,
+          path: ['variants', i, 'costCurrencyCode'],
+        });
+      }
+    }
+  }
+}
+
 const productSchemaShape = z.object({
   uniqueId: z.cuid2(),
   activeStores: storesSchema
@@ -319,7 +372,27 @@ const productSchemaShape = z.object({
   variants: z.array(productVariantSchema).default([]),
   categories: z.array(productCategorySchema).default([]),
   tagIds: z.array(cuidSchema).default([]),
+  variantPricing: z.array(variantPricingSchema).default([]),
 });
+
+function checkPricing({ issues, value }: SharedCheckPayload) {
+  if (!value.variantPricing) return;
+  for (let i = 0; i < value.variantPricing.length; i++) {
+    const p = value.variantPricing[i];
+    if (
+      p.price !== null &&
+      p.compareAtPrice !== null &&
+      p.compareAtPrice <= p.price
+    ) {
+      issues.push({
+        code: 'custom',
+        input: p.compareAtPrice,
+        error: V.COMPARE_AT_PRICE_MUST_BE_HIGHER,
+        path: ['variantPricing', i, 'compareAtPrice'],
+      });
+    }
+  }
+}
 
 function checkImageCounts({
   issues,
@@ -354,6 +427,8 @@ function checkImageCounts({
 export const ProductSchema = productSchemaShape
   .check(checkDuplicateLocales)
   .check(checkImageCounts)
+  .check(checkPricing)
+  .check(checkCostCurrencies)
   .check(checkVariantIntegrity)
   .check(checkDuplicates);
 
@@ -377,10 +452,13 @@ const backendProductSchemaShape = z.object({
   variants: z.array(backendProductVariantSchema).default([]),
   categories: z.array(productCategorySchema).default([]),
   tagIds: z.array(cuidSchema).default([]),
+  variantPricing: z.array(variantPricingSchema).default([]),
 });
 
 export const BackendProductSchema = backendProductSchemaShape
   .check(checkDuplicateLocales)
+  .check(checkPricing)
+  .check(checkCostCurrencies)
   .check(checkVariantIntegrity)
   .check(checkDuplicates);
 
@@ -411,4 +489,5 @@ export const NEW_PRODUCT_DEFAULT_VALUES: ProductInputType = {
   variants: [],
   categories: [],
   tagIds: [],
+  variantPricing: [],
 };

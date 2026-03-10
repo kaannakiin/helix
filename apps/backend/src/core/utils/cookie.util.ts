@@ -24,12 +24,10 @@ function baseCookieOptions(hostname?: string): CookieOptions {
   };
 }
 
-// ─── Admin (Portal) Cookies ──────────────────────────────────────────────────
-
 export function setAccessTokenCookie(
   res: Response,
   token: string,
-  hostname?: string,
+  hostname?: string
 ): void {
   res.cookie(ACCESS_TOKEN_COOKIE_NAME, token, {
     ...baseCookieOptions(hostname),
@@ -41,7 +39,7 @@ export function setAccessTokenCookie(
 export function setRefreshTokenCookie(
   res: Response,
   token: string,
-  hostname?: string,
+  hostname?: string
 ): void {
   res.cookie(REFRESH_TOKEN_COOKIE_NAME, token, {
     ...baseCookieOptions(hostname),
@@ -62,12 +60,10 @@ export function clearAuthCookies(res: Response, hostname?: string): void {
   });
 }
 
-// ─── Customer (Storefront) Cookies ───────────────────────────────────────────
-
 export function setCustomerAccessTokenCookie(
   res: Response,
   token: string,
-  hostname?: string,
+  hostname?: string
 ): void {
   res.cookie(CUSTOMER_ACCESS_COOKIE_NAME, token, {
     ...baseCookieOptions(hostname),
@@ -78,7 +74,7 @@ export function setCustomerAccessTokenCookie(
 export function setCustomerRefreshTokenCookie(
   res: Response,
   token: string,
-  hostname?: string,
+  hostname?: string
 ): void {
   res.cookie(CUSTOMER_REFRESH_COOKIE_NAME, token, {
     ...baseCookieOptions(hostname),
@@ -88,7 +84,7 @@ export function setCustomerRefreshTokenCookie(
 
 export function clearCustomerAuthCookies(
   res: Response,
-  hostname?: string,
+  hostname?: string
 ): void {
   const opts = hostname ? { domain: hostname } : {};
   res.clearCookie(CUSTOMER_ACCESS_COOKIE_NAME, { path: '/', ...opts });

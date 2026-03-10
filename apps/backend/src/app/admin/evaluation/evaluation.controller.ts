@@ -26,7 +26,7 @@ export class EvaluationController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get paginated list of evaluation jobs' })
   async getEvaluationJobs(@Body() query: EvaluationJobQueryDTO) {
-    return this.evaluationService.getEvaluationJobs(query);
+    // return this.evaluationService.getEvaluationJobs(query);
   }
 
   @Get(':id')

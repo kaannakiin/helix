@@ -8,16 +8,16 @@ npx nx prisma-migrate prisma     # run migrations
 npx nx seed prisma               # run base seed (currencies, locales, countries)
 
 # Individual seeds
-npx tsx src/seeds/base-seed.ts              # bootstrap data
-npx tsx src/new-seeds/catalog-seed.ts       # products, variants, pricing
-npx tsx src/new-seeds/customer-seed.ts      # customers
-npx tsx src/new-seeds/organization-seed.ts  # org hierarchy
-npx tsx src/seeds/store-seed.ts             # sample stores/domains
-npx tsx src/seeds/taxonomy-seed.ts          # Google taxonomy
-npx tsx src/seeds/geolocation-seed.ts       # countries/states/cities
+npx tsx src/seeds/bootstrap/base-seed.ts                # bootstrap data
+npx tsx src/seeds/catalog/catalog-seed.ts               # products, variants, pricing
+npx tsx src/seeds/customer/customer-seed.ts             # customers
+npx tsx src/seeds/organization/organization-seed.ts     # org hierarchy
+npx tsx src/seeds/bootstrap/store-seed.ts               # sample stores/domains
+npx tsx src/seeds/reference/taxonomy/taxonomy-seed.ts   # Google taxonomy
+npx tsx src/seeds/reference/geolocation/geolocation-seed.ts # countries/states/cities
 
 # Bulk seed with env var
-PRODUCT_SEED_COUNT=300 npx tsx src/new-seeds/catalog-seed.ts
+PRODUCT_SEED_COUNT=300 npx tsx src/seeds/catalog/catalog-seed.ts
 ```
 
 ## Schema Organization
@@ -200,9 +200,9 @@ import { Locale, FileType, ... } from '@org/prisma/browser';  // browser-safe en
 
 `/browser` export is safe for frontend — no Node.js dependencies. Use it for enum imports in schemas and UI code.
 
-## Seed Pattern (New Seeds — Preferred)
+## Seed Pattern
 
-New seeds in `src/new-seeds/` follow a config-driven pattern:
+Seeds live under `src/seeds/<domain>/` and follow a config-driven pattern:
 
 ```
 {domain}-seed.ts         # Main seed script

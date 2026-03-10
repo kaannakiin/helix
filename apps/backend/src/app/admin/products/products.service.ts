@@ -67,8 +67,13 @@ export class ProductsService {
     );
 
     if (resolvedWhere['storeIds']) {
-      const storeIdsFilter = resolvedWhere['storeIds'] as { in?: string[]; equals?: string };
-      const ids = storeIdsFilter.in ?? (storeIdsFilter.equals ? [storeIdsFilter.equals] : []);
+      const storeIdsFilter = resolvedWhere['storeIds'] as {
+        in?: string[];
+        equals?: string;
+      };
+      const ids =
+        storeIdsFilter.in ??
+        (storeIdsFilter.equals ? [storeIdsFilter.equals] : []);
       delete resolvedWhere['storeIds'];
       if (ids.length > 0) {
         resolvedWhere['stores'] = { some: { storeId: { in: ids } } };
@@ -177,6 +182,7 @@ export class ProductsService {
       categories,
       tagIds,
       activeStores,
+      variantPricing,
     } = data;
 
     const cleanBrandId = brandId && brandId !== '' ? brandId : null;
@@ -487,6 +493,8 @@ export class ProductsService {
               barcode: variant.barcode || null,
               isActive: variant.isActive,
               trackingStrategy: variant.trackingStrategy,
+              costPrice: variant.costPrice ?? null,
+              costCurrencyCode: variant.costCurrencyCode ?? null,
               sortOrder: variant.sortOrder,
               optionValues: {
                 create: variant.optionValueIds.map((optId) => ({
@@ -499,6 +507,8 @@ export class ProductsService {
               barcode: variant.barcode || null,
               isActive: variant.isActive,
               trackingStrategy: variant.trackingStrategy,
+              costPrice: variant.costPrice ?? null,
+              costCurrencyCode: variant.costCurrencyCode ?? null,
               sortOrder: variant.sortOrder,
               optionValues: {
                 create: variant.optionValueIds.map((optId) => ({
@@ -545,6 +555,60 @@ export class ProductsService {
             storeId,
           })),
         });
+      }
+
+      if (variantPricing.length > 0 && activeStores.length > 0) {
+        const stores = await tx.store.findMany({
+          where: { id: { in: activeStores } },
+          select: {
+            id: true,
+            defaultBasePriceListId: true,
+            defaultBasePriceList: {
+              select: { defaultCurrencyCode: true },
+            },
+          },
+        });
+
+        const defaultUoM = await tx.unitOfMeasure.findFirst({
+          where: { code: 'PC' },
+          select: { id: true },
+        });
+        const defaultUoMId = defaultUoM?.id ?? 'default_uom_pc';
+
+        for (const store of stores) {
+          if (!store.defaultBasePriceListId || !store.defaultBasePriceList)
+            continue;
+
+          const currencyCode = store.defaultBasePriceList.defaultCurrencyCode;
+
+          for (const vp of variantPricing) {
+            await tx.priceListPrice.upsert({
+              where: {
+                priceListId_productVariantId_currencyCode_unitOfMeasureId_minQuantity:
+                  {
+                    priceListId: store.defaultBasePriceListId,
+                    productVariantId: vp.variantUniqueId,
+                    currencyCode,
+                    unitOfMeasureId: defaultUoMId,
+                    minQuantity: 1,
+                  },
+              },
+              create: {
+                priceListId: store.defaultBasePriceListId,
+                productVariantId: vp.variantUniqueId,
+                originType: 'FIXED',
+                price: vp.price,
+                compareAtPrice: vp.compareAtPrice,
+                currencyCode,
+                unitOfMeasureId: defaultUoMId,
+              },
+              update: {
+                price: vp.price,
+                compareAtPrice: vp.compareAtPrice,
+              },
+            });
+          }
+        }
       }
 
       await tx.productTranslation.deleteMany({

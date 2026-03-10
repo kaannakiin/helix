@@ -67,6 +67,9 @@ model ProductVariant {
 
   trackingStrategy TrackingStrategy @default(NONE)
 
+  costPrice Decimal?
+  costCurrencyCode CurrencyCode?
+
   sortOrder Int @default(0)
 
   createdAt DateTime @default(now())

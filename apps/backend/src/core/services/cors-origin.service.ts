@@ -5,7 +5,7 @@ import { PrismaService } from '../../app/prisma/prisma.service';
 export class CorsOriginService {
   private allowedHostnames: Set<string> | null = null;
   private lastRefresh = 0;
-  private readonly TTL = 60_000; // 1 minute cache
+  private readonly TTL = 60_000;
 
   constructor(private readonly prisma: PrismaService) {}
 

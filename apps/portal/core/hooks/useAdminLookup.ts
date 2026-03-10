@@ -100,4 +100,66 @@ export const taxonomyLookupFetcher = createLookupFetcher(
 );
 export const taxonomyTreeFetcher = createTreeFetcher('/admin/taxonomy/tree');
 
+function createQueryFetcher(
+  endpoint: string,
+  mapFn: (item: Record<string, unknown>) => LookupItem,
+  searchField = 'name'
+): FetchOptions {
+  return async ({ q, ids, page = 1 }) => {
+    const query: Record<string, unknown> = { page, limit: LOOKUP_LIMIT };
+    const filters: Record<string, unknown> = {};
+    if (q?.trim()) {
+      filters[searchField] = {
+        filterType: 'text',
+        op: 'contains',
+        value: q.trim(),
+      };
+    }
+    if (ids?.length) {
+      filters['id'] = { filterType: 'set', op: 'in', values: ids };
+    }
+    if (Object.keys(filters).length > 0) {
+      query.filters = filters;
+    }
+    const res = await apiClient.post<
+      PaginatedResponse<Record<string, unknown>>
+    >(endpoint, query);
+    return res.data.data.map(mapFn);
+  };
+}
+
+export const customerGroupQueryFetcher = createQueryFetcher(
+  '/admin/customer-groups/query',
+  (item) => ({ id: item.id as string, label: item.name as string })
+);
+export const organizationQueryFetcher = createQueryFetcher(
+  '/admin/organizations/query',
+  (item) => ({ id: item.id as string, label: item.name as string })
+);
+export const customerQueryFetcher = createQueryFetcher(
+  '/admin/customers/query',
+  (item) => ({
+    id: item.id as string,
+    label: `${item.name as string} ${item.surname as string}`,
+  })
+);
+
+export function createVariantSearchFetcher(
+  priceListId: string
+): FetchOptions {
+  return async ({ q, page = 1 }) => {
+    const res = await apiClient.post<
+      PaginatedResponse<{ id: string; sku: string; productName: string }>
+    >(`/admin/price-lists/${priceListId}/prices/search-variants`, {
+      search: q?.trim() ?? '',
+      page,
+      limit: LOOKUP_LIMIT,
+    });
+    return res.data.data.map((item) => ({
+      id: item.id,
+      label: `${item.sku} — ${item.productName}`,
+    }));
+  };
+}
+
 export { DATA_ACCESS_KEYS };

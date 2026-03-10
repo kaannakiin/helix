@@ -7,6 +7,7 @@ import {
   Divider,
   Drawer,
   Group,
+  NumberInput,
   Select,
   Stack,
   Switch,
@@ -15,7 +16,7 @@ import {
   type DrawerProps,
 } from '@mantine/core';
 import { getMimePatterns } from '@org/constants/product-constants';
-import { FileType } from '@org/prisma/browser';
+import { CurrencyCode, FileType } from '@org/prisma/browser';
 import type {
   ProductInputType,
   ProductVariantInputType,
@@ -41,6 +42,7 @@ interface Props extends Omit<DrawerProps, 'title'> {
   variantIndex: number;
   optionLookup: Map<string, OptionLookupEntry>;
   trackingOptions: Array<{ value: string; label: string }>;
+  currencyOptions: Array<{ value: string; label: string }>;
   deleteImage: (file: RemoteFile) => Promise<boolean>;
   deletingIds: Set<string>;
 }
@@ -49,14 +51,18 @@ export const VariantEditDrawer = ({
   variantIndex,
   optionLookup,
   trackingOptions,
+  currencyOptions,
   deleteImage,
   deletingIds,
   ...drawerProps
 }: Props) => {
   const t = useTranslations('frontend.admin.products.form');
 
-  const { getValues: mainGetValues, setValue: mainSetValue } =
-    useFormContext<ProductInputType>();
+  const {
+    control: mainControl,
+    getValues: mainGetValues,
+    setValue: mainSetValue,
+  } = useFormContext<ProductInputType>();
 
   const draftForm = useForm<ProductVariantInputType>({
     defaultValues: {
@@ -67,6 +73,8 @@ export const VariantEditDrawer = ({
       barcode: '',
       isActive: true,
       trackingStrategy: 'NONE',
+      costPrice: null,
+      costCurrencyCode: null,
       sortOrder: 0,
       newImages: [],
       existingImages: [],
@@ -297,6 +305,80 @@ export const VariantEditDrawer = ({
             />
           )}
         />
+
+        <Divider />
+
+        <Group grow gap="md">
+          <Controller
+            control={mainControl}
+            name={`variantPricing.${variantIndex}.price`}
+            render={({ field, fieldState }) => (
+              <NumberInput
+                {...field}
+                value={field.value ?? ''}
+                onChange={(val) => field.onChange(val === '' ? null : val)}
+                label={t('combinations.editDrawer.price')}
+                placeholder="0.00"
+                error={fieldState.error?.message}
+                min={0}
+                decimalScale={2}
+                fixedDecimalScale
+                hideControls
+              />
+            )}
+          />
+          <Controller
+            control={mainControl}
+            name={`variantPricing.${variantIndex}.compareAtPrice`}
+            render={({ field, fieldState }) => (
+              <NumberInput
+                {...field}
+                value={field.value ?? ''}
+                onChange={(val) => field.onChange(val === '' ? null : val)}
+                label={t('combinations.editDrawer.compareAtPrice')}
+                placeholder="0.00"
+                error={fieldState.error?.message}
+                min={0}
+                decimalScale={2}
+                fixedDecimalScale
+                hideControls
+              />
+            )}
+          />
+          <Controller
+            control={draftControl}
+            name="costPrice"
+            render={({ field, fieldState }) => (
+              <NumberInput
+                {...field}
+                value={field.value ?? ''}
+                onChange={(val) => field.onChange(val === '' ? null : val)}
+                label={t('combinations.editDrawer.costPrice')}
+                placeholder="0.00"
+                error={fieldState.error?.message}
+                min={0}
+                decimalScale={2}
+                fixedDecimalScale
+                hideControls
+              />
+            )}
+          />
+          <Controller
+            control={draftControl}
+            name="costCurrencyCode"
+            render={({ field, fieldState }) => (
+              <Select
+                {...field}
+                value={field.value ?? null}
+                label={t('combinations.editDrawer.costCurrency')}
+                placeholder={t('combinations.editDrawer.costCurrencyPlaceholder')}
+                data={currencyOptions}
+                error={fieldState.error?.message}
+                clearable
+              />
+            )}
+          />
+        </Group>
 
         <Divider />
 

@@ -81,6 +81,13 @@ export const adminProductDetailPrismaQuery = (locale: Locale) =>
           },
         },
         images: true,
+        prices: {
+          include: {
+            priceList: {
+              select: { id: true, storeId: true, isSystemManaged: true },
+            },
+          },
+        },
       },
       orderBy: { sortOrder: 'asc' as const },
     },

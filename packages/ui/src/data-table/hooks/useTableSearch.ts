@@ -19,7 +19,6 @@ export function useTableSearch<TData>(options: UseTableSearchOptions<TData>): {
   const router = useRouter();
   const search = searchParams.get(paramName) ?? '';
 
-  // Serialize fields to a stable string so useMemo dependency works correctly
   const fieldsKey = fields.join(',');
 
   const setSearch = (value: string) => {
@@ -32,10 +31,9 @@ export function useTableSearch<TData>(options: UseTableSearchOptions<TData>): {
     router.replace(`?${params.toString()}`, { scroll: false });
   };
 
-  // Stabilize the object reference — only recreates when search value or fields change
   const searchParam = useMemo<SearchParam | undefined>(
     () => (search ? { value: search, fields: fields as string[] } : undefined),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [search, fieldsKey]
   );
 

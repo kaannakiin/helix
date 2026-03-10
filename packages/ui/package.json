@@ -29,6 +29,12 @@
       "import": "./src/inputs/product-seo-card/index.ts",
       "default": "./src/inputs/product-seo-card/index.ts"
     },
+    "./inputs/date-time-range": {
+      "@org/source": "./src/inputs/date-time-range/index.ts",
+      "types": "./dist/inputs/date-time-range/index.d.ts",
+      "import": "./src/inputs/date-time-range/index.ts",
+      "default": "./src/inputs/date-time-range/index.ts"
+    },
     "./inputs/relation-input": {
       "@org/source": "./src/inputs/relation-input/index.ts",
       "types": "./dist/inputs/relation-input/index.d.ts",

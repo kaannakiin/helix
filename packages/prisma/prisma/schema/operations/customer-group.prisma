@@ -16,8 +16,8 @@ model CustomerGroup {
   cronExpression  String?   @default("0 * * * *")
   lastEvaluatedAt DateTime?
 
-  members    CustomerGroupMember[]
-  priceLists PriceListCustomerGroup[]
+  members              CustomerGroupMember[]
+  priceListAssignments PriceListAssignment[]
 
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())

@@ -1,15 +1,24 @@
 import type {
   AccountStatus,
   AccountType,
+  AdjustmentType,
+  AssignmentTargetType,
   BusinessModel,
+  CurrencyCode,
   CustomerGroupType,
   EvaluationJobStatus,
   EvaluationTrigger,
+  PriceListStatus,
+  PriceListType,
+  PriceOriginType,
   ProductStatus,
   ProductType,
+  RoundingRule,
   RuleTargetEntity,
+  SourceSystem,
   StorefrontStatus,
   StoreStatus,
+  TaxBehavior,
   TrackingStrategy,
   VariantGroupDisplayMode,
   VariantGroupType,
@@ -125,6 +134,80 @@ export const WarehouseStatusConfigs: Record<WarehouseStatus, EnumConfig> = {
   ACTIVE: { color: 'green', labelKey: 'warehouseStatus.ACTIVE' },
   INACTIVE: { color: 'gray', labelKey: 'warehouseStatus.INACTIVE' },
   MAINTENANCE: { color: 'orange', labelKey: 'warehouseStatus.MAINTENANCE' },
+};
+
+export const PriceListTypeConfigs: Record<PriceListType, EnumConfig> = {
+  BASE: { color: 'blue', labelKey: 'priceListType.BASE' },
+  SALE: { color: 'green', labelKey: 'priceListType.SALE' },
+  CUSTOM: { color: 'violet', labelKey: 'priceListType.CUSTOM' },
+  CONTRACT: { color: 'teal', labelKey: 'priceListType.CONTRACT' },
+};
+
+export const PriceListStatusConfigs: Record<PriceListStatus, EnumConfig> = {
+  DRAFT: { color: 'gray', labelKey: 'priceListStatus.DRAFT' },
+  ACTIVE: { color: 'green', labelKey: 'priceListStatus.ACTIVE' },
+  ARCHIVED: { color: 'yellow', labelKey: 'priceListStatus.ARCHIVED' },
+};
+
+export const CurrencyCodeConfigs: Record<CurrencyCode, EnumConfig> = {
+  TRY: { color: 'red', labelKey: 'currencyCode.TRY' },
+  USD: { color: 'green', labelKey: 'currencyCode.USD' },
+  EUR: { color: 'blue', labelKey: 'currencyCode.EUR' },
+  GBP: { color: 'violet', labelKey: 'currencyCode.GBP' },
+};
+
+export const SourceSystemConfigs: Record<SourceSystem, EnumConfig> = {
+  INTERNAL: { color: 'blue', labelKey: 'sourceSystem.INTERNAL' },
+  SAP: { color: 'orange', labelKey: 'sourceSystem.SAP' },
+  CANIAS: { color: 'teal', labelKey: 'sourceSystem.CANIAS' },
+  WMS: { color: 'cyan', labelKey: 'sourceSystem.WMS' },
+  API: { color: 'violet', labelKey: 'sourceSystem.API' },
+  CSV_IMPORT: { color: 'yellow', labelKey: 'sourceSystem.CSV_IMPORT' },
+  MANUAL_IMPORT: { color: 'gray', labelKey: 'sourceSystem.MANUAL_IMPORT' },
+};
+
+export const RoundingRuleConfigs: Record<RoundingRule, EnumConfig> = {
+  NONE: { color: 'gray', labelKey: 'roundingRule.NONE' },
+  ROUND_99: { color: 'blue', labelKey: 'roundingRule.ROUND_99' },
+  ROUND_95: { color: 'teal', labelKey: 'roundingRule.ROUND_95' },
+  ROUND_NEAREST: { color: 'green', labelKey: 'roundingRule.ROUND_NEAREST' },
+  ROUND_UP: { color: 'orange', labelKey: 'roundingRule.ROUND_UP' },
+  ROUND_DOWN: { color: 'red', labelKey: 'roundingRule.ROUND_DOWN' },
+};
+
+export const PriceOriginTypeConfigs: Record<PriceOriginType, EnumConfig> = {
+  FIXED: { color: 'blue', labelKey: 'priceOriginType.FIXED' },
+  RELATIVE: { color: 'orange', labelKey: 'priceOriginType.RELATIVE' },
+};
+
+export const AdjustmentTypeConfigs: Record<AdjustmentType, EnumConfig> = {
+  PERCENTAGE: { color: 'violet', labelKey: 'adjustmentType.PERCENTAGE' },
+  FIXED_AMOUNT: { color: 'cyan', labelKey: 'adjustmentType.FIXED_AMOUNT' },
+};
+
+export const TaxBehaviorConfigs: Record<TaxBehavior, EnumConfig> = {
+  INCLUSIVE: { color: 'green', labelKey: 'taxBehavior.INCLUSIVE' },
+  EXCLUSIVE: { color: 'yellow', labelKey: 'taxBehavior.EXCLUSIVE' },
+  UNSPECIFIED: { color: 'gray', labelKey: 'taxBehavior.UNSPECIFIED' },
+};
+
+export const AssignmentTargetTypeConfigs: Record<
+  AssignmentTargetType,
+  EnumConfig
+> = {
+  ALL_CUSTOMERS: {
+    color: 'blue',
+    labelKey: 'assignmentTargetType.ALL_CUSTOMERS',
+  },
+  CUSTOMER_GROUP: {
+    color: 'teal',
+    labelKey: 'assignmentTargetType.CUSTOMER_GROUP',
+  },
+  ORGANIZATION: {
+    color: 'violet',
+    labelKey: 'assignmentTargetType.ORGANIZATION',
+  },
+  CUSTOMER: { color: 'orange', labelKey: 'assignmentTargetType.CUSTOMER' },
 };
 
 export function buildColorMap<K extends string>(

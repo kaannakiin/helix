@@ -15,6 +15,7 @@ import {
   Button,
   Divider,
   Group,
+  NumberInput,
   Select,
   Stack,
   Text,
@@ -31,7 +32,7 @@ import {
 } from '@org/constants/enum-configs';
 import { getMimePatterns } from '@org/constants/product-constants';
 import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
-import { FileType } from '@org/prisma/browser';
+import { CurrencyCode, FileType } from '@org/prisma/browser';
 import {
   NEW_PRODUCT_DEFAULT_VALUES,
   ProductSchema,
@@ -50,6 +51,7 @@ import { createId } from '@paralleldrive/cuid2';
 import {
   Activity,
   Building,
+  DollarSign,
   FileText,
   Image as ImageIcon,
   Save,
@@ -84,6 +86,15 @@ const AdminProductPage = () => {
 
   const formattedData = useMemo<ProductInputType>(() => {
     if (!data || isNew) return NEW_PRODUCT_DEFAULT_VALUES;
+
+    const fallbackCostCurrencyCode = (() => {
+      const currencies = [
+        ...new Set(
+          (data.stores ?? []).map((storeLink) => storeLink.store.currency)
+        ),
+      ];
+      return currencies.length === 1 ? currencies[0] : null;
+    })();
 
     return {
       type: data.type,
@@ -156,6 +167,8 @@ const AdminProductPage = () => {
           barcode: v.barcode ?? '',
           isActive: v.isActive,
           trackingStrategy: v.trackingStrategy,
+          costPrice: v.costPrice ? Number(v.costPrice) : null,
+          costCurrencyCode: v.costCurrencyCode ?? fallbackCostCurrencyCode,
           sortOrder: v.sortOrder,
           newImages: [],
           existingImages:
@@ -166,6 +179,19 @@ const AdminProductPage = () => {
               sortOrder: img.sortOrder,
             })) ?? [],
         })) ?? [],
+      variantPricing:
+        data.variants?.map((v) => {
+          const defaultPrice = v.prices?.find(
+            (p) => p.priceList.isSystemManaged
+          );
+          return {
+            variantUniqueId: v.id,
+            price: defaultPrice?.price ? Number(defaultPrice.price) : null,
+            compareAtPrice: defaultPrice?.compareAtPrice
+              ? Number(defaultPrice.compareAtPrice)
+              : null,
+          };
+        }) ?? [],
       categories:
         data.categories?.map((c, i) => ({
           categoryId: c.category.id,
@@ -277,6 +303,7 @@ const AdminProductPage = () => {
   } = methods;
 
   const productName = watch('translations.0.name');
+  const hasVariants = watch('hasVariants');
 
   const onSubmit: SubmitHandler<ProductInputType> = async (formData) => {
     try {
@@ -488,6 +515,10 @@ const AdminProductPage = () => {
 
   const statusOptions = buildEnumOptions(ProductStatusConfigs, tEnums);
   const typeOptions = buildEnumOptions(ProductTypeConfigs, tEnums);
+  const currencyOptions = Object.values(CurrencyCode).map((currency) => ({
+    value: currency,
+    label: currency,
+  }));
 
   return (
     <FormProvider {...methods}>
@@ -571,6 +602,92 @@ const AdminProductPage = () => {
                 deleteImage={deleteImage}
                 deletingIds={deletingIds}
               />
+
+              {!hasVariants && (
+                <FormCard
+                  title={t('pricing.title')}
+                  icon={DollarSign}
+                  iconColor="green"
+                >
+                  <Group grow gap="md">
+                    <Controller
+                      control={control}
+                      name="variantPricing.0.price"
+                      render={({ field, fieldState }) => (
+                        <NumberInput
+                          {...field}
+                          value={field.value ?? ''}
+                          onChange={(val) =>
+                            field.onChange(val === '' ? null : val)
+                          }
+                          label={t('pricing.price')}
+                          placeholder={t('pricing.pricePlaceholder')}
+                          error={fieldState.error?.message}
+                          min={0}
+                          decimalScale={2}
+                          fixedDecimalScale
+                          hideControls
+                        />
+                      )}
+                    />
+                    <Controller
+                      control={control}
+                      name="variantPricing.0.compareAtPrice"
+                      render={({ field, fieldState }) => (
+                        <NumberInput
+                          {...field}
+                          value={field.value ?? ''}
+                          onChange={(val) =>
+                            field.onChange(val === '' ? null : val)
+                          }
+                          label={t('pricing.compareAtPrice')}
+                          placeholder={t('pricing.compareAtPricePlaceholder')}
+                          error={fieldState.error?.message}
+                          min={0}
+                          decimalScale={2}
+                          fixedDecimalScale
+                          hideControls
+                        />
+                      )}
+                    />
+                    <Controller
+                      control={control}
+                      name="variants.0.costPrice"
+                      render={({ field, fieldState }) => (
+                        <NumberInput
+                          {...field}
+                          value={field.value ?? ''}
+                          onChange={(val) =>
+                            field.onChange(val === '' ? null : val)
+                          }
+                          label={t('pricing.costPrice')}
+                          placeholder={t('pricing.costPricePlaceholder')}
+                          error={fieldState.error?.message}
+                          min={0}
+                          decimalScale={2}
+                          fixedDecimalScale
+                          hideControls
+                        />
+                      )}
+                    />
+                    <Controller
+                      control={control}
+                      name="variants.0.costCurrencyCode"
+                      render={({ field, fieldState }) => (
+                        <Select
+                          {...field}
+                          value={field.value ?? null}
+                          label={t('pricing.costCurrency')}
+                          placeholder={t('pricing.costCurrencyPlaceholder')}
+                          data={currencyOptions}
+                          error={fieldState.error?.message}
+                          clearable
+                        />
+                      )}
+                    />
+                  </Group>
+                </FormCard>
+              )}
 
               <FormCard
                 title={t('media.title')}

@@ -8,6 +8,7 @@ import {
   Checkbox,
   ColorSwatch,
   Group,
+  NumberInput,
   ScrollArea,
   Select,
   Switch,
@@ -21,7 +22,7 @@ import {
   TrackingStrategyConfigs,
   buildEnumOptions,
 } from '@org/constants/enum-configs';
-import { VariantGroupType } from '@org/prisma/browser';
+import { CurrencyCode, VariantGroupType } from '@org/prisma/browser';
 import type { ProductInputType } from '@org/schemas/admin/products';
 import { FormCard } from '@org/ui/common/form-card';
 import type { RemoteFile } from '@org/ui/dropzone';
@@ -80,6 +81,7 @@ interface VariantRowProps {
   index: number;
   optionLookup: Map<string, OptionLookupEntry>;
   trackingOptions: Array<{ value: string; label: string }>;
+  currencyOptions: Array<{ value: string; label: string }>;
   isSelected: boolean;
   onToggleSelect: (index: number) => void;
   onEdit: (index: number) => void;
@@ -90,6 +92,7 @@ const VariantRow = memo(
     index,
     optionLookup,
     trackingOptions,
+    currencyOptions,
     isSelected,
     onToggleSelect,
     onEdit,
@@ -198,6 +201,88 @@ const VariantRow = memo(
         <Table.Td>
           <Controller
             control={control}
+            name={`variantPricing.${index}.price`}
+            render={({ field, fieldState }) => (
+              <NumberInput
+                {...field}
+                value={field.value ?? ''}
+                onChange={(val) => field.onChange(val === '' ? null : val)}
+                size="xs"
+                placeholder="0.00"
+                error={!!fieldState.error}
+                min={0}
+                decimalScale={2}
+                hideControls
+                style={{ minWidth: 100 }}
+              />
+            )}
+          />
+        </Table.Td>
+
+        <Table.Td>
+          <Controller
+            control={control}
+            name={`variantPricing.${index}.compareAtPrice`}
+            render={({ field, fieldState }) => (
+              <NumberInput
+                {...field}
+                value={field.value ?? ''}
+                onChange={(val) => field.onChange(val === '' ? null : val)}
+                size="xs"
+                placeholder="0.00"
+                error={!!fieldState.error}
+                min={0}
+                decimalScale={2}
+                hideControls
+                style={{ minWidth: 100 }}
+              />
+            )}
+          />
+        </Table.Td>
+
+        <Table.Td>
+          <Controller
+            control={control}
+            name={`variants.${index}.costPrice`}
+            render={({ field, fieldState }) => (
+              <NumberInput
+                {...field}
+                value={field.value ?? ''}
+                onChange={(val) => field.onChange(val === '' ? null : val)}
+                size="xs"
+                placeholder="0.00"
+                error={!!fieldState.error}
+                min={0}
+                decimalScale={2}
+                hideControls
+                style={{ minWidth: 100 }}
+              />
+            )}
+          />
+        </Table.Td>
+
+        <Table.Td>
+          <Controller
+            control={control}
+            name={`variants.${index}.costCurrencyCode`}
+            render={({ field, fieldState }) => (
+              <Select
+                {...field}
+                value={field.value ?? null}
+                data={currencyOptions}
+                size="xs"
+                placeholder="—"
+                error={!!fieldState.error}
+                clearable
+                style={{ minWidth: 110 }}
+              />
+            )}
+          />
+        </Table.Td>
+
+        <Table.Td>
+          <Controller
+            control={control}
             name={`variants.${index}.barcode`}
             render={({ field, fieldState }) => (
               <TextInput
@@ -285,6 +370,14 @@ export const VariantCombinationTable = ({
   const trackingOptions = useMemo(
     () => buildEnumOptions(TrackingStrategyConfigs, tEnums),
     [tEnums]
+  );
+  const currencyOptions = useMemo(
+    () =>
+      Object.values(CurrencyCode).map((currency) => ({
+        value: currency,
+        label: currency,
+      })),
+    []
   );
 
   const [selectedIndices, setSelectedIndices] = useState<Set<number>>(
@@ -410,6 +503,10 @@ export const VariantCombinationTable = ({
               <Table.Th style={{ width: 48 }} />
               <Table.Th>{t('combinations.variant')}</Table.Th>
               <Table.Th>{t('combinations.sku')}</Table.Th>
+              <Table.Th>{t('combinations.price')}</Table.Th>
+              <Table.Th>{t('combinations.compareAtPrice')}</Table.Th>
+              <Table.Th>{t('combinations.costPrice')}</Table.Th>
+              <Table.Th>{t('combinations.costCurrency')}</Table.Th>
               <Table.Th>{t('combinations.barcode')}</Table.Th>
               <Table.Th>{t('combinations.isActive')}</Table.Th>
               <Table.Th>{t('combinations.trackingStrategy')}</Table.Th>
@@ -425,6 +522,7 @@ export const VariantCombinationTable = ({
                 index={index}
                 optionLookup={optionLookup}
                 trackingOptions={trackingOptions}
+                currencyOptions={currencyOptions}
                 isSelected={selectedIndices.has(index)}
                 onToggleSelect={toggleSelect}
                 onEdit={handleEditVariant}
@@ -444,6 +542,7 @@ export const VariantCombinationTable = ({
         variantIndex={editingVariantIndex}
         optionLookup={optionLookup}
         trackingOptions={trackingOptions}
+        currencyOptions={currencyOptions}
         deleteImage={deleteImage}
         deletingIds={deletingIds}
       />
@@ -453,6 +552,7 @@ export const VariantCombinationTable = ({
         onClose={bulkDrawerHandlers.close}
         selectedIndices={selectedIndices}
         trackingOptions={trackingOptions}
+        currencyOptions={currencyOptions}
       />
     </FormCard>
   );

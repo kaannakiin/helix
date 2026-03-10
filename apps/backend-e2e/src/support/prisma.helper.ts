@@ -1,6 +1,7 @@
 import {
   BusinessModel,
   CurrencyCode,
+  CustomerGroupType,
   DomainOnboardingMode,
   DomainOwnershipMethod,
   DomainRoutingMethod,
@@ -93,7 +94,7 @@ export async function createStoreOnly(suffix: string) {
       status: StoreStatus.ACTIVE,
       storefrontStatus: StorefrontStatus.ACTIVE,
       defaultLocale: Locale.TR,
-      currency: CurrencyCode.TRY,
+      defaultCurrencyCode: CurrencyCode.TRY,
     },
   });
   return store;
@@ -122,8 +123,9 @@ export async function createInstallationWithIngress(suffix: string) {
 
 // DomainSpace: ownership VERIFIED (READY), apex/wildcard PENDING
 export async function createOwnershipOnlyFixture(suffix: string) {
-  const { installation, portalHostname } =
-    await createInstallationWithIngress(suffix);
+  const { installation, portalHostname } = await createInstallationWithIngress(
+    suffix
+  );
   const store = await createStoreOnly(suffix);
   const baseDomain = `helix-${suffix}.e2e.test`;
 
@@ -153,8 +155,9 @@ export async function createOwnershipOnlyFixture(suffix: string) {
 
 // DomainSpace: apex VERIFIED, wildcard PENDING
 export async function createApexOnlyFixture(suffix: string) {
-  const { installation, portalHostname } =
-    await createInstallationWithIngress(suffix);
+  const { installation, portalHostname } = await createInstallationWithIngress(
+    suffix
+  );
   const store = await createStoreOnly(suffix);
   const baseDomain = `helix-${suffix}.e2e.test`;
 
@@ -188,8 +191,9 @@ export async function createWildcardFixture(
   suffix: string,
   mode: DomainOnboardingMode
 ) {
-  const { installation, portalHostname } =
-    await createInstallationWithIngress(suffix);
+  const { installation, portalHostname } = await createInstallationWithIngress(
+    suffix
+  );
   const store = await createStoreOnly(suffix);
   const baseDomain = `helix-${suffix}.e2e.test`;
 
@@ -278,7 +282,7 @@ export async function createActiveStoreFixture(suffix: string) {
       status: StoreStatus.ACTIVE,
       storefrontStatus: StorefrontStatus.ACTIVE,
       defaultLocale: Locale.TR,
-      currency: CurrencyCode.TRY,
+      defaultCurrencyCode: CurrencyCode.TRY,
     },
   });
 
@@ -329,4 +333,162 @@ export async function createActiveStoreFixture(suffix: string) {
     baseDomain,
     host,
   };
+}
+
+// ─── Pricing E2E Fixtures ───────────────────────────────────────────
+
+export function uniqueSuffix(): string {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+export async function resetPricingFixtures() {
+  // Delete in FK order
+  await prisma.priceListAssignment.deleteMany({
+    where: { priceList: { store: { slug: { startsWith: 'e2e-pricing-' } } } },
+  });
+  await prisma.priceListPrice.deleteMany({
+    where: { priceList: { store: { slug: { startsWith: 'e2e-pricing-' } } } },
+  });
+  await prisma.priceList.deleteMany({
+    where: { store: { slug: { startsWith: 'e2e-pricing-' } } },
+  });
+  await prisma.customerGroup.deleteMany({
+    where: { store: { slug: { startsWith: 'e2e-pricing-' } } },
+  });
+  await prisma.organization.deleteMany({
+    where: { store: { slug: { startsWith: 'e2e-pricing-' } } },
+  });
+  await prisma.customer.deleteMany({
+    where: { store: { slug: { startsWith: 'e2e-pricing-' } } },
+  });
+  await prisma.productStore.deleteMany({
+    where: { store: { slug: { startsWith: 'e2e-pricing-' } } },
+  });
+  await prisma.productVariant.deleteMany({
+    where: { sku: { startsWith: 'e2e-pricing-' } },
+  });
+  await prisma.product.deleteMany({
+    where: { translations: { some: { name: { startsWith: 'E2E Pricing Product' } } } },
+  });
+  await prisma.unitOfMeasure.deleteMany({
+    where: { code: 'E2E-PC' },
+  });
+  // Store delete cascades: storeCurrency, priceList, customerGroup, organization, customer, productStore
+  await prisma.store.deleteMany({
+    where: { slug: { startsWith: 'e2e-pricing-' } },
+  });
+}
+
+export async function createPricingStore(suffix: string) {
+  const store = await prisma.store.create({
+    data: {
+      name: `E2E Pricing Store ${suffix}`,
+      slug: `e2e-pricing-${suffix}`,
+      businessModel: BusinessModel.B2C,
+      status: StoreStatus.ACTIVE,
+      storefrontStatus: StorefrontStatus.ACTIVE,
+      defaultLocale: Locale.TR,
+      defaultCurrencyCode: CurrencyCode.TRY,
+    },
+  });
+
+  const storeCurrencyTRY = await prisma.storeCurrency.create({
+    data: {
+      storeId: store.id,
+      currencyCode: CurrencyCode.TRY,
+      isSelectable: true,
+      allowCheckout: true,
+    },
+  });
+
+  const storeCurrencyUSD = await prisma.storeCurrency.create({
+    data: {
+      storeId: store.id,
+      currencyCode: CurrencyCode.USD,
+      isSelectable: true,
+      allowCheckout: false,
+    },
+  });
+
+  return { store, storeCurrencyTRY, storeCurrencyUSD };
+}
+
+export async function createProductWithVariants(
+  storeId: string,
+  suffix: string,
+  count = 3
+) {
+  const uom = await prisma.unitOfMeasure.upsert({
+    where: { code: 'E2E-PC' },
+    update: {},
+    create: { code: 'E2E-PC', isActive: true },
+  });
+
+  const product = await prisma.product.create({
+    data: {
+      translations: {
+        create: {
+          locale: Locale.TR,
+          name: `E2E Pricing Product ${suffix}`,
+          slug: `e2e-pricing-product-${suffix}`,
+        },
+      },
+      stores: {
+        create: { storeId, isVisible: true },
+      },
+    },
+  });
+
+  const variants = [];
+  for (let i = 0; i < count; i++) {
+    const variant = await prisma.productVariant.create({
+      data: {
+        productId: product.id,
+        sku: `e2e-pricing-${suffix}-v${i}`,
+        isActive: true,
+      },
+    });
+    variants.push(variant);
+  }
+
+  return { product, variants, uom };
+}
+
+export async function createCustomerGroupFixture(
+  storeId: string,
+  suffix: string
+) {
+  return prisma.customerGroup.create({
+    data: {
+      name: `E2E Group ${suffix}`,
+      storeId,
+      type: CustomerGroupType.MANUAL,
+    },
+  });
+}
+
+export async function createOrganizationFixture(
+  storeId: string,
+  suffix: string
+) {
+  return prisma.organization.create({
+    data: {
+      name: `E2E Org ${suffix}`,
+      storeId,
+    },
+  });
+}
+
+export async function createCustomerFixture(
+  storeId: string,
+  suffix: string
+) {
+  return prisma.customer.create({
+    data: {
+      name: 'E2E',
+      surname: `Customer ${suffix}`,
+      email: `e2e-pricing-${suffix}@test.local`,
+      storeId,
+    },
+  });
 }

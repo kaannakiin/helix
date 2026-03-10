@@ -151,6 +151,59 @@
       "ACTIVE": "Aktif",
       "INACTIVE": "Pasif",
       "MAINTENANCE": "Bakımda"
+    },
+    "priceListType": {
+      "BASE": "Temel",
+      "SALE": "İndirim",
+      "CUSTOM": "Özel",
+      "CONTRACT": "Sözleşme"
+    },
+    "priceListStatus": {
+      "DRAFT": "Taslak",
+      "ACTIVE": "Aktif",
+      "ARCHIVED": "Arşivlendi"
+    },
+    "currencyCode": {
+      "TRY": "TRY",
+      "USD": "USD",
+      "EUR": "EUR",
+      "GBP": "GBP"
+    },
+    "sourceSystem": {
+      "INTERNAL": "Dahili",
+      "SAP": "SAP",
+      "CANIAS": "Canias",
+      "WMS": "WMS",
+      "API": "API",
+      "CSV_IMPORT": "CSV İçe Aktarma",
+      "MANUAL_IMPORT": "Manuel İçe Aktarma"
+    },
+    "roundingRule": {
+      "NONE": "Yok",
+      "ROUND_99": ".99'a Yuvarla",
+      "ROUND_95": ".95'e Yuvarla",
+      "ROUND_NEAREST": "En Yakına Yuvarla",
+      "ROUND_UP": "Yukarı Yuvarla",
+      "ROUND_DOWN": "Aşağı Yuvarla"
+    },
+    "assignmentTargetType": {
+      "ALL_CUSTOMERS": "Tüm Müşteriler",
+      "CUSTOMER_GROUP": "Müşteri Grubu",
+      "ORGANIZATION": "Organizasyon",
+      "CUSTOMER": "Müşteri"
+    },
+    "priceOriginType": {
+      "FIXED": "Sabit",
+      "RELATIVE": "Göreceli"
+    },
+    "adjustmentType": {
+      "PERCENTAGE": "Yüzde",
+      "FIXED_AMOUNT": "Sabit Tutar"
+    },
+    "taxBehavior": {
+      "INCLUSIVE": "Dahil",
+      "EXCLUSIVE": "Hariç",
+      "UNSPECIFIED": "Belirtilmemiş"
     }
   },
   "relationInput": {
@@ -454,7 +507,12 @@
             "images": "Görseller",
             "imagesDescription": "Bu varyant için görselleri yönetin",
             "cancel": "İptal",
-            "save": "Kaydet"
+            "save": "Kaydet",
+            "price": "Fiyat",
+            "compareAtPrice": "Karşılaştırma Fiyatı",
+            "costPrice": "Maliyet Fiyatı",
+            "costCurrency": "Maliyet Para Birimi",
+            "costCurrencyPlaceholder": "Para birimi seç..."
           },
           "bulkDrawer": {
             "title": "{count} Varyantı Düzenle",
@@ -462,14 +520,36 @@
             "images": "Görseller",
             "imagesDescription": "Seçili tüm varyantların görsellerini değiştir",
             "cancel": "İptal",
-            "apply": "Uygula"
-          }
+            "apply": "Uygula",
+            "price": "Fiyat",
+            "pricePlaceholder": "Sabit fiyat ata",
+            "costPrice": "Maliyet Fiyatı",
+            "costPricePlaceholder": "Sabit maliyet ata",
+            "costCurrency": "Maliyet Para Birimi",
+            "costCurrencyPlaceholder": "Para birimi seç..."
+          },
+          "price": "Fiyat",
+          "compareAtPrice": "İndirimli Fiyat",
+          "costPrice": "Maliyet",
+          "costCurrency": "Maliyet Para Birimi"
         },
         "salesChannels": {
           "title": "Satış Kanalları",
           "placeholder": "Mağaza seçin...",
           "b2b": "B2B",
           "b2c": "B2C"
+        },
+        "pricing": {
+          "title": "Fiyatlandırma",
+          "price": "Fiyat",
+          "pricePlaceholder": "0.00",
+          "compareAtPrice": "Karşılaştırma Fiyatı",
+          "compareAtPricePlaceholder": "0.00",
+          "costPrice": "Maliyet Fiyatı",
+          "costPricePlaceholder": "0.00",
+          "costCurrency": "Maliyet Para Birimi",
+          "costCurrencyPlaceholder": "Para birimi seç...",
+          "profitMargin": "Kar Marjı"
         }
       },
       "noRows": {
@@ -999,12 +1079,18 @@
         "name": "Ad",
         "type": "Tür",
         "status": "Durum",
-        "currencyCode": "Para Birimi",
+        "defaultCurrencyCode": "Para Birimi",
         "isActive": "Aktif",
         "priority": "Öncelik",
         "validFrom": "Başlangıç Tarihi",
         "validTo": "Bitiş Tarihi",
         "pricesCount": "Fiyatlar",
+        "sourceSystem": "Kaynak Sistem",
+        "isExchangeRateDerived": "Türetilmiş",
+        "sourceCurrencyCode": "Kaynak Para Birimi",
+        "isSourceLocked": "Kilitli",
+        "store": "Mağaza",
+        "assignmentsCount": "Atamalar",
         "createdAt": "Oluşturulma Tarihi"
       },
       "contextMenu": {
@@ -1042,10 +1128,234 @@
           "ACTIVE": "Aktif",
           "DRAFT": "Taslak",
           "ARCHIVED": "Arşivlenmiş"
+        },
+        "sourceSystem": {
+          "INTERNAL": "Dahili",
+          "ERP": "ERP",
+          "IMPORT": "İçe Aktarma"
         }
       },
       "noRows": {
         "label": "Fiyat listesi bulunamadı"
+      },
+      "actions": {
+        "newPriceList": "Yeni Fiyat Listesi"
+      },
+      "form": {
+        "newPriceList": "Yeni Fiyat Listesi",
+        "discard": "Vazgeç",
+        "save": "Kaydet",
+        "saveSuccess": "Fiyat listesi başarıyla kaydedildi.",
+        "saveError": "Fiyat listesi kaydedilemedi.",
+        "loadError": "Yükleme Hatası",
+        "loadErrorDescription": "Fiyat listesi yüklenirken bir hata oluştu.",
+        "notFound": "Fiyat Listesi Bulunamadı",
+        "notFoundDescription": "Aradığınız fiyat listesi mevcut değil.",
+        "backToList": "Fiyat Listelerine Dön",
+        "tabs": {
+          "general": "Genel",
+          "assignments": "Atamalar",
+          "prices": "Fiyatlar"
+        },
+        "generalInfo": "Genel Bilgiler",
+        "name": { "label": "Ad", "placeholder": "Fiyat listesi adı girin" },
+        "store": { "label": "Mağaza", "placeholder": "Mağaza seçin" },
+        "type": { "label": "Tür" },
+        "status": { "label": "Durum" },
+        "defaultCurrencyCode": { "label": "Varsayılan Para Birimi" },
+        "priority": { "label": "Öncelik" },
+        "description": { "label": "Açıklama", "placeholder": "İsteğe bağlı açıklama" },
+        "isActive": "Aktif",
+        "validityCard": "Geçerlilik & Sözleşme",
+        "validFrom": { "label": "Başlangıç Tarihi" },
+        "validTo": { "label": "Bitiş Tarihi" },
+        "contractRef": { "label": "Sözleşme Referansı", "placeholder": "ör. CNT-2024-001" },
+        "currencyBehaviorCard": {
+          "title": "Döviz Davranışı",
+          "description": "Bu fiyat listesinde fiyatların nasıl kaynaklandığını ve dönüştürüldüğünü yapılandırın."
+        },
+        "isExchangeRateDerived": {
+          "label": "Döviz Kuru Türetilmiş",
+          "description": "Etkinleştirildiğinde, fiyatlar kaynak para biriminden güncel döviz kurları kullanılarak otomatik olarak dönüştürülür."
+        },
+        "sourceCurrencyCode": {
+          "label": "Kaynak Para Birimi",
+          "description": "Dönüştürme öncesinde orijinal fiyatların tanımlandığı para birimi."
+        },
+        "roundingRule": {
+          "label": "Yuvarlama Kuralı",
+          "description": "Döviz kuru hesaplamasından sonra dönüştürülen fiyatların nasıl yuvarlanacağı."
+        },
+        "sourceSystem": { "label": "Kaynak Sistem" },
+        "isSourceLocked": {
+          "label": "Kaynak Kilitli",
+          "description": "Etkinleştirildiğinde, fiyatlar harici bir sistem tarafından yönetilir ve Fiyatlar sekmesinde manuel olarak düzenlenemez."
+        },
+        "sourceLockedWarning": "Bu fiyat listesi kilitli. Fiyatlar {sourceSystem} tarafından yönetilmektedir ve burada değiştirilemez.",
+        "sourceLockedWarningInternal": "Bu fiyat listesi kilitli. Fiyatlar manuel olarak düzenlenemez.",
+        "derivedPricingInfo": "Bu listedeki fiyatlar otomatik olarak {sourceCurrency} para biriminden {defaultCurrency} para birimine dönüştürülür. Döviz kurları yazma anında uygulanır.",
+        "prices": {
+          "title": "Fiyatlar",
+          "description": "Bu fiyat listesi için yapılandırılmış fiyatları görüntüleyin.",
+          "lockedCallout": "Fiyat düzenleme devre dışı çünkü bu liste harici bir sistem tarafından yönetilmektedir.",
+          "emptyState": "Henüz fiyat yapılandırılmamış. Fiyatlar içe aktarıldığında veya oluşturulduğunda burada görünecektir.",
+          "lockedBadge": "Kilitli",
+          "colVariantId": "Varyant ID",
+          "colPrice": "Fiyat",
+          "colCompareAtPrice": "Karşılaştırma Fiyatı",
+          "colCostPrice": "Maliyet",
+          "colCurrency": "Para Birimi",
+          "colOriginType": "Kaynak",
+          "colMinQty": "Min Adet",
+          "colSourcePrice": "Kaynak Fiyat",
+          "colExchangeRate": "Döviz Kuru",
+          "colLocked": "Kilitli",
+          "rowCount": "{count} fiyat",
+          "showingLimited": "Toplam {total} fiyattan ilk {shown} tanesi gösteriliyor."
+        },
+        "statusCard": "Durum & Meta Bilgi",
+        "baseTypeNote": "Temel fiyat listesi mağazanın varsayılan para birimini kullanır.",
+        "enums": {
+          "type": {
+            "BASE": "Temel",
+            "SALE": "İndirim",
+            "CUSTOM": "Özel",
+            "CONTRACT": "Sözleşme"
+          },
+          "status": {
+            "ACTIVE": "Aktif",
+            "DRAFT": "Taslak",
+            "ARCHIVED": "Arşivlenmiş"
+          },
+          "sourceSystem": {
+            "INTERNAL": "Dahili",
+            "SAP": "SAP",
+            "CANIAS": "Canias",
+            "WMS": "WMS",
+            "API": "API",
+            "CSV_IMPORT": "CSV İçe Aktarma",
+            "MANUAL_IMPORT": "Manuel İçe Aktarma"
+          },
+          "roundingRule": {
+            "NONE": "Yok",
+            "ROUND_99": ".99'a Yuvarla",
+            "ROUND_95": ".95'e Yuvarla",
+            "ROUND_NEAREST": "En Yakına Yuvarla",
+            "ROUND_UP": "Yukarı Yuvarla",
+            "ROUND_DOWN": "Aşağı Yuvarla"
+          }
+        },
+        "assignments": {
+          "title": "Atamalar",
+          "description": "Bu fiyat listesine erişebilecek müşteri veya grupları tanımlayın.",
+          "addAssignment": "Atama Ekle",
+          "emptyState": "Henüz atama yapılmamış. Bu fiyat listesi hiçbir hedefe atanmamış.",
+          "colTargetType": "Hedef Türü",
+          "colTargetName": "Hedef",
+          "colPriority": "Öncelik",
+          "saveSuccess": "Atama başarıyla kaydedildi.",
+          "saveError": "Atama kaydedilemedi.",
+          "deleteSuccess": "Atama silindi.",
+          "deleteError": "Atama silinemedi.",
+          "deleteConfirmTitle": "Atamayı Sil",
+          "deleteConfirmBody": "Bu atamayı kaldırmak istediğinizden emin misiniz?",
+          "allCustomersLabel": "Tüm Müşteriler",
+          "modal": {
+            "title": "Atama Ekle",
+            "editTitle": "Atamayı Düzenle",
+            "targetType": { "label": "Hedef Türü", "placeholder": "Hedef türü seçin" },
+            "customerGroup": { "label": "Müşteri Grubu", "placeholder": "Müşteri grubu seçin" },
+            "organization": { "label": "Organizasyon", "placeholder": "Organizasyon seçin" },
+            "customer": { "label": "Müşteri", "placeholder": "Müşteri seçin" },
+            "priority": { "label": "Öncelik" },
+            "allCustomersInfo": "Bu fiyat listesi mağazadaki tüm müşterilere uygulanacaktır.",
+            "cancel": "İptal",
+            "add": "Ekle"
+          }
+        },
+        "prices": {
+          "title": "Fiyatlar",
+          "description": "Ürün varyantları için fiyat satırlarını yönetin.",
+          "addVariants": "Varyant Ekle",
+          "summary": {
+            "totalRows": "Toplam Satır",
+            "currencies": "Para Birimleri",
+            "lockedRows": "Kilitli Satırlar",
+            "missingPrices": "Eksik Fiyatlar"
+          },
+          "table": {
+            "variantName": "Varyant",
+            "sku": "SKU",
+            "currency": "Para Birimi",
+            "originType": "Kaynak",
+            "price": "Fiyat",
+            "compareAt": "Karşılaştırma",
+            "minQty": "Min Miktar",
+            "maxQty": "Maks Miktar",
+            "uom": "Birim",
+            "validity": "Geçerlilik",
+            "locked": "Kilitli",
+            "updatedAt": "Güncellendi"
+          },
+          "contextMenu": {
+            "edit": "Düzenle",
+            "delete": "Sil"
+          },
+          "footer": {
+            "totalRows": "Toplam: {count}",
+            "selectedRows": "Seçili: {count}",
+            "refresh": "Yenile"
+          },
+          "noRows": {
+            "label": "Fiyat satırı bulunamadı"
+          },
+          "editDrawer": {
+            "title": "Fiyat Satırını Düzenle",
+            "createTitle": "Yeni Fiyat Satırı",
+            "variant": "Varyant",
+            "sku": "SKU",
+            "currency": "Para Birimi",
+            "originType": "Kaynak Türü",
+            "price": "Fiyat",
+            "compareAtPrice": "Karşılaştırma Fiyatı",
+            "costPrice": "Maliyet Fiyatı",
+            "adjustmentType": "Ayarlama Türü",
+            "adjustmentValue": "Ayarlama Değeri",
+            "minQuantity": "Min Miktar",
+            "maxQuantity": "Maks Miktar",
+            "unitOfMeasure": "Ölçü Birimi",
+            "taxBehavior": "Vergi Davranışı",
+            "validFrom": "Başlangıç Tarihi",
+            "validTo": "Bitiş Tarihi",
+            "conditionType": "Koşul Türü",
+            "metadata": "Kaynak Meta Verileri",
+            "sourcePrice": "Kaynak Fiyat",
+            "sourceExchangeRate": "Uygulanan Döviz Kuru",
+            "lastRateComputedAt": "Son Kur Hesaplama",
+            "isSourceLocked": "Kaynak Kilitli",
+            "save": "Kaydet",
+            "cancel": "İptal",
+            "saveSuccess": "Fiyat satırı kaydedildi.",
+            "saveError": "Fiyat satırı kaydedilemedi.",
+            "lockedWarning": "Bu satır kaynak kilitli olduğundan düzenlenemez."
+          },
+          "addDrawer": {
+            "title": "Varyant Ekle",
+            "searchPlaceholder": "SKU veya ürün adına göre arayın...",
+            "addSelected": "Seçilenleri Ekle",
+            "noResults": "Varyant bulunamadı.",
+            "currency": "Varsayılan Para Birimi",
+            "uom": "Varsayılan Ölçü Birimi",
+            "originType": "Kaynak Türü",
+            "success": "Varyantlar başarıyla eklendi.",
+            "error": "Varyantlar eklenemedi.",
+            "cancel": "İptal"
+          },
+          "deleteConfirmTitle": "Fiyat Satırını Sil",
+          "deleteConfirmBody": "Bu fiyat satırını kaldırmak istediğinizden emin misiniz?",
+          "deleteSuccess": "Fiyat satırı silindi.",
+          "deleteError": "Fiyat satırı silinemedi."
+        }
       }
     },
     "customerGroups": {
@@ -1081,7 +1391,9 @@
         "clearAll": "Temizle",
         "activeFilters": "{count} aktif",
         "noFilters": "Filtre mevcut değil",
-        "apply": "Filtreleri Uygula"
+        "apply": "Filtreleri Uygula",
+        "searchPlaceholder": "Filtre ara...",
+        "appliedFilters": "Uygulanan Filtreler"
       },
       "form": {
         "newCustomerGroup": "Yeni Müşteri Grubu",
@@ -1295,7 +1607,50 @@
       "new": "Yeni Mağaza",
       "tabs": {
         "general": "Genel",
-        "domains": "Domainler"
+        "domains": "Domainler",
+        "currencies": "Para Birimleri"
+      },
+      "currencies": {
+        "title": "Para Birimi Politikası",
+        "subtitle": "Bu mağazada hangi para birimlerinin aktif olduğunu yönetin.",
+        "defaultCurrency": {
+          "title": "Varsayılan Para Birimi",
+          "description": "Mağazanın ana para birimi. Checkout fallback ve baz fiyat listesi rotasyonu bununla ilişkilidir.",
+          "label": "Varsayılan Para Birimi",
+          "changeConfirmTitle": "Varsayılan Para Birimi Değiştirilsin mi?",
+          "changeConfirmBody": "Yeni para birimi için bir BASE fiyat listesi oluşturulacak. Devam etmek istiyor musunuz?",
+          "changeConfirmBtn": "Değiştir",
+          "cancel": "İptal"
+        },
+        "policy": {
+          "title": "Para Birimi Satırları",
+          "description": "Her para birimi için görünürlük, ödeme erişimi ve sıralamayı yapılandırın.",
+          "addCurrency": "Para Birimi Ekle",
+          "colCurrency": "Para Birimi",
+          "colStorefront": "Vitirinde görünür",
+          "colCheckout": "Ödemeye izin ver",
+          "colSortOrder": "Sıra",
+          "colRole": "Rol"
+        },
+        "roles": {
+          "default": "Varsayılan",
+          "checkout": "Ödeme",
+          "displayOnly": "Sadece gösterim"
+        },
+        "addModal": {
+          "title": "Para Birimi Ekle",
+          "currencyLabel": "Para Birimi",
+          "currencyPlaceholder": "Para birimi seçin...",
+          "add": "Ekle",
+          "cancel": "İptal",
+          "noneAvailable": "Tüm platform para birimleri zaten eklenmiş."
+        },
+        "saveSuccess": "Para birimi ayarları kaydedildi.",
+        "saveError": "Para birimi ayarları kaydedilemedi.",
+        "deleteSuccess": "Para birimi kaldırıldı.",
+        "deleteError": "Para birimi kaldırılamadı.",
+        "addSuccess": "Para birimi eklendi.",
+        "addError": "Para birimi eklenemedi."
       },
       "domains": {
         "title": "Bağlı Domainler",

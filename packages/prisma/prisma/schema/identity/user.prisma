@@ -26,13 +26,14 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  sessions                 Session[]
-  devices                  Device[]
-  loginHistory             LoginHistory[]
-  refreshTokens            RefreshToken[]
-  accountEvents            AccountEvent[]
-  oauthAccounts            OAuthAccount[]
+  sessions       Session[]
+  devices        Device[]
+  loginHistory   LoginHistory[]
+  refreshTokens  RefreshToken[]
+  accountEvents  AccountEvent[]
+  oauthAccounts  OAuthAccount[]
   stockMovements StockMovementGroup[]
+  stockMovementStatusEvents StockMovementGroupStatusEvent[]
 
   @@index([email])
   @@index([phone])

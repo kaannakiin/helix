@@ -145,6 +145,18 @@ enum StockMovementStatus {
   CANCELLED
 }
 
+enum BusinessReferenceType {
+  PURCHASE_ORDER
+  SALES_ORDER
+  PURCHASE_RETURN
+  SALES_RETURN
+  STOCK_TRANSFER
+  STOCK_COUNT
+  MANUAL_ADJUSTMENT
+  SHIPMENT
+  INVOICE
+}
+
 // ─── Variant ──────────────────────────────────────────────────────────────────
 
 enum VariantGroupType {
@@ -189,6 +201,7 @@ enum PriceListType {
   BASE
   SALE
   CUSTOM
+  CONTRACT
 }
 
 enum PriceListStatus {
@@ -205,6 +218,43 @@ enum PriceOriginType {
 enum AdjustmentType {
   PERCENTAGE
   FIXED_AMOUNT
+}
+
+enum SourceSystem {
+  INTERNAL
+  SAP
+  CANIAS
+  WMS
+  API
+  CSV_IMPORT
+  MANUAL_IMPORT
+}
+
+enum BuyerType {
+  CUSTOMER
+  ORGANIZATION
+}
+
+enum DocumentNumberType {
+  STOCK_MOVEMENT_GROUP
+  SALES_ORDER
+  PURCHASE_ORDER
+  SHIPMENT
+  RETURN
+  INVOICE
+}
+
+enum ExternalEntityType {
+  PRODUCT_VARIANT
+  PRICE_LIST
+  PRICE_LIST_PRICE
+  PRICE_LIST_ASSIGNMENT
+  WAREHOUSE
+  STOCK_MOVEMENT_GROUP
+  CUSTOMER_GROUP
+  SUPPLIER
+  PURCHASE_ORDER
+  SALES_ORDER
 }
 
 // ─── Rule Engine ──────────────────────────────────────────────────────────────
@@ -300,6 +350,30 @@ enum HostBindingStatus {
   ACTIVE
   FAILED
   DISABLED
+}
+
+// ─── Pricing (Advanced) ─────────────────────────────────────────────────────
+
+enum TaxBehavior {
+  INCLUSIVE
+  EXCLUSIVE
+  UNSPECIFIED
+}
+
+enum RoundingRule {
+  NONE
+  ROUND_99
+  ROUND_95
+  ROUND_NEAREST
+  ROUND_UP
+  ROUND_DOWN
+}
+
+enum AssignmentTargetType {
+  ALL_CUSTOMERS
+  CUSTOMER_GROUP
+  ORGANIZATION
+  CUSTOMER
 }
 
 // ─── Account ──────────────────────────────────────────────────────────────────

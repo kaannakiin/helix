@@ -58,7 +58,36 @@ export class StoresService {
   }
 
   async create(data: CreateStoreOutput): Promise<Store> {
-    return this.prisma.store.create({ data });
+    return this.prisma.$transaction(async (tx) => {
+      const store = await tx.store.create({ data });
+
+      await tx.storeCurrency.create({
+        data: {
+          storeId: store.id,
+          currencyCode: store.defaultCurrencyCode,
+          isSelectable: true,
+          allowCheckout: true,
+          sortOrder: 0,
+        },
+      });
+
+      const defaultPriceList = await tx.priceList.create({
+        data: {
+          name: `${store.name} - Default`,
+          storeId: store.id,
+          type: 'BASE',
+          status: 'ACTIVE',
+          defaultCurrencyCode: store.defaultCurrencyCode,
+          isActive: true,
+          isSystemManaged: true,
+        },
+      });
+
+      return tx.store.update({
+        where: { id: store.id },
+        data: { defaultBasePriceListId: defaultPriceList.id },
+      });
+    });
   }
 
   async update(storeId: string, data: UpdateStoreOutput): Promise<Store> {

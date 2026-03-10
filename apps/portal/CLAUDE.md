@@ -244,6 +244,14 @@ Usage: `useTranslations('frontend.admin.brands')` → `t('title')` maps to `port
 
 For parameterized text (e.g., DataTable footer counts): use `t.raw('footer.totalRows')`.
 
+## Component Placement Rule
+
+**Page-specific components** → `app/(admin)/{route}/components/` (not reusable outside that route)
+
+**Generic / reusable UI components** → `packages/ui/src/` (shared across portal, storefronts, etc.)
+
+> Example: `DrawerFooter`, `DrawerWithFooter`, custom Mantine compound extensions — these belong in `packages/ui`, NOT in a route's `components/` folder.
+
 ## UI Conventions
 
 - **Layout:** Mantine `AppShell` with collapsible navbar + responsive header

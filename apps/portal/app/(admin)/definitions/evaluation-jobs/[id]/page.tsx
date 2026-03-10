@@ -57,7 +57,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 
 const ENTITY_EDIT_ROUTES: Record<string, (id: string) => string> = {
-  CustomerGroup: (id) => `/admin/customers/customer-groups/${id}`,
+  CustomerGroup: (id) => `/customers/customer-groups/${id}`,
 };
 
 function useLiveDuration(
@@ -564,9 +564,7 @@ export default function EvaluationJobDetailPage() {
                         withBorder
                         style={{ cursor: 'pointer' }}
                         onClick={() =>
-                          router.push(
-                            `/admin/definitions/evaluation-jobs/${job.id}`
-                          )
+                          router.push(`/definitions/evaluation-jobs/${job.id}`)
                         }
                       >
                         <Group justify="space-between">

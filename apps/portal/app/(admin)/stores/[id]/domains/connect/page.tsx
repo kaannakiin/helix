@@ -648,7 +648,7 @@ export default function DomainConnectWizard() {
                         setActiveStep(0);
                         setInitialized(false);
                         router.replace(
-                          `/admin/stores/${storeId}/domains/connect?domain=${comp}`
+                          `/stores/${storeId}/domains/connect?domain=${comp}`
                         );
                       }}
                     >

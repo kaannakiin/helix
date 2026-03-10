@@ -45,6 +45,12 @@ export const DATA_ACCESS_KEYS = {
     priceLists: {
       list: ['admin', 'priceLists', 'list'],
       detail: (id: string) => ['admin', 'priceLists', 'detail', id] as const,
+      assignments: (priceListId: string) =>
+        ['admin', 'priceLists', 'assignments', priceListId] as const,
+      prices: (priceListId: string) =>
+        ['admin', 'priceLists', 'prices', priceListId] as const,
+      pricesSummary: (priceListId: string) =>
+        ['admin', 'priceLists', 'pricesSummary', priceListId] as const,
     },
     organizations: {
       list: ['admin', 'organizations', 'list'],
@@ -71,6 +77,8 @@ export const DATA_ACCESS_KEYS = {
     stores: {
       list: ['admin', 'stores', 'list'] as const,
       detail: (id: string) => ['admin', 'stores', 'detail', id] as const,
+      currencies: (storeId: string) =>
+        ['admin', 'stores', 'currencies', storeId] as const,
     },
     platformInstallation: {
       detail: ['admin', 'platform-installation', 'detail'] as const,

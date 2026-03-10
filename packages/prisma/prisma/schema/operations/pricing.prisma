@@ -10,7 +10,7 @@ model PriceList {
   type   PriceListType   @default(BASE)
   status PriceListStatus @default(DRAFT)
 
-  currencyCode CurrencyCode
+  defaultCurrencyCode CurrencyCode
 
   parentPriceListId String?
   parentPriceList   PriceList?  @relation("PriceListInheritance", fields: [parentPriceListId], references: [id], onDelete: SetNull)
@@ -24,17 +24,36 @@ model PriceList {
 
   priority    Int     @default(0)
   description String?
-  isActive    Boolean @default(true)
+  isActive    Boolean @default(false)
+
+  isSystemManaged Boolean @default(false)
+
+  // B2B contract
+  contractRef String?
+
+  // ERP source lock
+  sourceSystem   SourceSystem @default(INTERNAL)
+  isSourceLocked Boolean      @default(false)
+
+  // Exchange rate derived pricing (write-time, not runtime)
+  isExchangeRateDerived Boolean       @default(false)
+  sourceCurrencyCode    CurrencyCode?
+
+  // Rounding (post exchange rate conversion)
+  roundingRule RoundingRule @default(NONE)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  prices             PriceListPrice[]
-  customerGroupLinks PriceListCustomerGroup[]
+  prices          PriceListPrice[]
+  assignments     PriceListAssignment[]
+  defaultForStore Store?                @relation("StoreDefaultPriceList")
 
+  // Name uniqueness enforced via partial unique index in migration
+  // (only among non-ARCHIVED records)
   @@index([storeId])
-  @@index([currencyCode])
-  @@index([type, currencyCode])
+  @@index([defaultCurrencyCode])
+  @@index([type, defaultCurrencyCode])
   @@index([status])
   @@index([isActive])
   @@index([priority])
@@ -62,28 +81,72 @@ model PriceListPrice {
   adjustmentType  AdjustmentType?
   adjustmentValue Decimal?
 
+  // Currency (row-level, always target currency)
+  currencyCode CurrencyCode
+
+  // Quantity break
+  minQuantity Decimal @default(1)
+  maxQuantity Decimal?
+
+  // UoM-specific pricing
+  unitOfMeasureId String
+  unitOfMeasure   UnitOfMeasure @relation(fields: [unitOfMeasureId], references: [id])
+
+  // Tax behavior
+  taxBehavior TaxBehavior @default(INCLUSIVE)
+
+  // Exchange rate derived fields (only filled when PriceList.isExchangeRateDerived=true)
+  sourcePrice               Decimal?
+  sourceAppliedExchangeRate Decimal?
+  lastRateComputedAt        DateTime?
+
+  // Row-level validity
+  validFrom DateTime?
+  validTo   DateTime?
+
+  // ERP condition mapping
+  conditionType String?
+
+  // Source lock
+  isSourceLocked Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([priceListId, productVariantId])
+  @@unique([priceListId, productVariantId, currencyCode, unitOfMeasureId, minQuantity])
   @@index([priceListId])
   @@index([productVariantId])
+  @@index([priceListId, productVariantId, currencyCode])
+  @@index([validFrom, validTo])
 }
 
-// ─── Price List ↔ Customer Group ─────────────────────────────────────────────
+// ─── Price List Assignment ──────────────────────────────────────────────────
 
-model PriceListCustomerGroup {
+model PriceListAssignment {
   id String @id @default(cuid())
 
   priceListId String
   priceList   PriceList @relation(fields: [priceListId], references: [id], onDelete: Cascade)
 
-  customerGroupId String
-  customerGroup   CustomerGroup @relation(fields: [customerGroupId], references: [id], onDelete: Cascade)
+  targetType AssignmentTargetType
+
+  customerGroupId String?
+  customerGroup   CustomerGroup? @relation(fields: [customerGroupId], references: [id], onDelete: Cascade)
+
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  customerId String?
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  priority Int @default(0)
 
   createdAt DateTime @default(now())
 
-  @@unique([priceListId, customerGroupId])
+  // Partial unique indexes + CHECK constraint added via raw SQL in migration
   @@index([priceListId])
+  @@index([targetType])
   @@index([customerGroupId])
+  @@index([organizationId])
+  @@index([customerId])
 }

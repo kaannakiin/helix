@@ -15,6 +15,7 @@ model UnitOfMeasure {
   conversionsFrom UnitConversion[]           @relation("ConversionFrom")
   conversionsTo   UnitConversion[]           @relation("ConversionTo")
   productUnits    ProductUnitOfMeasure[]
+  priceListPrices PriceListPrice[]
   stockLevels     StockLevel[]
   stockMovements  StockMovement[]
 

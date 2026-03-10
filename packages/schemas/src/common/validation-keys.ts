@@ -70,7 +70,19 @@ export const V = {
     'validation.errors.common.price_list_currency_required',
   PRICE_REQUIRED: 'validation.errors.common.price_required',
   PRICE_NONNEGATIVE: 'validation.errors.common.price_nonnegative',
+  COST_CURRENCY_REQUIRED:
+    'validation.errors.common.cost_currency_required',
   DUPLICATE_VARIANT_PRICE: 'validation.errors.common.duplicate_variant_price',
+  COMPARE_AT_PRICE_MUST_BE_HIGHER:
+    'validation.errors.common.compare_at_price_must_be_higher',
+  SOURCE_CURRENCY_REQUIRED_FOR_EXCHANGE_RATE:
+    'validation.errors.common.source_currency_required_for_exchange_rate',
+  SOURCE_CURRENCY_MUST_DIFFER_FROM_DEFAULT:
+    'validation.errors.common.source_currency_must_differ_from_default',
+  ASSIGNMENT_RELATION_REQUIRED:
+    'validation.errors.pricing.assignment_relation_required',
+  ASSIGNMENT_RELATION_MUST_BE_NULL:
+    'validation.errors.pricing.assignment_relation_must_be_null',
 
   // ── Customer Groups ──
   CUSTOMER_GROUP_NAME_REQUIRED:
@@ -103,6 +115,20 @@ export const V = {
   // ── Condition Set ──
   CONDITION_SET_MIN_CONDITIONS:
     'validation.errors.common.condition_set_min_conditions',
+
+  // ── Pricing (Price Row) ──
+  ADJUSTMENT_TYPE_REQUIRED_FOR_RELATIVE:
+    'validation.errors.pricing.adjustment_type_required_for_relative',
+  ADJUSTMENT_VALUE_REQUIRED_FOR_RELATIVE:
+    'validation.errors.pricing.adjustment_value_required_for_relative',
+  MAX_QTY_MUST_BE_GTE_MIN:
+    'validation.errors.pricing.max_qty_must_be_gte_min',
+
+  // ── Date / Time ──
+  DATE_FROM_MUST_BE_BEFORE_TO:
+    'validation.errors.common.date_from_must_be_before_to',
+  DATE_FROM_CANNOT_BE_IN_PAST:
+    'validation.errors.common.date_from_cannot_be_in_past',
 
   // Store
   ACTIVE_STORES_REQUIRED: 'validation.errors.common.active_stores_required',

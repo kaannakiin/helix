@@ -73,3 +73,17 @@ export function findDuplicates<T>(
 }
 
 export const storesSchema = z.array(z.union([z.cuid2(), z.string()]));
+
+/**
+ * Nullable ISO 8601 date-time string schema.
+ * Accepts ISO strings (from JSON/API) and converts Date objects to ISO strings via preprocess.
+ * Safe for JSON Schema / Swagger — no `z.date()` involved.
+ */
+export const dateTimeSchema = z.preprocess(
+  (val) => {
+    if (val instanceof Date) return val.toISOString();
+    if (val === '' || val === undefined) return null;
+    return val;
+  },
+  z.iso.datetime({ offset: true }).nullable().default(null)
+);

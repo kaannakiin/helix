@@ -43,6 +43,7 @@ import { useTranslations } from 'next-intl';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useMemo } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { StoreCurrencyPolicyCard } from './components/StoreCurrencyPolicyCard';
 import { StoreDomainStatusCard } from './components/StoreDomainStatusCard';
 
 const NEW_STORE_DEFAULTS: CreateStoreInput = {
@@ -51,7 +52,7 @@ const NEW_STORE_DEFAULTS: CreateStoreInput = {
   businessModel: 'B2C',
   status: 'ACTIVE',
   defaultLocale: 'TR',
-  currency: 'TRY',
+  defaultCurrencyCode: 'TRY',
   timezone: 'Europe/Istanbul',
   description: '',
 };
@@ -68,6 +69,7 @@ export default function StoreDetailPage() {
   const t = useTranslations('frontend.admin.stores.form');
   const tDomains = useTranslations('frontend.admin.stores.domains');
   const tTabs = useTranslations('frontend.admin.stores.tabs');
+  const tCurrencies = useTranslations('frontend.admin.stores.currencies');
   const tEnums = useTranslations('frontend.enums');
 
   const { data, isLoading, isError, error } = useAdminStore(
@@ -83,7 +85,7 @@ export default function StoreDetailPage() {
       businessModel: data.businessModel,
       status: data.status,
       defaultLocale: data.defaultLocale,
-      currency: data.currency,
+      defaultCurrencyCode: data.defaultCurrencyCode,
       timezone: data.timezone ?? '',
       description: data.description ?? '',
       logoUrl: data.logoUrl ?? '',
@@ -229,6 +231,7 @@ export default function StoreDetailPage() {
           <Tabs.List>
             <Tabs.Tab value="general">{tTabs('general')}</Tabs.Tab>
             <Tabs.Tab value="domains">{tTabs('domains')}</Tabs.Tab>
+            <Tabs.Tab value="currencies">{tTabs('currencies')}</Tabs.Tab>
           </Tabs.List>
 
           <Tabs.Panel value="general" pt="md">
@@ -264,6 +267,20 @@ export default function StoreDetailPage() {
                 storeId={id}
                 storefrontStatus={data?.storefrontStatus}
               />
+            </Stack>
+          </Tabs.Panel>
+
+          <Tabs.Panel value="currencies" pt="md">
+            <Stack gap="md">
+              <div>
+                <Text size="lg" fw={600}>
+                  {tCurrencies('title')}
+                </Text>
+                <Text size="sm" c="dimmed">
+                  {tCurrencies('subtitle')}
+                </Text>
+              </div>
+              <StoreCurrencyPolicyCard storeId={id} store={data} />
             </Stack>
           </Tabs.Panel>
         </Tabs>
@@ -405,7 +422,7 @@ function GeneralTabContent({
 
                 <Controller
                   control={control}
-                  name="currency"
+                  name="defaultCurrencyCode"
                   render={({ field, fieldState }: any) => (
                     <Select
                       label={t('currency.label')}

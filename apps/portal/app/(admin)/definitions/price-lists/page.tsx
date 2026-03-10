@@ -2,7 +2,7 @@
 
 import { apiClient } from '@/core/lib/api/api-client';
 import { downloadExport } from '@/core/lib/api/download';
-import { Stack, Text, Title } from '@mantine/core';
+import { Button, Group, Stack, Text, Title } from '@mantine/core';
 import type { AdminPriceListListPrismaType } from '@org/types/admin/pricing';
 import type { ExportFormat } from '@org/types/export';
 import type { PaginatedResponse } from '@org/types/pagination';
@@ -15,7 +15,7 @@ import {
   type DataTableTranslations,
 } from '@org/ui';
 import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
-import { DollarSign } from 'lucide-react';
+import { DollarSign, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { useCallback, useMemo, useRef } from 'react';
@@ -77,12 +77,18 @@ export default function PriceListsPage() {
         name: t('table.name'),
         type: t('table.type'),
         status: t('table.status'),
-        currencyCode: t('table.currencyCode'),
+        defaultCurrencyCode: t('table.defaultCurrencyCode'),
         isActive: t('table.isActive'),
         priority: t('table.priority'),
         validFrom: t('table.validFrom'),
         validTo: t('table.validTo'),
         pricesCount: t('table.pricesCount'),
+        sourceSystem: t('table.sourceSystem'),
+        isExchangeRateDerived: t('table.isExchangeRateDerived'),
+        sourceCurrencyCode: t('table.sourceCurrencyCode'),
+        isSourceLocked: t('table.isSourceLocked'),
+        store: t('table.store'),
+        assignmentsCount: t('table.assignmentsCount'),
         createdAt: t('table.createdAt'),
       },
       contextMenu: {
@@ -152,8 +158,8 @@ export default function PriceListsPage() {
           { value: 'ARCHIVED', label: t('enums.status.ARCHIVED') },
         ],
       }),
-      createColumn<AdminPriceListListPrismaType>('currencyCode', {
-        headerKey: 'currencyCode',
+      createColumn<AdminPriceListListPrismaType>('defaultCurrencyCode', {
+        headerKey: 'defaultCurrencyCode',
         type: 'badge',
         colorMap: { TRY: 'red', USD: 'green', EUR: 'blue', GBP: 'indigo' },
         enumOptions: [
@@ -182,6 +188,49 @@ export default function PriceListsPage() {
         headerKey: 'validTo',
         type: 'datetime',
         minWidth: 170,
+      }),
+      createColumn<AdminPriceListListPrismaType>('sourceSystem', {
+        headerKey: 'sourceSystem',
+        type: 'badge',
+        colorMap: { INTERNAL: 'gray', ERP: 'orange', IMPORT: 'violet' },
+        enumOptions: [
+          { value: 'INTERNAL', label: t('enums.sourceSystem.INTERNAL') },
+          { value: 'ERP', label: t('enums.sourceSystem.ERP') },
+          { value: 'IMPORT', label: t('enums.sourceSystem.IMPORT') },
+        ],
+        minWidth: 120,
+      }),
+      createColumn<AdminPriceListListPrismaType>('isExchangeRateDerived', {
+        headerKey: 'isExchangeRateDerived',
+        type: 'boolean',
+        minWidth: 100,
+      }),
+      createColumn<AdminPriceListListPrismaType>('sourceCurrencyCode', {
+        headerKey: 'sourceCurrencyCode',
+        type: 'badge',
+        colorMap: { TRY: 'red', USD: 'green', EUR: 'blue', GBP: 'indigo' },
+        enumOptions: [
+          { value: 'TRY', label: 'TRY' },
+          { value: 'USD', label: 'USD' },
+          { value: 'EUR', label: 'EUR' },
+          { value: 'GBP', label: 'GBP' },
+        ],
+        minWidth: 110,
+      }),
+      createColumn<AdminPriceListListPrismaType>('isSourceLocked', {
+        headerKey: 'isSourceLocked',
+        type: 'boolean',
+        minWidth: 90,
+      }),
+      createColumn<AdminPriceListListPrismaType>('store.name', {
+        headerKey: 'store',
+        type: 'text',
+        minWidth: 140,
+      }),
+      createColumn<AdminPriceListListPrismaType>('_count.assignments', {
+        headerKey: 'assignmentsCount',
+        type: 'number',
+        minWidth: 110,
       }),
       createColumn<AdminPriceListListPrismaType>('_count.prices', {
         headerKey: 'pricesCount',
@@ -212,6 +261,8 @@ export default function PriceListsPage() {
   const copyFormatters = useMemo<Record<string, (value: unknown) => string>>(
     () => ({
       isActive: (v) => (v ? tExport('boolean_yes') : tExport('boolean_no')),
+      isExchangeRateDerived: (v) => (v ? tExport('boolean_yes') : tExport('boolean_no')),
+      isSourceLocked: (v) => (v ? tExport('boolean_yes') : tExport('boolean_no')),
       createdAt: (v) => (v ? new Date(v as string).toLocaleString() : '—'),
       validFrom: (v) => (v ? new Date(v as string).toLocaleString() : '—'),
       validTo: (v) => (v ? new Date(v as string).toLocaleString() : '—'),
@@ -285,12 +336,20 @@ export default function PriceListsPage() {
 
   return (
     <Stack gap="md" className="flex-1">
-      <div>
-        <Title order={2}>{t('title')}</Title>
-        <Text c="dimmed" mt="xs">
-          {t('subtitle')}
-        </Text>
-      </div>
+      <Group justify="space-between" align="flex-start">
+        <div>
+          <Title order={2}>{t('title')}</Title>
+          <Text c="dimmed" mt="xs">
+            {t('subtitle')}
+          </Text>
+        </div>
+        <Button
+          leftSection={<Plus size={16} />}
+          onClick={() => router.push('/definitions/price-lists/new')}
+        >
+          {t('actions.newPriceList')}
+        </Button>
+      </Group>
 
       <DataTable<AdminPriceListListPrismaType>
         tableId="price-lists"

@@ -8,7 +8,7 @@ import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
 import { PRICE_LIST_EXPORT_COLUMNS } from './price-lists.export-config';
 import { PriceListsService } from './price-lists.service';
-import { PriceListExportQueryDTO, PriceListQueryDTO } from './dto';
+import { PriceListExportQueryDTO, PriceListQueryDTO, PriceListSaveDTO } from './dto';
 
 @ApiTags('Admin - Price Lists')
 @Controller('admin/price-lists')
@@ -22,6 +22,12 @@ export class PriceListsController {
   @ApiOperation({ summary: 'Get paginated list of price lists' })
   async getPriceLists(@Body() query: PriceListQueryDTO) {
     return this.priceListsService.getPriceLists(query);
+  }
+
+  @Post('save')
+  @ApiOperation({ summary: 'Create or update a price list' })
+  async savePriceList(@Body() body: PriceListSaveDTO) {
+    return this.priceListsService.savePriceList(body);
   }
 
   @Get('export')

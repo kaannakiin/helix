@@ -18,6 +18,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit {
       },
       errorFormat: 'pretty',
       log: ['error', 'warn'],
+      transactionOptions: {
+        maxWait: 10000,
+        timeout: 10000,
+      },
     });
   }
 

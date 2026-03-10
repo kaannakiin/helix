@@ -6,6 +6,8 @@ import { DomainSpacesService } from './domain-spaces.service.js';
 import { HostRoutingService } from './host-routing.service.js';
 import { PlatformInstallationController } from './platform-installation.controller.js';
 import { PlatformInstallationService } from './platform-installation.service.js';
+import { StoreCurrenciesController } from './store-currencies.controller.js';
+import { StoreCurrenciesService } from './store-currencies.service.js';
 import { StoreHostBindingsController } from './store-host-bindings.controller.js';
 import { StoreHostBindingsService } from './store-host-bindings.service.js';
 import { StoreGuard } from './store.guard.js';
@@ -20,6 +22,7 @@ import { StoresService } from './stores.service.js';
   imports: [PrismaModule, RedisModule],
   controllers: [
     StoresController,
+    StoreCurrenciesController,
     PlatformInstallationController,
     DomainSpacesController,
     StoreHostBindingsController,
@@ -28,6 +31,7 @@ import { StoresService } from './stores.service.js';
   ],
   providers: [
     StoresService,
+    StoreCurrenciesService,
     StoreGuard,
     StorefrontStatusService,
     PlatformInstallationService,

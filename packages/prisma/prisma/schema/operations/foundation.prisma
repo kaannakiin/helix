@@ -1,0 +1,35 @@
+model ExternalReference {
+  id String @id @default(cuid())
+
+  entityType ExternalEntityType
+  entityId   String
+
+  sourceSystem SourceSystem
+  externalRef  String
+  externalSubRef String @default("")
+
+  payloadHash  String?
+  metadata     Json?
+  lastSyncedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sourceSystem, entityType, entityId])
+  @@unique([sourceSystem, entityType, externalRef, externalSubRef])
+  @@index([entityType, entityId])
+}
+
+model NumberSeries {
+  id String @id @default(cuid())
+
+  documentType DocumentNumberType
+  scopeKey     String
+  year         Int
+  lastValue    Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([documentType, scopeKey, year])
+}

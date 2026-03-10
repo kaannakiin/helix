@@ -27,4 +27,4 @@ COPY packages/prisma ./packages/prisma
 # Generate Prisma client
 RUN cd packages/prisma && npx prisma generate
 
-CMD ["node", "--loader", "ts-node/esm", "packages/prisma/src/seeds/production-seed.ts"]
+CMD ["node", "--loader", "ts-node/esm", "packages/prisma/src/seeds/bootstrap/production-seed.ts"]

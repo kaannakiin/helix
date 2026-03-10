@@ -4,9 +4,16 @@ import {
   PriceListStatus,
   PriceListType,
   PriceOriginType,
+  RoundingRule,
+  SourceSystem,
 } from '@org/prisma/browser';
+import { createId } from '@paralleldrive/cuid2';
 import { z } from 'zod';
-import { cuidSchema, findDuplicates } from '../../common/common-schemas.js';
+import {
+  cuidSchema,
+  dateTimeSchema,
+  findDuplicates,
+} from '../../common/common-schemas.js';
 import { V } from '../../common/validation-keys.js';
 
 export const priceListPriceSchema = z.object({
@@ -41,18 +48,27 @@ export const BasePriceListSchema = z.object({
     .string({ error: V.PRICE_LIST_NAME_REQUIRED })
     .trim()
     .min(1, { error: V.PRICE_LIST_NAME_REQUIRED }),
+  storeId: cuidSchema,
   type: z.enum(PriceListType).default('BASE'),
   status: z.enum(PriceListStatus).default('DRAFT'),
-  currencyCode: z.enum(CurrencyCode, { error: V.PRICE_LIST_CURRENCY_REQUIRED }),
+  defaultCurrencyCode: z.enum(CurrencyCode, {
+    error: V.PRICE_LIST_CURRENCY_REQUIRED,
+  }),
   parentPriceListId: cuidSchema.nullable().default(null),
   adjustmentType: z.enum(AdjustmentType).nullable().default(null),
   adjustmentValue: z.number().nullable().default(null),
-  validFrom: z.coerce.date().nullable().default(null),
-  validTo: z.coerce.date().nullable().default(null),
+  validFrom: dateTimeSchema,
+  validTo: dateTimeSchema,
   priority: z.number().int().nonnegative().default(0),
   description: z.string().nullable().default(null),
   isActive: z.boolean().default(true),
   prices: z.array(priceListPriceSchema).default([]),
+  contractRef: z.string().optional(),
+  sourceSystem: z.enum(SourceSystem).default('INTERNAL'),
+  isSourceLocked: z.boolean().default(false),
+  isExchangeRateDerived: z.boolean().default(false),
+  sourceCurrencyCode: z.enum(CurrencyCode).nullable().optional(),
+  roundingRule: z.enum(RoundingRule).default('NONE'),
 });
 
 const checkPriceList = ({
@@ -88,8 +104,29 @@ const checkPriceList = ({
     issues.push({
       code: 'custom',
       input: value.validTo,
-      error: V.REQUIRED,
+      error: V.DATE_FROM_MUST_BE_BEFORE_TO,
       path: ['validTo'],
+    });
+  }
+
+  if (value.isExchangeRateDerived && !value.sourceCurrencyCode) {
+    issues.push({
+      code: 'custom',
+      input: value.sourceCurrencyCode,
+      error: V.SOURCE_CURRENCY_REQUIRED_FOR_EXCHANGE_RATE,
+      path: ['sourceCurrencyCode'],
+    });
+  }
+
+  if (
+    value.sourceCurrencyCode &&
+    value.sourceCurrencyCode === value.defaultCurrencyCode
+  ) {
+    issues.push({
+      code: 'custom',
+      input: value.sourceCurrencyCode,
+      error: V.SOURCE_CURRENCY_MUST_DIFFER_FROM_DEFAULT,
+      path: ['sourceCurrencyCode'],
     });
   }
 };
@@ -99,3 +136,27 @@ export const BackendPriceListSchema = BasePriceListSchema.check(checkPriceList);
 
 export type PriceListInput = z.input<typeof PriceListSchema>;
 export type PriceListOutput = z.output<typeof PriceListSchema>;
+
+export const NEW_PRICE_LIST_DEFAULT_VALUES: PriceListInput = {
+  uniqueId: createId(),
+  name: '',
+  storeId: '',
+  type: 'BASE',
+  status: 'DRAFT',
+  defaultCurrencyCode: 'TRY',
+  parentPriceListId: null,
+  adjustmentType: null,
+  adjustmentValue: null,
+  validFrom: null,
+  validTo: null,
+  priority: 0,
+  description: null,
+  isActive: true,
+  prices: [],
+  contractRef: undefined,
+  sourceSystem: 'INTERNAL',
+  isSourceLocked: false,
+  isExchangeRateDerived: false,
+  sourceCurrencyCode: null,
+  roundingRule: 'NONE',
+};

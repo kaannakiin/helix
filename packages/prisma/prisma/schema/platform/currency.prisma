@@ -19,6 +19,8 @@ model Currency {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  storeCurrencies StoreCurrency[]
+
   @@index([code])
   @@index([isActive])
   @@index([isDefault])

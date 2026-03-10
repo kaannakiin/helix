@@ -29,12 +29,13 @@ model Customer {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  sessions      CustomerSession[]
-  devices       CustomerDevice[]
-  refreshTokens CustomerRefreshToken[]
+  sessions                 CustomerSession[]
+  devices                  CustomerDevice[]
+  refreshTokens            CustomerRefreshToken[]
   oauthAccounts            CustomerOAuthAccount[]
   customerGroupMemberships CustomerGroupMember[]
   organizationMemberships  OrganizationMember[]
+  priceListAssignments     PriceListAssignment[]
 
   @@unique([storeId, email])
   @@unique([storeId, phone])

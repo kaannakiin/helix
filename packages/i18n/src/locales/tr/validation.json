@@ -64,7 +64,25 @@
       "decision_tree_simple_no_branch_not_allowed": "Basit modda hayır dalına izin verilmez.",
       "active_stores_required": "En az bir mağaza seçilmelidir.",
       "duplicate_store": "Aynı mağaza birden fazla seçilmiş.",
-      "timezone_invalid": "Geçersiz saat dilimi."
+      "timezone_invalid": "Geçersiz saat dilimi.",
+      "price_list_name_required": "Fiyat listesi adı zorunludur.",
+      "price_list_currency_required": "Fiyat listesi para birimi zorunludur.",
+      "price_required": "Fiyat zorunludur.",
+      "price_nonnegative": "Fiyat negatif olamaz.",
+      "cost_currency_required": "Maliyet fiyatı girildiğinde para birimi zorunludur.",
+      "duplicate_variant_price": "Aynı varyant için birden fazla fiyat tanımlanmış.",
+      "compare_at_price_must_be_higher": "Karşılaştırma fiyatı, satış fiyatından yüksek olmalıdır.",
+      "source_currency_required_for_exchange_rate": "Kur bazlı fiyatlandırma etkinleştirildiğinde kaynak para birimi zorunludur.",
+      "source_currency_must_differ_from_default": "Kaynak para birimi, varsayılan para biriminden farklı olmalıdır.",
+      "date_from_must_be_before_to": "Bitiş tarihi, başlangıç tarihinden sonra olmalıdır.",
+      "date_from_cannot_be_in_past": "Başlangıç tarihi geçmişe ayarlanamaz."
+    },
+    "pricing": {
+      "assignment_relation_required": "Bu atama türü için bir hedef seçilmelidir.",
+      "assignment_relation_must_be_null": "Bu atama türü için hedef seçilmemelidir.",
+      "adjustment_type_required_for_relative": "Göreceli fiyatlandırma için ayarlama türü zorunludur.",
+      "adjustment_value_required_for_relative": "Göreceli fiyatlandırma için ayarlama değeri zorunludur.",
+      "max_qty_must_be_gte_min": "Maksimum miktar, minimum miktara eşit veya büyük olmalıdır."
     }
   }
 }

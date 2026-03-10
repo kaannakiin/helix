@@ -1,0 +1,23 @@
+// ─── Store Currency Policy ────────────────────────────────────────────────────
+
+model StoreCurrency {
+  id String @id @default(cuid())
+
+  storeId String
+  store   Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  currencyCode CurrencyCode
+  currency     Currency     @relation(fields: [currencyCode], references: [code])
+
+  isSelectable  Boolean @default(true)
+  allowCheckout Boolean @default(false)
+  sortOrder     Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([storeId, currencyCode])
+  @@index([storeId, isSelectable, sortOrder])
+  @@index([storeId, currencyCode, allowCheckout])
+  @@map("store_currencies")
+}

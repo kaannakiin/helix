@@ -28,15 +28,17 @@
     }
   },
   "scripts": {
-    "seed:base": "npx tsx src/seeds/base-seed.ts",
-    "seed:customers": "npx tsx src/new-seeds/customer-seed.ts",
-    "seed:products": "npx tsx src/new-seeds/catalog-seed.ts",
-    "seed:bulk": "PRODUCT_SEED_COUNT=300 npx tsx src/new-seeds/catalog-seed.ts",
-    "seed:taxonomy": "npx tsx src/seeds/taxonomy-seed.ts",
-    "seed:geo": "npx tsx src/seeds/geolocation-seed.ts",
-    "seed:stores": "npx tsx src/seeds/store-seed.ts",
-    "seed:organizations": "npx tsx src/new-seeds/organization-seed.ts",
-    "seed:production": "npx tsx src/seeds/production-seed.ts"
+    "seed:base": "npx tsx src/seeds/bootstrap/base-seed.ts",
+    "seed:customers": "npx tsx src/seeds/customer/customer-seed.ts",
+    "seed:products": "npx tsx src/seeds/catalog/catalog-seed.ts",
+    "seed:bulk": "PRODUCT_SEED_COUNT=300 npx tsx src/seeds/catalog/catalog-seed.ts",
+    "seed:pricing": "npx tsx src/seeds/pricing/pricing-seed.ts",
+    "seed:main": "npx tsx src/seeds/bootstrap/main-seed.ts",
+    "seed:taxonomy": "npx tsx src/seeds/reference/taxonomy/taxonomy-seed.ts",
+    "seed:geo": "npx tsx src/seeds/reference/geolocation/geolocation-seed.ts",
+    "seed:stores": "npx tsx src/seeds/bootstrap/store-seed.ts",
+    "seed:organizations": "npx tsx src/seeds/organization/organization-seed.ts",
+    "seed:production": "npx tsx src/seeds/bootstrap/production-seed.ts"
   },
   "dependencies": {
     "@node-rs/argon2": "^2.0.2",

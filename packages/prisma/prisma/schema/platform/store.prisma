@@ -8,27 +8,32 @@ model Store {
   status           StoreStatus      @default(ACTIVE)
   storefrontStatus StorefrontStatus @default(PENDING_HOST)
 
-  defaultLocale Locale       @default(TR)
-  currency      CurrencyCode @default(TRY)
-  timezone      String?
-  description   String?
-  logoUrl       String?
+  defaultLocale       Locale       @default(TR)
+  defaultCurrencyCode CurrencyCode @default(TRY)
+  timezone            String?
+  description         String?
+  logoUrl             String?
+
+  defaultBasePriceListId String?    @unique
+  defaultBasePriceList   PriceList? @relation("StoreDefaultPriceList", fields: [defaultBasePriceListId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  organizations  Organization[]
-  products       ProductStore[]
-  priceLists     PriceList[]
-  customerGroups CustomerGroup[]
-  warehouses     Warehouse[]
-  categoryStores CategoryStore[]
-  ruleTrees      RuleTree[]
-  hostBindings   StoreHostBinding[]
-  customers      Customer[]
+  organizations   Organization[]
+  products        ProductStore[]
+  priceLists      PriceList[]
+  customerGroups  CustomerGroup[]
+  warehouses      Warehouse[]
+  categoryStores  CategoryStore[]
+  ruleTrees       RuleTree[]
+  hostBindings    StoreHostBinding[]
+  customers       Customer[]
+  storeCurrencies StoreCurrency[]
 
   @@index([businessModel])
   @@index([status])
   @@index([storefrontStatus])
+  @@index([defaultCurrencyCode])
   @@map("stores")
 }

@@ -133,8 +133,8 @@ export const DomainSpaceSchema = z.object({
 });
 
 export const StoreHostBindingSchema = z.object({
-  storeId: z.cuid(),
-  domainSpaceId: z.cuid(),
+  storeId: z.cuid2(),
+  domainSpaceId: z.cuid2(),
   hostname: exactHostnameSchema,
   type: z.enum(HostBindingType, { error: V.REQUIRED }).default('PRIMARY'),
   routingMethod: z
@@ -157,7 +157,7 @@ export const CreateStoreSchema = z.object({
   businessModel: z.enum(BusinessModel, { error: V.REQUIRED }),
   status: z.enum(StoreStatus, { error: V.REQUIRED }),
   defaultLocale: z.enum(Locale, { error: V.LOCALE_REQUIRED }),
-  currency: z.enum(CurrencyCode, { error: V.REQUIRED }),
+  defaultCurrencyCode: z.enum(CurrencyCode, { error: V.REQUIRED }),
   timezone: z
     .enum(TIMEZONES as unknown as [string, ...string[]], {
       error: V.TIMEZONE_INVALID,

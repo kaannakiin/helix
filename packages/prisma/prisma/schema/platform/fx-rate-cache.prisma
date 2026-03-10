@@ -1,0 +1,21 @@
+// ─── FX Rate Cache ────────────────────────────────────────────────────────────
+
+model FxRateCache {
+  id String @id @default(cuid())
+
+  // Semantik: 1 baseCurrency = rate quoteCurrency
+  // Örnek: base=USD, quote=TRY, rate=32.50 → 1 USD = 32.50 TRY
+  baseCurrency  CurrencyCode
+  quoteCurrency CurrencyCode
+
+  rate      Decimal  @db.Decimal(18, 8)
+  source    String
+  fetchedAt DateTime
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+
+  @@unique([baseCurrency, quoteCurrency])
+  @@index([expiresAt])
+  @@map("fx_rate_cache")
+}

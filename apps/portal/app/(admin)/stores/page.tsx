@@ -126,7 +126,7 @@ function StoreCard({
               {t('card.currency')}
             </Text>
             <Text size="sm" fw={500}>
-              {store.currency}
+              {store.defaultCurrencyCode}
             </Text>
           </div>
           <div>
