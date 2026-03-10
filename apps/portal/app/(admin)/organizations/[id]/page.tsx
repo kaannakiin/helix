@@ -123,7 +123,7 @@ export default function OrganizationDetailPage() {
         <Button
           variant="subtle"
           leftSection={<ArrowLeft size={16} />}
-          onClick={() => router.push('/admin/organizations')}
+          onClick={() => router.push('/organizations')}
         >
           {tDetail('backToList')}
         </Button>
@@ -169,7 +169,7 @@ export default function OrganizationDetailPage() {
         <Button
           variant="default"
           leftSection={<ArrowLeft size={16} />}
-          onClick={() => router.push('/admin/organizations')}
+          onClick={() => router.push('/organizations')}
         >
           {tDetail('backToList')}
         </Button>

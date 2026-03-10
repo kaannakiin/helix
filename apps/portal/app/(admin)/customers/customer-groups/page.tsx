@@ -231,7 +231,7 @@ export default function AdminCustomerGroupsPage() {
         </div>
         <Button
           leftSection={<Plus size={16} />}
-          onClick={() => router.push('/admin/customers/customer-groups/new')}
+          onClick={() => router.push('/customers/customer-groups/new')}
         >
           {t('new')}
         </Button>

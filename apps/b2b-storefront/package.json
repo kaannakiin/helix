@@ -2,6 +2,15 @@
   "name": "@org/b2b-storefront",
   "version": "0.0.1",
   "private": true,
+  "nx": {
+    "targets": {
+      "dev": {
+        "options": {
+          "port": 3002
+        }
+      }
+    }
+  },
   "dependencies": {
     "@org/i18n": "*",
     "@org/constants": "*",

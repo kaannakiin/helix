@@ -427,7 +427,7 @@ export default function DomainConnectWizard() {
                     color="orange"
                     size="xs"
                     mt="sm"
-                    onClick={() => router.push('/admin/settings/platform')}
+                    onClick={() => router.push('/settings/platform')}
                   >
                     {tDomains('goToSettings')}
                   </Button>

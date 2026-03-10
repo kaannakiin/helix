@@ -5,7 +5,6 @@ import {
   useCreateStore,
   useUpdateStore,
 } from '@/core/hooks/useAdminStores';
-import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import { ApiError } from '@/core/lib/api/api-error';
 import {
   Alert,
@@ -28,6 +27,7 @@ import {
   buildEnumOptions,
 } from '@org/constants/enum-configs';
 import { TIMEZONE_OPTIONS } from '@org/constants/timezone-constants';
+import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import type { Store } from '@org/prisma/browser';
 import {
   CreateStoreSchema,
@@ -175,7 +175,7 @@ export default function StoreDetailPage() {
             ? t('notFoundDescription')
             : t('loadErrorDescription')}
         </Alert>
-        <Button variant="default" onClick={() => router.push('/admin/stores')}>
+        <Button variant="default" onClick={() => router.push('/stores')}>
           {t('backToStores')}
         </Button>
       </Stack>
@@ -191,10 +191,7 @@ export default function StoreDetailPage() {
           </Text>
           {activeTab === 'general' && (
             <Group gap="sm">
-              <Button
-                variant="default"
-                onClick={() => router.push('/admin/stores')}
-              >
+              <Button variant="default" onClick={() => router.push('/stores')}>
                 {t('discard')}
               </Button>
               <Button

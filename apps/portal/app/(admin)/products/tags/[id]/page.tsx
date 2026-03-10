@@ -91,7 +91,7 @@ const AdminTagGroupFormPage = () => {
     if (isNew) {
       router.push(`/admin/products/tags/${formData.id}`);
     } else {
-      router.push('/admin/products/tags');
+      router.push('/products/tags');
     }
   };
 
@@ -118,7 +118,7 @@ const AdminTagGroupFormPage = () => {
             <Group gap="sm">
               <Button
                 variant="default"
-                onClick={() => router.push('/admin/products/tags')}
+                onClick={() => router.push('/products/tags')}
               >
                 {t('discard')}
               </Button>

@@ -4,7 +4,6 @@ import {
   useAdminVariantGroup,
   useSaveVariantGroup,
 } from '@/core/hooks/useAdminVariantGroup';
-import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import { apiClient } from '@/core/lib/api/api-client';
 import { ApiError } from '@/core/lib/api/api-error';
 import {
@@ -41,6 +40,7 @@ import {
 import { useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { getMimePatterns } from '@org/constants/product-constants';
+import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import { FileType, VariantGroupType } from '@org/prisma/browser';
 import {
   NEW_VARIANT_GROUP_DEFAULT_VALUES,
@@ -349,7 +349,7 @@ const AdminVariantGroupFormPage = () => {
         }
       }
 
-      router.push('/admin/products/variants');
+      router.push('/products/variants');
     } catch {}
   };
 
@@ -368,7 +368,7 @@ const AdminVariantGroupFormPage = () => {
         </Alert>
         <Button
           variant="default"
-          onClick={() => router.push('/admin/products/variants')}
+          onClick={() => router.push('/products/variants')}
         >
           {t('backToVariants')}
         </Button>
@@ -388,7 +388,7 @@ const AdminVariantGroupFormPage = () => {
               <Group gap="sm">
                 <Button
                   variant="default"
-                  onClick={() => router.push('/admin/products/variants')}
+                  onClick={() => router.push('/products/variants')}
                 >
                   {t('discard')}
                 </Button>

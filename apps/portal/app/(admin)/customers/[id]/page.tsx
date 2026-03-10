@@ -167,7 +167,7 @@ export default function CustomerDetailPage() {
         <Button
           variant="subtle"
           leftSection={<ArrowLeft size={16} />}
-          onClick={() => router.push('/admin/customers')}
+          onClick={() => router.push('/customers')}
         >
           {tDetail('backToList')}
         </Button>
@@ -226,7 +226,7 @@ export default function CustomerDetailPage() {
         <Button
           variant="default"
           leftSection={<ArrowLeft size={16} />}
-          onClick={() => router.push('/admin/customers')}
+          onClick={() => router.push('/customers')}
         >
           {tDetail('backToList')}
         </Button>

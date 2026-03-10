@@ -269,7 +269,7 @@ export default function EvaluationJobDetailPage() {
         <Button
           variant="default"
           leftSection={<ArrowLeft size={16} />}
-          onClick={() => router.push('/admin/definitions/evaluation-jobs')}
+          onClick={() => router.push('/definitions/evaluation-jobs')}
         >
           {t('backToList')}
         </Button>
@@ -310,7 +310,7 @@ export default function EvaluationJobDetailPage() {
             variant="subtle"
             size="compact-sm"
             leftSection={<ArrowLeft size={16} />}
-            onClick={() => router.push('/admin/definitions/evaluation-jobs')}
+            onClick={() => router.push('/definitions/evaluation-jobs')}
           >
             {t('backToList')}
           </Button>

@@ -292,7 +292,7 @@ export default function CategoriesPage() {
             onChange={setSearch}
             style={{ width: 280 }}
           />
-          <Button onClick={() => router.push('/admin/products/categories/new')}>
+          <Button onClick={() => router.push('/products/categories/new')}>
             {t('newCategory')}
           </Button>
         </Group>

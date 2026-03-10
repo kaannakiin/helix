@@ -7,7 +7,6 @@ import {
 import { categoryTreeFetcher } from '@/core/hooks/useAdminLookup';
 import { useAdminStores } from '@/core/hooks/useAdminStores';
 import { useImageUpload } from '@/core/hooks/useImageUpload';
-import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import {
   Button,
   Group,
@@ -21,6 +20,7 @@ import { useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { DATA_ACCESS_KEYS } from '@org/constants/data-keys';
 import { getMimePatterns } from '@org/constants/product-constants';
+import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import { FileType } from '@org/prisma/browser';
 import {
   CategoryInput,
@@ -186,7 +186,7 @@ const AdminCategoryFormPage = () => {
         images: [] as unknown as CategoryOutput['images'],
         existingImages: allExisting,
       });
-      router.push('/admin/products/categories');
+      router.push('/products/categories');
     } catch {
       // handled by useSaveCategory onError callback
     }
@@ -206,7 +206,7 @@ const AdminCategoryFormPage = () => {
               <Group gap="sm">
                 <Button
                   variant="default"
-                  onClick={() => router.push('/admin/products/categories')}
+                  onClick={() => router.push('/products/categories')}
                 >
                   {t('discard')}
                 </Button>

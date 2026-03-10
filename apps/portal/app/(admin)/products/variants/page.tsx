@@ -17,9 +17,9 @@ import {
   type DataTableTranslations,
 } from '@org/ui';
 import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
+import { Layers, Plus } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { Layers, Plus } from 'lucide-react';
 import { useCallback, useMemo, useRef } from 'react';
 
 export default function VariantGroupsPage() {
@@ -262,7 +262,7 @@ export default function VariantGroupsPage() {
           />
           <Button
             leftSection={<Plus size={16} />}
-            onClick={() => router.push('/admin/products/variants/new')}
+            onClick={() => router.push('/products/variants/new')}
           >
             {t('new')}
           </Button>

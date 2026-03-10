@@ -122,7 +122,7 @@ export function StoreDomainStatusCard({
             color="orange"
             size="xs"
             mt="sm"
-            onClick={() => router.push('/admin/settings/platform')}
+            onClick={() => router.push('/settings/platform')}
           >
             {t('goToSettings')}
           </Button>

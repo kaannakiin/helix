@@ -241,7 +241,7 @@ export default function BrandsPage() {
 
   const handleViewDetails = useCallback(
     (row: AdminBrandListPrismaType) => {
-      router.push(`/admin/products/brands/${row.id}`);
+      router.push(`/products/brands/${row.id}`);
     },
     [router]
   );
@@ -262,7 +262,7 @@ export default function BrandsPage() {
             onChange={setSearch}
             style={{ width: 280 }}
           />
-          <Button onClick={() => router.push('/admin/products/brands/new')}>
+          <Button onClick={() => router.push('/products/brands/new')}>
             {t('newBrand')}
           </Button>
         </Group>

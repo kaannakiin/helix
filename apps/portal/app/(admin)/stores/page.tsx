@@ -16,10 +16,10 @@ import {
 import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import {
-  buildColorMap,
   BusinessModelConfigs,
-  StorefrontStatusConfigs,
   StoreStatusConfigs,
+  StorefrontStatusConfigs,
+  buildColorMap,
 } from '@org/constants/enum-configs';
 import type { Store } from '@org/prisma/browser';
 import LoadingOverlay from '@org/ui/common/loading-overlay';
@@ -176,7 +176,7 @@ export default function StoresPage() {
         <Button
           size="lg"
           leftSection={<Plus size={20} />}
-          onClick={() => router.push('/admin/stores/new')}
+          onClick={() => router.push('/stores/new')}
         >
           {t('empty.cta')}
         </Button>
@@ -195,7 +195,7 @@ export default function StoresPage() {
         </div>
         <Button
           leftSection={<Plus size={16} />}
-          onClick={() => router.push('/admin/stores/new')}
+          onClick={() => router.push('/stores/new')}
         >
           {t('new')}
         </Button>

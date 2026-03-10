@@ -5,7 +5,6 @@ import {
   useCustomersDrawerFetchOptions,
   useSaveCustomerGroup,
 } from '@/core/hooks/useAdminCustomerGroup';
-import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import { ApiError } from '@/core/lib/api/api-error';
 import {
   Alert,
@@ -30,6 +29,7 @@ import {
   CustomerGroupTypeConfigs,
   buildEnumOptions,
 } from '@org/constants/enum-configs';
+import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import {
   CustomerGroupSchema,
   NEW_CUSTOMER_GROUP_DEFAULT_VALUES,
@@ -187,7 +187,7 @@ const AdminCustomerGroupPage = () => {
       await saveCustomerGroup.mutateAsync(
         formData as unknown as CustomerGroupOutput
       );
-      router.push('/admin/customers/customer-groups');
+      router.push('/customers/customer-groups');
     } catch (err) {
       const apiErr = err as ApiError;
       notifications.show({
@@ -239,7 +239,7 @@ const AdminCustomerGroupPage = () => {
         </Alert>
         <Button
           variant="default"
-          onClick={() => router.push('/admin/customers/customer-groups')}
+          onClick={() => router.push('/customers/customer-groups')}
         >
           {t('backToList')}
         </Button>
@@ -260,9 +260,7 @@ const AdminCustomerGroupPage = () => {
                 <Group gap="sm">
                   <Button
                     variant="default"
-                    onClick={() =>
-                      router.push('/admin/customers/customer-groups')
-                    }
+                    onClick={() => router.push('/customers/customer-groups')}
                   >
                     {t('discard')}
                   </Button>

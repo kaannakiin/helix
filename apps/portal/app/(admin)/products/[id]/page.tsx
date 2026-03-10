@@ -9,7 +9,6 @@ import {
 import { useAdminProduct, useSaveProduct } from '@/core/hooks/useAdminProducts';
 import { useAdminStores } from '@/core/hooks/useAdminStores';
 import { useImageUpload } from '@/core/hooks/useImageUpload';
-import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import { ApiError } from '@/core/lib/api/api-error';
 import {
   Alert,
@@ -31,6 +30,7 @@ import {
   buildEnumOptions,
 } from '@org/constants/enum-configs';
 import { getMimePatterns } from '@org/constants/product-constants';
+import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import { FileType } from '@org/prisma/browser';
 import {
   NEW_PRODUCT_DEFAULT_VALUES,
@@ -455,7 +455,7 @@ const AdminProductPage = () => {
         } as unknown as ProductOutputType);
       }
 
-      router.push('/admin/products');
+      router.push('/products');
     } catch (err) {
       const apiErr = err as ApiError;
       notifications.show({
@@ -479,10 +479,7 @@ const AdminProductPage = () => {
             ? t('notFoundDescription')
             : t('loadErrorDescription')}
         </Alert>
-        <Button
-          variant="default"
-          onClick={() => router.push('/admin/products')}
-        >
+        <Button variant="default" onClick={() => router.push('/products')}>
           {t('backToProducts')}
         </Button>
       </Stack>
@@ -504,7 +501,7 @@ const AdminProductPage = () => {
               <Group gap="sm">
                 <Button
                   variant="default"
-                  onClick={() => router.push('/admin/products')}
+                  onClick={() => router.push('/products')}
                 >
                   {t('discard')}
                 </Button>

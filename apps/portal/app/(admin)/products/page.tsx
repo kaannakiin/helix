@@ -376,7 +376,7 @@ export default function ProductsPage() {
           />
           <Button
             leftSection={<Plus size={16} />}
-            onClick={() => router.push('/admin/products/new')}
+            onClick={() => router.push('/products/new')}
           >
             {t('new')}
           </Button>

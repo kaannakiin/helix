@@ -242,7 +242,7 @@ export default function TagsPage() {
         </div>
         <Button
           leftSection={<Plus size={16} />}
-          onClick={() => router.push('/admin/products/tags/new')}
+          onClick={() => router.push('/products/tags/new')}
         >
           {t('new')}
         </Button>

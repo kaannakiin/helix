@@ -206,7 +206,7 @@ const AdminBrandFormPage = () => {
       };
 
       await saveBrand.mutateAsync(saveData as unknown as BrandOutput);
-      router.push('/admin/products/brands');
+      router.push('/products/brands');
     } catch {
       // handled by useSaveBrand onError callback
     }
@@ -227,7 +227,7 @@ const AdminBrandFormPage = () => {
         </Alert>
         <Button
           variant="default"
-          onClick={() => router.push('/admin/products/brands')}
+          onClick={() => router.push('/products/brands')}
         >
           {t('backToBrands')}
         </Button>
@@ -247,7 +247,7 @@ const AdminBrandFormPage = () => {
               <Group gap="sm">
                 <Button
                   variant="default"
-                  onClick={() => router.push('/admin/products/brands')}
+                  onClick={() => router.push('/products/brands')}
                 >
                   {t('discard')}
                 </Button>
