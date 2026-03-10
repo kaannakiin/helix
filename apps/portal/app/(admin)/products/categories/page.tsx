@@ -271,7 +271,7 @@ export default function CategoriesPage() {
 
   const handleViewDetails = useCallback(
     (row: AdminCategoryListPrismaType) => {
-      router.push(`/admin/products/categories/${row.id}`);
+      router.push(`/products/categories/${row.id}`);
     },
     [router]
   );

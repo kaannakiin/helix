@@ -242,7 +242,7 @@ export default function EvaluationJobDetailPage() {
         title: t('rerunSuccess'),
         message: '',
       });
-      router.push(`/admin/definitions/evaluation-jobs/${result.jobId}`);
+      router.push(`/definitions/evaluation-jobs/${result.jobId}`);
     } catch {
       notifications.show({
         color: 'red',

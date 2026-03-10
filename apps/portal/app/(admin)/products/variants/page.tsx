@@ -239,7 +239,7 @@ export default function VariantGroupsPage() {
 
   const handleViewDetails = useCallback(
     (row: AdminVariantGroupListPrismaType) => {
-      router.push(`/admin/products/variants/${row.id}`);
+      router.push(`/products/variants/${row.id}`);
     },
     [router]
   );

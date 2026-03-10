@@ -208,7 +208,7 @@ export default function StoresPage() {
             store={store}
             t={t}
             tEnums={tEnums}
-            onEdit={() => router.push(`/admin/stores/${store.id}`)}
+            onEdit={() => router.push(`/stores/${store.id}`)}
             onDelete={() => {
               modals.openConfirmModal({
                 title: t('card.delete'),

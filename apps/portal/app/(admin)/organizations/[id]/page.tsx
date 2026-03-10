@@ -275,9 +275,7 @@ export default function OrganizationDetailPage() {
                   size="sm"
                   fw={500}
                   style={{ cursor: 'pointer' }}
-                  onClick={() =>
-                    router.push(`/admin/organizations/${child.id}`)
-                  }
+                  onClick={() => router.push(`/organizations/${child.id}`)}
                 >
                   {child.name}
                 </Text>

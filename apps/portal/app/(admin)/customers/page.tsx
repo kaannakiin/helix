@@ -292,7 +292,7 @@ export default function CustomersPage() {
 
   const handleViewDetails = useCallback(
     (row: AdminCustomersPrismaType) => {
-      router.push(`/admin/customers/${row.id}`);
+      router.push(`/customers/${row.id}`);
     },
     [router]
   );

@@ -278,7 +278,7 @@ export default function PriceListsPage() {
 
   const handleViewDetails = useCallback(
     (row: AdminPriceListListPrismaType) => {
-      router.push(`/admin/definitions/price-lists/${row.id}`);
+      router.push(`/definitions/price-lists/${row.id}`);
     },
     [router]
   );

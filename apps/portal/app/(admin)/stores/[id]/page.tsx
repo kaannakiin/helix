@@ -109,7 +109,7 @@ export default function StoreDetailPage() {
   const createStore = useCreateStore({
     onSuccess: (result: Store) => {
       notifications.show({ color: 'green', message: t('createSuccess') });
-      router.push(`/admin/stores/${result.id}`);
+      router.push(`/stores/${result.id}`);
     },
     onError: (err) =>
       notifications.show({
@@ -157,7 +157,7 @@ export default function StoreDetailPage() {
       params.set('tab', value);
     }
     const query = params.toString();
-    router.push(`/admin/stores/${id}${query ? `?${query}` : ''}`, {
+    router.push(`/stores/${id}${query ? `?${query}` : ''}`, {
       scroll: false,
     });
   };

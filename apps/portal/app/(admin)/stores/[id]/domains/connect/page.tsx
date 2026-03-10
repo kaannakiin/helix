@@ -385,7 +385,7 @@ export default function DomainConnectWizard() {
         <Button
           variant="subtle"
           leftSection={<ArrowLeft size={16} />}
-          onClick={() => router.push(`/admin/stores/${storeId}?tab=domains`)}
+          onClick={() => router.push(`/stores/${storeId}?tab=domains`)}
         >
           {store?.name ?? t('backToStore')}
         </Button>
@@ -671,7 +671,7 @@ export default function DomainConnectWizard() {
                 <Button
                   onClick={() => {
                     wizard.reset();
-                    router.push(`/admin/stores/${storeId}?tab=domains`);
+                    router.push(`/stores/${storeId}?tab=domains`);
                   }}
                 >
                   {t('step4.backToStore')}

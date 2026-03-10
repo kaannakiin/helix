@@ -226,7 +226,7 @@ export default function TagsPage() {
 
   const handleViewDetails = useCallback(
     (row: AdminTagGroupListPrismaType) => {
-      router.push(`/admin/products/tags/${row.id}`);
+      router.push(`/products/tags/${row.id}`);
     },
     [router]
   );

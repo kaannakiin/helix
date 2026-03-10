@@ -203,7 +203,7 @@ export function StoreDomainStatusCard({
                 disabled={!hasIngress}
                 leftSection={<Plus size={14} />}
                 onClick={() =>
-                  router.push(`/admin/stores/${storeId}/domains/connect`)
+                  router.push(`/stores/${storeId}/domains/connect`)
                 }
               >
                 {t('connect')}
@@ -227,9 +227,7 @@ export function StoreDomainStatusCard({
             <Button
               leftSection={<Plus size={16} />}
               disabled={!hasIngress}
-              onClick={() =>
-                router.push(`/admin/stores/${storeId}/domains/connect`)
-              }
+              onClick={() => router.push(`/stores/${storeId}/domains/connect`)}
             >
               {t('connect')}
             </Button>
@@ -312,9 +310,7 @@ export function StoreDomainStatusCard({
               size="sm"
               disabled={!hasIngress}
               leftSection={<Plus size={14} />}
-              onClick={() =>
-                router.push(`/admin/stores/${storeId}/domains/connect`)
-              }
+              onClick={() => router.push(`/stores/${storeId}/domains/connect`)}
             >
               {t('connect')}
             </Button>

@@ -275,7 +275,7 @@ export default function OrganizationsPage() {
 
   const handleViewDetails = useCallback(
     (row: AdminOrganizationsPrismaType) => {
-      router.push(`/admin/organizations/${row.id}`);
+      router.push(`/organizations/${row.id}`);
     },
     [router]
   );

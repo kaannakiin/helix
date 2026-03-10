@@ -261,7 +261,7 @@ export default function AdminEvaluationJobsPage() {
 
   const handleViewDetails = useCallback(
     (row: EvaluationJobDetailResponse) => {
-      router.push(`/admin/definitions/evaluation-jobs/${row.id}`);
+      router.push(`/definitions/evaluation-jobs/${row.id}`);
     },
     [router]
   );

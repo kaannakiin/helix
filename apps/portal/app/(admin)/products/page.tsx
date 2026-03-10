@@ -236,7 +236,7 @@ export default function ProductsPage() {
         'storeIds' as keyof AdminProductListPrismaType & string,
         {
           headerKey: 'storeCount',
-          type: 'text',
+          type: 'badge',
           hide: true,
           filter: {
             component: AsyncMultiSelectFilter,
@@ -353,7 +353,7 @@ export default function ProductsPage() {
 
   const handleViewDetails = useCallback(
     (row: AdminProductListPrismaType) => {
-      router.push(`/admin/products/${row.id}`);
+      router.push(`/products/${row.id}`);
     },
     [router]
   );

@@ -89,7 +89,7 @@ const AdminTagGroupFormPage = () => {
     await saveTagGroup.mutateAsync(payload);
 
     if (isNew) {
-      router.push(`/admin/products/tags/${formData.id}`);
+      router.push(`/products/tags/${formData.id}`);
     } else {
       router.push('/products/tags');
     }

@@ -215,7 +215,7 @@ export default function AdminCustomerGroupsPage() {
 
   const handleViewDetails = useCallback(
     (row: AdminCustomerGroupListPrismaType) => {
-      router.push(`/admin/customers/customer-groups/${row.id}`);
+      router.push(`/customers/customer-groups/${row.id}`);
     },
     [router]
   );
