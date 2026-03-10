@@ -1,7 +1,6 @@
 'use client';
 
 import { useSaveTag } from '@/core/hooks/useAdminTagGroup';
-import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import {
   Button,
   Drawer,
@@ -15,6 +14,7 @@ import {
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { getMimePatterns } from '@org/constants/product-constants';
+import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import { FileType } from '@org/prisma/browser';
 import {
   BaseTagSchema,
@@ -25,9 +25,9 @@ import {
 } from '@org/schemas/admin/tags';
 import type { AdminTagChildrenPrismaType } from '@org/types/admin/tags';
 import { Dropzone } from '@org/ui/dropzone';
+import { slugify } from '@org/utils/slugify';
 import { createId } from '@paralleldrive/cuid2';
 import { useTranslations } from 'next-intl';
-import { slugify } from '@org/utils';
 import { useEffect, useRef, useState } from 'react';
 import { Controller, useForm, useFormContext } from 'react-hook-form';
 import { addTagToTree, updateTagInTree } from '../utils/tag-tree-helpers';

@@ -2,7 +2,6 @@
 
 import { useAdminBrand, useSaveBrand } from '@/core/hooks/useAdminBrands';
 import { useImageUpload } from '@/core/hooks/useImageUpload';
-import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import { ApiError } from '@/core/lib/api/api-error';
 import {
   Alert,
@@ -19,6 +18,7 @@ import {
 import { useMediaQuery } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { getMimePatterns } from '@org/constants/product-constants';
+import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import { FileType } from '@org/prisma/browser';
 import {
   BrandInput,
@@ -29,11 +29,11 @@ import {
 import { FormCard } from '@org/ui/common/form-card';
 import LoadingOverlay from '@org/ui/common/loading-overlay';
 import { Dropzone, type RemoteFile } from '@org/ui/dropzone';
+import { slugify } from '@org/utils/slugify';
 import { createId } from '@paralleldrive/cuid2';
 import { Activity, FileText, Image as ImageIcon, Save } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useParams, useRouter } from 'next/navigation';
-import { slugify } from '@org/utils';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Controller,
