@@ -1,10 +1,12 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import type { Locale, Prisma } from '@org/prisma/client';
+import type { AuthorizationContext } from '@org/types/authorization';
 import type { LookupItem } from '@org/schemas/admin/common';
 import {
   adminCategoryDetailPrismaQuery,
@@ -51,9 +53,25 @@ export class CategoriesService {
     stores: { table: 'CategoryStore', fk: 'categoryId' },
   };
 
+  private async assertCategoryStoreAccess(
+    categoryId: string,
+    authzCtx: AuthorizationContext
+  ): Promise<void> {
+    if (authzCtx.allStores) return;
+    const stores = await this.prisma.categoryStore.findMany({
+      where: { categoryId },
+      select: { storeId: true },
+    });
+    const hasAccess = stores.some((s) => authzCtx.storeIds.includes(s.storeId));
+    if (!hasAccess) {
+      throw new ForbiddenException('backend.errors.auth.insufficient_permissions');
+    }
+  }
+
   async getCategories(
     query: CategoryQueryDTO,
-    locale: Locale
+    locale: Locale,
+    authzCtx: AuthorizationContext
   ): Promise<PaginatedResponse<AdminCategoryListPrismaType>> {
     const { page, limit, filters, sort, search } = query;
 
@@ -79,6 +97,13 @@ export class CategoriesService {
       countFilters,
       baseWhere
     )) as Prisma.CategoryWhereInput;
+
+    if (!authzCtx.allStores) {
+      const storeCondition: Prisma.CategoryWhereInput = {
+        stores: { some: { storeId: { in: authzCtx.storeIds } } },
+      };
+      where.AND = [...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []), storeCondition];
+    }
 
     const [items, total] = await Promise.all([
       this.prisma.category.findMany({
@@ -139,12 +164,17 @@ export class CategoriesService {
     limit: number;
     page: number;
     lang: Locale;
+    authzCtx: AuthorizationContext;
   }): Promise<LookupItem[] | PaginatedResponse<LookupItem>> {
-    const { q, ids, limit, page, lang } = opts;
+    const { q, ids, limit, page, lang, authzCtx } = opts;
+
+    const storeFilter: Prisma.CategoryWhereInput = !authzCtx.allStores
+      ? { stores: { some: { storeId: { in: authzCtx.storeIds } } } }
+      : {};
 
     if (ids?.length) {
       const categories = await this.prisma.category.findMany({
-        where: { id: { in: ids } },
+        where: { id: { in: ids }, ...storeFilter },
         include: {
           translations: { where: { locale: lang } },
           images: { where: { isPrimary: true }, take: 1 },
@@ -184,6 +214,7 @@ export class CategoriesService {
 
     const where: Prisma.CategoryWhereInput = {
       isActive: true,
+      ...storeFilter,
       ...(q
         ? {
             translations: {
@@ -242,19 +273,25 @@ export class CategoriesService {
     limit: number;
     page: number;
     lang: Locale;
+    authzCtx: AuthorizationContext;
   }): Promise<LookupItem[] | PaginatedResponse<LookupItem>> {
-    const { q, ids, parentId, limit, page, lang } = opts;
+    const { q, ids, parentId, limit, page, lang, authzCtx } = opts;
 
     if (ids?.length) {
-      return this.lookup({ q, ids, limit, page, lang });
+      return this.lookup({ q, ids, limit, page, lang, authzCtx });
     }
 
     const skip = (page - 1) * limit;
+
+    const storeFilter: Prisma.CategoryWhereInput = !authzCtx.allStores
+      ? { stores: { some: { storeId: { in: authzCtx.storeIds } } } }
+      : {};
 
     if (parentId) {
       const where: Prisma.CategoryWhereInput = {
         parentId,
         isActive: true,
+        ...storeFilter,
         ...(q
           ? {
               translations: {
@@ -302,6 +339,7 @@ export class CategoriesService {
     const where: Prisma.CategoryWhereInput = {
       parentId: null,
       isActive: true,
+      ...storeFilter,
       ...(q
         ? {
             OR: [
@@ -365,7 +403,8 @@ export class CategoriesService {
 
   async getCategoryById(
     id: string,
-    locale: Locale
+    locale: Locale,
+    authzCtx: AuthorizationContext
   ): Promise<AdminCategoryDetailPrismaType> {
     const category = await this.prisma.category.findUnique({
       where: { id },
@@ -376,12 +415,15 @@ export class CategoriesService {
       throw new NotFoundException('backend.errors.category_not_found');
     }
 
+    await this.assertCategoryStoreAccess(id, authzCtx);
+
     return category;
   }
 
   async saveCategory(
     data: CategorySaveDTO,
-    locale: Locale
+    locale: Locale,
+    authzCtx: AuthorizationContext
   ): Promise<AdminCategoryDetailPrismaType> {
     const {
       uniqueId,
@@ -392,6 +434,22 @@ export class CategoriesService {
       translations,
       existingImages,
     } = data;
+
+    if (!authzCtx.allStores && activeStores) {
+      for (const storeId of activeStores) {
+        if (!authzCtx.storeIds.includes(storeId)) {
+          throw new ForbiddenException('backend.errors.auth.insufficient_permissions');
+        }
+      }
+    }
+
+    const existing = await this.prisma.categoryStore.findMany({
+      where: { categoryId: uniqueId },
+      select: { storeId: true },
+    });
+    if (existing.length > 0) {
+      await this.assertCategoryStoreAccess(uniqueId, authzCtx);
+    }
 
     const cleanParentId = parentId && parentId !== '' ? parentId : null;
 
@@ -488,13 +546,15 @@ export class CategoriesService {
     return category;
   }
 
-  async uploadCategoryImage(categoryId: string, file: Express.Multer.File) {
+  async uploadCategoryImage(categoryId: string, file: Express.Multer.File, authzCtx: AuthorizationContext) {
     const category = await this.prisma.category.findUnique({
       where: { id: categoryId },
     });
     if (!category) {
       throw new NotFoundException('backend.errors.category_not_found');
     }
+
+    await this.assertCategoryStoreAccess(categoryId, authzCtx);
 
     const imageCount = await this.prisma.image.count({
       where: { categoryId },
@@ -520,8 +580,11 @@ export class CategoriesService {
 
   async deleteCategoryImage(
     categoryId: string,
-    imageId: string
+    imageId: string,
+    authzCtx: AuthorizationContext
   ): Promise<void> {
+    await this.assertCategoryStoreAccess(categoryId, authzCtx);
+
     const image = await this.prisma.image.findFirst({
       where: { id: imageId, categoryId },
     });

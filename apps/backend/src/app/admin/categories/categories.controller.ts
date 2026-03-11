@@ -19,6 +19,9 @@ import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import type { Response } from 'express';
 import { I18nContext } from 'nestjs-i18n';
 import { ContentLocale, Locale } from '../../../core/decorators';
+import { AuthzCtx } from '../../../core/decorators/authz-context.decorator';
+import { RequireCapability } from '../../../core/decorators/require-capability.decorator';
+import { CAPABILITIES, type AuthorizationContext } from '@org/types/authorization';
 import { ContentLocaleInterceptor } from '../../../core/interceptors/content-locale.interceptor.js';
 import { FileValidationPipe } from '../../../core/pipes/file-validation.pipe';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
@@ -42,16 +45,23 @@ export class CategoriesController {
   ) {}
 
   @Post('query')
+  @RequireCapability(CAPABILITIES.CATEGORIES_READ)
   @ApiOperation({ summary: 'Get paginated list of categories' })
-  async getCategories(@Body() query: CategoryQueryDTO, @ContentLocale() locale: LocaleType) {
-    return this.categoriesService.getCategories(query, locale);
+  async getCategories(
+    @Body() query: CategoryQueryDTO,
+    @ContentLocale() locale: LocaleType,
+    @AuthzCtx() authzCtx: AuthorizationContext
+  ) {
+    return this.categoriesService.getCategories(query, locale, authzCtx);
   }
 
   @Get('lookup')
+  @RequireCapability(CAPABILITIES.CATEGORIES_READ)
   @ApiOperation({ summary: 'Lookup categories for selection inputs' })
   async lookupCategories(
     @Query() query: CategoryLookupQueryDTO,
-    @Locale() lang: import('@org/prisma/client').Locale
+    @Locale() lang: import('@org/prisma/client').Locale,
+    @AuthzCtx() authzCtx: AuthorizationContext
   ) {
     return this.categoriesService.lookup({
       q: query.q,
@@ -59,16 +69,19 @@ export class CategoriesController {
       limit: query.limit,
       page: query.page,
       lang,
+      authzCtx,
     });
   }
 
   @Get('tree')
+  @RequireCapability(CAPABILITIES.CATEGORIES_READ)
   @ApiOperation({
     summary: 'Get categories as a tree (top-level parents with children)',
   })
   async getCategoryTree(
     @Query() query: CategoryLookupQueryDTO,
-    @Locale() lang: import('@org/prisma/client').Locale
+    @Locale() lang: import('@org/prisma/client').Locale,
+    @AuthzCtx() authzCtx: AuthorizationContext
   ) {
     return this.categoriesService.getTree({
       q: query.q,
@@ -77,14 +90,17 @@ export class CategoriesController {
       limit: query.limit,
       page: query.page,
       lang,
+      authzCtx,
     });
   }
 
   @Get('export')
+  @RequireCapability(CAPABILITIES.CATEGORIES_READ)
   @ApiOperation({ summary: 'Export categories as Excel or CSV' })
   async exportCategories(
     @Query() query: CategoryExportQueryDTO,
-    @Res() res: Response
+    @Res() res: Response,
+    @AuthzCtx() authzCtx: AuthorizationContext
   ) {
     const { where, orderBy } = buildPrismaQuery({
       page: 1,
@@ -93,6 +109,14 @@ export class CategoriesController {
       sort: query.sort as SortCondition[] | undefined,
       defaultSort: { field: 'createdAt', order: 'desc' },
     });
+
+    const typedWhere = where as Prisma.CategoryWhereInput;
+    if (!authzCtx.allStores) {
+      const storeCondition: Prisma.CategoryWhereInput = {
+        stores: { some: { storeId: { in: authzCtx.storeIds } } },
+      };
+      typedWhere.AND = [...(Array.isArray(typedWhere.AND) ? typedWhere.AND : typedWhere.AND ? [typedWhere.AND] : []), storeCondition];
+    }
 
     const lang = I18nContext.current()?.lang ?? 'en';
     const i18n = I18nContext.current();
@@ -109,7 +133,7 @@ export class CategoriesController {
         columns,
         createDataIterator: (batchSize) =>
           this.categoriesService.iterateCategories({
-            where: where as Prisma.CategoryWhereInput,
+            where: typedWhere,
             orderBy: orderBy as
               | Prisma.CategoryOrderByWithRelationInput
               | Prisma.CategoryOrderByWithRelationInput[],
@@ -145,12 +169,18 @@ export class CategoriesController {
   }
 
   @Post('save')
+  @RequireCapability(CAPABILITIES.CATEGORIES_WRITE)
   @ApiOperation({ summary: 'Create or update a category (upsert by uniqueId)' })
-  async saveCategory(@Body() body: CategorySaveDTO, @ContentLocale() locale: LocaleType) {
-    return this.categoriesService.saveCategory(body, locale);
+  async saveCategory(
+    @Body() body: CategorySaveDTO,
+    @ContentLocale() locale: LocaleType,
+    @AuthzCtx() authzCtx: AuthorizationContext
+  ) {
+    return this.categoriesService.saveCategory(body, locale, authzCtx);
   }
 
   @Post(':id/images')
+  @RequireCapability(CAPABILITIES.CATEGORIES_WRITE)
   @ApiOperation({ summary: 'Upload an image for a category' })
   @ApiParam({ name: 'id', description: 'Category ID' })
   @UseInterceptors(FileInterceptor('file'))
@@ -162,27 +192,35 @@ export class CategoriesController {
         maxSize: 5 * 1024 * 1024,
       })
     )
-    file: Express.Multer.File
+    file: Express.Multer.File,
+    @AuthzCtx() authzCtx: AuthorizationContext
   ) {
-    return this.categoriesService.uploadCategoryImage(id, file);
+    return this.categoriesService.uploadCategoryImage(id, file, authzCtx);
   }
 
   @Delete(':id/images/:imageId')
+  @RequireCapability(CAPABILITIES.CATEGORIES_WRITE)
   @ApiOperation({ summary: 'Delete a category image' })
   @ApiParam({ name: 'id', description: 'Category ID' })
   @ApiParam({ name: 'imageId', description: 'Image ID' })
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteCategoryImage(
     @Param('id') categoryId: string,
-    @Param('imageId') imageId: string
+    @Param('imageId') imageId: string,
+    @AuthzCtx() authzCtx: AuthorizationContext
   ) {
-    return this.categoriesService.deleteCategoryImage(categoryId, imageId);
+    return this.categoriesService.deleteCategoryImage(categoryId, imageId, authzCtx);
   }
 
   @Get(':id')
+  @RequireCapability(CAPABILITIES.CATEGORIES_READ)
   @ApiOperation({ summary: 'Get category by ID' })
   @ApiParam({ name: 'id', description: 'Category ID' })
-  async getCategoryById(@Param('id') id: string, @ContentLocale() locale: LocaleType) {
-    return this.categoriesService.getCategoryById(id, locale);
+  async getCategoryById(
+    @Param('id') id: string,
+    @ContentLocale() locale: LocaleType,
+    @AuthzCtx() authzCtx: AuthorizationContext
+  ) {
+    return this.categoriesService.getCategoryById(id, locale, authzCtx);
   }
 }
