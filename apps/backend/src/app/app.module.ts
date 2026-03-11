@@ -8,6 +8,7 @@ import { HttpExceptionI18nFilter } from './i18n/http-exception-i18n.filter';
 import { I18nModule } from './i18n/i18n.module';
 import { ZodValidationI18nFilter } from './i18n/zod-validation-i18n.filter';
 import { CorsOriginService } from '../core/services/cors-origin.service';
+import { RequestTimingInterceptor } from '../core/interceptors/request-timing.interceptor';
 import { PrismaModule } from './prisma/prisma.module';
 import { RedisModule } from './redis/redis.module';
 import { StorefrontModule } from './storefront/storefront.module';
@@ -31,6 +32,10 @@ import { StorefrontModule } from './storefront/storefront.module';
     {
       provide: APP_INTERCEPTOR,
       useClass: ZodSerializerInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: RequestTimingInterceptor,
     },
     {
       provide: APP_FILTER,

@@ -7,7 +7,9 @@ import { PrismaModule } from '../../prisma/prisma.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { DeviceService } from './device.service';
+import { AuthorizationService } from './authorization.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { PermissionGuard } from './guards/permission.guard';
 import { SessionService } from './session.service';
 import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
@@ -35,11 +37,16 @@ import { TokenService } from './token.service';
     LocalStrategy,
     JwtStrategy,
     JwtRefreshStrategy,
+    AuthorizationService,
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
+    {
+      provide: APP_GUARD,
+      useClass: PermissionGuard,
+    },
   ],
-  exports: [AuthService],
+  exports: [AuthService, AuthorizationService],
 })
 export class AuthModule {}

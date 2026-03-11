@@ -1,7 +1,60 @@
+import { hash as argon2Hash } from '@node-rs/argon2';
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
-import { hash as argon2Hash } from '@node-rs/argon2';
 import { prisma } from '../../prisma.js';
+const CAPABILITIES = {
+  // Store-scoped resources
+  PRODUCTS_READ: 'products:read',
+  PRODUCTS_WRITE: 'products:write',
+  PRODUCTS_DELETE: 'products:delete',
+
+  CUSTOMERS_READ: 'customers:read',
+  CUSTOMERS_WRITE: 'customers:write',
+  CUSTOMERS_DELETE: 'customers:delete',
+
+  ORGANIZATIONS_READ: 'organizations:read',
+  ORGANIZATIONS_WRITE: 'organizations:write',
+  ORGANIZATIONS_DELETE: 'organizations:delete',
+
+  WAREHOUSES_READ: 'warehouses:read',
+  WAREHOUSES_WRITE: 'warehouses:write',
+  WAREHOUSES_DELETE: 'warehouses:delete',
+
+  PRICE_LISTS_READ: 'price_lists:read',
+  PRICE_LISTS_WRITE: 'price_lists:write',
+  PRICE_LISTS_DELETE: 'price_lists:delete',
+
+  CUSTOMER_GROUPS_READ: 'customer_groups:read',
+  CUSTOMER_GROUPS_WRITE: 'customer_groups:write',
+  CUSTOMER_GROUPS_DELETE: 'customer_groups:delete',
+
+  CATEGORIES_READ: 'categories:read',
+  CATEGORIES_WRITE: 'categories:write',
+  CATEGORIES_DELETE: 'categories:delete',
+
+  // Capability-only resources (no store scoping)
+  STORES_READ: 'stores:read',
+  STORES_WRITE: 'stores:write',
+
+  BRANDS_READ: 'brands:read',
+  BRANDS_WRITE: 'brands:write',
+  BRANDS_DELETE: 'brands:delete',
+
+  TAGS_READ: 'tags:read',
+  TAGS_WRITE: 'tags:write',
+  TAGS_DELETE: 'tags:delete',
+
+  VARIANTS_READ: 'variants:read',
+  VARIANTS_WRITE: 'variants:write',
+
+  SETTINGS_READ: 'settings:read',
+  SETTINGS_WRITE: 'settings:write',
+
+  USERS_READ: 'users:read',
+  USERS_WRITE: 'users:write',
+} as const;
+
+const ALL_CAPABILITIES = Object.values(CAPABILITIES);
 
 export async function runBaseSeed() {
   console.log('Starting base seed...');
@@ -22,6 +75,83 @@ export async function runBaseSeed() {
   });
 
   console.log(`Admin user created: ${admin.email} (${admin.id})`);
+
+  // ── Authorization: Full-admin (all capabilities + all stores) ──
+  await prisma.userStoreAccess.upsert({
+    where: { userId: admin.id },
+    update: { allStores: true },
+    create: {
+      userId: admin.id,
+      allStores: true,
+    },
+  });
+
+  for (const capability of ALL_CAPABILITIES) {
+    await prisma.userCapability.upsert({
+      where: {
+        userId_capability: { userId: admin.id, capability },
+      },
+      update: {},
+      create: { userId: admin.id, capability },
+    });
+  }
+
+  console.log(
+    `Admin authorization seeded: allStores=true, ${ALL_CAPABILITIES.length} capabilities`
+  );
+
+  // ── Read-only test user ──
+  const readOnlyPassword = await argon2Hash('ReadOnly123!');
+  const readOnlyUser = await prisma.user.upsert({
+    where: { email: 'readonly@helix.test' },
+    update: {},
+    create: {
+      name: 'Read',
+      surname: 'Only',
+      email: 'readonly@helix.test',
+      password: readOnlyPassword,
+      emailVerified: true,
+      status: 'ACTIVE',
+    },
+  });
+
+  await prisma.userStoreAccess.upsert({
+    where: { userId: readOnlyUser.id },
+    update: { allStores: true },
+    create: {
+      userId: readOnlyUser.id,
+      allStores: true,
+    },
+  });
+
+  const readCapabilities = [
+    CAPABILITIES.PRODUCTS_READ,
+    CAPABILITIES.CUSTOMERS_READ,
+    CAPABILITIES.ORGANIZATIONS_READ,
+    CAPABILITIES.WAREHOUSES_READ,
+    CAPABILITIES.PRICE_LISTS_READ,
+    CAPABILITIES.CUSTOMER_GROUPS_READ,
+    CAPABILITIES.CATEGORIES_READ,
+    CAPABILITIES.STORES_READ,
+    CAPABILITIES.BRANDS_READ,
+    CAPABILITIES.TAGS_READ,
+    CAPABILITIES.VARIANTS_READ,
+    CAPABILITIES.SETTINGS_READ,
+  ];
+
+  for (const capability of readCapabilities) {
+    await prisma.userCapability.upsert({
+      where: {
+        userId_capability: { userId: readOnlyUser.id, capability },
+      },
+      update: {},
+      create: { userId: readOnlyUser.id, capability },
+    });
+  }
+
+  console.log(
+    `Read-only user created: ${readOnlyUser.email} (${readCapabilities.length} read capabilities)`
+  );
 
   const currencies = [
     {
@@ -98,7 +228,9 @@ export async function runBaseSeed() {
     });
     console.log(`BASE PriceList seeded for ${defaultCurrency.code}`);
   } else {
-    console.log('No store found — skipping PriceList seed (run seed:stores first)');
+    console.log(
+      'No store found — skipping PriceList seed (run seed:stores first)'
+    );
   }
 
   console.log('Base seed completed!');

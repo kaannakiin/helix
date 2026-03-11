@@ -35,6 +35,9 @@ model User {
   stockMovements StockMovementGroup[]
   stockMovementStatusEvents StockMovementGroupStatusEvent[]
 
+  storeAccess  UserStoreAccess?
+  capabilities UserCapability[]
+
   @@index([email])
   @@index([phone])
   @@index([status])

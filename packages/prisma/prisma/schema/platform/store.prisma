@@ -28,8 +28,9 @@ model Store {
   categoryStores  CategoryStore[]
   ruleTrees       RuleTree[]
   hostBindings    StoreHostBinding[]
-  customers       Customer[]
-  storeCurrencies StoreCurrency[]
+  customers        Customer[]
+  storeCurrencies  StoreCurrency[]
+  userAssignments  UserStoreAssignment[]
 
   @@index([businessModel])
   @@index([status])

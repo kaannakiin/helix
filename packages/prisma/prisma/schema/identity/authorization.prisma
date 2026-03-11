@@ -1,0 +1,50 @@
+// ─── Authorization ────────────────────────────────────────────────────────────
+
+// User'ın hangi store'lara erişebildiğini belirler.
+// allStores=true ise tüm store'lara erişir, store relation kullanılmaz.
+// allStores=false ise sadece ilişkili store'lara erişir.
+model UserStoreAccess {
+  id        String  @id @default(cuid())
+  userId    String  @unique
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  allStores Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  stores UserStoreAssignment[]
+
+  @@index([userId])
+  @@map("user_store_access")
+}
+
+// allStores=false durumunda, user'ın erişebildiği spesifik store'lar.
+model UserStoreAssignment {
+  id            String          @id @default(cuid())
+  storeAccessId String
+  storeAccess   UserStoreAccess @relation(fields: [storeAccessId], references: [id], onDelete: Cascade)
+  storeId       String
+  store         Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([storeAccessId, storeId])
+  @@index([storeAccessId])
+  @@index([storeId])
+  @@map("user_store_assignments")
+}
+
+// User'ın sahip olduğu capability'ler.
+// capability formatı: "{resource}:{action}" (ör: "products:read")
+model UserCapability {
+  id         String @id @default(cuid())
+  userId     String
+  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  capability String
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, capability])
+  @@index([userId])
+  @@map("user_capabilities")
+}
