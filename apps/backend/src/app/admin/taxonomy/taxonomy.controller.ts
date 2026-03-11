@@ -1,6 +1,8 @@
 import { Controller, Get, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Locale } from '../../../core/decorators';
+import { RequireCapability } from '../../../core/decorators/require-capability.decorator';
+import { CAPABILITIES } from '@org/types/authorization';
 import { TaxonomyService } from './taxonomy.service';
 import { TaxonomyLookupQueryDTO, TaxonomyTreeQueryDTO } from './dto';
 
@@ -10,6 +12,7 @@ export class TaxonomyController {
   constructor(private readonly taxonomyService: TaxonomyService) {}
 
   @Get('tree')
+  @RequireCapability(CAPABILITIES.CATEGORIES_READ)
   @ApiOperation({ summary: 'Get taxonomy tree (lazy load by parentId)' })
   async getTaxonomyTree(
     @Query() query: TaxonomyTreeQueryDTO,
@@ -26,6 +29,7 @@ export class TaxonomyController {
   }
 
   @Get('lookup')
+  @RequireCapability(CAPABILITIES.CATEGORIES_READ)
   @ApiOperation({ summary: 'Lookup taxonomy (ID resolve or flat search)' })
   async lookupTaxonomy(
     @Query() query: TaxonomyLookupQueryDTO,

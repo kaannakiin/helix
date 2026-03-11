@@ -8,6 +8,8 @@ import {
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Public } from '../../../core/decorators/public.decorator.js';
+import { RequireCapability } from '../../../core/decorators/require-capability.decorator';
+import { CAPABILITIES } from '@org/types/authorization';
 import { PlatformInstallationDTO } from './dto/index.js';
 import { PlatformInstallationService } from './platform-installation.service.js';
 
@@ -31,12 +33,14 @@ export class PlatformInstallationController {
   }
 
   @Get()
+  @RequireCapability(CAPABILITIES.SETTINGS_READ)
   @ApiOperation({ summary: 'Get current platform installation configuration' })
   async getCurrent() {
     return this.platformInstallationService.findCurrent();
   }
 
   @Put()
+  @RequireCapability(CAPABILITIES.SETTINGS_WRITE)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Create or update platform installation configuration' })
   async upsert(@Body() body: PlatformInstallationDTO) {

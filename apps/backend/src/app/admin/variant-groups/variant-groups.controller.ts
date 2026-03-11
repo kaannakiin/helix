@@ -17,6 +17,8 @@ import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import { I18nContext } from 'nestjs-i18n';
 import type { Response } from 'express';
 import { ContentLocale, Locale } from '../../../core/decorators';
+import { RequireCapability } from '../../../core/decorators/require-capability.decorator';
+import { CAPABILITIES } from '@org/types/authorization';
 import { ContentLocaleInterceptor } from '../../../core/interceptors/content-locale.interceptor.js';
 import { FileValidationPipe } from '../../../core/pipes/file-validation.pipe';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
@@ -41,18 +43,21 @@ export class VariantGroupsController {
   ) {}
 
   @Post('save')
+  @RequireCapability(CAPABILITIES.VARIANTS_WRITE)
   @ApiOperation({ summary: 'Create or update a variant group' })
   async saveVariantGroup(@Body() body: VariantGroupSaveDTO, @ContentLocale() locale: LocaleType) {
     return this.variantGroupsService.saveVariantGroup(body, locale);
   }
 
   @Post('query')
+  @RequireCapability(CAPABILITIES.VARIANTS_READ)
   @ApiOperation({ summary: 'Get paginated list of variant groups' })
   async getVariantGroups(@Body() query: VariantGroupQueryDTO, @ContentLocale() locale: LocaleType) {
     return this.variantGroupsService.getVariantGroups(query, locale);
   }
 
   @Get('lookup')
+  @RequireCapability(CAPABILITIES.VARIANTS_READ)
   @ApiOperation({ summary: 'Lookup variant groups for selection inputs' })
   async lookupVariantGroups(
     @Query() query: VariantGroupLookupQueryDTO,
@@ -69,6 +74,7 @@ export class VariantGroupsController {
   }
 
   @Get('export')
+  @RequireCapability(CAPABILITIES.VARIANTS_READ)
   @ApiOperation({ summary: 'Export variant groups as Excel or CSV' })
   async exportVariantGroups(
     @Query() query: VariantGroupExportQueryDTO,
@@ -133,6 +139,7 @@ export class VariantGroupsController {
   }
 
   @Post('options/:optionId/image')
+  @RequireCapability(CAPABILITIES.VARIANTS_WRITE)
   @ApiOperation({ summary: 'Upload image for a variant option or product variant group option' })
   @ApiParam({ name: 'optionId', description: 'VariantOption ID or ProductVariantGroupOption ID' })
   @ApiConsumes('multipart/form-data')
@@ -163,6 +170,7 @@ export class VariantGroupsController {
   }
 
   @Get('check-slug')
+  @RequireCapability(CAPABILITIES.VARIANTS_READ)
   @ApiOperation({ summary: 'Check if a variant group name already exists (by slug)' })
   async checkSlugExists(@Query() query: VariantGroupCheckSlugDTO) {
     return this.variantGroupsService.checkNameExists({
@@ -172,6 +180,7 @@ export class VariantGroupsController {
   }
 
   @Get(':id')
+  @RequireCapability(CAPABILITIES.VARIANTS_READ)
   @ApiOperation({ summary: 'Get variant group by ID' })
   @ApiParam({ name: 'id', description: 'Variant Group ID' })
   async getVariantGroupById(@Param('id') id: string, @ContentLocale() locale: LocaleType) {

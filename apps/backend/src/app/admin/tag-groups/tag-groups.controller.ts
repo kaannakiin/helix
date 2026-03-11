@@ -5,6 +5,8 @@ import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import { I18nContext } from 'nestjs-i18n';
 import type { Response } from 'express';
 import { ContentLocale, Locale } from '../../../core/decorators';
+import { RequireCapability } from '../../../core/decorators/require-capability.decorator';
+import { CAPABILITIES } from '@org/types/authorization';
 import { ContentLocaleInterceptor } from '../../../core/interceptors/content-locale.interceptor.js';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { ExportService } from '../../export/export.service';
@@ -30,12 +32,14 @@ export class TagGroupsController {
   ) {}
 
   @Post('query')
+  @RequireCapability(CAPABILITIES.TAGS_READ)
   @ApiOperation({ summary: 'Get paginated list of tag groups' })
   async getTagGroups(@Body() query: TagGroupQueryDTO, @ContentLocale() locale: LocaleType) {
     return this.tagGroupsService.getTagGroups(query, locale);
   }
 
   @Get('tags/lookup')
+  @RequireCapability(CAPABILITIES.TAGS_READ)
   @ApiOperation({ summary: 'Lookup tags for selection inputs (grouped by tag group)' })
   async lookupTags(
     @Query() query: TagLookupQueryDTO,
@@ -51,6 +55,7 @@ export class TagGroupsController {
   }
 
   @Get('tags/tree')
+  @RequireCapability(CAPABILITIES.TAGS_READ)
   @ApiOperation({ summary: 'Get tags as a tree (tag groups with their tags)' })
   async getTagTree(
     @Query() query: TagLookupQueryDTO,
@@ -68,6 +73,7 @@ export class TagGroupsController {
   }
 
   @Get('export')
+  @RequireCapability(CAPABILITIES.TAGS_READ)
   @ApiOperation({ summary: 'Export tag groups as Excel or CSV' })
   async exportTagGroups(
     @Query() query: TagGroupExportQueryDTO,
@@ -132,12 +138,14 @@ export class TagGroupsController {
   }
 
   @Post('save')
+  @RequireCapability(CAPABILITIES.TAGS_WRITE)
   @ApiOperation({ summary: 'Create or update a tag group (upsert by id)' })
   async saveTagGroup(@Body() body: TagGroupSaveDTO, @ContentLocale() locale: LocaleType) {
     return this.tagGroupsService.saveTagGroup(body, locale);
   }
 
   @Post(':id/tags/save')
+  @RequireCapability(CAPABILITIES.TAGS_WRITE)
   @ApiOperation({ summary: 'Create or update a single tag' })
   @ApiParam({ name: 'id', description: 'Tag Group ID' })
   async saveTag(
@@ -149,6 +157,7 @@ export class TagGroupsController {
   }
 
   @Delete(':id/tags/:tagId')
+  @RequireCapability(CAPABILITIES.TAGS_DELETE)
   @ApiOperation({ summary: 'Delete a single tag' })
   @ApiParam({ name: 'id', description: 'Tag Group ID' })
   @ApiParam({ name: 'tagId', description: 'Tag ID' })
@@ -157,6 +166,7 @@ export class TagGroupsController {
   }
 
   @Post(':id/tags/bulk-delete')
+  @RequireCapability(CAPABILITIES.TAGS_DELETE)
   @ApiOperation({ summary: 'Delete multiple tags at once' })
   @ApiParam({ name: 'id', description: 'Tag Group ID' })
   async deleteTags(@Body() body: TagBulkDeleteDTO) {
@@ -164,6 +174,7 @@ export class TagGroupsController {
   }
 
   @Get(':id/tags')
+  @RequireCapability(CAPABILITIES.TAGS_READ)
   @ApiOperation({ summary: 'Get direct child tags of a tag group (lazy load by parentTagId)' })
   @ApiParam({ name: 'id', description: 'Tag Group ID' })
   async getTagChildren(
@@ -175,6 +186,7 @@ export class TagGroupsController {
   }
 
   @Get(':id')
+  @RequireCapability(CAPABILITIES.TAGS_READ)
   @ApiOperation({ summary: 'Get tag group by ID' })
   @ApiParam({ name: 'id', description: 'Tag Group ID' })
   async getTagGroupById(@Param('id') id: string, @ContentLocale() locale: LocaleType) {

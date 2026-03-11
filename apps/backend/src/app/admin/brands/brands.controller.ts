@@ -20,6 +20,8 @@ import type { Response } from 'express';
 import { I18nContext } from 'nestjs-i18n';
 import { ContentLocale } from '../../../core/decorators/index.js';
 import { LocaleDecorator } from '../../../core/decorators/locale.decorator';
+import { RequireCapability } from '../../../core/decorators/require-capability.decorator';
+import { CAPABILITIES } from '@org/types/authorization';
 import { ContentLocaleInterceptor } from '../../../core/interceptors/content-locale.interceptor.js';
 import { FileValidationPipe } from '../../../core/pipes/file-validation.pipe';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
@@ -43,6 +45,7 @@ export class BrandsController {
   ) {}
 
   @Post('query')
+  @RequireCapability(CAPABILITIES.BRANDS_READ)
   @ApiOperation({ summary: 'Get paginated list of brands' })
   async getBrands(
     @Body() query: BrandQueryDTO,
@@ -52,12 +55,14 @@ export class BrandsController {
   }
 
   @Post('save')
+  @RequireCapability(CAPABILITIES.BRANDS_WRITE)
   @ApiOperation({ summary: 'Create or update a brand' })
   async saveBrand(@Body() body: BrandSaveDTO, @ContentLocale() locale: Locale) {
     return this.brandsService.saveBrand(body, locale);
   }
 
   @Get('lookup')
+  @RequireCapability(CAPABILITIES.BRANDS_READ)
   @ApiOperation({ summary: 'Lookup brands for selection inputs' })
   async lookupBrands(
     @Query() query: BrandLookupQueryDTO,
@@ -73,6 +78,7 @@ export class BrandsController {
   }
 
   @Get('export')
+  @RequireCapability(CAPABILITIES.BRANDS_READ)
   @ApiOperation({ summary: 'Export brands as Excel or CSV' })
   async exportBrands(
     @Query() query: BrandExportQueryDTO,
@@ -138,6 +144,7 @@ export class BrandsController {
   }
 
   @Post(':id/images')
+  @RequireCapability(CAPABILITIES.BRANDS_WRITE)
   @ApiOperation({ summary: 'Upload an image for a brand' })
   @ApiParam({ name: 'id', description: 'Brand ID' })
   @UseInterceptors(FileInterceptor('file'))
@@ -155,6 +162,7 @@ export class BrandsController {
   }
 
   @Delete(':id/images/:imageId')
+  @RequireCapability(CAPABILITIES.BRANDS_WRITE)
   @ApiOperation({ summary: 'Delete a brand image' })
   @ApiParam({ name: 'id', description: 'Brand ID' })
   @ApiParam({ name: 'imageId', description: 'Image ID' })
@@ -167,6 +175,7 @@ export class BrandsController {
   }
 
   @Get(':id')
+  @RequireCapability(CAPABILITIES.BRANDS_READ)
   @ApiOperation({ summary: 'Get brand by ID' })
   @ApiParam({ name: 'id', description: 'Brand ID' })
   async getBrandById(@Param('id') id: string, @ContentLocale() locale: Locale) {

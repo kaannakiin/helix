@@ -11,6 +11,8 @@ import {
   Post,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { RequireCapability } from '../../../core/decorators/require-capability.decorator';
+import { CAPABILITIES } from '@org/types/authorization';
 import {
   StoreCurrencyCreateDTO,
   StoreCurrencyUpdateDTO,
@@ -27,12 +29,14 @@ export class StoreCurrenciesController {
   ) {}
 
   @Get()
+  @RequireCapability(CAPABILITIES.STORES_READ)
   @ApiOperation({ summary: 'List currencies for a store' })
   async list(@Param('storeId') storeId: string) {
     return this.service.list(storeId);
   }
 
   @Post()
+  @RequireCapability(CAPABILITIES.STORES_WRITE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Add a currency to a store' })
   async create(
@@ -43,6 +47,7 @@ export class StoreCurrenciesController {
   }
 
   @Patch(':currencyId')
+  @RequireCapability(CAPABILITIES.STORES_WRITE)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Update store currency policy' })
   async update(
@@ -54,6 +59,7 @@ export class StoreCurrenciesController {
   }
 
   @Delete(':currencyId')
+  @RequireCapability(CAPABILITIES.STORES_WRITE)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Remove a currency from a store' })
   async delete(

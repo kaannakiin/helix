@@ -10,6 +10,8 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { RequireCapability } from '../../../core/decorators/require-capability.decorator';
+import { CAPABILITIES } from '@org/types/authorization';
 import { StoreHostBindingDTO } from './dto/index.js';
 import { StoreHostBindingsService } from './store-host-bindings.service.js';
 
@@ -21,12 +23,14 @@ export class StoreHostBindingsController {
   ) {}
 
   @Get()
+  @RequireCapability(CAPABILITIES.STORES_READ)
   @ApiOperation({ summary: 'List store host bindings' })
   async list(@Query('storeId') storeId?: string) {
     return this.storeHostBindingsService.list(storeId);
   }
 
   @Post()
+  @RequireCapability(CAPABILITIES.STORES_WRITE)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Create a store host binding' })
   async create(@Body() body: StoreHostBindingDTO) {
@@ -34,6 +38,7 @@ export class StoreHostBindingsController {
   }
 
   @Post(':bindingId/verify-routing')
+  @RequireCapability(CAPABILITIES.STORES_WRITE)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Verify routing for a store host binding' })
   async verifyRouting(@Param('bindingId') bindingId: string) {
@@ -41,6 +46,7 @@ export class StoreHostBindingsController {
   }
 
   @Delete(':bindingId')
+  @RequireCapability(CAPABILITIES.STORES_WRITE)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Delete a store host binding' })
   async delete(@Param('bindingId') bindingId: string) {

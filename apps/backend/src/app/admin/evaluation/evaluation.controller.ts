@@ -9,6 +9,8 @@ import {
   Sse,
 } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { RequireCapability } from '../../../core/decorators/require-capability.decorator';
+import { CAPABILITIES } from '@org/types/authorization';
 import type { Observable } from 'rxjs';
 import { EvaluationJobQueryDTO } from './dto/index';
 import { EvaluationSseService } from './evaluation-sse.service';
@@ -23,6 +25,7 @@ export class EvaluationController {
   ) {}
 
   @Post('query')
+  @RequireCapability(CAPABILITIES.CUSTOMER_GROUPS_READ)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Get paginated list of evaluation jobs' })
   async getEvaluationJobs(@Body() query: EvaluationJobQueryDTO) {
@@ -30,6 +33,7 @@ export class EvaluationController {
   }
 
   @Get(':id')
+  @RequireCapability(CAPABILITIES.CUSTOMER_GROUPS_READ)
   @ApiOperation({ summary: 'Get evaluation job by ID' })
   @ApiParam({ name: 'id', description: 'Evaluation Job ID' })
   async getEvaluationJobById(@Param('id') id: string) {
@@ -37,6 +41,7 @@ export class EvaluationController {
   }
 
   @Post(':id/cancel')
+  @RequireCapability(CAPABILITIES.CUSTOMER_GROUPS_WRITE)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Cancel a pending evaluation job' })
   @ApiParam({ name: 'id', description: 'Evaluation Job ID' })
@@ -45,6 +50,7 @@ export class EvaluationController {
   }
 
   @Get('entity/:entityType/:entityId')
+  @RequireCapability(CAPABILITIES.CUSTOMER_GROUPS_READ)
   @ApiOperation({ summary: 'Get evaluation history for an entity' })
   @ApiParam({
     name: 'entityType',
@@ -59,6 +65,7 @@ export class EvaluationController {
   }
 
   @Sse(':id/stream')
+  @RequireCapability(CAPABILITIES.CUSTOMER_GROUPS_READ)
   @ApiOperation({ summary: 'Stream real-time evaluation job status' })
   @ApiParam({ name: 'id', description: 'Evaluation Job ID' })
   streamJob(@Param('id') id: string): Observable<MessageEvent> {
@@ -66,6 +73,7 @@ export class EvaluationController {
   }
 
   @Sse('entity/:entityType/:entityId/stream')
+  @RequireCapability(CAPABILITIES.CUSTOMER_GROUPS_READ)
   @ApiOperation({ summary: 'Stream real-time evaluation events for an entity' })
   @ApiParam({ name: 'entityType', description: 'Entity type' })
   @ApiParam({ name: 'entityId', description: 'Entity ID' })
