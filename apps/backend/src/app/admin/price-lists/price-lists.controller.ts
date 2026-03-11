@@ -1,4 +1,7 @@
-import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Param, Post, Query, Res } from '@nestjs/common';
+import { AuthzCtx } from '../../../core/decorators/authz-context.decorator';
+import { RequireCapability } from '../../../core/decorators/require-capability.decorator';
+import { CAPABILITIES, type AuthorizationContext } from '@org/types/authorization';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Prisma } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
@@ -19,22 +22,32 @@ export class PriceListsController {
   ) {}
 
   @Post('query')
+  @RequireCapability(CAPABILITIES.PRICE_LISTS_READ)
   @ApiOperation({ summary: 'Get paginated list of price lists' })
-  async getPriceLists(@Body() query: PriceListQueryDTO) {
-    return this.priceListsService.getPriceLists(query);
+  async getPriceLists(
+    @Body() query: PriceListQueryDTO,
+    @AuthzCtx() authzCtx: AuthorizationContext
+  ) {
+    return this.priceListsService.getPriceLists(query, authzCtx);
   }
 
   @Post('save')
+  @RequireCapability(CAPABILITIES.PRICE_LISTS_WRITE)
   @ApiOperation({ summary: 'Create or update a price list' })
-  async savePriceList(@Body() body: PriceListSaveDTO) {
-    return this.priceListsService.savePriceList(body);
+  async savePriceList(
+    @Body() body: PriceListSaveDTO,
+    @AuthzCtx() authzCtx: AuthorizationContext
+  ) {
+    return this.priceListsService.savePriceList(body, authzCtx);
   }
 
   @Get('export')
+  @RequireCapability(CAPABILITIES.PRICE_LISTS_READ)
   @ApiOperation({ summary: 'Export price lists as Excel or CSV' })
   async exportPriceLists(
     @Query() query: PriceListExportQueryDTO,
-    @Res() res: Response
+    @Res() res: Response,
+    @AuthzCtx() authzCtx: AuthorizationContext
   ) {
     const { where, orderBy } = buildPrismaQuery({
       page: 1,
@@ -43,6 +56,12 @@ export class PriceListsController {
       sort: query.sort as SortCondition[] | undefined,
       defaultSort: { field: 'createdAt', order: 'desc' },
     });
+
+    const typedWhere = where as Prisma.PriceListWhereInput;
+    if (!authzCtx.allStores) {
+      const storeCondition = { storeId: { in: authzCtx.storeIds } };
+      typedWhere.AND = [...(Array.isArray(typedWhere.AND) ? typedWhere.AND : typedWhere.AND ? [typedWhere.AND] : []), storeCondition];
+    }
 
     const lang = I18nContext.current()?.lang ?? 'en';
     const i18n = I18nContext.current();
@@ -59,7 +78,7 @@ export class PriceListsController {
         columns,
         createDataIterator: (batchSize) =>
           this.priceListsService.iteratePriceLists({
-            where: where as Prisma.PriceListWhereInput,
+            where: typedWhere,
             orderBy: orderBy as
               | Prisma.PriceListOrderByWithRelationInput
               | Prisma.PriceListOrderByWithRelationInput[],
@@ -94,9 +113,25 @@ export class PriceListsController {
   }
 
   @Get(':id')
+  @RequireCapability(CAPABILITIES.PRICE_LISTS_READ)
   @ApiOperation({ summary: 'Get price list by ID' })
   @ApiParam({ name: 'id', description: 'Price List ID' })
-  async getPriceListById(@Param('id') id: string) {
-    return this.priceListsService.getPriceListById(id);
+  async getPriceListById(
+    @Param('id') id: string,
+    @AuthzCtx() authzCtx: AuthorizationContext
+  ) {
+    return this.priceListsService.getPriceListById(id, authzCtx);
+  }
+
+  @Delete(':id')
+  @RequireCapability(CAPABILITIES.PRICE_LISTS_DELETE)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ summary: 'Delete a price list' })
+  @ApiParam({ name: 'id', description: 'Price List ID' })
+  async deletePriceList(
+    @Param('id') id: string,
+    @AuthzCtx() authzCtx: AuthorizationContext
+  ) {
+    return this.priceListsService.deletePriceList(id, authzCtx);
   }
 }

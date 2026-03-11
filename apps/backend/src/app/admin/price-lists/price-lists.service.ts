@@ -12,6 +12,7 @@ import {
   type AdminPriceListDetailPrismaType,
   type AdminPriceListListPrismaType,
 } from '@org/types/admin/pricing';
+import type { AuthorizationContext } from '@org/types/authorization';
 import type { FilterCondition } from '@org/types/data-query';
 import type { PaginatedResponse } from '@org/types/pagination';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
@@ -23,7 +24,8 @@ export class PriceListsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getPriceLists(
-    query: PriceListQueryDTO
+    query: PriceListQueryDTO,
+    authzCtx: AuthorizationContext
   ): Promise<PaginatedResponse<AdminPriceListListPrismaType>> {
     const { page, limit, filters, sort } = query;
 
@@ -35,9 +37,15 @@ export class PriceListsService {
       defaultSort: { field: 'createdAt', order: 'desc' },
     });
 
+    const typedWhere = where as Prisma.PriceListWhereInput;
+    if (!authzCtx.allStores) {
+      const storeCondition = { storeId: { in: authzCtx.storeIds } };
+      typedWhere.AND = [...(Array.isArray(typedWhere.AND) ? typedWhere.AND : typedWhere.AND ? [typedWhere.AND] : []), storeCondition];
+    }
+
     const [items, total] = await Promise.all([
       this.prisma.priceList.findMany({
-        where: where as Prisma.PriceListWhereInput,
+        where: typedWhere,
         orderBy: orderBy as
           | Prisma.PriceListOrderByWithRelationInput
           | Prisma.PriceListOrderByWithRelationInput[],
@@ -46,7 +54,7 @@ export class PriceListsService {
         include: AdminPriceListListPrismaQuery,
       }),
       this.prisma.priceList.count({
-        where: where as Prisma.PriceListWhereInput,
+        where: typedWhere,
       }),
     ]);
 
@@ -88,7 +96,10 @@ export class PriceListsService {
     }
   }
 
-  async getPriceListById(id: string): Promise<AdminPriceListDetailPrismaType> {
+  async getPriceListById(
+    id: string,
+    authzCtx: AuthorizationContext
+  ): Promise<AdminPriceListDetailPrismaType> {
     const priceList = await this.prisma.priceList.findUnique({
       where: { id },
       include: AdminPriceListDetailPrismaQuery,
@@ -98,13 +109,27 @@ export class PriceListsService {
       throw new NotFoundException('backend.errors.price_list_not_found');
     }
 
+    if (
+      !authzCtx.allStores &&
+      !authzCtx.storeIds.includes(priceList.storeId)
+    ) {
+      throw new ForbiddenException(
+        'backend.errors.auth.insufficient_permissions'
+      );
+    }
+
     return priceList;
   }
 
   async savePriceList(
-    data: PriceListSaveDTO
+    data: PriceListSaveDTO,
+    authzCtx: AuthorizationContext
   ): Promise<AdminPriceListDetailPrismaType> {
     const { uniqueId, name, storeId, prices: _prices, ...rest } = data;
+
+    if (!authzCtx.allStores && !authzCtx.storeIds.includes(storeId)) {
+      throw new ForbiddenException('backend.errors.auth.no_store_access');
+    }
 
     const store = await this.prisma.store.findUnique({
       where: { id: storeId },
@@ -382,14 +407,18 @@ export class PriceListsService {
     }
   }
 
-  async deletePriceList(id: string): Promise<void> {
+  async deletePriceList(id: string, authzCtx: AuthorizationContext): Promise<void> {
     const priceList = await this.prisma.priceList.findUnique({
       where: { id },
-      select: { isSystemManaged: true },
+      select: { isSystemManaged: true, storeId: true },
     });
 
     if (!priceList) {
       throw new NotFoundException('backend.errors.price_list_not_found');
+    }
+
+    if (!authzCtx.allStores && !authzCtx.storeIds.includes(priceList.storeId)) {
+      throw new ForbiddenException('backend.errors.auth.no_store_access');
     }
 
     if (priceList.isSystemManaged) {

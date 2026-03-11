@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -13,6 +14,7 @@ import {
   AdminPriceListPriceListPrismaQuery,
   type AdminPriceListPriceListPrismaType,
 } from '@org/types/admin/pricing';
+import type { AuthorizationContext } from '@org/types/authorization';
 import type { PaginatedResponse } from '@org/types/pagination';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -24,10 +26,27 @@ const PRICE_INCLUDE = AdminPriceListPriceListPrismaQuery;
 export class PriceListPricesService {
   constructor(private readonly prisma: PrismaService) {}
 
+  private async assertParentStoreAccess(
+    priceListId: string,
+    authzCtx: AuthorizationContext
+  ): Promise<string> {
+    const pl = await this.prisma.priceList.findUniqueOrThrow({
+      where: { id: priceListId },
+      select: { storeId: true },
+    });
+    if (!authzCtx.allStores && !authzCtx.storeIds.includes(pl.storeId)) {
+      throw new ForbiddenException('backend.errors.auth.no_store_access');
+    }
+    return pl.storeId;
+  }
+
   async query(
     priceListId: string,
-    dto: PriceListPriceQueryDTO
+    dto: PriceListPriceQueryDTO,
+    authzCtx: AuthorizationContext
   ): Promise<PaginatedResponse<AdminPriceListPriceListPrismaType>> {
+    await this.assertParentStoreAccess(priceListId, authzCtx);
+
     const { page, limit, filters, sort, search } = dto;
     const {
       where: baseWhere,
@@ -69,8 +88,11 @@ export class PriceListPricesService {
 
   async save(
     priceListId: string,
-    data: PriceListPriceSaveOutput
+    data: PriceListPriceSaveOutput,
+    authzCtx: AuthorizationContext
   ): Promise<AdminPriceListPriceListPrismaType> {
+    await this.assertParentStoreAccess(priceListId, authzCtx);
+
     this.normalizeOriginType(data);
 
     if (data.id) {
@@ -127,7 +149,9 @@ export class PriceListPricesService {
     }
   }
 
-  async delete(priceListId: string, id: string): Promise<void> {
+  async delete(priceListId: string, id: string, authzCtx: AuthorizationContext): Promise<void> {
+    await this.assertParentStoreAccess(priceListId, authzCtx);
+
     const existing = await this.prisma.priceListPrice.findFirst({
       where: { id, priceListId },
     });
@@ -139,7 +163,9 @@ export class PriceListPricesService {
     await this.prisma.priceListPrice.delete({ where: { id } });
   }
 
-  async bulkCreate(priceListId: string, data: PriceListPriceBulkCreateOutput) {
+  async bulkCreate(priceListId: string, data: PriceListPriceBulkCreateOutput, authzCtx: AuthorizationContext) {
+    await this.assertParentStoreAccess(priceListId, authzCtx);
+
     const existing = await this.prisma.priceListPrice.findMany({
       where: {
         priceListId,
@@ -172,7 +198,9 @@ export class PriceListPricesService {
     return { created: result.count };
   }
 
-  async summary(priceListId: string) {
+  async summary(priceListId: string, authzCtx: AuthorizationContext) {
+    await this.assertParentStoreAccess(priceListId, authzCtx);
+
     const [totalRows, lockedRows, missingPrices, currencyGroups] =
       await Promise.all([
         this.prisma.priceListPrice.count({ where: { priceListId } }),
@@ -203,16 +231,12 @@ export class PriceListPricesService {
     priceListId: string,
     search: string,
     page: number,
-    limit: number
+    limit: number,
+    authzCtx: AuthorizationContext
   ) {
-    const skip = (page - 1) * limit;
+    const storeId = await this.assertParentStoreAccess(priceListId, authzCtx);
 
-    const priceList = await this.prisma.priceList.findUnique({
-      where: { id: priceListId },
-      select: { storeId: true },
-    });
-    if (!priceList)
-      throw new NotFoundException('backend.errors.price_list_not_found');
+    const skip = (page - 1) * limit;
 
     const addedVariants = await this.prisma.priceListPrice.findMany({
       where: { priceListId },
@@ -225,7 +249,7 @@ export class PriceListPricesService {
       product: {
         is: {
           stores: {
-            some: { storeId: priceList.storeId },
+            some: { storeId },
           },
         },
       },

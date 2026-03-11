@@ -109,6 +109,15 @@ export const AdminPriceListPriceListPrismaQuery = {
           translations: { select: { name: true, locale: true } },
         },
       },
+      optionValues: {
+        select: {
+          variantOption: {
+            select: {
+              translations: { select: { name: true, locale: true } },
+            },
+          },
+        },
+      },
     },
   },
   unitOfMeasure: { select: { id: true, code: true } },
