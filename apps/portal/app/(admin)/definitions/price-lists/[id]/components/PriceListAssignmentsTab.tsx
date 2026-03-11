@@ -2,6 +2,7 @@
 
 import {
   useAdminPriceListAssignments,
+  useCreatePriceListAssignment,
   useDeletePriceListAssignment,
   useUpdatePriceListAssignment,
 } from '@/core/hooks/useAdminPriceListAssignments';
@@ -9,6 +10,7 @@ import {
   ActionIcon,
   Badge,
   Button,
+  Group,
   NumberInput,
   Skeleton,
   Stack,
@@ -20,14 +22,16 @@ import { modals } from '@mantine/modals';
 import { notifications } from '@mantine/notifications';
 import type { PriceListAssignment } from '@org/prisma/browser';
 import { AssignmentTargetTypeConfigs } from '@org/constants/enum-configs';
+import type { PriceListAssignmentCreateInput, PriceListAssignmentCreateOutput } from '@org/schemas/admin/pricing';
 import { FormCard } from '@org/ui/common/form-card';
-import { Target, Trash } from 'lucide-react';
+import { Target, Trash, X } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import { AddAssignmentModal } from './AddAssignmentModal';
 
 interface PriceListAssignmentsTabProps {
   priceListId: string;
+  storeId: string | null;
 }
 
 function getTargetName(
@@ -61,6 +65,7 @@ function getTargetName(
 
 export function PriceListAssignmentsTab({
   priceListId,
+  storeId,
 }: PriceListAssignmentsTabProps) {
   const t = useTranslations('frontend.admin.priceLists.form.assignments');
   const tEnums = useTranslations('frontend.enums');
@@ -70,11 +75,12 @@ export function PriceListAssignmentsTab({
     useAdminPriceListAssignments(priceListId);
   const updateAssignment = useUpdatePriceListAssignment(priceListId);
   const deleteAssignment = useDeletePriceListAssignment(priceListId);
+  const createAssignment = useCreatePriceListAssignment(priceListId);
 
   const [addOpened, { open: openAdd, close: closeAdd }] = useDisclosure(false);
-  const [priorityValues, setPriorityValues] = useState<
-    Record<string, number>
-  >({});
+  const [priorityValues, setPriorityValues] = useState<Record<string, number>>({});
+  const [pendingAssignments, setPendingAssignments] = useState<Array<PriceListAssignmentCreateInput & { _label?: string }>>([]);
+  const [isSavingAll, setIsSavingAll] = useState(false);
 
   const handlePriorityBlur = (row: PriceListAssignment) => {
     const val = priorityValues[row.id];
@@ -107,6 +113,51 @@ export function PriceListAssignmentsTab({
     });
   };
 
+  const isSameTarget = (
+    a: { targetType: string; customerGroupId?: string | null; organizationId?: string | null; customerId?: string | null },
+    b: PriceListAssignmentCreateInput
+  ) => {
+    if (a.targetType !== b.targetType) return false;
+    switch (b.targetType) {
+      case 'ALL_CUSTOMERS': return true;
+      case 'CUSTOMER_GROUP': return a.customerGroupId === b.customerGroupId;
+      case 'ORGANIZATION': return a.organizationId === b.organizationId;
+      case 'CUSTOMER': return a.customerId === b.customerId;
+      default: return false;
+    }
+  };
+
+  const handleAddPending = (data: PriceListAssignmentCreateInput, label: string) => {
+    const isDuplicate =
+      (assignments ?? []).some((a) => isSameTarget(a, data)) ||
+      pendingAssignments.some((a) => isSameTarget(a, data));
+
+    if (isDuplicate) {
+      notifications.show({ color: 'orange', message: t('duplicateError') });
+      return;
+    }
+    setPendingAssignments((prev) => [...prev, { ...data, _label: label }]);
+  };
+
+  const handleRemovePending = (index: number) => {
+    setPendingAssignments((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSaveAll = async () => {
+    setIsSavingAll(true);
+    try {
+      for (const { _label: _, ...item } of pendingAssignments) {
+        await createAssignment.mutateAsync(item as PriceListAssignmentCreateOutput);
+      }
+      setPendingAssignments([]);
+      notifications.show({ color: 'green', message: t('saveAllSuccess') });
+    } catch {
+      notifications.show({ color: 'red', message: t('saveError') });
+    } finally {
+      setIsSavingAll(false);
+    }
+  };
+
   return (
     <Stack gap="md">
       <FormCard
@@ -115,9 +166,16 @@ export function PriceListAssignmentsTab({
         icon={Target}
         iconColor="teal"
         rightSection={
-          <Button size="xs" variant="default" onClick={openAdd}>
-            {t('addAssignment')}
-          </Button>
+          <Group gap="xs">
+            {pendingAssignments.length > 0 && (
+              <Button size="xs" loading={isSavingAll} onClick={handleSaveAll}>
+                {t('saveAssignments', { count: pendingAssignments.length })}
+              </Button>
+            )}
+            <Button size="xs" variant="default" onClick={openAdd}>
+              {t('addAssignment')}
+            </Button>
+          </Group>
         }
       >
         {isLoading ? (
@@ -183,7 +241,39 @@ export function PriceListAssignmentsTab({
                   </Table.Tr>
                 );
               })}
-              {(assignments ?? []).length === 0 && (
+              {pendingAssignments.map((pending, index) => {
+                const config =
+                  AssignmentTargetTypeConfigs[
+                    pending.targetType as keyof typeof AssignmentTargetTypeConfigs
+                  ];
+                return (
+                  <Table.Tr key={`pending-${index}`} style={{ opacity: 0.65 }}>
+                    <Table.Td>
+                      <Badge variant="dot" color="yellow">
+                        {config
+                          ? tEnums(config.labelKey)
+                          : pending.targetType}
+                      </Badge>
+                    </Table.Td>
+                    <Table.Td>
+                      <Text size="sm" c="dimmed">{pending._label ?? t('unsavedLabel')}</Text>
+                    </Table.Td>
+                    <Table.Td>
+                      <Text size="sm">{pending.priority}</Text>
+                    </Table.Td>
+                    <Table.Td>
+                      <ActionIcon
+                        variant="subtle"
+                        color="gray"
+                        onClick={() => handleRemovePending(index)}
+                      >
+                        <X size={16} />
+                      </ActionIcon>
+                    </Table.Td>
+                  </Table.Tr>
+                );
+              })}
+              {(assignments ?? []).length === 0 && pendingAssignments.length === 0 && (
                 <Table.Tr>
                   <Table.Td colSpan={4}>
                     <Text size="sm" c="dimmed" ta="center">
@@ -198,9 +288,11 @@ export function PriceListAssignmentsTab({
       </FormCard>
 
       <AddAssignmentModal
-        priceListId={priceListId}
+        storeId={storeId}
         existingAssignments={assignments ?? []}
+        pendingAssignments={pendingAssignments}
         opened={addOpened}
+        onAdd={handleAddPending}
         onClose={closeAdd}
       />
     </Stack>

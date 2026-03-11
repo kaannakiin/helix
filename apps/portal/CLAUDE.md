@@ -156,9 +156,16 @@ const onSubmit = async (formData) => {
 };
 
 // 5. Render with FormProvider + FormCard sections
+// IMPORTANT: Use <div> NOT <form>. Bind handleSubmit to the save button's onClick.
+// This prevents nested Modals/Drawers from accidentally triggering the page save.
 return (
   <FormProvider {...methods}>
-    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+    <div>
+      <Group justify="flex-end">
+        <Button type="button" onClick={handleSubmit(onSubmit)} loading={isSubmitting}>
+          {t('save')}
+        </Button>
+      </Group>
       <FormCard title={t('generalInfo')} icon={FileText} iconColor="blue">
         <Controller
           name="translations.0.name"
@@ -189,7 +196,7 @@ return (
           )}
         />
       </FormCard>
-    </form>
+    </div>
   </FormProvider>
 );
 ```
@@ -200,6 +207,7 @@ Key rules:
 - Use `FooSchema` (frontend version with `images` field), not `BackendFooSchema`
 - `NEW_FOO_DEFAULT_VALUES` exported from schema package for `defaultValues`
 - Slug auto-generation: watch name field → `slugify(name, 'tr')` → `setValue('slug', ...)`
+- **Form submit pattern:** Never use `<form onSubmit={handleSubmit(onSubmit)}>`. Use `<div>` and bind `handleSubmit(onSubmit)` to the save button's `onClick={handleSubmit(onSubmit)}` with `type="button"`. Reason: nested Modals/Drawers contain `type="submit"` buttons that would bubble up and trigger the page save unexpectedly.
 
 ## React Query Hooks
 

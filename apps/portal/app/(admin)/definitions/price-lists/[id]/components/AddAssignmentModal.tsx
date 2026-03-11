@@ -1,11 +1,13 @@
 'use client';
 
-import { useCreatePriceListAssignment } from '@/core/hooks/useAdminPriceListAssignments';
 import {
   customerGroupQueryFetcher,
   customerQueryFetcher,
-  DATA_ACCESS_KEYS,
   organizationQueryFetcher,
+  createStoreCustomerGroupFetcher,
+  createStoreOrganizationFetcher,
+  createStoreCustomerFetcher,
+  DATA_ACCESS_KEYS,
 } from '@/core/hooks/useAdminLookup';
 import {
   Alert,
@@ -16,7 +18,6 @@ import {
   Select,
   Stack,
 } from '@mantine/core';
-import { notifications } from '@mantine/notifications';
 import type { PriceListAssignment } from '@org/prisma/browser';
 import {
   AssignmentTargetTypeConfigs,
@@ -26,18 +27,19 @@ import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import {
   PriceListAssignmentCreateSchema,
   type PriceListAssignmentCreateInput,
-  type PriceListAssignmentCreateOutput,
 } from '@org/schemas/admin/pricing';
 import { RelationInput } from '@org/ui/inputs/relation-input';
 import { Info } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 
 interface AddAssignmentModalProps {
-  priceListId: string;
+  storeId: string | null;
   existingAssignments: PriceListAssignment[];
+  pendingAssignments: PriceListAssignmentCreateInput[];
   opened: boolean;
+  onAdd: (data: PriceListAssignmentCreateInput, label: string) => void;
   onClose: () => void;
 }
 
@@ -50,18 +52,18 @@ const DEFAULT_VALUES: PriceListAssignmentCreateInput = {
 };
 
 export function AddAssignmentModal({
-  priceListId,
+  storeId,
   existingAssignments,
+  pendingAssignments,
   opened,
+  onAdd,
   onClose,
 }: AddAssignmentModalProps) {
-  const t = useTranslations('frontend.admin.priceLists.form.assignments');
   const tEnums = useTranslations('frontend.enums');
   const tModal = useTranslations(
     'frontend.admin.priceLists.form.assignments.modal'
   );
 
-  const createAssignment = useCreatePriceListAssignment(priceListId);
   const resolver = useTranslatedZodResolver(PriceListAssignmentCreateSchema);
 
   const { control, handleSubmit, watch, setValue, reset } =
@@ -71,39 +73,49 @@ export function AddAssignmentModal({
     });
 
   const targetType = watch('targetType');
+  const [selectedLabel, setSelectedLabel] = useState<string>('');
 
-  // Reset relation fields when target type changes
   useEffect(() => {
     setValue('customerGroupId', null);
     setValue('organizationId', null);
     setValue('customerId', null);
+    setSelectedLabel('');
   }, [targetType, setValue]);
+
+  const customerGroupFetcher = useMemo(
+    () => storeId ? createStoreCustomerGroupFetcher(storeId) : customerGroupQueryFetcher,
+    [storeId]
+  );
+  const organizationFetcher = useMemo(
+    () => storeId ? createStoreOrganizationFetcher(storeId) : organizationQueryFetcher,
+    [storeId]
+  );
+  const customerFetcher = useMemo(
+    () => storeId ? createStoreCustomerFetcher(storeId) : customerQueryFetcher,
+    [storeId]
+  );
 
   const targetTypeOptions = buildEnumOptions(
     AssignmentTargetTypeConfigs,
     tEnums
   );
 
-  const hasAllCustomers = existingAssignments.some(
-    (a) => a.targetType === 'ALL_CUSTOMERS'
-  );
+  const hasAllCustomers =
+    existingAssignments.some((a) => a.targetType === 'ALL_CUSTOMERS') ||
+    pendingAssignments.some((a) => a.targetType === 'ALL_CUSTOMERS');
 
   const filteredTargetTypeOptions = targetTypeOptions.filter((opt) => {
     if (opt.value === 'ALL_CUSTOMERS' && hasAllCustomers) return false;
     return true;
   });
 
-  const onSubmit = async (data: PriceListAssignmentCreateInput) => {
-    try {
-      await createAssignment.mutateAsync(
-        data as PriceListAssignmentCreateOutput
-      );
-      notifications.show({ color: 'green', message: t('saveSuccess') });
-      reset(DEFAULT_VALUES);
-      onClose();
-    } catch {
-      notifications.show({ color: 'red', message: t('saveError') });
-    }
+  const onSubmit = (data: PriceListAssignmentCreateInput) => {
+    const label =
+      data.targetType === 'ALL_CUSTOMERS'
+        ? tModal('allCustomersInfo')
+        : selectedLabel;
+    onAdd(data, label);
+    reset(DEFAULT_VALUES);
   };
 
   const handleClose = () => {
@@ -111,8 +123,21 @@ export function AddAssignmentModal({
     onClose();
   };
 
+  const customerGroupQueryKey = useMemo(
+    () => [...DATA_ACCESS_KEYS.admin.customerGroups.list, storeId ?? 'all'],
+    [storeId]
+  );
+  const organizationQueryKey = useMemo(
+    () => [...DATA_ACCESS_KEYS.admin.organizations.list, storeId ?? 'all'],
+    [storeId]
+  );
+  const customerQueryKey = useMemo(
+    () => [...DATA_ACCESS_KEYS.admin.customers.list, storeId ?? 'all'],
+    [storeId]
+  );
+
   return (
-    <Modal opened={opened} onClose={handleClose} title={tModal('title')}>
+    <Modal opened={opened} onClose={handleClose} title={tModal('title')} returnFocus={false}>
       <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Stack gap="md">
           <Controller
@@ -142,10 +167,11 @@ export function AddAssignmentModal({
               control={control}
               render={({ field, fieldState }) => (
                 <RelationInput
-                  fetchOptions={customerGroupQueryFetcher}
-                  queryKey={DATA_ACCESS_KEYS.admin.customerGroups.list}
+                  fetchOptions={customerGroupFetcher}
+                  queryKey={customerGroupQueryKey}
                   value={field.value ?? null}
                   onChange={field.onChange}
+                  onSelectItem={(item) => setSelectedLabel(item.label)}
                   label={tModal('customerGroup.label')}
                   placeholder={tModal('customerGroup.placeholder')}
                   error={fieldState.error?.message}
@@ -162,10 +188,11 @@ export function AddAssignmentModal({
               control={control}
               render={({ field, fieldState }) => (
                 <RelationInput
-                  fetchOptions={organizationQueryFetcher}
-                  queryKey={DATA_ACCESS_KEYS.admin.organizations.list}
+                  fetchOptions={organizationFetcher}
+                  queryKey={organizationQueryKey}
                   value={field.value ?? null}
                   onChange={field.onChange}
+                  onSelectItem={(item) => setSelectedLabel(item.label)}
                   label={tModal('organization.label')}
                   placeholder={tModal('organization.placeholder')}
                   error={fieldState.error?.message}
@@ -182,10 +209,11 @@ export function AddAssignmentModal({
               control={control}
               render={({ field, fieldState }) => (
                 <RelationInput
-                  fetchOptions={customerQueryFetcher}
-                  queryKey={DATA_ACCESS_KEYS.admin.customers.list}
+                  fetchOptions={customerFetcher}
+                  queryKey={customerQueryKey}
                   value={field.value ?? null}
                   onChange={field.onChange}
+                  onSelectItem={(item) => setSelectedLabel(item.label)}
                   label={tModal('customer.label')}
                   placeholder={tModal('customer.placeholder')}
                   error={fieldState.error?.message}
@@ -214,8 +242,8 @@ export function AddAssignmentModal({
             <Button variant="default" onClick={handleClose}>
               {tModal('cancel')}
             </Button>
-            <Button type="submit" loading={createAssignment.isPending}>
-              {tModal('add')}
+            <Button type="submit">
+              {tModal('addToList')}
             </Button>
           </Group>
         </Stack>

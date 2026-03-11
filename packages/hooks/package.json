@@ -12,15 +12,19 @@
       "default": "./src/index.ts"
     },
     "./*": "./src/*.ts",
+    "./stores/*": "./src/stores/*.ts",
+    "./providers/*": "./src/providers/*.tsx",
     "./package.json": "./package.json"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
-    "react-hook-form": "^7.56.4",
+    "react-hook-form": "^7.71.1",
     "tslib": "^2.3.0"
   },
   "peerDependencies": {
+    "immer": "^11.0.0",
     "next-intl": "^4.0.0",
-    "react": "^19.0.0"
+    "react": "^19.0.0",
+    "zustand": "^5.0.0"
   }
 }

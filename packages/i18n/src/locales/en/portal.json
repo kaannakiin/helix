@@ -27,10 +27,13 @@
     "price_lists": "Price Lists",
     "evaluation_jobs": "Evaluation Jobs",
     "groups": {
-      "main": "Main",
-      "commerce": "Commerce",
-      "marketing": "Marketing",
-      "system": "System"
+      "overview": "Overview",
+      "sales": "Sales",
+      "catalog": "Catalog",
+      "customers": "Customers",
+      "operations": "Operations",
+      "admin": "Admin",
+      "insights": "Insights"
     },
     "search_placeholder": "Search...",
     "search_nothing_found": "No results found",
@@ -973,7 +976,8 @@
         "twoFactorEnabled": "2FA",
         "lastLoginAt": "Last Login",
         "loginCount": "Login Count",
-        "createdAt": "Created At"
+        "createdAt": "Created At",
+        "store": "Store"
       },
       "contextMenu": {
         "view": "View Details",
@@ -998,7 +1002,8 @@
         "noFilters": "No filters available",
         "apply": "Apply Filters",
         "searchPlaceholder": "Search filters...",
-        "appliedFilters": "Applied Filters"
+        "appliedFilters": "Applied Filters",
+        "storePlaceholder": "Select store..."
       },
       "detail": {
         "title": "Customer Details",
@@ -1036,7 +1041,8 @@
         "membersCount": "Members",
         "childOrgsCount": "Sub-Orgs",
         "parentOrg": "Parent Org",
-        "createdAt": "Created At"
+        "createdAt": "Created At",
+        "store": "Store"
       },
       "contextMenu": {
         "view": "View Details",
@@ -1061,7 +1067,8 @@
         "noFilters": "No filters available",
         "apply": "Apply Filters",
         "searchPlaceholder": "Search filters...",
-        "appliedFilters": "Applied Filters"
+        "appliedFilters": "Applied Filters",
+        "storePlaceholder": "Select store..."
       },
       "detail": {
         "title": "Organization Details",
@@ -1260,6 +1267,10 @@
           "deleteConfirmTitle": "Delete Assignment",
           "deleteConfirmBody": "Are you sure you want to remove this assignment?",
           "allCustomersLabel": "All Customers",
+          "duplicateError": "This assignment already exists.",
+          "saveAllSuccess": "All assignments saved successfully.",
+          "saveAssignments": "Save {count} Assignment(s)",
+          "unsavedLabel": "Pending",
           "modal": {
             "title": "Add Assignment",
             "editTitle": "Edit Assignment",
@@ -1270,7 +1281,8 @@
             "priority": { "label": "Priority" },
             "allCustomersInfo": "This price list will apply to all customers in the store.",
             "cancel": "Cancel",
-            "add": "Add"
+            "add": "Add",
+            "addToList": "Add to List"
           }
         },
         "prices": {
@@ -1368,7 +1380,8 @@
         "isActive": "Active",
         "membersCount": "Members",
         "lastEvaluatedAt": "Last Run",
-        "createdAt": "Created At"
+        "createdAt": "Created At",
+        "store": "Store"
       },
       "contextMenu": {
         "view": "View Details",
@@ -1393,7 +1406,8 @@
         "noFilters": "No filters available",
         "apply": "Apply Filters",
         "searchPlaceholder": "Search filters...",
-        "appliedFilters": "Applied Filters"
+        "appliedFilters": "Applied Filters",
+        "storePlaceholder": "Select store..."
       },
       "form": {
         "newCustomerGroup": "New Customer Group",
@@ -1843,7 +1857,8 @@
         "country": "Country",
         "state": "State",
         "city": "City",
-        "createdAt": "Created At"
+        "createdAt": "Created At",
+        "store": "Store"
       },
       "contextMenu": {
         "copy": "Copy",
@@ -1867,7 +1882,8 @@
         "noFilters": "No filters available",
         "apply": "Apply Filters",
         "searchPlaceholder": "Search filters...",
-        "appliedFilters": "Applied Filters"
+        "appliedFilters": "Applied Filters",
+        "storePlaceholder": "Select store..."
       },
       "noRows": {
         "label": "No warehouses found"

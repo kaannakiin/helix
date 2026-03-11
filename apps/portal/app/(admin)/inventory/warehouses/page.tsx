@@ -12,6 +12,7 @@ import type { AdminWarehouseListPrismaType } from '@org/types/admin/warehouses';
 import type { ExportFormat } from '@org/types/export';
 import type { PaginatedResponse } from '@org/types/pagination';
 import {
+  AsyncMultiSelectFilter,
   DataTable,
   serializeGridQuery,
   useColumnFactory,
@@ -19,7 +20,7 @@ import {
   type DataTableFilterTranslations,
   type DataTableTranslations,
 } from '@org/ui';
-import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
+import type { ColDef, IDatasource, IGetRowsParams } from 'ag-grid-community';
 import { Warehouse } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useCallback, useMemo, useRef } from 'react';
@@ -83,6 +84,7 @@ export default function WarehousesPage() {
         status: t('table.status'),
         location: t('table.location'),
         createdAt: t('table.createdAt'),
+        store: t('table.store'),
       },
       contextMenu: {
         view: '',
@@ -162,6 +164,34 @@ export default function WarehousesPage() {
         },
         sortable: false,
       }),
+      {
+        field: 'store.name',
+        headerName: t('table.store'),
+        minWidth: 140,
+        sortable: false,
+        filter: false,
+        valueGetter: (params: { data?: AdminWarehouseListPrismaType }) =>
+          params.data?.store?.name ?? '—',
+      } as ColDef<AdminWarehouseListPrismaType>,
+      createColumn<AdminWarehouseListPrismaType>(
+        'storeId' as keyof AdminWarehouseListPrismaType & string,
+        {
+          headerKey: 'store',
+          type: 'badge',
+          hide: true,
+          filter: {
+            component: AsyncMultiSelectFilter,
+            params: {
+              fetchOptions: () =>
+                apiClient
+                  .get<Array<{ id: string; name: string }>>('/admin/stores')
+                  .then((r) => r.data.map((s) => ({ value: s.id, label: s.name }))),
+              placeholder: t('filterDrawer.storePlaceholder'),
+            },
+            doesFilterPass: () => true,
+          },
+        }
+      ),
       createColumn<AdminWarehouseListPrismaType>('createdAt', {
         headerKey: 'createdAt',
         type: 'date',

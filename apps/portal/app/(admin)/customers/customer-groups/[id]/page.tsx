@@ -250,7 +250,7 @@ const AdminCustomerGroupPage = () => {
   return (
     <>
       <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+        <div>
           <Stack gap="lg">
             <div>
               <Group justify="space-between" align="center">
@@ -265,9 +265,10 @@ const AdminCustomerGroupPage = () => {
                     {t('discard')}
                   </Button>
                   <Button
-                    type="submit"
+                    type="button"
                     leftSection={<Save size={16} />}
                     loading={isSubmitting}
+                    onClick={handleSubmit(onSubmit)}
                   >
                     {t('save')}
                   </Button>
@@ -524,7 +525,7 @@ const AdminCustomerGroupPage = () => {
               </Grid.Col>
             </Grid>
           </Stack>
-        </form>
+        </div>
       </FormProvider>
 
       <Modal

@@ -7,6 +7,7 @@ import type { AdminOrganizationsPrismaType } from '@org/types/admin/organization
 import type { ExportFormat } from '@org/types/export';
 import type { PaginatedResponse } from '@org/types/pagination';
 import {
+  AsyncMultiSelectFilter,
   DataTable,
   SearchInput,
   serializeGridQuery,
@@ -88,6 +89,7 @@ export default function OrganizationsPage() {
         childOrgsCount: t('table.childOrgsCount'),
         parentOrg: t('table.parentOrg'),
         createdAt: t('table.createdAt'),
+        store: t('table.store'),
       },
       contextMenu: {
         view: t('contextMenu.view'),
@@ -182,6 +184,34 @@ export default function OrganizationsPage() {
         valueGetter: (params: { data?: AdminOrganizationsPrismaType }) =>
           params.data?.parentOrg?.name ?? '—',
       } as ColDef<AdminOrganizationsPrismaType>,
+      {
+        field: 'store.name',
+        headerName: t('table.store'),
+        minWidth: 140,
+        sortable: false,
+        filter: false,
+        valueGetter: (params: { data?: AdminOrganizationsPrismaType }) =>
+          params.data?.store?.name ?? '—',
+      } as ColDef<AdminOrganizationsPrismaType>,
+      createColumn<AdminOrganizationsPrismaType>(
+        'storeId' as keyof AdminOrganizationsPrismaType & string,
+        {
+          headerKey: 'store',
+          type: 'badge',
+          hide: true,
+          filter: {
+            component: AsyncMultiSelectFilter,
+            params: {
+              fetchOptions: () =>
+                apiClient
+                  .get<Array<{ id: string; name: string }>>('/admin/stores')
+                  .then((r) => r.data.map((s) => ({ value: s.id, label: s.name }))),
+              placeholder: t('filterDrawer.storePlaceholder'),
+            },
+            doesFilterPass: () => true,
+          },
+        }
+      ),
       createColumn<AdminOrganizationsPrismaType>('createdAt', {
         headerKey: 'createdAt',
         type: 'date',

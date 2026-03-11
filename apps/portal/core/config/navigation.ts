@@ -35,7 +35,6 @@ export interface NavItem {
   children?: NavItem[];
 
   isSection?: boolean;
-  quickActionHref?: string;
 }
 
 export const adminNavItems: NavItem[] = [
@@ -44,36 +43,32 @@ export const adminNavItems: NavItem[] = [
     icon: LayoutDashboard,
     href: ADMIN_NAV_ROUTES.DASHBOARD,
     visibility: 'both',
-    group: 'main',
-    description: 'Genel mağaza durumu ve istatistikler',
+    group: 'overview',
+    description: 'Kontrol paneli, özetler ve genel operasyon görünümü',
   },
-
   {
     key: 'orders',
     icon: ShoppingCart,
     href: ADMIN_NAV_ROUTES.ORDERS,
     visibility: 'both',
-    group: 'commerce',
-    description: 'Mağaza siparişlerini görüntüle ve yönet',
+    group: 'sales',
+    description: 'Sipariş operasyonlarını ve akışlarını takip et',
   },
   {
     key: 'stores',
     icon: Store,
     href: ADMIN_NAV_ROUTES.STORES,
     visibility: 'both',
-    group: 'commerce',
-    description: 'Mağazaları listele ve yönet',
-    quickActionHref: `${ADMIN_NAV_ROUTES.STORES}/new`,
+    group: 'sales',
+    description: 'Mağazaları, storefront durumlarını ve kanal yapısını yönet',
   },
   {
     key: 'products',
     icon: Package,
     href: ADMIN_NAV_ROUTES.PRODUCTS,
     visibility: 'both',
-    group: 'commerce',
-    description: 'Ürün kataloğunu ve stokları yönet',
-    isSection: false,
-    quickActionHref: `${ADMIN_NAV_ROUTES.PRODUCTS}/new`,
+    group: 'catalog',
+    description: 'Ürün kataloğunu ve bağlı katalog yapılarını yönet',
     children: [
       {
         key: 'brands',
@@ -81,7 +76,6 @@ export const adminNavItems: NavItem[] = [
         href: ADMIN_NAV_ROUTES.BRANDS,
         visibility: 'both',
         description: 'Markaları listele ve yönet',
-        quickActionHref: `${ADMIN_NAV_ROUTES.BRANDS}/new`,
       },
       {
         key: 'categories',
@@ -89,7 +83,6 @@ export const adminNavItems: NavItem[] = [
         href: ADMIN_NAV_ROUTES.CATEGORIES,
         visibility: 'both',
         description: 'Ürün kategorilerini yönet',
-        quickActionHref: `${ADMIN_NAV_ROUTES.CATEGORIES}/new`,
       },
       {
         key: 'tags',
@@ -97,7 +90,6 @@ export const adminNavItems: NavItem[] = [
         href: ADMIN_NAV_ROUTES.TAGS,
         visibility: 'both',
         description: 'Etiket gruplarını yönet',
-        quickActionHref: `${ADMIN_NAV_ROUTES.TAGS}/new`,
       },
       {
         key: 'variants',
@@ -105,7 +97,6 @@ export const adminNavItems: NavItem[] = [
         href: ADMIN_NAV_ROUTES.VARIANTS,
         visibility: 'both',
         description: 'Ürün varyantlarını yönet',
-        quickActionHref: `${ADMIN_NAV_ROUTES.VARIANTS}/new`,
       },
     ],
   },
@@ -114,9 +105,8 @@ export const adminNavItems: NavItem[] = [
     icon: Users,
     href: ADMIN_NAV_ROUTES.CUSTOMERS,
     visibility: 'both',
-    group: 'commerce',
-    description: 'Müşteri hesapları ve detayları',
-    isSection: false,
+    group: 'customers',
+    description: 'Müşteri hesapları, segmentler ve erişim kapsamını yönet',
     children: [
       {
         key: 'customer_groups',
@@ -124,7 +114,6 @@ export const adminNavItems: NavItem[] = [
         href: ADMIN_NAV_ROUTES.CUSTOMER_GROUPS,
         visibility: 'both',
         description: 'Müşteri gruplarını yönet',
-        quickActionHref: `${ADMIN_NAV_ROUTES.CUSTOMER_GROUPS}/new`,
       },
     ],
   },
@@ -133,16 +122,16 @@ export const adminNavItems: NavItem[] = [
     icon: Building2,
     href: ADMIN_NAV_ROUTES.ORGANIZATIONS,
     visibility: 'both',
-    group: 'commerce',
-    description: 'Kurumsal hesapları ve detayları',
+    group: 'customers',
+    description: 'B2B organizasyonlarını ve kurumsal yapılarını yönet',
   },
   {
     key: 'inventory',
     icon: Warehouse,
     href: ADMIN_NAV_ROUTES.INVENTORY,
     visibility: 'both',
-    group: 'commerce',
-    description: 'Depo ve envanter yönetimi',
+    group: 'operations',
+    description: 'Depo ve envanter operasyonlarını yönet',
     children: [
       {
         key: 'warehouses',
@@ -159,26 +148,24 @@ export const adminNavItems: NavItem[] = [
     icon: Megaphone,
     href: ADMIN_NAV_ROUTES.MARKETING,
     visibility: 'both',
-    group: 'marketing',
-    description: 'Pazarlama kampanyalarını yönet',
+    group: 'catalog',
+    description: 'Pazarlama kurgularını ve ticari görünürlüğü yönet',
   },
   {
     key: 'discounts',
     icon: Percent,
     href: ADMIN_NAV_ROUTES.DISCOUNTS,
     visibility: 'both',
-    group: 'marketing',
+    group: 'catalog',
     description: 'İndirim kodları ve promosyonlar',
   },
-
   {
     key: 'definitions',
     icon: BookOpen,
     href: ADMIN_NAV_ROUTES.DEFINITIONS,
     visibility: 'both',
-    group: 'system',
+    group: 'admin',
     description: 'Sistem tanımlamaları',
-    isSection: true,
     children: [
       {
         key: 'locations',
@@ -209,7 +196,7 @@ export const adminNavItems: NavItem[] = [
     icon: BarChart3,
     href: ADMIN_NAV_ROUTES.ANALYTICS,
     visibility: 'both',
-    group: 'system',
+    group: 'insights',
     description: 'Detaylı analizler ve metrikler',
   },
   {
@@ -217,7 +204,7 @@ export const adminNavItems: NavItem[] = [
     icon: FileText,
     href: ADMIN_NAV_ROUTES.REPORTS,
     visibility: 'spotlight',
-    group: 'system',
+    group: 'insights',
     description: 'Oluşturulan raporlar',
   },
   {
@@ -225,9 +212,8 @@ export const adminNavItems: NavItem[] = [
     icon: Settings,
     href: ADMIN_NAV_ROUTES.SETTINGS,
     visibility: 'both',
-    group: 'system',
+    group: 'admin',
     description: 'Sistem ayarları',
-    isSection: true,
     children: [
       {
         key: 'platform',
@@ -256,12 +242,22 @@ export function getSpotlightItems(): NavItem[] {
   );
 }
 
-export function getQuickActionItems(): NavItem[] {
-  return getAllItems().filter((item) => !!item.quickActionHref);
-}
+const NAVBAR_GROUP_ORDER = [
+  'overview',
+  'sales',
+  'catalog',
+  'customers',
+  'operations',
+  'admin',
+  'insights',
+  'ungrouped',
+] as const;
 
 export function getGroupedNavbarItems(): Map<string, NavItem[]> {
-  const grouped = new Map<string, NavItem[]>();
+  const grouped = new Map<string, NavItem[]>(
+    NAVBAR_GROUP_ORDER.map((groupKey) => [groupKey, [] as NavItem[]])
+  );
+
   for (const item of getNavbarItems()) {
     const groupKey = item.group ?? 'ungrouped';
     if (!grouped.has(groupKey)) {
@@ -269,5 +265,12 @@ export function getGroupedNavbarItems(): Map<string, NavItem[]> {
     }
     grouped.get(groupKey)!.push(item);
   }
+
+  for (const [groupKey, items] of grouped.entries()) {
+    if (items.length === 0) {
+      grouped.delete(groupKey);
+    }
+  }
+
   return grouped;
 }

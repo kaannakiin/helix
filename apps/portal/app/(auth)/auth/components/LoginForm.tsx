@@ -2,7 +2,6 @@
 
 import { useLogin } from '@/core/hooks/useAuth';
 import { useAuthStore } from '@/core/stores/auth.store';
-import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import {
   Anchor,
   Button,
@@ -14,6 +13,7 @@ import {
   Text,
   TextInput,
 } from '@mantine/core';
+import { useTranslatedZodResolver } from '@org/hooks/useTranslatedZodResolver';
 import {
   LoginSchema,
   type LoginSchemaInputType,

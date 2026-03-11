@@ -93,6 +93,12 @@ export const DATA_ACCESS_KEYS = {
           : (['admin', 'store-host-bindings', 'list'] as const),
     },
   },
+  storefront: {
+    customer: {
+      profile: ['storefront', 'customer', 'profile'] as const,
+      organizations: ['storefront', 'customer', 'organizations'] as const,
+    },
+  },
   locations: {
     countries: ['locations', 'countries'],
     states: (countryId: string) => ['locations', 'states', countryId] as const,

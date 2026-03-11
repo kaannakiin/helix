@@ -160,9 +160,16 @@ export function PriceListPricesTab({
           headerKey: 'variantName',
           type: 'text',
           minWidth: 200,
-          valueGetter: (params) =>
-            params.data?.productVariant?.product?.translations?.[0]?.name ??
-            '—',
+          valueGetter: (params) => {
+            const productName =
+              params.data?.productVariant?.product?.translations?.[0]?.name ??
+              '—';
+            const options = params.data?.productVariant?.optionValues
+              ?.map((o) => o.variantOption?.translations?.[0]?.name)
+              .filter(Boolean)
+              .join(' / ');
+            return options ? `${productName} — ${options}` : productName;
+          },
           sortable: false,
           filter: false,
         }

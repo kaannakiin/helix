@@ -13,7 +13,9 @@
       "invalid_credentials": "Geçersiz kimlik bilgileri.",
       "refresh_token_missing": "Yenileme tokeni eksik.",
       "invalid_refresh_token": "Geçersiz yenileme tokeni.",
-      "no_password_set": "Bu hesap sosyal giriş kullanıyor. Lütfen sosyal hesabınızla giriş yapın."
+      "no_password_set": "Bu hesap sosyal giriş kullanıyor. Lütfen sosyal hesabınızla giriş yapın.",
+      "insufficient_permissions": "Bu işlemi gerçekleştirmek için yetkiniz yok.",
+      "no_store_access": "Bu mağazaya erişim yetkiniz yok."
     },
     "brand_not_found": "Marka bulunamadı.",
     "brand_slug_conflict": "Bu slug'a sahip bir marka zaten var.",

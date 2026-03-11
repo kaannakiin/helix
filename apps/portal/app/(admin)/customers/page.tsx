@@ -13,6 +13,7 @@ import type { AdminCustomersPrismaType } from '@org/types/admin/customers';
 import type { ExportFormat } from '@org/types/export';
 import type { PaginatedResponse } from '@org/types/pagination';
 import {
+  AsyncMultiSelectFilter,
   DataTable,
   SearchInput,
   serializeGridQuery,
@@ -22,7 +23,7 @@ import {
   type DataTableFilterTranslations,
   type DataTableTranslations,
 } from '@org/ui';
-import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
+import type { ColDef, IDatasource, IGetRowsParams } from 'ag-grid-community';
 import { Users } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -98,6 +99,7 @@ export default function CustomersPage() {
         lastLoginAt: t('table.lastLoginAt'),
         loginCount: t('table.loginCount'),
         createdAt: t('table.createdAt'),
+        store: t('table.store'),
       },
       contextMenu: {
         view: t('contextMenu.view'),
@@ -193,6 +195,34 @@ export default function CustomersPage() {
         type: 'number',
         minWidth: 110,
       }),
+      {
+        field: 'store.name',
+        headerName: t('table.store'),
+        minWidth: 140,
+        sortable: false,
+        filter: false,
+        valueGetter: (params: { data?: AdminCustomersPrismaType }) =>
+          params.data?.store?.name ?? '—',
+      } as ColDef<AdminCustomersPrismaType>,
+      createColumn<AdminCustomersPrismaType>(
+        'storeId' as keyof AdminCustomersPrismaType & string,
+        {
+          headerKey: 'store',
+          type: 'badge',
+          hide: true,
+          filter: {
+            component: AsyncMultiSelectFilter,
+            params: {
+              fetchOptions: () =>
+                apiClient
+                  .get<Array<{ id: string; name: string }>>('/admin/stores')
+                  .then((r) => r.data.map((s) => ({ value: s.id, label: s.name }))),
+              placeholder: t('filterDrawer.storePlaceholder'),
+            },
+            doesFilterPass: () => true,
+          },
+        }
+      ),
       createColumn<AdminCustomersPrismaType>('createdAt', {
         headerKey: 'createdAt',
         type: 'date',

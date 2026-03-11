@@ -103,11 +103,12 @@ export const taxonomyTreeFetcher = createTreeFetcher('/admin/taxonomy/tree');
 function createQueryFetcher(
   endpoint: string,
   mapFn: (item: Record<string, unknown>) => LookupItem,
-  searchField = 'name'
+  searchField = 'name',
+  extraFilters?: Record<string, unknown>
 ): FetchOptions {
   return async ({ q, ids, page = 1 }) => {
     const query: Record<string, unknown> = { page, limit: LOOKUP_LIMIT };
-    const filters: Record<string, unknown> = {};
+    const filters: Record<string, unknown> = { ...extraFilters };
     if (q?.trim()) {
       filters[searchField] = {
         filterType: 'text',
@@ -143,6 +144,40 @@ export const customerQueryFetcher = createQueryFetcher(
     label: `${item.name as string} ${item.surname as string}`,
   })
 );
+
+function makeStoreFilter(storeId: string): Record<string, unknown> {
+  return { storeId: { filterType: 'text', op: 'equals', value: storeId } };
+}
+
+export function createStoreCustomerGroupFetcher(storeId: string): FetchOptions {
+  return createQueryFetcher(
+    '/admin/customer-groups/query',
+    (item) => ({ id: item.id as string, label: item.name as string }),
+    'name',
+    makeStoreFilter(storeId)
+  );
+}
+
+export function createStoreOrganizationFetcher(storeId: string): FetchOptions {
+  return createQueryFetcher(
+    '/admin/organizations/query',
+    (item) => ({ id: item.id as string, label: item.name as string }),
+    'name',
+    makeStoreFilter(storeId)
+  );
+}
+
+export function createStoreCustomerFetcher(storeId: string): FetchOptions {
+  return createQueryFetcher(
+    '/admin/customers/query',
+    (item) => ({
+      id: item.id as string,
+      label: `${item.name as string} ${item.surname as string}`,
+    }),
+    'name',
+    makeStoreFilter(storeId)
+  );
+}
 
 export function createVariantSearchFetcher(
   priceListId: string

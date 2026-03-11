@@ -2,7 +2,7 @@
 
 import { apiClient } from '@/core/lib/api/api-client';
 import { downloadExport } from '@/core/lib/api/download';
-import { Badge, Button, Group, Stack, Text, Title } from '@mantine/core';
+import { Badge, Button, Group, MultiSelect, Stack, Text, Title } from '@mantine/core';
 import {
   ProductStatusConfigs,
   ProductTypeConfigs,
@@ -25,11 +25,12 @@ import {
   type DataTableTranslations,
   type HoverCardCellRendererParams,
 } from '@org/ui';
-import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
+import type { AgGridEvent, IDatasource, IGetRowsParams } from 'ag-grid-community';
 import { Package, Plus } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 export default function ProductsPage() {
   const t = useTranslations('frontend.admin.products');
@@ -288,7 +289,35 @@ export default function ProductsPage() {
     []
   );
 
+  const gridRef = useRef<{ api?: AgGridEvent['api'] }>({});
   const lastQueryRef = useRef<{ filters?: string; sort?: string }>({});
+
+  const [selectedStores, setSelectedStores] = useState<string[]>([]);
+
+  const { data: storeOptions } = useQuery({
+    queryKey: ['admin', 'stores', 'options'],
+    queryFn: () =>
+      apiClient
+        .get<Array<{ id: string; name: string }>>('/admin/stores')
+        .then((r) => r.data.map((s) => ({ value: s.id, label: s.name }))),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const handleStoreFilter = useCallback((values: string[]) => {
+    setSelectedStores(values);
+    const api = gridRef.current.api;
+    if (!api) return;
+    const current = api.getFilterModel() ?? {};
+    if (values.length === 0) {
+      const { storeIds: _, ...rest } = current;
+      api.setFilterModel(rest);
+    } else {
+      api.setFilterModel({
+        ...current,
+        storeIds: { filterType: 'custom', values },
+      });
+    }
+  }, []);
 
   const { search, setSearch, searchParam } = useTableSearch({
     fields: ['_translations.name', '_variants.sku'],
@@ -372,9 +401,16 @@ export default function ProductsPage() {
             placeholder={t('searchPlaceholder')}
             value={search}
             onChange={setSearch}
-            style={{
-              width: 280,
-            }}
+            style={{ width: 280 }}
+          />
+          <MultiSelect
+            data={storeOptions ?? []}
+            value={selectedStores}
+            onChange={handleStoreFilter}
+            placeholder={t('filterDrawer.storePlaceholder')}
+            clearable
+            searchable
+            style={{ width: 240 }}
           />
           <Button
             leftSection={<Plus size={16} />}
@@ -397,6 +433,9 @@ export default function ProductsPage() {
           rowSelection: {
             enableClickSelection: false,
             mode: 'multiRow',
+          },
+          onGridReady: (event) => {
+            gridRef.current.api = event.api;
           },
         }}
         showFilterDrawer

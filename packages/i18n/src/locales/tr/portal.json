@@ -27,10 +27,13 @@
     "price_lists": "Fiyat Listeleri",
     "evaluation_jobs": "Değerlendirme İşleri",
     "groups": {
-      "main": "Ana Menü",
-      "commerce": "Ticaret",
-      "marketing": "Pazarlama",
-      "system": "Sistem"
+      "overview": "Genel Bakış",
+      "sales": "Satış",
+      "catalog": "Katalog",
+      "customers": "Müşteriler",
+      "operations": "Operasyon",
+      "admin": "Yönetim",
+      "insights": "İçgörüler"
     },
     "search_placeholder": "Ara...",
     "search_nothing_found": "Sonuç bulunamadı",
@@ -973,7 +976,8 @@
         "twoFactorEnabled": "2FA",
         "lastLoginAt": "Son Giriş",
         "loginCount": "Giriş Sayısı",
-        "createdAt": "Oluşturulma"
+        "createdAt": "Oluşturulma",
+        "store": "Mağaza"
       },
       "contextMenu": {
         "view": "Detayları Görüntüle",
@@ -998,7 +1002,8 @@
         "noFilters": "Filtre bulunmuyor",
         "apply": "Filtrele",
         "searchPlaceholder": "Filtre ara...",
-        "appliedFilters": "Uygulanan Filtreler"
+        "appliedFilters": "Uygulanan Filtreler",
+        "storePlaceholder": "Mağaza seçin..."
       },
       "detail": {
         "title": "Müşteri Detayları",
@@ -1036,7 +1041,8 @@
         "membersCount": "Üyeler",
         "childOrgsCount": "Alt Org.",
         "parentOrg": "Üst Org.",
-        "createdAt": "Oluşturulma"
+        "createdAt": "Oluşturulma",
+        "store": "Mağaza"
       },
       "contextMenu": {
         "view": "Detayları Görüntüle",
@@ -1061,7 +1067,8 @@
         "noFilters": "Filtre bulunmuyor",
         "apply": "Filtrele",
         "searchPlaceholder": "Filtre ara...",
-        "appliedFilters": "Uygulanan Filtreler"
+        "appliedFilters": "Uygulanan Filtreler",
+        "storePlaceholder": "Mağaza seçin..."
       },
       "detail": {
         "title": "Organizasyon Detayları",
@@ -1260,6 +1267,10 @@
           "deleteConfirmTitle": "Atamayı Sil",
           "deleteConfirmBody": "Bu atamayı kaldırmak istediğinizden emin misiniz?",
           "allCustomersLabel": "Tüm Müşteriler",
+          "duplicateError": "Bu atama zaten mevcut.",
+          "saveAllSuccess": "Tüm atmalar başarıyla kaydedildi.",
+          "saveAssignments": "{count} Atamayı Kaydet",
+          "unsavedLabel": "Beklemede",
           "modal": {
             "title": "Atama Ekle",
             "editTitle": "Atamayı Düzenle",
@@ -1270,7 +1281,8 @@
             "priority": { "label": "Öncelik" },
             "allCustomersInfo": "Bu fiyat listesi mağazadaki tüm müşterilere uygulanacaktır.",
             "cancel": "İptal",
-            "add": "Ekle"
+            "add": "Ekle",
+            "addToList": "Listeye Ekle"
           }
         },
         "prices": {
@@ -1368,7 +1380,8 @@
         "isActive": "Aktif",
         "membersCount": "Üyeler",
         "lastEvaluatedAt": "Son Çalışma",
-        "createdAt": "Oluşturulma"
+        "createdAt": "Oluşturulma",
+        "store": "Mağaza"
       },
       "contextMenu": {
         "view": "Detayları Görüntüle",
@@ -1393,7 +1406,8 @@
         "noFilters": "Filtre mevcut değil",
         "apply": "Filtreleri Uygula",
         "searchPlaceholder": "Filtre ara...",
-        "appliedFilters": "Uygulanan Filtreler"
+        "appliedFilters": "Uygulanan Filtreler",
+        "storePlaceholder": "Mağaza seçin..."
       },
       "form": {
         "newCustomerGroup": "Yeni Müşteri Grubu",
@@ -1843,7 +1857,8 @@
         "country": "Ülke",
         "state": "İl",
         "city": "İlçe",
-        "createdAt": "Oluşturulma Tarihi"
+        "createdAt": "Oluşturulma Tarihi",
+        "store": "Mağaza"
       },
       "contextMenu": {
         "copy": "Kopyala",
@@ -1867,7 +1882,8 @@
         "noFilters": "Kullanılabilir filtre yok",
         "apply": "Filtreleri Uygula",
         "searchPlaceholder": "Filtre ara...",
-        "appliedFilters": "Uygulanan Filtreler"
+        "appliedFilters": "Uygulanan Filtreler",
+        "storePlaceholder": "Mağaza seçin..."
       },
       "noRows": {
         "label": "Depo bulunamadı"

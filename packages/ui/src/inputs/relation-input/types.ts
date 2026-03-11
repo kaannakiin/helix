@@ -41,6 +41,7 @@ interface RelationInputSingleProps extends RelationInputBaseProps {
   value: string | null;
   onChange: (value: string | null) => void;
   clearable?: boolean;
+  onSelectItem?: (item: LookupItem) => void;
 }
 
 interface RelationInputMultiProps extends RelationInputBaseProps {

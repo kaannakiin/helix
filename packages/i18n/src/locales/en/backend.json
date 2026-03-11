@@ -13,7 +13,9 @@
       "invalid_credentials": "Invalid credentials.",
       "refresh_token_missing": "Refresh token missing.",
       "invalid_refresh_token": "Invalid refresh token.",
-      "no_password_set": "This account uses social login. Please sign in with your social provider."
+      "no_password_set": "This account uses social login. Please sign in with your social provider.",
+      "insufficient_permissions": "You do not have permission to perform this action.",
+      "no_store_access": "You do not have access to this store."
     },
     "brand_not_found": "Brand not found.",
     "brand_slug_conflict": "A brand with this slug already exists.",

@@ -118,11 +118,13 @@ export function RelationInput(props: RelationInputProps) {
         multiOnChange([...multiValue, item.id]);
       } else {
         const singleOnChange = onChange as (v: string | null) => void;
+        const onSelectItem = (props as { onSelectItem?: (item: LookupItem) => void }).onSelectItem;
         setLocalItems([item]);
         singleOnChange(item.id);
+        onSelectItem?.(item);
       }
     },
-    [isMultiple, value, onChange, maxItems]
+    [isMultiple, value, onChange, maxItems, props]
   );
 
   const handleRemove = useCallback(

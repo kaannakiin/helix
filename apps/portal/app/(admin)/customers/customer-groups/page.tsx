@@ -10,6 +10,7 @@ import {
 import type { AdminCustomerGroupListPrismaType } from '@org/types/admin/customer-groups';
 import type { PaginatedResponse } from '@org/types/pagination';
 import {
+  AsyncMultiSelectFilter,
   DataTable,
   serializeGridQuery,
   useColumnFactory,
@@ -17,7 +18,7 @@ import {
   type DataTableFilterTranslations,
   type DataTableTranslations,
 } from '@org/ui';
-import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
+import type { ColDef, IDatasource, IGetRowsParams } from 'ag-grid-community';
 import { Plus, UsersRound } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
@@ -83,6 +84,7 @@ export default function AdminCustomerGroupsPage() {
         membersCount: t('table.membersCount'),
         lastEvaluatedAt: t('table.lastEvaluatedAt'),
         createdAt: t('table.createdAt'),
+        store: t('table.store'),
       },
       contextMenu: {
         view: t('contextMenu.view'),
@@ -152,6 +154,34 @@ export default function AdminCustomerGroupsPage() {
         type: 'datetime',
         minWidth: 170,
       }),
+      {
+        field: 'store.name',
+        headerName: t('table.store'),
+        minWidth: 140,
+        sortable: false,
+        filter: false,
+        valueGetter: (params: { data?: AdminCustomerGroupListPrismaType }) =>
+          params.data?.store?.name ?? '—',
+      } as ColDef<AdminCustomerGroupListPrismaType>,
+      createColumn<AdminCustomerGroupListPrismaType>(
+        'storeId' as keyof AdminCustomerGroupListPrismaType & string,
+        {
+          headerKey: 'store',
+          type: 'badge',
+          hide: true,
+          filter: {
+            component: AsyncMultiSelectFilter,
+            params: {
+              fetchOptions: () =>
+                apiClient
+                  .get<Array<{ id: string; name: string }>>('/admin/stores')
+                  .then((r) => r.data.map((s) => ({ value: s.id, label: s.name }))),
+              placeholder: t('filterDrawer.storePlaceholder'),
+            },
+            doesFilterPass: () => true,
+          },
+        }
+      ),
       createColumn<AdminCustomerGroupListPrismaType>('createdAt', {
         headerKey: 'createdAt',
         type: 'date',
