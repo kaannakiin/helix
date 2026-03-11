@@ -7,6 +7,7 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
+    "customConditions": ["@org/source"],
     "resolveJsonModule": true,
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -19,17 +20,18 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./*"]
     },
     "outDir": "dist",
-    "rootDir": "src",
-    "tsBuildInfoFile": "dist/tsconfig.tsbuildinfo"
+    "rootDir": "."
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.js",
-    "src/**/*.jsx",
+    "app/**/*.ts",
+    "app/**/*.tsx",
+    "app/**/*.js",
+    "app/**/*.jsx",
+    "core/**/*.ts",
+    "core/**/*.tsx",
     "../../apps/b2c-storefront/.next/types/**/*.ts",
     "../../dist/apps/b2c-storefront/.next/types/**/*.ts",
     "next-env.d.ts"
@@ -40,8 +42,8 @@
     "node_modules",
     "jest.config.ts",
     "jest.config.cts",
-    "src/**/*.spec.ts",
-    "src/**/*.test.ts",
+    "app/**/*.spec.ts",
+    "app/**/*.test.ts",
     ".next"
   ],
   "references": [
@@ -49,10 +51,13 @@
       "path": "../../packages/types"
     },
     {
+      "path": "../../packages/constants"
+    },
+    {
       "path": "../../packages/hooks"
     },
     {
-      "path": "../../packages/constants"
+      "path": "../../packages/utils"
     },
     {
       "path": "../../packages/i18n"

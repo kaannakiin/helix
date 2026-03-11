@@ -3,11 +3,12 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start": "nx run-many -t serve dev --parallel",
-    "start:op": "nx run-many -t serve dev --exclude=@org/b2c-storefront,@org/b2b-storefront",
-    "start:ob2b": "nx run-many -t serve dev --exclude=@org/portal,@org/b2c-storefront",
-    "start:ob2c": "nx run-many -t serve dev --exclude=@org/portal,@org/b2b-storefront",
-    "build": "nx run-many -t build --parallel --skip-nx-cache"
+    "start": "nx run-many -t serve dev --parallel=3 --exclude=@org/b2c-storefront,@org/b2b-storefront",
+    "start:all": "nx run-many -t serve dev --parallel=5",
+    "start:op": "nx run-many -t serve dev --parallel=3 --exclude=@org/b2c-storefront,@org/b2b-storefront",
+    "start:ob2b": "nx run-many -t serve dev --parallel=3 --exclude=@org/portal,@org/b2c-storefront",
+    "start:ob2c": "nx run-many -t serve dev --parallel=3 --exclude=@org/portal,@org/b2b-storefront",
+    "build": "nx run-many -t build --parallel"
   },
   "private": true,
   "workspaces": [

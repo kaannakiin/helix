@@ -12,13 +12,24 @@
     }
   },
   "dependencies": {
-    "@org/i18n": "*",
     "@org/constants": "*",
     "@org/hooks": "*",
+    "@org/i18n": "*",
+    "@org/prisma": "*",
     "@org/types": "*",
+    "@org/utils": "*",
+    "@tanstack/react-query": "^5.90.21",
+    "axios": "^1.13.5",
+    "immer": "^11.1.4",
+    "jose": "^6.1.3",
     "next": "~16.0.1",
-    "next-intl": "^4.1.0",
+    "next-intl": "^4.8.3",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "zustand": "^5.0.11"
+  },
+  "devDependencies": {
+    "@types/set-cookie-parser": "^2.4.10",
+    "set-cookie-parser": "^3.0.1"
   }
 }

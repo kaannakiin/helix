@@ -7,6 +7,7 @@
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
+    "customConditions": ["@org/source"],
     "resolveJsonModule": true,
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -29,6 +30,8 @@
     "app/**/*.tsx",
     "app/**/*.js",
     "app/**/*.jsx",
+    "core/**/*.ts",
+    "core/**/*.tsx",
     "../../apps/b2b-storefront/.next/types/**/*.ts",
     "../../dist/apps/b2b-storefront/.next/types/**/*.ts",
     "next-env.d.ts"
@@ -45,16 +48,22 @@
   ],
   "references": [
     {
-      "path": "../../packages/types"
+      "path": "../../packages/prisma"
     },
     {
-      "path": "../../packages/hooks"
+      "path": "../../packages/utils"
+    },
+    {
+      "path": "../../packages/i18n"
     },
     {
       "path": "../../packages/constants"
     },
     {
-      "path": "../../packages/i18n"
+      "path": "../../packages/hooks"
+    },
+    {
+      "path": "../../packages/types"
     }
   ]
 }

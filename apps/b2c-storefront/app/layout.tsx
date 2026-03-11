@@ -1,5 +1,3 @@
-import './global.css';
-
 import type { CustomerTokenPayload } from '@org/types/storefront';
 import { headers } from 'next/headers';
 import { CustomerAuthProvider } from '@org/hooks/providers/CustomerAuthProvider';
@@ -41,6 +39,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const h = await headers();
+  const storeName = decodeURIComponent(
+    h.get('x-store-name') ?? process.env.DEV_STORE_NAME ?? 'Store'
+  );
+  const businessModel = h.get('x-business-model') ?? 'B2C';
   const customer = getCustomerFromHeaders(h);
 
   return (
@@ -48,7 +50,21 @@ export default async function RootLayout({
       <body>
         <QueryProvider>
           <CustomerAuthProvider customer={customer}>
-            {children}
+            <header
+              style={{ padding: '1rem', borderBottom: '1px solid #eee' }}
+            >
+              <strong>{storeName}</strong>
+              <span
+                style={{
+                  marginLeft: '1rem',
+                  fontSize: '0.75rem',
+                  color: '#999',
+                }}
+              >
+                {businessModel} Storefront
+              </span>
+            </header>
+            <main style={{ padding: '1rem' }}>{children}</main>
           </CustomerAuthProvider>
         </QueryProvider>
       </body>

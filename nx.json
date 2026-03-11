@@ -72,10 +72,24 @@
       }
     }
   ],
-  "useDaemonProcess": false,
+  "useDaemonProcess": true,
   "targetDefaults": {
+    "build": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    },
+    "lint": {
+      "cache": true,
+      "inputs": ["default", "^default"]
+    },
+    "typecheck": {
+      "cache": true,
+      "inputs": ["default", "^default"]
+    },
     "test": {
-      "dependsOn": ["^build"]
+      "cache": true,
+      "inputs": ["default", "^default"]
     },
     "@nx/esbuild:esbuild": {
       "cache": true,

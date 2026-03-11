@@ -3,9 +3,8 @@ import { wrapper } from 'axios-cookiejar-support';
 import { CookieJar } from 'tough-cookie';
 import { hash as argon2Hash } from '@node-rs/argon2';
 import { DEFAULT_PASSWORD, uniqueEmail } from './auth.helper.js';
+import { E2E_ADMIN_HOSTNAME, E2E_BASE_URL } from './e2e-env.js';
 import { prisma } from './prisma.helper.js';
-
-const PORTAL_HOSTNAME = 'admin.helix.local';
 
 /**
  * Creates an admin client with working cookie auth.
@@ -35,13 +34,13 @@ export async function createAdminClient(): Promise<{
   });
 
   const jar = new CookieJar();
-  const baseURL = axios.defaults.baseURL || 'http://localhost:3003';
+  const baseURL = axios.defaults.baseURL || E2E_BASE_URL;
 
   const client = (wrapper as any)(
     axios.create({
       baseURL,
       jar,
-      headers: { Host: PORTAL_HOSTNAME },
+      headers: { Host: E2E_ADMIN_HOSTNAME },
       withCredentials: true,
       validateStatus: () => true,
     } as any)

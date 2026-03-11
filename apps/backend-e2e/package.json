@@ -14,13 +14,8 @@
           "{projectRoot}/test-output/jest/coverage"
         ],
         "options": {
-          "jestConfig": "apps/backend-e2e/jest.config.cts",
-          "passWithNoTests": true
-        },
-        "dependsOn": [
-          "@org/backend:build",
-          "@org/backend:serve"
-        ]
+          "jestConfig": "apps/backend-e2e/jest.config.cts"
+        }
       }
     }
   },

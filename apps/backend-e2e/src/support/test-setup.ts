@@ -1,7 +1,6 @@
 import axios from 'axios';
+import { E2E_BASE_URL } from './e2e-env.js';
 
 module.exports = async function () {
-  const host = process.env.HOST ?? 'localhost';
-  const port = process.env.PORT ?? '3003';
-  axios.defaults.baseURL = `http://${host}:${port}`;
+  axios.defaults.baseURL = E2E_BASE_URL;
 };

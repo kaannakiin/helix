@@ -16,16 +16,9 @@ import {
   VerificationStatus,
 } from '@org/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { config } from 'dotenv';
-import { resolve } from 'path';
+import { getRequiredDatabaseUrl } from './e2e-env.js';
 
-config({ path: resolve(__dirname, '../../../../apps/backend/.env') });
-
-const connectionString = process.env.DATABASE_URL;
-
-if (!connectionString) {
-  throw new Error('DATABASE_URL is required for backend e2e tests.');
-}
+const connectionString = getRequiredDatabaseUrl();
 
 const adapter = new PrismaPg({ connectionString });
 
@@ -368,7 +361,9 @@ export async function resetPricingFixtures() {
     where: { sku: { startsWith: 'e2e-pricing-' } },
   });
   await prisma.product.deleteMany({
-    where: { translations: { some: { name: { startsWith: 'E2E Pricing Product' } } } },
+    where: {
+      translations: { some: { name: { startsWith: 'E2E Pricing Product' } } },
+    },
   });
   await prisma.unitOfMeasure.deleteMany({
     where: { code: 'E2E-PC' },
@@ -479,10 +474,7 @@ export async function createOrganizationFixture(
   });
 }
 
-export async function createCustomerFixture(
-  storeId: string,
-  suffix: string
-) {
+export async function createCustomerFixture(storeId: string, suffix: string) {
   return prisma.customer.create({
     data: {
       name: 'E2E',

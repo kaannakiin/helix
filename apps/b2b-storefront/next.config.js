@@ -19,7 +19,7 @@ const nextConfig = {
   nx: {},
   output: 'standalone',
   compress: false,
-  transpilePackages: ['@org/i18n', '@org/constants', '@org/utils', '@org/hooks'],
+  transpilePackages: ['@org/i18n', '@org/constants', '@org/utils', '@org/hooks', '@org/types', '@org/prisma'],
   webpack(config) {
     config.resolve.conditionNames = [
       '@org/source',

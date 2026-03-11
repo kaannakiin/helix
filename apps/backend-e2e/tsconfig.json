@@ -3,10 +3,9 @@
   "compilerOptions": {
     "outDir": "out-tsc/@org/backend-e2e",
     "esModuleInterop": true,
-    "noUnusedLocals": false,
-    "noImplicitAny": false
+    "noUnusedLocals": false
   },
-  "include": ["jest.config.cts", "src/**/*.ts"],
+  "include": ["jest.config.cts", "src/**/*.ts", "src/**/*.d.ts"],
   "references": [
     {
       "path": "../../packages/constants"
