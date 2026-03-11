@@ -9,6 +9,7 @@ export const ADMIN_CUSTOMER_GROUPS_FIELD_CONFIG = {
   createdAt: { filterType: 'date' },
   updatedAt: { filterType: 'date' },
   '_count.members': { filterType: 'number' },
+  storeId: { filterType: 'text' },
 } as const satisfies Record<string, FieldFilterConfig>;
 
 export type AdminCustomerGroupsFilterableField =
@@ -29,6 +30,7 @@ export type AdminCustomerGroupsSortField =
 
 export const AdminCustomerGroupListPrismaQuery = {
   _count: { select: { members: true } },
+  store: { select: { id: true, name: true } },
 } as const satisfies Prisma.CustomerGroupInclude;
 
 export type AdminCustomerGroupListPrismaType = Prisma.CustomerGroupGetPayload<{

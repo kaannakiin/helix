@@ -17,6 +17,7 @@ const inlineRuleTreeSchema = z.object({
 
 export const BaseCustomerGroupSchema = z.object({
   id: z.cuid2(),
+  storeId: z.cuid2(),
   name: z
     .string({ error: V.CUSTOMER_GROUP_NAME_REQUIRED })
     .trim()
@@ -69,6 +70,7 @@ export type CustomerGroupOutput = z.output<typeof CustomerGroupSchema>;
 
 export const NEW_CUSTOMER_GROUP_DEFAULT_VALUES: CustomerGroupInput = {
   id: createId(),
+  storeId: '',
   name: '',
   description: '',
   color: '',

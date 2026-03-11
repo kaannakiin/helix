@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -10,6 +11,7 @@ import {
   type AdminCustomerGroupDetailPrismaType,
   type AdminCustomerGroupListPrismaType,
 } from '@org/types/admin/customer-groups';
+import type { AuthorizationContext } from '@org/types/authorization';
 import type { FilterCondition } from '@org/types/data-query';
 import type { PaginatedResponse } from '@org/types/pagination';
 import {
@@ -32,8 +34,16 @@ export class CustomerGroupsService {
     members: { table: 'CustomerGroupMember', fk: 'customerGroupId' },
   };
 
+  private assertStoreAccess(authzCtx: AuthorizationContext, storeId: string): void {
+    if (authzCtx.allStores) return;
+    if (!authzCtx.storeIds.includes(storeId)) {
+      throw new ForbiddenException('backend.errors.auth.no_store_access');
+    }
+  }
+
   async getCustomerGroups(
-    query: CustomerGroupQueryDTO
+    query: CustomerGroupQueryDTO,
+    authzCtx: AuthorizationContext
   ): Promise<PaginatedResponse<AdminCustomerGroupListPrismaType>> {
     const { page, limit, filters, sort } = query;
 
@@ -58,6 +68,11 @@ export class CustomerGroupsService {
       countFilters,
       baseWhere
     )) as Prisma.CustomerGroupWhereInput;
+
+    if (!authzCtx.allStores) {
+      const storeCondition = { storeId: { in: authzCtx.storeIds } };
+      where.AND = [...(Array.isArray(where.AND) ? where.AND : where.AND ? [where.AND] : []), storeCondition];
+    }
 
     const [items, total] = await Promise.all([
       this.prisma.customerGroup.findMany({
@@ -111,7 +126,8 @@ export class CustomerGroupsService {
   }
 
   async getCustomerGroupById(
-    id: string
+    id: string,
+    authzCtx: AuthorizationContext
   ): Promise<AdminCustomerGroupDetailPrismaType> {
     const group = await this.prisma.customerGroup.findUnique({
       where: { id },
@@ -122,14 +138,18 @@ export class CustomerGroupsService {
       throw new NotFoundException('backend.errors.customer_group_not_found');
     }
 
+    this.assertStoreAccess(authzCtx, group.storeId);
+
     return group;
   }
 
   async saveCustomerGroup(
-    data: CustomerGroupSaveDTO
+    data: CustomerGroupSaveDTO,
+    authzCtx: AuthorizationContext
   ): Promise<AdminCustomerGroupDetailPrismaType> {
     const {
       id,
+      storeId,
       name,
       description,
       color,
@@ -140,6 +160,17 @@ export class CustomerGroupsService {
       cronExpression,
     } = data;
 
+    this.assertStoreAccess(authzCtx, storeId);
+
+    const existing = await this.prisma.customerGroup.findUnique({
+      where: { id },
+      select: { storeId: true },
+    });
+
+    if (existing) {
+      this.assertStoreAccess(authzCtx, existing.storeId);
+    }
+
     const group = await this.prisma.$transaction(async (tx) => {
       let resolvedRuleTreeId: string | null = null;
 
@@ -149,7 +180,7 @@ export class CustomerGroupsService {
             name: ruleTree.name,
             store: {
               connect: {
-                id: '',
+                id: storeId,
               },
             },
             description: ruleTree.description ?? null,
@@ -185,7 +216,7 @@ export class CustomerGroupsService {
           type,
           isActive,
           ruleTreeId: resolvedRuleTreeId,
-          storeId: '',
+          storeId,
           cronExpression: cronExpression ?? null,
         },
         update: {
@@ -210,7 +241,8 @@ export class CustomerGroupsService {
 
   async triggerEvaluation(
     customerGroupId: string,
-    triggeredBy: string
+    triggeredBy: string,
+    authzCtx: AuthorizationContext
   ): Promise<{ jobId: string }> {
     const group = await this.prisma.customerGroup.findUnique({
       where: { id: customerGroupId },
@@ -220,6 +252,8 @@ export class CustomerGroupsService {
     if (!group) {
       throw new NotFoundException('backend.errors.customer_group_not_found');
     }
+
+    this.assertStoreAccess(authzCtx, group.storeId);
 
     if (group.type !== 'RULE_BASED') {
       throw new BadRequestException('backend.errors.evaluation_manual_group');
@@ -241,7 +275,7 @@ export class CustomerGroupsService {
     return { jobId };
   }
 
-  async deleteCustomerGroup(id: string): Promise<void> {
+  async deleteCustomerGroup(id: string, authzCtx: AuthorizationContext): Promise<void> {
     const group = await this.prisma.customerGroup.findUnique({
       where: { id },
     });
@@ -249,6 +283,8 @@ export class CustomerGroupsService {
     if (!group) {
       throw new NotFoundException('backend.errors.customer_group_not_found');
     }
+
+    this.assertStoreAccess(authzCtx, group.storeId);
 
     await this.prisma.customerGroup.delete({ where: { id } });
   }
