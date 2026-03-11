@@ -8,6 +8,7 @@ export const ADMIN_ORGANIZATIONS_FIELD_CONFIG = {
   phone: { filterType: 'text' },
   isActive: { filterType: 'boolean' },
   createdAt: { filterType: 'date' },
+  storeId: { filterType: 'text' },
 } as const satisfies Record<string, FieldFilterConfig>;
 
 export type AdminOrganizationsFilterableField =
@@ -27,6 +28,7 @@ export type AdminOrganizationsSortField =
 export const AdminOrganizationsPrismaQuery = {
   _count: { select: { members: true, childOrgs: true } },
   parentOrg: { select: { id: true, name: true } },
+  store: { select: { id: true, name: true } },
 } as const satisfies Prisma.OrganizationInclude;
 
 export type AdminOrganizationsPrismaType = Prisma.OrganizationGetPayload<{

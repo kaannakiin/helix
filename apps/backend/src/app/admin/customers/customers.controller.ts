@@ -1,4 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
+import { AuthzCtx } from '../../../core/decorators/authz-context.decorator';
+import { RequireCapability } from '../../../core/decorators/require-capability.decorator';
+import { CAPABILITIES, type AuthorizationContext } from '@org/types/authorization';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Prisma } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
@@ -19,16 +22,22 @@ export class CustomersController {
   ) {}
 
   @Post('query')
+  @RequireCapability(CAPABILITIES.CUSTOMERS_READ)
   @ApiOperation({ summary: 'Get paginated list of customers' })
-  async getCustomers(@Body() query: CustomerQueryDTO) {
-    return this.customersService.getCustomers(query);
+  async getCustomers(
+    @Body() query: CustomerQueryDTO,
+    @AuthzCtx() authzCtx: AuthorizationContext
+  ) {
+    return this.customersService.getCustomers(query, authzCtx);
   }
 
   @Get('export')
+  @RequireCapability(CAPABILITIES.CUSTOMERS_READ)
   @ApiOperation({ summary: 'Export customers as Excel or CSV' })
   async exportCustomers(
     @Query() query: CustomerExportQueryDTO,
-    @Res() res: Response
+    @Res() res: Response,
+    @AuthzCtx() authzCtx: AuthorizationContext
   ) {
     const { where, orderBy } = buildPrismaQuery({
       page: 1,
@@ -37,6 +46,12 @@ export class CustomersController {
       sort: query.sort as SortCondition[] | undefined,
       defaultSort: { field: 'createdAt', order: 'desc' },
     });
+
+    const typedWhere = where as Prisma.CustomerWhereInput;
+    if (!authzCtx.allStores) {
+      const storeCondition = { storeId: { in: authzCtx.storeIds } };
+      typedWhere.AND = [...(Array.isArray(typedWhere.AND) ? typedWhere.AND : typedWhere.AND ? [typedWhere.AND] : []), storeCondition];
+    }
 
     const lang = I18nContext.current()?.lang ?? 'en';
     const i18n = I18nContext.current();
@@ -53,7 +68,7 @@ export class CustomersController {
         columns,
         createDataIterator: (batchSize) =>
           this.customersService.iterateCustomers({
-            where: where as Prisma.CustomerWhereInput,
+            where: typedWhere,
             orderBy: orderBy as
               | Prisma.CustomerOrderByWithRelationInput
               | Prisma.CustomerOrderByWithRelationInput[],
@@ -88,9 +103,13 @@ export class CustomersController {
   }
 
   @Get(':id')
+  @RequireCapability(CAPABILITIES.CUSTOMERS_READ)
   @ApiOperation({ summary: 'Get customer by ID' })
   @ApiParam({ name: 'id', description: 'Customer ID' })
-  async getCustomerById(@Param('id') id: string) {
-    return this.customersService.getCustomerById(id);
+  async getCustomerById(
+    @Param('id') id: string,
+    @AuthzCtx() authzCtx: AuthorizationContext
+  ) {
+    return this.customersService.getCustomerById(id, authzCtx);
   }
 }

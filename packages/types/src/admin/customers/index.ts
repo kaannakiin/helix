@@ -17,6 +17,7 @@ export const ADMIN_CUSTOMERS_FIELD_CONFIG = {
   createdAt: { filterType: 'date' },
   lastLoginAt: { filterType: 'date' },
   loginCount: { filterType: 'number' },
+  storeId: { filterType: 'text' },
 } as const satisfies Record<string, FieldFilterConfig>;
 
 export type AdminCustomersFilterableField =
@@ -39,8 +40,9 @@ export const ADMIN_CUSTOMERS_SORT_FIELDS = [
 export type AdminCustomersSortField =
   (typeof ADMIN_CUSTOMERS_SORT_FIELDS)[number];
 
-export const AdminCustomersPrismaQuery =
-  {} as const satisfies Prisma.CustomerInclude;
+export const AdminCustomersPrismaQuery = {
+  store: { select: { id: true, name: true } },
+} as const satisfies Prisma.CustomerInclude;
 
 export type AdminCustomersPrismaType = Prisma.CustomerGetPayload<{
   include: typeof AdminCustomersPrismaQuery;

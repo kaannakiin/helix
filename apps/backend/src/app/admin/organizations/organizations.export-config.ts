@@ -7,5 +7,6 @@ export const ORGANIZATION_EXPORT_COLUMNS: ExportColumnDef[] = [
   { field: 'phone', headerKey: 'frontend.admin.organizations.table.phone', type: 'text', width: 15 },
   { field: 'address', headerKey: 'frontend.admin.organizations.table.address', type: 'text', width: 30 },
   { field: 'isActive', headerKey: 'frontend.admin.organizations.table.isActive', type: 'boolean', width: 10 },
+  { field: 'store.name', headerKey: 'frontend.admin.organizations.table.store', type: 'text', width: 20 },
   { field: 'createdAt', headerKey: 'frontend.admin.organizations.table.createdAt', type: 'datetime', width: 22 },
 ];

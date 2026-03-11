@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import type { AuthorizationContext } from '@org/types/authorization';
 import type { Prisma } from '@org/prisma/client';
 import {
   AdminOrganizationDetailPrismaQuery,
@@ -16,7 +17,8 @@ export class OrganizationsService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getOrganizations(
-    query: OrganizationQueryDTO
+    query: OrganizationQueryDTO,
+    authzCtx: AuthorizationContext
   ): Promise<PaginatedResponse<AdminOrganizationsPrismaType>> {
     const { page, limit, filters, sort, search } = query;
 
@@ -29,9 +31,15 @@ export class OrganizationsService {
       defaultSort: { field: 'createdAt', order: 'desc' },
     });
 
+    const typedWhere = where as Prisma.OrganizationWhereInput;
+    if (!authzCtx.allStores) {
+      const storeCondition = { storeId: { in: authzCtx.storeIds } };
+      typedWhere.AND = [...(Array.isArray(typedWhere.AND) ? typedWhere.AND : typedWhere.AND ? [typedWhere.AND] : []), storeCondition];
+    }
+
     const [items, total] = await Promise.all([
       this.prisma.organization.findMany({
-        where: where as Prisma.OrganizationWhereInput,
+        where: typedWhere,
         orderBy: orderBy as
           | Prisma.OrganizationOrderByWithRelationInput
           | Prisma.OrganizationOrderByWithRelationInput[],
@@ -40,7 +48,7 @@ export class OrganizationsService {
         include: AdminOrganizationsPrismaQuery,
       }),
       this.prisma.organization.count({
-        where: where as Prisma.OrganizationWhereInput,
+        where: typedWhere,
       }),
     ]);
 
@@ -83,7 +91,8 @@ export class OrganizationsService {
   }
 
   async getOrganizationById(
-    id: string
+    id: string,
+    authzCtx: AuthorizationContext
   ): Promise<AdminOrganizationDetailPrismaType> {
     const organization = await this.prisma.organization.findUnique({
       where: { id },
@@ -92,6 +101,15 @@ export class OrganizationsService {
 
     if (!organization) {
       throw new NotFoundException('backend.errors.organization_not_found');
+    }
+
+    if (
+      !authzCtx.allStores &&
+      !authzCtx.storeIds.includes(organization.storeId)
+    ) {
+      throw new ForbiddenException(
+        'backend.errors.auth.insufficient_permissions'
+      );
     }
 
     return organization;

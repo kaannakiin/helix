@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import type { Locale, Prisma } from '@org/prisma/client';
+import type { AuthorizationContext } from '@org/types/authorization';
 import type { LookupItem } from '@org/schemas/admin/common';
 import {
   adminWarehouseListPrismaQuery,
@@ -17,7 +18,8 @@ export class WarehousesService {
 
   async getWarehouses(
     query: WarehouseQueryDTO,
-    locale: Locale
+    locale: Locale,
+    authzCtx: AuthorizationContext
   ): Promise<PaginatedResponse<AdminWarehouseListPrismaType>> {
     const { page, limit, filters, sort } = query;
 
@@ -29,9 +31,15 @@ export class WarehousesService {
       defaultSort: { field: 'createdAt', order: 'desc' },
     });
 
+    const typedWhere = where as Prisma.WarehouseWhereInput;
+    if (!authzCtx.allStores) {
+      const storeCondition = { storeId: { in: authzCtx.storeIds } };
+      typedWhere.AND = [...(Array.isArray(typedWhere.AND) ? typedWhere.AND : typedWhere.AND ? [typedWhere.AND] : []), storeCondition];
+    }
+
     const [items, total] = await Promise.all([
       this.prisma.warehouse.findMany({
-        where: where as Prisma.WarehouseWhereInput,
+        where: typedWhere,
         orderBy: orderBy as
           | Prisma.WarehouseOrderByWithRelationInput
           | Prisma.WarehouseOrderByWithRelationInput[],
@@ -40,7 +48,7 @@ export class WarehousesService {
         include: adminWarehouseListPrismaQuery(locale),
       }),
       this.prisma.warehouse.count({
-        where: where as Prisma.WarehouseWhereInput,
+        where: typedWhere,
       }),
     ]);
 
@@ -90,12 +98,17 @@ export class WarehousesService {
     limit: number;
     page: number;
     lang: Locale;
+    authzCtx: AuthorizationContext;
   }): Promise<LookupItem[] | PaginatedResponse<LookupItem>> {
-    const { q, ids, limit, page, lang } = opts;
+    const { q, ids, limit, page, lang, authzCtx } = opts;
+
+    const storeFilter: Prisma.WarehouseWhereInput = !authzCtx.allStores
+      ? { storeId: { in: authzCtx.storeIds } }
+      : {};
 
     if (ids?.length) {
       const warehouses = await this.prisma.warehouse.findMany({
-        where: { id: { in: ids } },
+        where: { id: { in: ids }, ...storeFilter },
         include: {
           translations: { where: { locale: lang } },
         },
@@ -112,6 +125,7 @@ export class WarehousesService {
 
     const where: Prisma.WarehouseWhereInput = {
       status: 'ACTIVE',
+      ...storeFilter,
       ...(q
         ? {
             translations: {

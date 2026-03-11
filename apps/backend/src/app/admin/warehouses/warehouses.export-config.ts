@@ -7,5 +7,6 @@ export const WAREHOUSE_EXPORT_COLUMNS: ExportColumnDef[] = [
   { field: 'country.translations[0].name', headerKey: 'frontend.admin.warehouses.table.country', type: 'text', width: 20 },
   { field: 'state.name', headerKey: 'frontend.admin.warehouses.table.state', type: 'text', width: 20 },
   { field: 'city.name', headerKey: 'frontend.admin.warehouses.table.city', type: 'text', width: 20 },
+  { field: 'store.name', headerKey: 'frontend.admin.warehouses.table.store', type: 'text', width: 20 },
   { field: 'createdAt', headerKey: 'frontend.admin.warehouses.table.createdAt', type: 'datetime', width: 22 },
 ];

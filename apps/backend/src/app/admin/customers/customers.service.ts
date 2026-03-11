@@ -1,5 +1,6 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import type { Prisma } from '@org/prisma/client';
+import type { AuthorizationContext } from '@org/types/authorization';
 import {
   AdminCustomerDetailPrismaQuery,
   AdminCustomersPrismaQuery,
@@ -16,7 +17,8 @@ export class CustomersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async getCustomers(
-    query: CustomerQueryDTO
+    query: CustomerQueryDTO,
+    authzCtx: AuthorizationContext
   ): Promise<PaginatedResponse<AdminCustomersPrismaType>> {
     const { page, limit, filters, sort, search } = query;
 
@@ -29,9 +31,15 @@ export class CustomersService {
       defaultSort: { field: 'createdAt', order: 'desc' },
     });
 
+    const typedWhere = where as Prisma.CustomerWhereInput;
+    if (!authzCtx.allStores) {
+      const storeCondition = { storeId: { in: authzCtx.storeIds } };
+      typedWhere.AND = [...(Array.isArray(typedWhere.AND) ? typedWhere.AND : typedWhere.AND ? [typedWhere.AND] : []), storeCondition];
+    }
+
     const [items, total] = await Promise.all([
       this.prisma.customer.findMany({
-        where: where as Prisma.CustomerWhereInput,
+        where: typedWhere,
         orderBy: orderBy as
           | Prisma.CustomerOrderByWithRelationInput
           | Prisma.CustomerOrderByWithRelationInput[],
@@ -39,7 +47,7 @@ export class CustomersService {
         take,
         include: AdminCustomersPrismaQuery,
       }),
-      this.prisma.customer.count({ where: where as Prisma.CustomerWhereInput }),
+      this.prisma.customer.count({ where: typedWhere }),
     ]);
 
     return {
@@ -80,7 +88,10 @@ export class CustomersService {
     }
   }
 
-  async getCustomerById(id: string): Promise<AdminCustomerDetailPrismaType> {
+  async getCustomerById(
+    id: string,
+    authzCtx: AuthorizationContext
+  ): Promise<AdminCustomerDetailPrismaType> {
     const customer = await this.prisma.customer.findUnique({
       where: { id },
       include: AdminCustomerDetailPrismaQuery,
@@ -88,6 +99,12 @@ export class CustomersService {
 
     if (!customer) {
       throw new NotFoundException('backend.errors.auth.customer_not_found');
+    }
+
+    if (!authzCtx.allStores && !authzCtx.storeIds.includes(customer.storeId)) {
+      throw new ForbiddenException(
+        'backend.errors.auth.insufficient_permissions'
+      );
     }
 
     return customer;

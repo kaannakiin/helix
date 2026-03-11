@@ -6,6 +6,7 @@ export const ADMIN_WAREHOUSES_FIELD_CONFIG = {
   status: { filterType: 'enum' },
   createdAt: { filterType: 'date' },
   updatedAt: { filterType: 'date' },
+  storeId: { filterType: 'text' },
 } as const satisfies Record<string, FieldFilterConfig>;
 
 export type AdminWarehousesFilterableField =
@@ -28,6 +29,7 @@ export const adminWarehouseListPrismaQuery = (locale: Locale) =>
     country: { include: { translations: { where: { locale } } } },
     state: true,
     city: true,
+    store: { select: { id: true, name: true } },
   }) satisfies Prisma.WarehouseInclude;
 
 export type AdminWarehouseListPrismaType = Prisma.WarehouseGetPayload<{

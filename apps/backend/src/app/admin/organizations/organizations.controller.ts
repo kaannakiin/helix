@@ -1,4 +1,7 @@
 import { Body, Controller, Get, Param, Post, Query, Res } from '@nestjs/common';
+import { AuthzCtx } from '../../../core/decorators/authz-context.decorator';
+import { RequireCapability } from '../../../core/decorators/require-capability.decorator';
+import { CAPABILITIES, type AuthorizationContext } from '@org/types/authorization';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { Prisma } from '@org/prisma/client';
 import type { FilterCondition, SortCondition } from '@org/types/data-query';
@@ -19,16 +22,22 @@ export class OrganizationsController {
   ) {}
 
   @Post('query')
+  @RequireCapability(CAPABILITIES.ORGANIZATIONS_READ)
   @ApiOperation({ summary: 'Get paginated list of organizations' })
-  async getOrganizations(@Body() query: OrganizationQueryDTO) {
-    return this.organizationsService.getOrganizations(query);
+  async getOrganizations(
+    @Body() query: OrganizationQueryDTO,
+    @AuthzCtx() authzCtx: AuthorizationContext
+  ) {
+    return this.organizationsService.getOrganizations(query, authzCtx);
   }
 
   @Get('export')
+  @RequireCapability(CAPABILITIES.ORGANIZATIONS_READ)
   @ApiOperation({ summary: 'Export organizations as Excel or CSV' })
   async exportOrganizations(
     @Query() query: OrganizationExportQueryDTO,
-    @Res() res: Response
+    @Res() res: Response,
+    @AuthzCtx() authzCtx: AuthorizationContext
   ) {
     const { where, orderBy } = buildPrismaQuery({
       page: 1,
@@ -37,6 +46,12 @@ export class OrganizationsController {
       sort: query.sort as SortCondition[] | undefined,
       defaultSort: { field: 'createdAt', order: 'desc' },
     });
+
+    const typedWhere = where as Prisma.OrganizationWhereInput;
+    if (!authzCtx.allStores) {
+      const storeCondition = { storeId: { in: authzCtx.storeIds } };
+      typedWhere.AND = [...(Array.isArray(typedWhere.AND) ? typedWhere.AND : typedWhere.AND ? [typedWhere.AND] : []), storeCondition];
+    }
 
     const lang = I18nContext.current()?.lang ?? 'en';
     const i18n = I18nContext.current();
@@ -53,7 +68,7 @@ export class OrganizationsController {
         columns,
         createDataIterator: (batchSize) =>
           this.organizationsService.iterateOrganizations({
-            where: where as Prisma.OrganizationWhereInput,
+            where: typedWhere,
             orderBy: orderBy as
               | Prisma.OrganizationOrderByWithRelationInput
               | Prisma.OrganizationOrderByWithRelationInput[],
@@ -88,9 +103,13 @@ export class OrganizationsController {
   }
 
   @Get(':id')
+  @RequireCapability(CAPABILITIES.ORGANIZATIONS_READ)
   @ApiOperation({ summary: 'Get organization by ID' })
   @ApiParam({ name: 'id', description: 'Organization ID' })
-  async getOrganizationById(@Param('id') id: string) {
-    return this.organizationsService.getOrganizationById(id);
+  async getOrganizationById(
+    @Param('id') id: string,
+    @AuthzCtx() authzCtx: AuthorizationContext
+  ) {
+    return this.organizationsService.getOrganizationById(id, authzCtx);
   }
 }
