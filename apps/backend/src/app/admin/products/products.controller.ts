@@ -20,6 +20,9 @@ import type { FilterCondition, SortCondition } from '@org/types/data-query';
 import type { Response } from 'express';
 import { I18nContext } from 'nestjs-i18n';
 import { ContentLocale, Locale } from '../../../core/decorators';
+import { AuthzCtx } from '../../../core/decorators/authz-context.decorator';
+import { RequireCapability } from '../../../core/decorators/require-capability.decorator';
+import { CAPABILITIES, type AuthorizationContext } from '@org/types/authorization';
 import { ContentLocaleInterceptor } from '../../../core/interceptors/content-locale.interceptor.js';
 import { FileValidationPipe } from '../../../core/pipes/file-validation.pipe';
 import { buildPrismaQuery } from '../../../core/utils/prisma-query-builder';
@@ -38,24 +41,29 @@ export class ProductsController {
   ) {}
 
   @Post('query')
+  @RequireCapability(CAPABILITIES.PRODUCTS_READ)
   @ApiOperation({ summary: 'Get paginated list of products' })
   async getProducts(
     @Body() query: ProductQueryDTO,
-    @ContentLocale() locale: LocaleType
+    @ContentLocale() locale: LocaleType,
+    @AuthzCtx() authzCtx: AuthorizationContext
   ) {
-    return this.productsService.getProducts(query, locale);
+    return this.productsService.getProducts(query, locale, authzCtx);
   }
 
   @Post('save')
+  @RequireCapability(CAPABILITIES.PRODUCTS_WRITE)
   @ApiOperation({ summary: 'Create or update a product (upsert by uniqueId)' })
   async saveProduct(
     @Body() body: ProductSaveDTO,
-    @ContentLocale() locale: LocaleType
+    @ContentLocale() locale: LocaleType,
+    @AuthzCtx() authzCtx: AuthorizationContext
   ) {
-    return this.productsService.saveProduct(body, locale);
+    return this.productsService.saveProduct(body, locale, authzCtx);
   }
 
   @Post(':id/images')
+  @RequireCapability(CAPABILITIES.PRODUCTS_WRITE)
   @ApiOperation({ summary: 'Upload images for a product or product variant' })
   @ApiParam({ name: 'id', description: 'Product ID' })
   @ApiConsumes('multipart/form-data')
@@ -64,7 +72,8 @@ export class ProductsController {
     @Param('id') productId: string,
     @UploadedFiles(new FileValidationPipe({ allowedTypes: ['IMAGE', 'VIDEO'] }))
     files: Express.Multer.File[],
-    @Body() body: { ownerType: string; ownerId: string; sortOrders?: string }
+    @Body() body: { ownerType: string; ownerId: string; sortOrders?: string },
+    @AuthzCtx() authzCtx: AuthorizationContext
   ) {
     if (!files || files.length === 0) {
       throw new BadRequestException('backend.errors.no_files_provided');
@@ -90,27 +99,32 @@ export class ProductsController {
       ownerId: body.ownerId,
       files,
       sortOrders,
+      authzCtx,
     });
   }
 
   @Delete(':id/images/:imageId')
+  @RequireCapability(CAPABILITIES.PRODUCTS_WRITE)
   @ApiOperation({ summary: 'Delete a product image' })
   @ApiParam({ name: 'id', description: 'Product ID' })
   @ApiParam({ name: 'imageId', description: 'Image ID' })
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteProductImage(
     @Param('id') productId: string,
-    @Param('imageId') imageId: string
+    @Param('imageId') imageId: string,
+    @AuthzCtx() authzCtx: AuthorizationContext
   ) {
-    return this.productsService.deleteProductImage(productId, imageId);
+    return this.productsService.deleteProductImage(productId, imageId, authzCtx);
   }
 
   @Get('export')
+  @RequireCapability(CAPABILITIES.PRODUCTS_READ)
   @ApiOperation({ summary: 'Export products as Excel or CSV' })
   async exportProducts(
     @Query() query: ProductExportQueryDTO,
     @Locale() locale: string,
-    @Res() res: Response
+    @Res() res: Response,
+    @AuthzCtx() authzCtx: AuthorizationContext
   ) {
     const { where, orderBy } = buildPrismaQuery({
       page: 1,
@@ -119,6 +133,14 @@ export class ProductsController {
       sort: query.sort as SortCondition[] | undefined,
       defaultSort: { field: 'createdAt', order: 'desc' },
     });
+
+    const typedWhere = where as Prisma.ProductWhereInput;
+    if (!authzCtx.allStores) {
+      (typedWhere as Record<string, unknown>)['AND'] = [
+        ...((typedWhere as Record<string, unknown>)['AND'] as unknown[] ?? []),
+        { stores: { some: { storeId: { in: authzCtx.storeIds } } } },
+      ];
+    }
 
     const i18n = I18nContext.current();
 
@@ -135,7 +157,7 @@ export class ProductsController {
         columns,
         createDataIterator: (batchSize) =>
           this.productsService.iterateProducts({
-            where: where as Prisma.ProductWhereInput,
+            where: typedWhere,
             orderBy: orderBy as
               | Prisma.ProductOrderByWithRelationInput
               | Prisma.ProductOrderByWithRelationInput[],
@@ -173,26 +195,36 @@ export class ProductsController {
   }
 
   @Get(':id/stores')
+  @RequireCapability(CAPABILITIES.PRODUCTS_READ)
   @ApiOperation({ summary: 'Get stores for a product' })
   @ApiParam({ name: 'id', description: 'Product ID' })
-  async getProductStores(@Param('id') id: string) {
-    return this.productsService.getProductStores(id);
+  async getProductStores(
+    @Param('id') id: string,
+    @AuthzCtx() authzCtx: AuthorizationContext
+  ) {
+    return this.productsService.getProductStores(id, authzCtx);
   }
 
   @Get(':id')
+  @RequireCapability(CAPABILITIES.PRODUCTS_READ)
   @ApiOperation({ summary: 'Get product by ID' })
   @ApiParam({ name: 'id', description: 'Product ID' })
   async getProductById(
     @Param('id') id: string,
-    @ContentLocale() locale: LocaleType
+    @ContentLocale() locale: LocaleType,
+    @AuthzCtx() authzCtx: AuthorizationContext
   ) {
-    return this.productsService.getProductById(id, locale);
+    return this.productsService.getProductById(id, locale, authzCtx);
   }
 
   @Delete(':id')
+  @RequireCapability(CAPABILITIES.PRODUCTS_DELETE)
   @ApiOperation({ summary: 'Delete a product' })
   @ApiParam({ name: 'id', description: 'Product ID' })
-  async deleteProduct(@Param('id') id: string) {
-    return this.productsService.deleteProduct(id);
+  async deleteProduct(
+    @Param('id') id: string,
+    @AuthzCtx() authzCtx: AuthorizationContext
+  ) {
+    return this.productsService.deleteProduct(id, authzCtx);
   }
 }

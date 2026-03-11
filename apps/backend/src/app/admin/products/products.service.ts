@@ -1,10 +1,12 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import type { Locale, Prisma } from '@org/prisma/client';
+import type { AuthorizationContext } from '@org/types/authorization';
 import {
   adminProductDetailPrismaQuery,
   adminProductListPrismaQuery,
@@ -39,7 +41,8 @@ export class ProductsService {
 
   async getProducts(
     query: ProductQueryDTO,
-    locale: Locale
+    locale: Locale,
+    authzCtx: AuthorizationContext
   ): Promise<PaginatedResponse<AdminProductListPrismaType>> {
     const { page, limit, filters, sort, search } = query;
 
@@ -78,6 +81,13 @@ export class ProductsService {
       if (ids.length > 0) {
         resolvedWhere['stores'] = { some: { storeId: { in: ids } } };
       }
+    }
+
+    if (!authzCtx.allStores) {
+      resolvedWhere['AND'] = [
+        ...(resolvedWhere['AND'] as unknown[] ?? []),
+        { stores: { some: { storeId: { in: authzCtx.storeIds } } } },
+      ];
     }
 
     const where = resolvedWhere as Prisma.ProductWhereInput;
@@ -137,7 +147,8 @@ export class ProductsService {
 
   async getProductById(
     id: string,
-    locale: Locale
+    locale: Locale,
+    authzCtx: AuthorizationContext
   ): Promise<AdminProductDetailPrismaType> {
     const product = await this.prisma.product.findUnique({
       where: { id },
@@ -148,10 +159,30 @@ export class ProductsService {
       throw new NotFoundException('backend.errors.product_not_found');
     }
 
+    if (!authzCtx.allStores) {
+      const hasAccess = product.stores.some((s) =>
+        authzCtx.storeIds.includes(s.storeId)
+      );
+      if (!hasAccess) {
+        throw new ForbiddenException(
+          'backend.errors.auth.insufficient_permissions'
+        );
+      }
+    }
+
     return product;
   }
 
-  async getProductStores(productId: string) {
+  async getProductStores(productId: string, authzCtx: AuthorizationContext) {
+    const product = await this.prisma.product.findUnique({
+      where: { id: productId },
+      select: { id: true },
+    });
+    if (!product) {
+      throw new NotFoundException('backend.errors.product_not_found');
+    }
+    await this.assertProductStoreAccess(productId, authzCtx);
+
     const rows = await this.prisma.productStore.findMany({
       where: { productId },
       include: { store: true },
@@ -165,9 +196,29 @@ export class ProductsService {
     }));
   }
 
+  private async assertProductStoreAccess(
+    productId: string,
+    authzCtx: AuthorizationContext
+  ): Promise<void> {
+    if (authzCtx.allStores) return;
+    const stores = await this.prisma.productStore.findMany({
+      where: { productId },
+      select: { storeId: true },
+    });
+    const hasAccess = stores.some((s) =>
+      authzCtx.storeIds.includes(s.storeId)
+    );
+    if (!hasAccess) {
+      throw new ForbiddenException(
+        'backend.errors.auth.insufficient_permissions'
+      );
+    }
+  }
+
   async saveProduct(
     data: ProductSaveDTO,
-    locale: Locale
+    locale: Locale,
+    authzCtx: AuthorizationContext
   ): Promise<AdminProductDetailPrismaType> {
     const {
       uniqueId,
@@ -184,6 +235,16 @@ export class ProductsService {
       activeStores,
       variantPricing,
     } = data;
+
+    if (!authzCtx.allStores) {
+      for (const sid of activeStores) {
+        if (!authzCtx.storeIds.includes(sid)) {
+          throw new ForbiddenException(
+            'backend.errors.auth.no_store_access'
+          );
+        }
+      }
+    }
 
     const cleanBrandId = brandId && brandId !== '' ? brandId : null;
 
@@ -232,8 +293,13 @@ export class ProductsService {
         variants: { include: { images: true } },
         categories: true,
         tags: true,
+        stores: { select: { storeId: true } },
       },
     });
+
+    if (currentProduct) {
+      await this.assertProductStoreAccess(uniqueId, authzCtx);
+    }
 
     if (
       !hasVariants &&
@@ -523,6 +589,21 @@ export class ProductsService {
       await tx.productCategory.deleteMany({
         where: { productId: uniqueId },
       });
+      if (!authzCtx.allStores && categories.length > 0) {
+        const categoryIds = categories.map((c) => c.categoryId);
+        const accessibleCategories = await tx.categoryStore.findMany({
+          where: {
+            categoryId: { in: categoryIds },
+            storeId: { in: authzCtx.storeIds },
+          },
+          select: { categoryId: true },
+        });
+        const accessibleSet = new Set(accessibleCategories.map((c) => c.categoryId));
+        const forbidden = categoryIds.filter((id) => !accessibleSet.has(id));
+        if (forbidden.length > 0) {
+          throw new ForbiddenException('backend.errors.auth.insufficient_permissions');
+        }
+      }
       if (categories.length > 0) {
         await tx.productCategory.createMany({
           data: categories.map((cat) => ({
@@ -654,7 +735,7 @@ export class ProductsService {
     return product;
   }
 
-  async deleteProduct(id: string): Promise<void> {
+  async deleteProduct(id: string, authzCtx: AuthorizationContext): Promise<void> {
     const product = await this.prisma.product.findUnique({
       where: { id },
       include: {
@@ -666,6 +747,8 @@ export class ProductsService {
     if (!product) {
       throw new NotFoundException('backend.errors.product_not_found');
     }
+
+    await this.assertProductStoreAccess(id, authzCtx);
 
     await this.uploadService.deleteImagesByOwner('product', id);
 
@@ -688,7 +771,9 @@ export class ProductsService {
     await this.prisma.product.delete({ where: { id } });
   }
 
-  async deleteProductImage(productId: string, imageId: string): Promise<void> {
+  async deleteProductImage(productId: string, imageId: string, authzCtx: AuthorizationContext): Promise<void> {
+    await this.assertProductStoreAccess(productId, authzCtx);
+
     const image = await this.prisma.image.findUnique({
       where: { id: imageId },
       select: {
@@ -758,8 +843,9 @@ export class ProductsService {
     ownerId: string;
     files: Express.Multer.File[];
     sortOrders: number[];
+    authzCtx: AuthorizationContext;
   }) {
-    const { productId, ownerType, ownerId, files, sortOrders } = opts;
+    const { productId, ownerType, ownerId, files, sortOrders, authzCtx } = opts;
 
     const product = await this.prisma.product.findUnique({
       where: { id: productId },
@@ -768,6 +854,8 @@ export class ProductsService {
     if (!product) {
       throw new NotFoundException('backend.errors.product_not_found');
     }
+
+    await this.assertProductStoreAccess(productId, authzCtx);
 
     if (ownerType === 'productVariant') {
       const variant = await this.prisma.productVariant.findFirst({
