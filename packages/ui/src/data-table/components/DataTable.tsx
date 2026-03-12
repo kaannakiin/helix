@@ -1,6 +1,7 @@
 'use client';
 
 import { Badge, Button, Group, Tooltip } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
 import { DEFAULT_PAGE_SIZE } from '@org/constants';
 import type {
   CellContextMenuEvent,
@@ -22,6 +23,7 @@ import {
   type DataTableTranslations,
 } from '../context/DataTableTranslationContext';
 import DataTableProvider from '../data-table-provider';
+import { useColumnVisibility } from '../hooks/useColumnVisibility';
 import { useContextMenu } from '../hooks/useContextMenu';
 import { dataTableTheme } from '../theme';
 import type { ContextMenuConfig } from '../types/contextMenu.types';
@@ -30,10 +32,11 @@ import { ContextMenu } from './ContextMenu';
 import { DataTableFooter } from './DataTableFooter';
 import { FilterDrawer } from './FilterDrawer';
 import { createLoadingCellRenderer } from './LoadingCellRenderer';
+import { MobileMenuCellRenderer } from './MobileMenuCellRenderer';
 import { NoRowsOverlay } from './NoRowsOverlay';
-import { useColumnVisibility } from '../hooks/useColumnVisibility';
 
 const EMPTY_GRID_OPTIONS = {} as const;
+const MOBILE_MENU_COL_ID = '__mobile_menu__';
 
 export interface DataTableProps<TData> {
   tableId?: string;
@@ -48,6 +51,7 @@ export interface DataTableProps<TData> {
   contextMenu?: ContextMenuConfig<TData>;
   showFilterDrawer?: boolean;
   pageSize?: number;
+  contextMenuColumnPosition?: 'left' | 'right';
 }
 
 export function DataTable<TData>({
@@ -63,7 +67,9 @@ export function DataTable<TData>({
   contextMenu,
   showFilterDrawer = false,
   pageSize = DEFAULT_PAGE_SIZE,
+  contextMenuColumnPosition = 'right',
 }: DataTableProps<TData>) {
+  const isMobile = useMediaQuery('(pointer: coarse)') ?? false;
   const contextMenuEnabled = contextMenu?.enabled !== false && contextMenu;
 
   const {
@@ -73,6 +79,7 @@ export function DataTable<TData>({
     close: closeMenu,
   } = useContextMenu<TData>({ enabled: !!contextMenuEnabled });
   const [selectedRows, setSelectedRows] = useState<TData[]>([]);
+  const selectedRowsRef = useRef<TData[]>([]);
   const [totalRows, setTotalRows] = useState<number | null>(null);
   const [filterDrawerOpen, setFilterDrawerOpen] = useState(false);
   const [filterModel, setFilterModel] = useState<Record<string, unknown>>({});
@@ -87,6 +94,47 @@ export function DataTable<TData>({
         cellRenderer: createLoadingCellRenderer(col.cellRenderer),
       })),
     [columns]
+  );
+
+  const mobileMenuColumn = useMemo<ColDef<TData> | null>(() => {
+    if (!isMobile || !contextMenuEnabled) return null;
+    return {
+      colId: MOBILE_MENU_COL_ID,
+      headerName: '',
+      sortable: false,
+      filter: false,
+      resizable: false,
+      suppressMovable: true,
+      flex: 0,
+      width: 56,
+      pinned: contextMenuColumnPosition,
+      cellRenderer: MobileMenuCellRenderer,
+      cellRendererParams: {
+        config: contextMenu,
+        selectedRowsRef,
+        translations: translations?.contextMenu,
+      },
+      cellStyle: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+    };
+  }, [
+    isMobile,
+    contextMenuEnabled,
+    contextMenu,
+    contextMenuColumnPosition,
+    selectedRowsRef,
+    translations,
+  ]);
+
+  const columnsWithLoadingAndMenu = useMemo(
+    () =>
+      mobileMenuColumn
+        ? [...columnsWithLoading, mobileMenuColumn]
+        : columnsWithLoading,
+    [columnsWithLoading, mobileMenuColumn]
   );
 
   const { hiddenFields, toggleColumn, showAll, hideableColumns, isMounted } =
@@ -108,6 +156,7 @@ export function DataTable<TData>({
     (event: { api: { getSelectedRows: () => TData[] } }) => {
       const rows = event.api.getSelectedRows();
       setSelectedRows(rows);
+      selectedRowsRef.current = rows;
       onSelectionChanged?.(rows);
     },
     [onSelectionChanged]
@@ -182,11 +231,12 @@ export function DataTable<TData>({
         filter: false,
         resizable: true,
         flex: 1,
-        minWidth: 100,
+        minWidth: 50,
         floatingFilter: false,
         suppressMovable: true,
         ...(showFilterDrawer ? { suppressHeaderFilterButton: true } : {}),
       },
+      ...(isMobile ? { rowHeight: 38, headerHeight: 38 } : {}),
       alwaysMultiSort: true,
       pagination: false,
       animateRows: true,
@@ -198,7 +248,10 @@ export function DataTable<TData>({
       maxBlocksInCache: 10,
       reactiveCustomComponents: true,
       overlayComponentSelector: (params) => {
-        if (params.overlayType === 'noRows' || params.overlayType === 'noMatchingRows') {
+        if (
+          params.overlayType === 'noRows' ||
+          params.overlayType === 'noMatchingRows'
+        ) {
           return {
             component: NoRowsOverlay,
             params: {
@@ -214,10 +267,12 @@ export function DataTable<TData>({
       cellSelection: false,
       suppressDragLeaveHidesColumns: true,
       suppressContextMenu: true,
-      onCellContextMenu: contextMenuEnabled
-        ? (event: CellContextMenuEvent<TData>) => handleCellContextMenu(event)
-        : undefined,
-      onBodyScroll: contextMenuEnabled ? () => closeMenu() : undefined,
+      onCellContextMenu:
+        contextMenuEnabled && !isMobile
+          ? (event: CellContextMenuEvent<TData>) => handleCellContextMenu(event)
+          : undefined,
+      onBodyScroll:
+        contextMenuEnabled && !isMobile ? () => closeMenu() : undefined,
       onRowClicked: onRowClicked
         ? (event) => {
             if (event.data) {
@@ -246,6 +301,7 @@ export function DataTable<TData>({
     closeMenu,
     showFilterDrawer,
     pageSize,
+    isMobile,
   ]);
 
   return (
@@ -263,7 +319,7 @@ export function DataTable<TData>({
         >
           <div style={{ flex: 1, minHeight: 0, width: '100%', height: '100%' }}>
             <AgGridReact<TData>
-              columnDefs={columnsWithLoading}
+              columnDefs={columnsWithLoadingAndMenu}
               datasource={datasource}
               gridOptions={finalGridOptions}
             />
@@ -325,7 +381,7 @@ export function DataTable<TData>({
               </Tooltip>
             </Group>
           </Group>
-          {contextMenuEnabled && (
+          {contextMenuEnabled && !isMobile && (
             <ContextMenu<TData>
               state={menuState}
               config={contextMenu}

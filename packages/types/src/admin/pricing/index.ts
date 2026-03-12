@@ -17,6 +17,7 @@ export const ADMIN_PRICE_LISTS_FIELD_CONFIG = {
   isExchangeRateDerived: { filterType: 'boolean' },
   sourceCurrencyCode: { filterType: 'enum', values: ['TRY', 'USD', 'EUR', 'GBP'] },
   roundingRule: { filterType: 'text' },
+  storeId: { filterType: 'enum' },
 } as const satisfies Record<string, FieldFilterConfig>;
 
 export type AdminPriceListsFilterableField =

@@ -17,7 +17,7 @@ export const ADMIN_CUSTOMERS_FIELD_CONFIG = {
   createdAt: { filterType: 'date' },
   lastLoginAt: { filterType: 'date' },
   loginCount: { filterType: 'number' },
-  storeId: { filterType: 'text' },
+  storeId: { filterType: 'enum' },
 } as const satisfies Record<string, FieldFilterConfig>;
 
 export type AdminCustomersFilterableField =

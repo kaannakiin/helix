@@ -44,7 +44,6 @@ import LoadingOverlay from '@org/ui/common/loading-overlay';
 import { DecisionTreeDrawer } from '@org/ui/decision-tree';
 import { CronInput } from '@org/ui/inputs/cron-input';
 import { RelationDrawer } from '@org/ui/inputs/relation-drawer';
-import { createId } from '@paralleldrive/cuid2';
 import {
   Activity,
   GitBranch,
@@ -85,11 +84,14 @@ const AdminCustomerGroupPage = () => {
 
   const formattedData = useMemo<CustomerGroupInput>(() => {
     if (!data || isNew) {
-      return { ...NEW_CUSTOMER_GROUP_DEFAULT_VALUES, id: createId() };
+      return {
+        ...NEW_CUSTOMER_GROUP_DEFAULT_VALUES,
+      };
     }
 
     return {
       id: data.id,
+      storeId: data.storeId,
       name: data.name,
       description: data.description ?? '',
       color: data.color ?? '',

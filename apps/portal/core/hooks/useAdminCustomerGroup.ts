@@ -1,5 +1,6 @@
 import { DATA_ACCESS_KEYS } from '@org/constants/data-keys';
 import type { CustomerGroupOutput } from '@org/schemas/admin/customer-groups';
+import type { AdminCustomerGroupDetailPrismaType } from '@org/types/admin/customer-groups';
 import type { AdminCustomersPrismaType } from '@org/types/admin/customers';
 import type { PaginatedResponse } from '@org/types/pagination';
 import type { MemberFetchOptions } from '@org/ui/inputs/member-selector';
@@ -8,27 +9,6 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { apiClient } from '../lib/api/api-client';
 
-interface CustomerGroupDetailResponse {
-  id: string;
-  name: string;
-  description: string | null;
-  color: string | null;
-  type: 'RULE_BASED' | 'MANUAL';
-  isActive: boolean;
-  ruleTreeId: string | null;
-  ruleTree: {
-    id: string;
-    name: string;
-    description: string | null;
-    targetEntity: string;
-    conditions: unknown;
-    isActive: boolean;
-  } | null;
-  cronExpression: string | null;
-  _count: { members: number };
-  createdAt: string;
-  updatedAt: string;
-}
 
 export const useCustomersFetchOptions = (): MemberFetchOptions => {
   return useCallback(async ({ q, page = 1 }: { q?: string; page?: number }) => {
@@ -92,7 +72,7 @@ export const useAdminCustomerGroup = (id: string) => {
     queryKey: DATA_ACCESS_KEYS.admin.customerGroups.detail(id),
     enabled: !!id && id !== 'new',
     queryFn: async () => {
-      const res = await apiClient.get<CustomerGroupDetailResponse>(
+      const res = await apiClient.get<AdminCustomerGroupDetailPrismaType>(
         `/admin/customer-groups/${id}`
       );
       return res.data;
@@ -103,7 +83,7 @@ export const useAdminCustomerGroup = (id: string) => {
 export const useSaveCustomerGroup = () => {
   return useMutation({
     mutationFn: async (data: CustomerGroupOutput) => {
-      const res = await apiClient.post<CustomerGroupDetailResponse>(
+      const res = await apiClient.post<AdminCustomerGroupDetailPrismaType>(
         '/admin/customer-groups/save',
         data
       );

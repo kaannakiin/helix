@@ -9,7 +9,7 @@ export const ADMIN_CUSTOMER_GROUPS_FIELD_CONFIG = {
   createdAt: { filterType: 'date' },
   updatedAt: { filterType: 'date' },
   '_count.members': { filterType: 'number' },
-  storeId: { filterType: 'text' },
+  storeId: { filterType: 'enum' },
 } as const satisfies Record<string, FieldFilterConfig>;
 
 export type AdminCustomerGroupsFilterableField =

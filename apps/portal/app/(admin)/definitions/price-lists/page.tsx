@@ -2,11 +2,12 @@
 
 import { apiClient } from '@/core/lib/api/api-client';
 import { downloadExport } from '@/core/lib/api/download';
-import { Button, Group, Stack, Text, Title } from '@mantine/core';
+import { Button, Group, MultiSelect, Stack, Text, Title } from '@mantine/core';
 import type { AdminPriceListListPrismaType } from '@org/types/admin/pricing';
 import type { ExportFormat } from '@org/types/export';
 import type { PaginatedResponse } from '@org/types/pagination';
 import {
+  AsyncMultiSelectFilter,
   DataTable,
   serializeGridQuery,
   useColumnFactory,
@@ -14,11 +15,12 @@ import {
   type DataTableFilterTranslations,
   type DataTableTranslations,
 } from '@org/ui';
-import type { IDatasource, IGetRowsParams } from 'ag-grid-community';
+import type { AgGridEvent, IDatasource, IGetRowsParams } from 'ag-grid-community';
 import { DollarSign, Plus } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 export default function PriceListsPage() {
   const t = useTranslations('frontend.admin.priceLists');
@@ -237,6 +239,27 @@ export default function PriceListsPage() {
         type: 'number',
         minWidth: 110,
       }),
+      createColumn<AdminPriceListListPrismaType>(
+        'storeId' as keyof AdminPriceListListPrismaType & string,
+        {
+          headerKey: 'store',
+          type: 'badge',
+          hide: true,
+          filter: {
+            component: AsyncMultiSelectFilter,
+            params: {
+              fetchOptions: () =>
+                apiClient
+                  .get<Array<{ id: string; name: string }>>('/admin/stores')
+                  .then((r) =>
+                    r.data.map((s) => ({ value: s.id, label: s.name }))
+                  ),
+              placeholder: t('filterDrawer.storePlaceholder'),
+            },
+            doesFilterPass: () => true,
+          },
+        }
+      ),
       createColumn<AdminPriceListListPrismaType>('createdAt', {
         headerKey: 'createdAt',
         type: 'date',
@@ -261,8 +284,10 @@ export default function PriceListsPage() {
   const copyFormatters = useMemo<Record<string, (value: unknown) => string>>(
     () => ({
       isActive: (v) => (v ? tExport('boolean_yes') : tExport('boolean_no')),
-      isExchangeRateDerived: (v) => (v ? tExport('boolean_yes') : tExport('boolean_no')),
-      isSourceLocked: (v) => (v ? tExport('boolean_yes') : tExport('boolean_no')),
+      isExchangeRateDerived: (v) =>
+        v ? tExport('boolean_yes') : tExport('boolean_no'),
+      isSourceLocked: (v) =>
+        v ? tExport('boolean_yes') : tExport('boolean_no'),
       createdAt: (v) => (v ? new Date(v as string).toLocaleString() : '—'),
       validFrom: (v) => (v ? new Date(v as string).toLocaleString() : '—'),
       validTo: (v) => (v ? new Date(v as string).toLocaleString() : '—'),
@@ -271,6 +296,33 @@ export default function PriceListsPage() {
   );
 
   const lastQueryRef = useRef<{ filters?: string; sort?: string }>({});
+  const gridRef = useRef<{ api?: AgGridEvent['api'] }>({});
+  const [selectedStores, setSelectedStores] = useState<string[]>([]);
+
+  const { data: storeOptions } = useQuery({
+    queryKey: ['admin', 'stores', 'options'],
+    queryFn: () =>
+      apiClient
+        .get<Array<{ id: string; name: string }>>('/admin/stores')
+        .then((r) => r.data.map((s) => ({ value: s.id, label: s.name }))),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const handleStoreFilter = useCallback((values: string[]) => {
+    setSelectedStores(values);
+    const api = gridRef.current.api;
+    if (!api) return;
+    const current = api.getFilterModel() ?? {};
+    if (values.length === 0) {
+      const { storeId: _, ...rest } = current;
+      api.setFilterModel(rest);
+    } else {
+      api.setFilterModel({
+        ...current,
+        storeId: { filterType: 'custom', values },
+      });
+    }
+  }, []);
 
   const datasource = useMemo<IDatasource>(
     () => ({
@@ -343,6 +395,15 @@ export default function PriceListsPage() {
             {t('subtitle')}
           </Text>
         </div>
+        <MultiSelect
+          data={storeOptions ?? []}
+          value={selectedStores}
+          onChange={handleStoreFilter}
+          placeholder={t('filterDrawer.storePlaceholder')}
+          clearable
+          searchable
+          style={{ width: 240 }}
+        />
         <Button
           leftSection={<Plus size={16} />}
           onClick={() => router.push('/definitions/price-lists/new')}
@@ -363,6 +424,9 @@ export default function PriceListsPage() {
           rowSelection: {
             enableClickSelection: false,
             mode: 'multiRow',
+          },
+          onGridReady: (event) => {
+            gridRef.current.api = event.api;
           },
         }}
         showFilterDrawer

@@ -2,7 +2,7 @@
 
 import { apiClient } from '@/core/lib/api/api-client';
 import { downloadExport } from '@/core/lib/api/download';
-import { Group, Stack, Text, Title } from '@mantine/core';
+import { Group, MultiSelect, Stack, Text, Title } from '@mantine/core';
 import {
   AccountStatusConfigs,
   AccountTypeConfigs,
@@ -23,11 +23,12 @@ import {
   type DataTableFilterTranslations,
   type DataTableTranslations,
 } from '@org/ui';
-import type { ColDef, IDatasource, IGetRowsParams } from 'ag-grid-community';
+import type { AgGridEvent, ColDef, IDatasource, IGetRowsParams } from 'ag-grid-community';
 import { Users } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 export default function CustomersPage() {
   const t = useTranslations('frontend.admin.customers');
@@ -216,7 +217,9 @@ export default function CustomersPage() {
               fetchOptions: () =>
                 apiClient
                   .get<Array<{ id: string; name: string }>>('/admin/stores')
-                  .then((r) => r.data.map((s) => ({ value: s.id, label: s.name }))),
+                  .then((r) =>
+                    r.data.map((s) => ({ value: s.id, label: s.name }))
+                  ),
               placeholder: t('filterDrawer.storePlaceholder'),
             },
             doesFilterPass: () => true,
@@ -258,6 +261,33 @@ export default function CustomersPage() {
   );
 
   const lastQueryRef = useRef<{ filters?: string; sort?: string }>({});
+  const gridRef = useRef<{ api?: AgGridEvent['api'] }>({});
+  const [selectedStores, setSelectedStores] = useState<string[]>([]);
+
+  const { data: storeOptions } = useQuery({
+    queryKey: ['admin', 'stores', 'options'],
+    queryFn: () =>
+      apiClient
+        .get<Array<{ id: string; name: string }>>('/admin/stores')
+        .then((r) => r.data.map((s) => ({ value: s.id, label: s.name }))),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const handleStoreFilter = useCallback((values: string[]) => {
+    setSelectedStores(values);
+    const api = gridRef.current.api;
+    if (!api) return;
+    const current = api.getFilterModel() ?? {};
+    if (values.length === 0) {
+      const { storeId: _, ...rest } = current;
+      api.setFilterModel(rest);
+    } else {
+      api.setFilterModel({
+        ...current,
+        storeId: { filterType: 'custom', values },
+      });
+    }
+  }, []);
 
   const { search, setSearch, searchParam } =
     useTableSearch<AdminCustomersPrismaType>({
@@ -343,6 +373,15 @@ export default function CustomersPage() {
             placeholder={t('searchPlaceholder')}
             style={{ width: 280 }}
           />
+          <MultiSelect
+            data={storeOptions ?? []}
+            value={selectedStores}
+            onChange={handleStoreFilter}
+            placeholder={t('filterDrawer.storePlaceholder')}
+            clearable
+            searchable
+            style={{ width: 240 }}
+          />
         </Group>
       </Group>
       <DataTable<AdminCustomersPrismaType>
@@ -357,6 +396,9 @@ export default function CustomersPage() {
           rowSelection: {
             mode: 'multiRow',
             enableClickSelection: true,
+          },
+          onGridReady: (event) => {
+            gridRef.current.api = event.api;
           },
         }}
         showFilterDrawer
